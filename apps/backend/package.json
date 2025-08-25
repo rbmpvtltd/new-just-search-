@@ -1,0 +1,28 @@
+{
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/bun": "latest",
+    "trpc-ui": "^1.0.15"
+  },
+  "scripts": {
+    "dev": "bun src/index --watch"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@trpc/server": "^11.5.0",
+    "@types/express": "^5.0.3",
+    "express": "^5.1.0",
+    "zod": "^4.0.17"
+  },
+  "exports": {
+    "./router": {
+      "import": "./src/route.ts",
+      "types": "./src/route.ts"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+# Node
+node_modules
+bun.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+
+# Turbo cache
+/.turbo
+.turbo
+
+# Output
+dist
+build
+.next
+out
+expo
+.expo
+.expo-shared
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+*.log.*
+*.out
+*.out.*
+*.err
+*.err.*
+
+# IDE
+.vscode
+.idea
+.DS_Store
+*.swp
+*.swo
+
+# Coverage / Tests
+coverage
+*.lcov
+.jest
+
+# OS
+Thumbs.db
