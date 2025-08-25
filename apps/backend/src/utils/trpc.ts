@@ -19,7 +19,7 @@ export const adminProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
 
   if (!ctx.user?.isAdmin) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    throw new TRPCError({ code: "FORBIDDEN" });
   }
   return opts.next({
     ctx: {

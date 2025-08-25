@@ -1,5 +1,6 @@
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import express from "express";
+import { renderTrpcPanel } from "trpc-ui";
 import { appRouter } from "./route";
 import { createContext } from "./utils/trpc";
 
@@ -17,7 +18,7 @@ app.get("/panel", (_, res) => {
     return res.status(404).send("Not Found");
   }
 
-  const {renderTrpcPanel} = await import "trpc-ui"
+  // const {renderTrpcPanel} = await import "trpc-ui"
 
   return res.send(
     renderTrpcPanel(appRouter, {

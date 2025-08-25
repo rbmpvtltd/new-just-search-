@@ -48,3 +48,4 @@ coverage
 
 # OS
 Thumbs.db
+packages/db/drizzle
