@@ -8,6 +8,12 @@ const getUserById = (email: string) => {
   };
 };
 
+interface Session {
+  id : string,
+  secretHash : Uint8Array,
+  createdAt : Date  
+}
+
 const checkUserPassword = (email: string, password: string) => {
   const user = getUserById(email);
   if (!user) {
