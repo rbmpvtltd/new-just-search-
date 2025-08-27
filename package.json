@@ -23,6 +23,10 @@
 		"packages/*"
 	],
 	"dependencies": {
-		"drizzle-kit": "^0.31.4"
+		"connect-redis": "^9.0.0",
+		"drizzle-kit": "^0.31.4",
+		"express-session": "^1.18.2",
+		"lucia": "^3.2.2",
+		"redis": "^5.8.2"
 	}
 }
