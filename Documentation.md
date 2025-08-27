@@ -11,8 +11,8 @@
 - **Functions**: `camelCase` → `getUserData()`, `handleLogin()`
 - **React/Next Components**: `PascalCase` → `UserCard`, `LoginForm`
 - **Constants**: `UPPER_CASE_WITH_UNDERSCORE` → `API_URL`, `MAX_LIMIT`
-- **File names**: `kebab-case` → `auth-service.ts`, `user-card.tsx`
-- **Type aliases & interfaces**: `PascalCase` → `User`, `OrderItem`, `ApiResponse<T>`
+- **File names**: `kebab-case` + `.types` → `auth.service.ts`, `user-card.components.tsx`
+- **Type aliases & interfaces**: `PascalCase` → `User`, `OrderItem`, `ApiResponse<T>` , `Avoid Prefix I`
 - **Enums**: `PascalCase` (members UPPER_CASE) → `HttpStatus.OK`
 
 ### 1.1 Advanced Naming Rules
@@ -22,26 +22,18 @@
   - `getUsers(): User[]`, `fetchOrders(): Order[]`
 - **Converters / Transformers** use `toX` / `fromX`:
   - `toJson(user)`, `fromJson(str)`, `toCamelCase(s)`
-- **Functions returning JSON/object** should indicate the shape:
-  - `getUserJson()`, `buildConfigObject()`,
 - **Primitive returns** should read naturally:
   - `getUserName(): string`, `getRetryCount(): number`
-- **Async functions** must end with `Async`:
-  - `fetchUserAsync()`, `saveOrderAsync()`
 
 ---
 
 ## 📂 2) Monorepo Structure (Turborepo + bun)
 ```
 repo-root/
-├─ apps/               # deployable apps (web, mobile, admin)
-├─ packages/           # shared libraries (ui, utils, config, api, eslint-config)
-├─ turbo.json          # Turborepo pipeline & caching
-├─ bun-workspace.yaml # workspace configuration
-└─ tsconfig.base.json  # shared TS config & path aliases
+├─ apps/               # deployable apps (web, mobile, backend)
+├─ packages/           # shared libraries ( utils, config, schema , types )
 ```
 **Placement rules**
-- UI primitives/components → `packages/ui`
 - Cross-project helpers → `packages/utils`
 - API client / SDK / services → `packages/api`
 - Shared config/constants/env schema → `packages/config`
@@ -52,7 +44,6 @@ repo-root/
 ## 🧭 3) TypeScript & Imports
 - Use **path aliases** from `tsconfig.base.json` (e.g. `@ui/*`, `@utils/*`). Avoid `../../../`.
 - Prefer **named exports** over default exports in packages.
-- Enable `strict`, `noImplicitAny`, `noUncheckedIndexedAccess` in TS.
 - Public APIs of each package are re-exported via a single `index.ts` barrel.
 
 ---
@@ -112,7 +103,7 @@ repo-root/
 ---
 
 ## ♻️ 12) Clean Code
-- Prefer **early returns** over deeply nested `if` ladders (max nesting: 3).
+- Prefer **early returns** over deeply nested `if` ladders (max nesting: 2).
 - No dead code, commented-out blocks, or unused exports.
 - Clear function boundaries; single responsibility per file (~300 LOC guideline).
 
