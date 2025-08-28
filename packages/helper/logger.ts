@@ -1,7 +1,7 @@
-import winston from "winston";
+import { error, time } from "console";
 import fs from "fs";
 import path from "path";
-import { error, time } from "console";
+import winston from "winston";
 
 const logDir = path.resolve(process.cwd(), "logs");
 if (!fs.existsSync(logDir)) {
@@ -43,11 +43,11 @@ const logger = winston.createLogger({
   ],
 });
 
-// export const log = {
-//   error: (msg: string) => logger.error(msg),
-//   warn: (msg: string) => logger.warn(msg),
-//   info: (msg: string) => logger.info(msg),
-//   debug: (msg: string) => logger.info(msg),
-// };
+export const log = {
+  error: (msg: string) => logger.error(msg),
+  warn: (msg: string) => logger.warn(msg),
+  info: (msg: string) => logger.info(msg),
+  debug: (msg: string) => logger.info(msg),
+};
 
 export { logger };

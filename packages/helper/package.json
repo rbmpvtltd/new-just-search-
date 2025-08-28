@@ -15,9 +15,9 @@
     "winston": "^3.17.0"
   },
   "exports": {
-    ".": {
-      "import": "./index.ts",
-      "types": "./index.ts"
+    "./logger": {
+      "import": "./logger.ts",
+      "types": "./logger.ts"
     }
   }
 }
