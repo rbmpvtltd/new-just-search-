@@ -12,7 +12,7 @@ export default defineConfig({
     user: process.env.PGUSER ?? "myuser",
     password: process.env.PGPASSWORD ?? "mypassword",
     database: process.env.PGDATABASE ?? "mydb",
-    port: Number(process.env.PGPORT) ?? 5432,
+    port: Number(process.env.PGPORT || 5432),
 
     ssl: false,
   },

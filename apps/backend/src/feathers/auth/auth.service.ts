@@ -8,6 +8,7 @@ const getUserById = (email: string) => {
   };
 };
 
+
 interface Session {
   id : string,
   secretHash : Uint8Array,
