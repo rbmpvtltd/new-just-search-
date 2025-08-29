@@ -23,7 +23,6 @@ export const authRouter = router({
       return session?.token;
     }),
   logout: protectedProcedure.query(async ({ ctx }) => {
-    return true;
     const userId = ctx.userId;
     return userId;
   }),

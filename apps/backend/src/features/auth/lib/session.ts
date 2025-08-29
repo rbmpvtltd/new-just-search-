@@ -80,13 +80,14 @@ async function validateSessionToken(token: string): Promise<Session | null> {
   const sessionSecret = tokenParts[1] as string;
 
   const session = await getSession(sessionId);
+
   if (!session) {
     return null;
   }
 
   const tokenSecretHash = await hashSecret(sessionSecret);
-  const validSecret = constantTimeEqual(tokenSecretHash, session.secretHash);
-  if (!validSecret) {
+
+  if (!validSecret(tokenSecretHash, session.secretHash)) {
     return null;
   }
 
@@ -98,8 +99,17 @@ async function getSession(sessionId: string): Promise<Session | null> {
   if (!data) {
     return null; // not found or expired
   }
+  const jsonParseData = JSON.parse(data);
 
-  return JSON.parse(data) as Session;
+  const base64 = jsonParseData.secretHash; // "hello world"
+  const uint8 = Uint8Array.from(Buffer.from(base64, "base64"));
+
+  return {
+    id: jsonParseData.id,
+    userId: jsonParseData.userId,
+    secretHash: uint8,
+    createdAt: jsonParseData.createdAt,
+  };
 }
 
 async function deleteSession(sessionId: string): Promise<void> {
@@ -112,15 +122,8 @@ async function hashSecret(secret: string): Promise<Uint8Array> {
   return new Uint8Array(secretHashBuffer);
 }
 
-function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.byteLength !== b.byteLength) {
-    return false;
-  }
-  let c = 0;
-  for (let i = 0; i < a.byteLength; i++) {
-    c |= a[i] ^ b[i];
-  }
-  return c === 0;
+function validSecret(a: Uint8Array, b: Uint8Array): boolean {
+  return crypto.timingSafeEqual(a, b);
 }
 
 export { createSession, getSession, deleteSession, validateSessionToken };

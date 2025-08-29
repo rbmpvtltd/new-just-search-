@@ -1,24 +1,25 @@
 "use client";
 import Link from "next/link";
-import { trpc } from "utils/trpc";
+import { useTransition } from "react";
+import { serverFunction } from "./action";
 
 export default function Home() {
+  const [isPending, startTransition] = useTransition();
   return (
     <div>
       <button
         type="button"
-        onClick={async () => {
-          const token = (await trpc.auth.login.query({
-            email: "otherritik000@gmail.com",
-            password: "12345678",
-          })) as string;
-
-          localStorage.setItem("token", token);
+        onClick={() => {
+          startTransition(async () => {
+            await serverFunction();
+          });
         }}
       >
         login
       </button>
-      <Link href={"/user"}>hi go to use</Link>
+      <p>
+        {isPending ? "Loading..." : <Link href={"/user"}>hi go to use</Link>}
+      </p>
     </div>
   );
 }
