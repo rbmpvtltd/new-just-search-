@@ -1,10 +1,14 @@
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import cors from "cors";
 import express from "express";
 import { renderTrpcPanel } from "trpc-ui";
 import { appRouter } from "./route";
-import { createContext } from "./utils/trpc";
+import { createContext } from "./utils/context";
 
 const app = express();
+
+app.use(cors({ origin: "*" }));
+
 app.use(
   "/trpc",
   createExpressMiddleware({

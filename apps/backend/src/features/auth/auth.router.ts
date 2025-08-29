@@ -1,10 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
-import { publicProcedure, router } from "../../utils/trpc";
-import { checkUserPassword, generateToken } from "./auth.service";
+import { protectedProcedure, publicProcedure, router } from "../../utils/trpc";
+import { checkUserPassword } from "./auth.service";
+import { createSession } from "./lib/session";
 
 export const authRouter = router({
-  checkUserPassword: publicProcedure
+  login: publicProcedure
     .input(z.object({ email: z.string(), password: z.string() }))
     .query(async ({ input }) => {
       const isCredentialCorrect = checkUserPassword(
@@ -18,9 +19,12 @@ export const authRouter = router({
           message: "your credential is not correct",
         });
       }
-
-      const token = generateToken();
-
-      return token;
+      const session = await createSession(isCredentialCorrect.userId);
+      return session?.token;
     }),
+  logout: protectedProcedure.query(async ({ ctx }) => {
+    return true;
+    const userId = ctx.userId;
+    return userId;
+  }),
 });

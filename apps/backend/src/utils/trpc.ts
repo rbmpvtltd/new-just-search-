@@ -1,13 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-
-export const createContext = () => ({
-  user: {
-    id: 1,
-    isAdmin: true,
-  },
-});
-
-type Context = Awaited<ReturnType<typeof createContext>>;
+import { validateSessionToken } from "@/features/auth/lib/session";
+import type { Context } from "./context";
 
 export const t = initTRPC.context<Context>().create();
 
@@ -15,15 +8,21 @@ export const router = t.router;
 
 export const publicProcedure = t.procedure;
 
-export const adminProcedure = publicProcedure.use(async (opts) => {
+export const protectedProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
 
-  if (!ctx.user?.isAdmin) {
-    throw new TRPCError({ code: "FORBIDDEN" });
+  if (!ctx.token) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
+  const validateToken = await validateSessionToken(ctx.token);
+  if (!validateToken) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
   return opts.next({
     ctx: {
-      user: ctx.user,
+      userId: validateToken.userId,
     },
   });
 });
