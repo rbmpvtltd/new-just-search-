@@ -9,17 +9,12 @@ import {
 } from "react-native";
 import ProductListingCard from "@/components/cards/ProductCard";
 import { useProductList } from "@/query/myProductList";
-import { PROFILE_URL } from "@/constants/apis";
-import { useSuspenceData } from "@/query/getAllSuspense";
 export default function product() {
   const { data, isLoading, fetchNextPage, hasNextPage } = useProductList();
   
   const router = useRouter();
-
-  // if(userProfile?.plan?.title === "Free"){
-  //  return router.navigate("/user/pricingPlans")
-  // }
   if (isLoading) return <ActivityIndicator />;
+  
 
   if (!data?.pages[0]?.data || data?.pages[0].data.length === 0)
     return (

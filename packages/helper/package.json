@@ -10,8 +10,8 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-
   "dependencies": {
+    "react-hook-form": "^7.62.0",
     "winston": "^3.17.0"
   },
   "exports": {
