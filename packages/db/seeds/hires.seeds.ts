@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "@/config/dbConnections";
-import { users } from "@/features/auth/auth.model";
+import { db } from "../index";
+import { users } from "../schema/auth.schema";
 import {
   genderEnum,
   hireCategories,
@@ -14,13 +14,13 @@ import {
   recentViewHire,
   relocateEnum,
   workShiftEnum,
-} from "@/features/hire/hire.model";
-import { cities } from "@/features/not-related/address/address.model";
-import { categories } from "@/features/not-related/categroy/category.model";
-import { subcategories } from "@/features/not-related/subcategory/subCategory.model";
-import { uploadOnCloudinary } from "@/helper/cloudinary";
+} from "../schema/hire.schema";
+import { cities } from "../schema/address.schema";
+import { categories } from "../schema/category.schema";
+import { subcategories } from "../schema/subcategory.schema";
+import { uploadOnCloudinary } from "../index";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
-import { sql } from "./mysqldb";
+import { sql } from "./mysqldb.seed";
 
 export const hireSeed = async () => {
   await cleardataofhire();
@@ -72,8 +72,8 @@ export const addHire = async () => {
     try {
       await db.insert(hireListing).values({
         id: row.id,
-        userId: createUser.id,
-        city: city?.id,
+        userId: createUser!.id,
+        city: city!.id,
         name: row.name,
         slug: row.slug,
         fatherName: row.father_name,

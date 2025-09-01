@@ -1,17 +1,16 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@/config/dbConnections";
-import { users } from "@/features/auth/auth.model";
+import { db } from "../index";
+import { users ,UserRole} from "../schema/auth.schema";
 import {
   feedbacks,
   franchises,
   profiles,
   request_accounts,
   salesmen,
-} from "@/features/user/user.model";
-import { uploadOnCloudinary } from "@/helper/cloudinary";
-import { UserRole } from "@/types/auth";
-import { sql } from "./mysqldb";
+} from "../schema/user.schema";
+import { uploadOnCloudinary } from "../index";
+import { sql } from "./mysqldb.seed";
 
 dotenv.config();
 export const userSeed = async () => {
@@ -61,7 +60,7 @@ export const seedUsers = async () => {
 
     // 5️⃣ Insert profile
     const profileData = {
-      userId: insertedUser.id,
+      userId: insertedUser!.id,
       firstName: row.first_name ?? "null",
       lastName: row.last_name ?? "null",
       city: row.city ?? "null",
@@ -107,7 +106,7 @@ const seedfranchises = async () => {
 
     await db.insert(franchises).values({
       id: row.id,
-      userId: user.id,
+      userId: user!.id,
       referPrifixed: refer_prifixed,
       status: Boolean(row.status),
       employeeLimit: row.employee_limit,
@@ -151,7 +150,7 @@ export const seedOfSalesman = async () => {
     const refer_code = refer_prifixed + refer_suffix + row.id;
 
     await db.insert(salesmen).values({
-      userId: user.id,
+      userId: user!.id,
       franchiseId: Franchises.id,
       referCode: refer_code,
       status: Boolean(row.status),

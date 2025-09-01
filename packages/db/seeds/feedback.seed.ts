@@ -1,6 +1,6 @@
-import { db } from "@/config/dbConnections";
-import { feedbacks } from "@/features/user/user.model";
-import { sql } from "./mysqldb";
+import { db } from "../index";
+import { feedbacks } from "../schema/user.schema";
+import { sql } from "./mysqldb.seed";
 
 export const feedbackseed = async () => {
   await db.execute(`TRUNCATE TABLE feedbacks RESTART IDENTITY CASCADE;`);

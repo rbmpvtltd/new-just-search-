@@ -243,19 +243,19 @@
 
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@/config/dbConnections";
-import { users } from "@/features/auth/auth.model";
-import { businessListings } from "@/features/business/business.model";
-import { cities } from "@/features/not-related/address/address.model";
-import { UserRole } from "@/types/auth";
-import { hireListing } from "@/features/hire/hire.model";
+import { db } from "../index";
+import { users } from "../schema/auth.schema";
+import { businessListings } from "../schema/business.schema";
+import { cities } from "../schema/address.schema";
+import { UserRole } from "../schema/auth.schema";
+// import { hireListing } from "@/features/hire/hire.model";
 
 dotenv.config();
 
 export const fakeSeed = async () => {
   try {
     const user = await seedFakeUser(1);
-    const business = await seedFakeBusiness(user.id);
+    const business = await seedFakeBusiness(user!.id);
     return { user, business };
   } catch (error) {
     console.error("Error in fakeSeed:", error);

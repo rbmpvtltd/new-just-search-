@@ -3,7 +3,7 @@ import { db } from "../index";
 import { cities, states } from "../schema/address.schema";
 import { banners } from "../schema/banner.schema";
 import { categories } from "../schema/category.schema";
-import { subcategories } from "../schema/sucategory.schema";
+import { subcategories } from "../schema/subcategory.schema";
 import { uploadOnCloudinary } from "../index";
 import { sql } from "./mysqldb.seed";
 

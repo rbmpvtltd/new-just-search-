@@ -12,7 +12,7 @@ import {
 } from "../schema/business.schema";
 import { cities } from "../schema/address.schema";
 import { categories } from "../schema/category.schema";
-import { subcategories } from "../schema/sucategory.schema";
+import { subcategories } from "../schema/subcategory.schema";
 import { uploadOnCloudinary } from "../index";
 import { UserRole } from "../schema/auth.schema";
 import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";

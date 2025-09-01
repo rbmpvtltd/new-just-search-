@@ -1,14 +1,14 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@/config/dbConnections";
-import { users } from "@/features/auth/auth.model";
-import { businessListings } from "@/features/business/business.model";
-import { categories } from "@/features/not-related/categroy/category.model";
-import { productPhotos, productReviews, products, productSubCategories, recentViewProducts } from "@/features/product/product.model";
-import { uploadOnCloudinary } from "@/helper/cloudinary";
-import { sql } from "./mysqldb";
+import { db } from "../index";
+import { users } from "../schema/auth.schema";
+import { businessListings } from "../schema/business.schema";
+import { categories } from "../schema/category.schema";
+import { productPhotos, productReviews, products, productSubCategories, recentViewProducts } from "../schema/product.shema";
+import { uploadOnCloudinary } from "../index";
+import { sql } from "./mysqldb.seed";
 import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
-import { subcategories } from "@/features/not-related/subcategory/subCategory.model";
+import { subcategories } from "../schema/subcategory.schema";
 
 dotenv.config();
 export const productSeed = async () => {
@@ -82,7 +82,7 @@ export const addProduct = async () => {
 
         if (photoUrl) {
           await db.insert(productPhotos).values({
-            productId: productCreated.id,
+            productId: productCreated!.id,
             photo: photoUrl,
             createdAt: row.created_at,
             updatedAt: row.updated_at,
@@ -111,14 +111,14 @@ const addProductReviews = async () => {
       user = fakeUser;
     }
 
-    let [business] = await db
+    let [business]:any = await db
       .select()
       .from(businessListings)
       .where(eq(businessListings.id, row.listing_id));
 
     if (!business) {
       console.log(`business not found ${row.id} using faKe business`);
-      business = fakeBusiness;
+      business = fakeBusiness as any;
     }
 
     const [Product] = await db.select().from(products).where(eq(products.id, row.product_id));
@@ -129,8 +129,8 @@ const addProductReviews = async () => {
 
     await db.insert(productReviews).values({
       id: row.id,
-      userId: user.id,
-      businessId: business.id,
+      userId: user!.id,
+      businessId: business!.id,
       productId: Product.id ,
       name: row.name,
       email: row.email,

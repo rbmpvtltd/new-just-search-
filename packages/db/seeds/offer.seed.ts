@@ -1,19 +1,19 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@/config/dbConnections";
-import { users } from "@/features/auth/auth.model";
-import { businessListings } from "@/features/business/business.model";
-import { categories } from "@/features/not-related/categroy/category.model";
-import { subcategories } from "@/features/not-related/subcategory/subCategory.model";
+import { db } from "../index";
+import { users } from "../schema/auth.schema";
+import { businessListings } from "../schema/business.schema";
+import { categories } from "../schema/category.schema";
+import { subcategories } from "../schema/subcategory.schema";
 import {
   offerPhotos,
   offerReviews,
   offerSubcategory,
   offers,
-} from "@/features/offer/offer.model";
-import { uploadOnCloudinary } from "@/helper/cloudinary";
+} from "../schema/offer.schema";
+import { uploadOnCloudinary } from "../index";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
-import { sql } from "./mysqldb";
+import { sql } from "./mysqldb.seed";
 
 dotenv.config();
 
@@ -86,7 +86,7 @@ export const addOffer = async () => {
         const offerPhotoUrl = uploaded?.secure_url ?? null;
 
         await db.insert(offerPhotos).values({
-          offerId: offerCreate.id,
+          offerId: offerCreate!.id,
           photo: offerPhotoUrl,
           createdAt: row.created_at,
           updatedAt: row.updated_at,
@@ -121,7 +121,7 @@ export const addOfferReviews = async () => {
     }
 
     await db.insert(offerReviews).values({
-      userId: user.id,
+      userId: user!.id,
       offerId: offer.id,
       name: row.name,
       email: row.email,

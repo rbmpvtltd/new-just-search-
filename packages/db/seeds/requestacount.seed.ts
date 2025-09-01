@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../index";
-import { users } from "@/features/auth/auth.model";
-import { request_accounts } from "@/features/user/user.model";
-import { sql } from "./mysqldb";
+import { users } from "../schema/auth.schema";
+import { request_accounts } from "../schema/user.schema";
+import { sql } from "./mysqldb.seed";
 
 export const seedRequestAccounts = async () => {
   await db.execute(`TRUNCATE TABLE request_accounts RESTART IDENTITY CASCADE;`);

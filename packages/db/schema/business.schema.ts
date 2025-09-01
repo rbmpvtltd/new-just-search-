@@ -11,7 +11,7 @@ import {
 import { users } from "./auth.schema";
 import { cities } from "./address.schema";
 import { categories } from "./category.schema";
-import { subcategories } from "./sucategory.schema";
+import { subcategories } from "./subcategory.schema";
 
 // 1. Business Listing Interface
 export const businessListings = pgTable("business_listings", {
