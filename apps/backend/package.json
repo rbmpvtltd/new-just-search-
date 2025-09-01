@@ -8,7 +8,7 @@
     "trpc-ui": "^1.0.15"
   },
   "scripts": {
-    "dev": "bun src/index --watch"
+    "dev": "bun --watch src/index"
   },
   "peerDependencies": {
     "typescript": "^5"

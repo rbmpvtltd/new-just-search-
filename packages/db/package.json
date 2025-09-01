@@ -10,7 +10,8 @@
     "drizzle-kit": "^0.31.4"
   },
   "scripts": {
-    "dev": "bunx drizzle-kit studio"
+    "dev": "bunx drizzle-kit studio",
+    "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"
   },
   "peerDependencies": {
     "typescript": "^5"
