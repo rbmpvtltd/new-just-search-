@@ -16,8 +16,11 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.4",
+    "mysql2": "^3.14.4",
     "pg": "^8.16.3"
   }
 }
