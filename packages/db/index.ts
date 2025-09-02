@@ -56,3 +56,4 @@ export { uploadOnCloudinary, deleteOnCloudinary };
 export const db = drizzle({ client: pool });
 
 export * from "./schema/address.schema";
+export * from "./schema/banner.schema";

@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useTransition } from "react";
-import { serverFunction } from "./action";
+import { serverFunction,banners } from "./action";
+
 
 export default function Home() {
+  
   const [isPending, startTransition] = useTransition();
   return (
     <div>
@@ -12,6 +14,8 @@ export default function Home() {
         onClick={() => {
           startTransition(async () => {
             await serverFunction();
+            const data = await banners()
+            console.log("data in client side",data)
           });
         }}
       >

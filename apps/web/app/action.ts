@@ -9,3 +9,10 @@ export async function serverFunction() {
   })) as string;
   setToken(token);
 }
+
+
+export async function banners (){
+  const data = await trpc.banners.first.query()
+  console.log("====================== banners data ==================================>",data)
+  return data
+}
