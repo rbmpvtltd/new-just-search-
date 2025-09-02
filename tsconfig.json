@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@repo/helper/*": ["packages/helper/*"]
+    }
+  },
+  "references": [
+    { "path": "packages/helper" },
+    { "path": "packages/db" },
+    { "path": "apps/backend" },
+    { "path": "apps/web" },
+    { "path": "apps/mobile" }
+  ]
+}

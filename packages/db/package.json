@@ -16,11 +16,8 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "exports":{
-    "./drizzle":{
-      "import": "./drizzle.ts",
-      "types": "./drizzle.ts"
-    }
+  "exports": {
+    ".": "./index.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

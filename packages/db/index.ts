@@ -1,8 +1,7 @@
+import fs from "node:fs";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import fs from "node:fs";
 import cloudinary from "./configs/cloudinary.config"; // 👈 Use centralized config
-
 
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
@@ -54,6 +53,6 @@ const deleteOnCloudinary = async (cloudinary_url: any) => {
 
 export { uploadOnCloudinary, deleteOnCloudinary };
 
-
 export const db = drizzle({ client: pool });
 
+export * from "./schema/address.schema";
