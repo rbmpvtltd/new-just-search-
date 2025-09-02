@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "../index";
+import { db } from "../drizzle";
 import { users } from "../schema/auth.schema";
 import {
   genderEnum,
@@ -18,7 +18,7 @@ import {
 import { cities } from "../schema/address.schema";
 import { categories } from "../schema/category.schema";
 import { subcategories } from "../schema/subcategory.schema";
-import { uploadOnCloudinary } from "../index";
+import { uploadOnCloudinary } from "../drizzle";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 

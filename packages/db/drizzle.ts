@@ -3,10 +3,13 @@ import { Pool } from "pg";
 import fs from "node:fs";
 import cloudinary from "./configs/cloudinary.config"; // 👈 Use centralized config
 
-const database = process.env.PGDATABASE ?? "mydb";
 
 const pool = new Pool({
-  connectionString: database,
+  host: process.env.PGHOST ?? "localhost",
+  port: +(process.env.PGPORT ?? 5432),
+  user: process.env.PGUSER ?? "postgres",
+  password: process.env.PGPASSWORD ?? "12345678",
+  database: process.env.PGDATABASE ?? "justsearch",
 });
 
 const uploadOnCloudinary = async (localFilePath: string, folderName = "") => {

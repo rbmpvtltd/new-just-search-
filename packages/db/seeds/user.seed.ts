@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "../index";
+import { db } from "../drizzle";
 import { users ,UserRole} from "../schema/auth.schema";
 import {
   feedbacks,
@@ -9,21 +9,21 @@ import {
   request_accounts,
   salesmen,
 } from "../schema/user.schema";
-import { uploadOnCloudinary } from "../index";
+import { uploadOnCloudinary } from "../drizzle";
 import { sql } from "./mysqldb.seed";
 
 dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
-  // await seedUsers();
-  // await seedfranchises();
+  await seedUsers();
+  await seedfranchises();
   await seedOfSalesman();
 };
 
 export const clearAllTablesUser = async () => {
-  // await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE profiles RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE users RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE profiles RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE users RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };
@@ -145,8 +145,9 @@ export const seedOfSalesman = async () => {
 
     const [franchises1]: any[] = await sql.execute("SELECT * FROM franchises");
     const str = franchises1.refer_code;
-    const refer_prifixed = str.slice(0, -4); // "RBMHORJ00"
-    const refer_suffix = str.slice(-4); // "0000"
+    console.info("========================>",str)
+    const refer_prifixed = str ?  str.slice(0, -4) : "RBMHORJ00"; // "RBMHORJ00"
+    const refer_suffix =str ?  str.slice(-4) : "0000" ; // "0000"
     const refer_code = refer_prifixed + refer_suffix + row.id;
 
     await db.insert(salesmen).values({

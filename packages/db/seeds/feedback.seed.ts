@@ -1,4 +1,4 @@
-import { db } from "../index";
+import { db } from "../drizzle";
 import { feedbacks } from "../schema/user.schema";
 import { sql } from "./mysqldb.seed";
 

@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
-import { db } from "../index";
+import { db } from "../drizzle";
 import { cities, states } from "../schema/address.schema";
 import { banners } from "../schema/banner.schema";
 import { categories } from "../schema/category.schema";
 import { subcategories } from "../schema/subcategory.schema";
-import { uploadOnCloudinary } from "../index";
+import { uploadOnCloudinary } from "../drizzle";
 import { sql } from "./mysqldb.seed";
 
 export const notRelated = async () => {
@@ -17,7 +17,8 @@ export const notRelated = async () => {
 };
 
 export const clearAllTablesNotRelated = async () => {
-  await db.execute(`TRUNCATE  TABLE cities RESTART IDENTITY CASCADE;`);
+  console.log("================== execution comes here ====================")
+  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);

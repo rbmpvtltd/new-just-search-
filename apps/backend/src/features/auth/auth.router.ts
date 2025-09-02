@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
-import { protectedProcedure, publicProcedure, router } from "../../utils/trpc";
+import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
 import { checkUserPassword } from "./auth.service";
 import { createSession } from "./lib/session";
 

@@ -243,7 +243,7 @@
 
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "../index";
+import { db } from "../drizzle";
 import { users } from "../schema/auth.schema";
 import { businessListings } from "../schema/business.schema";
 import { cities } from "../schema/address.schema";

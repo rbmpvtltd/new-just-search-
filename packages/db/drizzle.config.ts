@@ -9,9 +9,9 @@ export default defineConfig({
   dialect: "postgresql",
   dbCredentials: {
     host: process.env.PGHOST ?? "localhost",
-    user: process.env.PGUSER ?? "myuser",
-    password: process.env.PGPASSWORD ?? "mypassword",
-    database: process.env.PGDATABASE ?? "mydb",
+    user: process.env.PGUSER ?? "postgres",
+    password: process.env.PGPASSWORD ?? "12345678",
+    database: process.env.PGDATABASE ?? "justsearch",
     port: Number(process.env.PGPORT || 5432),
 
     ssl: false,
