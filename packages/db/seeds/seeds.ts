@@ -18,12 +18,12 @@ dotenv.config();
 (async () => {
   try {
     // Postgres seeding
-    // await notRelated();
+    await notRelated();
     // await userSeed();
     // await fakeSeed();
     // await businessSeed();
     // await hireSeed();
-    await productSeed();
+    // await productSeed();
     // await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();

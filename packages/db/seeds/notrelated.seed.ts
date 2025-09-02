@@ -1,28 +1,28 @@
 import { eq } from "drizzle-orm";
-import { db } from "../drizzle";
+import { db } from "../index";
 import { cities, states } from "../schema/address.schema";
 import { banners } from "../schema/banner.schema";
 import { categories } from "../schema/category.schema";
 import { subcategories } from "../schema/subcategory.schema";
-import { uploadOnCloudinary } from "../drizzle";
+import { uploadOnCloudinary } from "../index";
 import { sql } from "./mysqldb.seed";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  await state();
-  await citie();
+  // await state();
+  // await citie();
   await bannerSeed();
-  await seedCategories();
-  await seedSubcategories();
+  // await seedCategories();
+  // await seedSubcategories();
 };
 
 export const clearAllTablesNotRelated = async () => {
   console.log("================== execution comes here ====================")
-  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };
@@ -72,7 +72,7 @@ export const bannerSeed = async () => {
     await db.insert(banners).values({
       mysqlId: row.id,
       route: row.route ?? null,
-      photo: bannerPhotoUrl ?? null,
+      photo: row.photo,
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,
