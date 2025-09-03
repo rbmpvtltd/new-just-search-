@@ -6,4 +6,19 @@ async function getFirstBannerData (){
     return banner1
 } 
 
-export {getFirstBannerData}
+async function getSecondBannerData (){
+    const banner2 = await db.select().from(banners).where(eq(banners.type,2))
+    return banner2
+}
+
+async function getThirdBannerData (){
+    const banner3 = await db.select().from(banners).where(eq(banners.type,3))
+    return banner3
+}
+
+async function getFourthBannerData (){
+    const banner4 = await db.select().from(banners).where(eq(banners.type,4))
+    return banner4
+}
+
+export {getFirstBannerData,getSecondBannerData,getThirdBannerData,getFourthBannerData}
