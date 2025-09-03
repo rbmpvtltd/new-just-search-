@@ -25,11 +25,5 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "zod": "^4.0.17"
-  },
-  "exports": {
-    "./router": {
-      "import": "./src/route.ts",
-      "types": "./src/route.ts"
-    }
   }
 }

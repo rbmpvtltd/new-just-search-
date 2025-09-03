@@ -1,4 +1,3 @@
-import { db, states } from "@repo/db";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
@@ -7,6 +6,8 @@ import { appRouter } from "./route";
 import { createContext } from "./utils/context";
 
 const app = express();
+
+export type { AppRouter } from "./route";
 
 app.use(cors({ origin: "*" }));
 

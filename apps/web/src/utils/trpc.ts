@@ -1,5 +1,5 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "backend/route";
+import type { AppRouter } from "types";
 import { getToken } from "./session";
 
 export const trpc = createTRPCClient<AppRouter>({

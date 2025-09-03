@@ -10,9 +10,9 @@ export async function serverFunction() {
   setToken(token);
 }
 
+export async function banners() {
+  await trpc.hi.hi2.query();
 
-export async function banners (){
-  const data = await trpc.banners.first.query()
-  console.log("====================== banners data ==================================>",data)
-  return data
+  const data = await trpc.hi.hi2.query();
+  return data;
 }

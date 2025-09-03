@@ -1,3 +1,4 @@
+// apps/frontend/tsconfig.json
 {
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
@@ -5,14 +6,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@": ["./src"],
-      "backend/*": ["../backend/src/*"],
-      "backend": ["../backend/src"]
+      "types/*": ["../../packages/types/src/*"]
     },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "plugins": [{ "name": "next" }]
   },
   "include": [
     "**/*.ts",
@@ -21,5 +17,6 @@
     "next.config.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "references": [{ "path": "../../packages/types" }]
 }
