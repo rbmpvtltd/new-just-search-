@@ -1,4 +1,4 @@
-import { trpc } from "utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 (async () => {
   // const hi = await trpc.hi.query();

@@ -1,6 +1,6 @@
 "use server";
-import { setToken } from "utils/session";
-import { trpc } from "utils/trpc";
+import { setToken } from "@/utils/session";
+import { trpc } from "@/utils/trpc";
 
 export async function serverFunction() {
   const token = (await trpc.auth.login.query({

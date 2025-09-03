@@ -6,7 +6,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      data-darkreader-mode="dynamic"
+      data-darkreader-scheme="dark"
+      lang="en"
+    >
       <body>{children}</body>
     </html>
   );

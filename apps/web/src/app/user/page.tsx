@@ -1,4 +1,4 @@
-import { trpc } from "utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 export default async function user() {
   const userId = await trpc.auth.logout.query();
