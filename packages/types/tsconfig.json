@@ -4,7 +4,11 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "backend/*": ["../../apps/backend/src/*"]
+    }
   },
   "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist"]

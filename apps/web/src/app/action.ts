@@ -1,4 +1,5 @@
 "use server";
+
 import { setToken } from "@/utils/session";
 import { trpc } from "@/utils/trpc";
 
@@ -11,7 +12,7 @@ export async function serverFunction() {
 }
 
 export async function banners() {
-  await trpc.hi.hi2.query();
+  await trpc.banners.;
 
   const data = await trpc.hi.hi2.query();
   return data;
