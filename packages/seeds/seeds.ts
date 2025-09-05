@@ -1,17 +1,17 @@
 import dotenv from "dotenv";
-import { businessSeed } from "./business.seed";
+import { businessSeed } from "./business.seed.js";
 // import { communicationSeed } from "./communication.seed";
 // import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
-import { fakeSeed } from "./fake.seed";
-import { feedbackseed } from "./feedback.seed";
-import { hireSeed } from "./hires.seeds";
-import { notRelated } from "./notrelated.seed";
-import { offerSeed } from "./offer.seed";
-import { planSeed } from "./plan.seed";
-import { productSeed } from "./product.seed";
-import { seedRequestAccounts } from "./requestacount.seed";
-import { userSeed } from "./user.seed";
+import { fakeSeed } from "./fake.seed.js";
+import { feedbackseed } from "./feedback.seed.js";
+import { hireSeed } from "./hires.seeds.js";
+import { notRelated } from "./notrelated.seed.js";
+import { offerSeed } from "./offer.seed.js";
+import { planSeed } from "./plan.seed.js";
+import { productSeed } from "./product.seed.js";
+import { seedRequestAccounts } from "./requestacount.seed.js";
+import { userSeed } from "./user.seed.js";
 
 dotenv.config();
 

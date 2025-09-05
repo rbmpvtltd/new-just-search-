@@ -1,19 +1,19 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { db } from "../drizzle";
-import { users } from "../schema/auth.schema";
-import { businessListings } from "../schema/business.schema";
-import { categories } from "../schema/category.schema";
-import { subcategories } from "../schema/subcategory.schema";
+import { users } from "../db/src/schema/auth.schema.js";
+import { businessListings } from "../db/src/schema/business.schema.js";
+import { categories } from "../db/src/schema/category.schema.js";
+import { subcategories } from "../db/src/schema/subcategory.schema.js";
 import {
   offerPhotos,
   offerReviews,
   offerSubcategory,
   offers,
-} from "../schema/offer.schema";
+} from "../db/src/schema/offer.schema.js";
 import { uploadOnCloudinary } from "../drizzle";
-import { fakeSeed, fakeUserSeed } from "./fake.seed";
-import { sql } from "./mysqldb.seed";
+import { fakeSeed, fakeUserSeed } from "./fake.seed.js";
+import { sql } from "./mysqldb.seed.js";
 
 dotenv.config();
 

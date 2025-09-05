@@ -27,3 +27,5 @@ export const authRouter = router({
     return userId;
   }),
 });
+
+export type AuthRouter = typeof authRouter;

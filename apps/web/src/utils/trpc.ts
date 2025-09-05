@@ -8,7 +8,6 @@ export const trpc = createTRPCClient<AppRouter>({
       url: "http://localhost:4000/trpc",
       async headers() {
         const token = await getToken();
-        // const token = "hiadf.eice";
         return {
           authorization: token ? `Bearer ${token.value}` : "",
         };

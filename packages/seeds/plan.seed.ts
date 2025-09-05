@@ -1,14 +1,14 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { db } from "../drizzle";
-import { users } from "../schema/auth.schema";
+import { users } from "../db/src/schema/auth.schema.js";
 import {
   planAttributes,
   plans1,
   transactions,
   userSubscriptions,
-} from "../schema/plan.schema";
-import { sql } from "./mysqldb.seed";
+} from "../db/src/schema/plan.schema.js";
+import { sql } from "./mysqldb.seed.js";
 
 dotenv.config();
 

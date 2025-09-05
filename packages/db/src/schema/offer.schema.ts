@@ -8,10 +8,10 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "../schema/auth.schema";
-import { businessListings } from "../schema/business.schema";
-import { categories } from "../schema/category.schema";
-import { subcategories } from "../schema/subcategory.schema";
+import { users } from "./auth.schema.js";
+import { businessListings } from "./business.schema.js";
+import { categories } from "./category.schema.js";
+import { subcategories } from "./subcategory.schema.js";
 
 //1.offers
 export const offers = pgTable("offers", {

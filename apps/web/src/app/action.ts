@@ -12,7 +12,7 @@ export async function serverFunction() {
 }
 
 export async function banners() {
-  await trpc.banners.;
+  await trpc.banners;
 
   const data = await trpc.hi.hi2.query();
   return data;

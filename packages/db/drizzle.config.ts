@@ -4,7 +4,7 @@ import { defineConfig } from "drizzle-kit";
 dotenv.config();
 
 export default defineConfig({
-  schema: "./schema/**/*.schema.ts", // 👈 schema files ka path
+  schema: "./src/schema/**/*.schema.ts", // 👈 schema files ka path
   out: "./drizzle", // migration folder
   dialect: "postgresql",
   dbCredentials: {
