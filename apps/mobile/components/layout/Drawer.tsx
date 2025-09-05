@@ -1,7 +1,7 @@
 import {
   DrawerContentScrollView,
-  DrawerItemList,
   DrawerItem,
+  DrawerItemList,
 } from "@react-navigation/drawer";
 import { router } from "expo-router";
 import { Drawer } from "expo-router/drawer";
@@ -33,7 +33,18 @@ function CustomDrawerContent(props) {
 
 export default function DrawerLayout() {
   return (
-    <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
-    </Drawer>
+    <Drawer
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#1e293b", // dark slate color
+        },
+        headerTintColor: "#fff", // text/icon color
+        headerTitleStyle: {
+          fontWeight: "bold",
+          fontSize: 20,
+        },
+      }}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+    ></Drawer>
   );
 }
