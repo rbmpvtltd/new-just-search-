@@ -10,9 +10,11 @@ export async function serverFunction() {
   setToken(token);
 }
 
-
-export async function banners (){
-  const data = await trpc.banners.first.query()
-  console.log("====================== banners data ==================================>",data)
-  return data
+export async function banners() {
+  const data = await trpc.banners.first.query();
+  console.log(
+    "====================== banners data ==================================>",
+    data,
+  );
+  return data;
 }

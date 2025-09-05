@@ -1,15 +1,15 @@
 "use client";
 
+import { format } from "date-fns";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 function DatePicker({
   id,
@@ -54,7 +54,7 @@ function DatePicker({
           data-testid="date-picker-calendar"
           mode="single"
           month={date ?? new Date()}
-          onMonthChange={(_date) => onChange(_date)}
+          onMonthChange={(_date: Date) => onChange(_date)}
           selected={date}
           onSelect={onChange}
           disabled={disabledDates}
@@ -74,6 +74,7 @@ function CalendarIcon({ className }: { className?: string }) {
       stroke="currentColor"
       className={cn("size-6", className)}
     >
+      <title>Calendar</title>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

@@ -1,7 +1,7 @@
-import type { z } from "zod";
 import type { ReactNode } from "react";
+import type { z } from "zod";
 
-export const enum FieldType {
+export enum FieldType {
   Text = "text",
   Number = "number",
   Select = "select",
