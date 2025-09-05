@@ -31,8 +31,9 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(home)"
         options={{
+        
           title: "",
           tabBarLabel: "Home",
           tabBarIcon: ({ color }) => (
@@ -44,8 +45,10 @@ export default function TabLayout() {
               <View className="flex-row items-center">
                 {isAuthenticated && (
                   <Pressable
-                    onPress={() =>
+                    onPress={() =>{
+                      console.log("clicked on drawer hamburger")
                       navigation.dispatch(DrawerActions.openDrawer())
+                    }
                     }
                     style={{ marginRight: 10, marginLeft: 10 }}
                   >
@@ -56,7 +59,7 @@ export default function TabLayout() {
                     />
                   </Pressable>
                 )}
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   {colorScheme === "dark" ? (
                     <Image
                       source={require("@/assets/images/Just_Search_Logo_Full_Dark.png")}
@@ -81,7 +84,7 @@ export default function TabLayout() {
                       message: "Need to login to access your chat sessions",
                       onConfirm: () => {
                         clearToken();
-                        router.navigate("/user/bottomNav/profile");
+                        router.navigate("/(root)/profile/profile");
                       },
                     });
                   } else {
@@ -111,7 +114,7 @@ export default function TabLayout() {
                           style: "destructive",
                           onPress: () => {
                             clearToken();
-                            router.navigate("/user/bottomNav/profile");
+                            router.navigate("/(root)/profile/profile");
                           },
                         },
                       ],
@@ -145,7 +148,7 @@ export default function TabLayout() {
                           style: "destructive",
                           onPress: () => {
                             clearToken();
-                            router.replace("/user/bottomNav/profile");
+                            router.replace("/(root)/profile/profile");
                           },
                         },
                       ],
@@ -174,7 +177,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="hire"
+        name="(hire)/hire"
         options={{
           headerShown: false,
           title: "Hire",
@@ -188,7 +191,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="allOffers"
+        name="(offer)/allOffers"
         options={{
           title: "Offers",
           headerShown: false,
@@ -199,11 +202,30 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="profile"
+        name="profile/profile"
         options={{
+          
           title: isAuthenticated ? "Profile" : "Login",
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-outline" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="user"
+        options={{
+          tabBarItemStyle: {
+            display:
+              "none",
+          },
+          headerShown: false,
+          title: "Profile Detail",
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="information-circle-outline"
+              size={24}
+              color={color}
+            />
           ),
         }}
       />

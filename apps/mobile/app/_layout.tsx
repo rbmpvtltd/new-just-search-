@@ -81,6 +81,8 @@ function RootLayoutNav() {
               {/* <Drawer /> */}
               <Stack>
                 <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(root)" options={{ headerShown: false }} />
+
                 <Stack.Screen
                   name="category/[category]"
                   options={({ route }) => {

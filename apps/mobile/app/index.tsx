@@ -8,5 +8,5 @@ export default function Index() {
     return <Loading position="center" />;
   }
 
-  return <Redirect href="/user/bottomNav" />;
+  return <Redirect href="/(root)/(home)/home" />;
 }
