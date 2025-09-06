@@ -24,6 +24,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@types/react-icons": "^3.0.0",
     "connect-redis": "^9.0.0",
     "drizzle-kit": "^0.31.4",
     "express-session": "^1.18.2",
