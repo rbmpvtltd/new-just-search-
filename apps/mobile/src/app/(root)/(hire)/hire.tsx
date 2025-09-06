@@ -36,7 +36,7 @@ export default function HireListScreen() {
           <HireSearchForm />
         </View>
         <FlatList
-          className="mt-1 mb-[100px]"
+          className="mt-1 "
           data={allData}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => {

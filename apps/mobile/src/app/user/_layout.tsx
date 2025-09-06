@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Drawer } from "expo-router/drawer";
-import { Image, useColorScheme, View } from "react-native";
+import { useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Colors from "@/constants/Colors"; // apni file ka path correct karo
 import { role, useAuthStore } from "@/store/authStore";
@@ -13,32 +13,25 @@ export default function Layout() {
   return (
     <GestureHandlerRootView className="flex-1">
       <Drawer
+      
         screenOptions={{
           headerShown: true,
           drawerActiveTintColor: Colors[colorScheme ?? "light"].primary,
         }}
       >
         <Drawer.Screen
-          name="bottomNav"
-          options={{
-            headerShown: false,
-            title: "Home",
-            drawerIcon: ({ color }) => (
-              <Ionicons name="home-outline" size={20} color={color} />
-            ),
-          }}
-        />
-        <Drawer.Screen
           name="index"
           options={{
             title: "Profile Detail",
+            drawerItemStyle: {
+              display: "none",
+            },
             drawerIcon: ({ color }) => (
-              <Ionicons name="create-outline" size={20} color={color} />
+              <Ionicons name="briefcase-outline" size={20} color={color} />
             ),
-
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -49,6 +42,7 @@ export default function Layout() {
             ),
           }}
         />
+       
 
         <Drawer.Screen
           name="bussinessList"
@@ -65,7 +59,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -89,7 +83,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -113,7 +107,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -136,7 +130,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -159,7 +153,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -183,7 +177,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -208,7 +202,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -229,7 +223,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -250,7 +244,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -277,7 +271,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -297,7 +291,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -319,7 +313,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
@@ -340,7 +334,7 @@ export default function Layout() {
             ),
             headerRight: () => (
               <View className="mr-4">
-                <Link href="/user/bottomNav" asChild>
+                <Link href="/(root)/(home)/home" asChild>
                   <Ionicons
                     name="home-outline"
                     size={24}
