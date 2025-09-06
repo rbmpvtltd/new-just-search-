@@ -1,16 +1,16 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { db } from "../drizzle";
-import { users ,UserRole} from "../schema/auth.schema";
+import { users ,UserRole} from "../db/src/schema/auth.schema.js";
 import {
   feedbacks,
   franchises,
   profiles,
   request_accounts,
   salesmen,
-} from "../schema/user.schema";
+} from "../db/src/schema/user.schema.js";
 import { uploadOnCloudinary } from "../drizzle";
-import { sql } from "./mysqldb.seed";
+import { sql } from "./mysqldb.seed.js";
 
 dotenv.config();
 export const userSeed = async () => {

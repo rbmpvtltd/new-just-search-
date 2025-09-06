@@ -1,0 +1,16 @@
+// packages/types/tsconfig.json
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@apps/backend": ["../../apps/backend/src/index.ts"]
+    }
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "references": [{ "path": "../../apps/backend" }]
+}

@@ -7,7 +7,7 @@ import { createSession } from "./lib/session";
 export const authRouter = router({
   login: publicProcedure
     .input(z.object({ email: z.string(), password: z.string() }))
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       const isCredentialCorrect = checkUserPassword(
         input.email,
         input.password,
@@ -27,3 +27,5 @@ export const authRouter = router({
     return userId;
   }),
 });
+
+export type AuthRouter = typeof authRouter;

@@ -1,14 +1,14 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { db } from "../drizzle";
-import { users } from "../schema/auth.schema";
-import { businessListings } from "../schema/business.schema";
-import { categories } from "../schema/category.schema";
-import { productPhotos, productReviews, products, productSubCategories, recentViewProducts } from "../schema/product.shema";
+import { users } from "../db/src/schema/auth.schema.js";
+import { businessListings } from "../db/src/schema/business.schema.js";
+import { categories } from "../db/src/schema/category.schema.js";
+import { productPhotos, productReviews, products, productSubCategories, recentViewProducts } from "../db/src/schema/product.shema.js";
 import { uploadOnCloudinary } from "../drizzle";
-import { sql } from "./mysqldb.seed";
-import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
-import { subcategories } from "../schema/subcategory.schema";
+import { sql } from "./mysqldb.seed.js";
+import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed.js";
+import { subcategories } from "../db/src/schema/subcategory.schema.js";
 
 dotenv.config();
 export const productSeed = async () => {

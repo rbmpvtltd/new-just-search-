@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
-import { db } from "../index";
-import { cities, states } from "../schema/address.schema";
-import { banners } from "../schema/banner.schema";
-import { categories } from "../schema/category.schema";
-import { subcategories } from "../schema/subcategory.schema";
-import { uploadOnCloudinary } from "../index";
-import { sql } from "./mysqldb.seed";
+import { db } from "../db/src/index";
+import { cities, states } from "../db/src/schema/address.schema.js";
+import { banners } from "../db/src/schema/banner.schema.js";
+import { categories } from "../db/src/schema/category.schema.js";
+import { subcategories } from "../db/src/schema/subcategory.schema.js";
+import { uploadOnCloudinary } from "../db/src/index";
+import { sql } from "./mysqldb.seed.js";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();

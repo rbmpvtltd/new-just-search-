@@ -9,7 +9,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth.schema";
+import { users } from "./auth.schema.js";
 
 // 1. Profiles
 export enum MaritalStatus {

@@ -1,6 +1,8 @@
 {
   "name": "backend",
-  "module": "index.ts",
+  "module": "src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "devDependencies": {
     "@repo/typescript-config": "*",
@@ -25,11 +27,5 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "zod": "^4.0.17"
-  },
-  "exports": {
-    "./router": {
-      "import": "./src/route.ts",
-      "types": "./src/route.ts"
-    }
   }
 }

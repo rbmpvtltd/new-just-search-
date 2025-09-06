@@ -8,10 +8,10 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth.schema";
-import { cities } from "./address.schema";
-import { categories } from "./category.schema";
-import { subcategories } from "./subcategory.schema";
+import { users } from "./auth.schema.js";
+import { cities } from "./address.schema.js";
+import { categories } from "./category.schema.js";
+import { subcategories } from "./subcategory.schema.js";
 
 // 1. Business Listing Interface
 export const businessListings = pgTable("business_listings", {

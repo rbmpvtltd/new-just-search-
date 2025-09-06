@@ -1,5 +1,5 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "backend/route";
+import type { AppRouter } from "types/index";
 import { getToken } from "./session";
 
 export const trpc = createTRPCClient<AppRouter>({
@@ -8,7 +8,6 @@ export const trpc = createTRPCClient<AppRouter>({
       url: "http://localhost:4000/trpc",
       async headers() {
         const token = await getToken();
-        // const token = "hiadf.eice";
         return {
           authorization: token ? `Bearer ${token.value}` : "",
         };

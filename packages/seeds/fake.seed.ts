@@ -244,10 +244,10 @@
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { db } from "../drizzle";
-import { users } from "../schema/auth.schema";
-import { businessListings } from "../schema/business.schema";
-import { cities } from "../schema/address.schema";
-import { UserRole } from "../schema/auth.schema";
+import { users } from "../db/src/schema/auth.schema";
+import { businessListings } from "../db/src/schema/business.schema";
+import { cities } from "../db/src/schema/address.schema";
+import { UserRole } from "../db/src/schema/auth.schema";
 // import { hireListing } from "@/features/hire/hire.model";
 
 dotenv.config();
