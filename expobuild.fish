@@ -2,12 +2,16 @@
 
 # Function to clean temp and gradle files
 function cleanup
+
     echo (set_color yellow)"Setting java version 17"(set_color normal)
     echo (set_color yellow)"Enter your password"(set_color normal)
     java-17
     echo (set_color yellow)"[INFO] Cleaning temp build files..."(set_color normal)
 
-    cd ~/eas-build-tmp
+    # cd $mydir
+    cp -r ./apps/mobile ~/eas-build-tmp
+
+    cd ~/eas-build-tmp/tmp
     if test (count *) -gt 0
         rm -rf *
         echo (set_color green)"[OK] Temp directory cleared."(set_color normal)
@@ -30,7 +34,7 @@ function usage
     echo "  ./build.fish <platform> <profile>"
     echo ""
     echo "Platforms: android | ios"
-    echo "Profiles : developer | preview | production"
+    echo "Profiles : development | preview | production"
     exit 1
 end
 
@@ -41,16 +45,18 @@ end
 
 set platform $argv[1]
 set profile $argv[2]
+set mydir (pwd)
 
 # Validate platform
 switch $platform
     case android ios
         # Validate profile
         switch $profile
-            case developer preview production
+            case development preview production
                 cleanup
-                cd ~/Project/JSExpo
-                TMPDIR=~/eas-build-tmp eas build --platform $platform --clear-cache --local --profile=$profile
+                cd ~/eas-build-tmp/mobile
+                yarn install
+                TMPDIR=~/eas-build-tmp/tmp eas build --platform $platform --clear-cache --local --profile=$profile
                 java-24
             case '*'
                 usage
