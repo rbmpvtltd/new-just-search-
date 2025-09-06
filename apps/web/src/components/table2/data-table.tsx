@@ -19,16 +19,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { getRowRange } from "@/utils/pagination";
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { DataTablePagination } from "./data-table-pagination";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Input } from "./ui/input";
+} from "../ui/dropdown-menu";
+import { Input } from "../ui/input";
 import {
   Table,
   TableBody,
@@ -36,7 +34,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
+} from "../ui/table";
+import { DataTableFacetedFilter } from "./data-table-faceted-filter";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

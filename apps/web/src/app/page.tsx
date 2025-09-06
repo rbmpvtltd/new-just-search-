@@ -1,80 +1,76 @@
-import { columns, type Payment } from "@/components/columns";
-import { DataTable } from "@/components/data-table";
+import { statuses } from "dummy/data";
+import { title } from "process";
+import { columns } from "@/components/table/columns";
+import { DataTable } from "@/components/table/data-table";
 
-async function getData(): Promise<Payment[]> {
+async function getData(): Promise<any> {
   return [
     {
       id: "1",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
+      title: "Hello",
+      status: statuses.map((status) => status.value)[0],
+      priority: "high",
+      hello: "hi",
     },
-    // add diff value
     {
       id: "2",
-      amount: 300,
-      status: "processing",
-      email: "test@examplecom",
+      title: "World",
+      status: statuses.map((status) => status.value)[1],
+      priority: "high",
     },
     {
       id: "3",
-      amount: 400,
-      status: "failed",
-      email: "test@examplecom",
+      title: "Goodbye",
+      status: statuses.map((status) => status.value)[2],
+      priority: "high",
     },
     {
       id: "4",
-      amount: 500,
-      status: "success",
-      email: "test@examplecom",
+      title: "World",
+      status: statuses.map((status) => status.value)[3],
+      priority: "medium",
     },
     {
       id: "5",
-      amount: 600,
-      status: "pending",
-      email: "test@examplecom",
+      title: "Goodbye",
+      status: statuses.map((status) => status.value)[2],
+      priority: "medium",
     },
     {
       id: "6",
-      amount: 700,
-      status: "processing",
-      email: "test@examplecom",
+      title: "Goodbye",
+      status: statuses.map((status) => status.value)[2],
+      priority: "medium",
     },
     {
       id: "7",
-      amount: 800,
-      status: "failed",
-      email: "test@examplecom",
+      title: "Hello",
+      status: statuses.map((status) => status.value)[1],
+      priority: "low",
     },
     {
       id: "8",
-      amount: 900,
-      status: "success",
-      email: "test@examplecom",
+      title: "Mera",
+      status: statuses.map((status) => status.value)[1],
+      priority: "high",
     },
     {
       id: "9",
-      amount: 1000,
-      status: "pending",
-      email: "test@examplecom",
+      title: "Naam",
+      status: statuses.map((status) => status.value)[1],
+      priority: "high",
     },
     {
       id: "10",
-      amount: 1100,
-      status: "processing",
-      email: "test@examplecom",
+      title: "Ranjeet",
+      status: statuses.map((status) => status.value)[1],
+      priority: "high",
     },
     {
       id: "11",
-      amount: 1200,
-      status: "failed",
-      email: "test@examplecom",
-    },
-    {
-      id: "12",
-      amount: 1300,
-      status: "success",
-      email: "test@examplecom",
+      title: "Goodbye",
+      status: statuses.map((status) => status.value)[1],
+      priority: "low",
     },
   ];
 }
