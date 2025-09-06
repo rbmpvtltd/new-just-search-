@@ -11,15 +11,14 @@ import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useHeadingStore } from "@/store/heading";
 import "react-native-reanimated";
-import { Platform, Text, useColorScheme, View } from "react-native";
+import { Platform, useColorScheme, View } from "react-native";
 import ErrorBoundary from "react-native-error-boundary";
-import "@/global.css";
+import "../../global.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import ErrorHandler from "@/components/layout/NativeErrorBoundry";
-import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import useGoogleUpdate from "@/hooks/useUpdateApplication";
 
 export {

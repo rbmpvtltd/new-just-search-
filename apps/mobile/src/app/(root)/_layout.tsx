@@ -12,6 +12,7 @@ import { useNotificationCount } from "@/query/notification/notication";
 
 export default function TabLayout() {
   const { data: noticationcount, isLoading, isError } = useNotificationCount();
+  const navigation = useNavigation();
 
   const colorScheme = useColorScheme();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
@@ -33,45 +34,44 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(home)"
         options={{
-        
           title: "",
           tabBarLabel: "Home",
           tabBarIcon: ({ color }) => (
             <Ionicons name="home-outline" size={24} color={color} />
           ),
           headerLeft: () => {
-            const navigation = useNavigation();
             return (
               <View className="flex-row items-center">
-                {isAuthenticated && (
-                  <Pressable
-                    onPress={() =>{
-                      console.log("clicked on drawer hamburger")
-                      navigation.dispatch(DrawerActions.openDrawer())
-                    }
-                    }
-                    style={{ marginRight: 10, marginLeft: 10 }}
-                  >
-                    <Ionicons
-                      name="menu-outline"
-                      size={28}
-                      color={Colors[colorScheme ?? "light"].secondary}
-                    />
-                  </Pressable>
-                )}
-                <Link href="/(root)/(home)/home" asChild>
-                  {colorScheme === "dark" ? (
-                    <Image
-                      source={require("@/assets/images/Just_Search_Logo_Full_Dark.png")}
-                      className="w-32 h-20"
-                    />
-                  ) : (
-                    <Image
-                      source={require("@/assets/images/Just_Search_Logo_Full_Light.png")}
-                      className="w-44 h-20"
-                    />
-                  )}
-                </Link>
+                {/* {isAuthenticated && ( */}
+                {/*   <Pressable */}
+                {/*     onPress={() => { */}
+                {/*       console.log("clicked on drawer hamburger"); */}
+                {/*       navigation.dispatch(DrawerActions.openDrawer()); */}
+                {/*     }} */}
+                {/*     style={{ marginRight: 10, marginLeft: 10 }} */}
+                {/*   > */}
+                {/*     <Ionicons */}
+                {/*       name="menu-outline" */}
+                {/*       size={28} */}
+                {/*       color={Colors[colorScheme ?? "light"].secondary} */}
+                {/*     /> */}
+                {/*   </Pressable> */}
+                {/* )} */}
+                {/* <Link href="/(root)/(home)/home" asChild> */}
+                {/*   {colorScheme === "dark" ? ( */}
+                {/*     <Image */}
+                {/*       source={require("@/assets/images/Just_Search_Logo_Full_Dark.png")} */}
+                {/*       width={300} */}
+                {/*       height={10} */}
+                {/*     /> */}
+                {/*   ) : ( */}
+                {/*     <Image */}
+                {/*       source={require("@/assets/images/Just_Search_Logo_Full_Light.png")} */}
+                {/*       width={300} */}
+                {/*       height={10} */}
+                {/*     /> */}
+                {/*   )} */}
+                {/* </Link> */}
               </View>
             );
           },
@@ -200,35 +200,32 @@ export default function TabLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
-        name="profile/profile"
+        name="profile"
         options={{
-          
           title: isAuthenticated ? "Profile" : "Login",
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-outline" size={24} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
-        name="user"
-        options={{
-          tabBarItemStyle: {
-            display:
-              "none",
-          },
-          headerShown: false,
-          title: "Profile Detail",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="information-circle-outline"
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
+      {/* <Tabs.Screen */}
+      {/*   name="" */}
+      {/*   options={{ */}
+      {/*     tabBarItemStyle: { */}
+      {/*       display: "none", */}
+      {/*     }, */}
+      {/*     headerShown: false, */}
+      {/*     title: "Profile Detail", */}
+      {/*     tabBarIcon: ({ color }) => ( */}
+      {/*       <Ionicons */}
+      {/*         name="information-circle-outline" */}
+      {/*         size={24} */}
+      {/*         color={color} */}
+      {/*       /> */}
+      {/*     ), */}
+      {/*   }} */}
+      {/* /> */}
     </Tabs>
   );
 }
