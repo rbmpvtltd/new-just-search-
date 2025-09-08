@@ -5,6 +5,7 @@
 ---
 
 ## ✅ 1) Code Style & Naming Conventions
+
 - **Variables**: `camelCase` → `userName`, `isLoggedIn`
 - **Functions**: `camelCase` → `getUserData()`, `handleLogin()`
 - **React/Next Components**: `PascalCase` → `UserCard`, `LoginForm`
@@ -14,6 +15,7 @@
 - **Enums**: `PascalCase` (members UPPER_CASE) → `HttpStatus.OK`
 
 ### 1.1 Advanced Naming Rules
+
 - **Boolean variables/functions** must start with: `is/has/should/can`
   - `isAdmin`, `hasPermission()`, `shouldRender()`, `canActivate()`
 - **Functions returning arrays** use **plural nouns**:
@@ -30,6 +32,7 @@
 ---
 
 ## 📂 2) Monorepo Structure (Turborepo + bun)
+
 ```
 repo-root/
 ├─ apps/               # deployable apps (web, mobile, backend, dashboard)
@@ -37,11 +40,14 @@ repo-root/
 ├─ turbo.json          # Turborepo pipeline & caching
 └─ tsconfig.base.json  # shared TS config & path aliases
 ```
+
 **Placement rules**
+
 - Each app must have a features/ folder.
 - Each feature is self-contained: keep its UI, state, hooks, services, and sub-routes together.
-- Cross-cutting/shared things still live in packages/*.
+- Cross-cutting/shared things still live in packages/\*.
 
+```
 repo-root/
 ├─ apps/               # deployable apps (web, mobile, backend, dashboard)
 │  └─ <web>/
@@ -64,18 +70,24 @@ repo-root/
 │
 ├─ turbo.json          # Turborepo pipeline & caching
 └─ tsconfig.base.json  # shared TS config & path aliases
+```
 
+```
    ## Apps (apps/*)
+```
+
+```
    apps/web/features/auth/
   ├─ components/  # UI components for this feature only
   ├─ types/       # TypeScript types/interfaces for this feature
   ├─ services/    # API calls, feature-specific services
-  └─ store/       # local/global state (Zustand, Redux, Jotai, etc.)   
-
+  └─ store/       # local/global state (Zustand, Redux, Jotai, etc.)
+```
 
 ---
 
 ## 🧭 3) TypeScript & Imports
+
 - Use **path aliases** from `tsconfig.base.json` (e.g. `@ui/*`, `@utils/*`). Avoid `../../../`.
 - Prefer **named exports** over default exports in packages.
 - Enable `strict`, `noImplicitAny`, `noUncheckedIndexedAccess` in TS.
@@ -84,6 +96,7 @@ repo-root/
 ---
 
 ## 🌱 4) Git Strategy
+
 - `main` is **production-ready** only.
 - Branch names:
   - `feat/<scope>-<short-desc>` → `feat/auth-login`
@@ -95,6 +108,7 @@ repo-root/
 ---
 
 ## 🔍 5) Pull Requests & Reviews
+
 - At least **1 approval** required.
 - Keep PRs **small and atomic**; include screenshots for UI changes.
 - PR description must explain **what** changed and **why**.
@@ -102,6 +116,7 @@ repo-root/
 - Merge strategy: **squash & merge** (clean history).
 
 **PR Checklist**
+
 - [ ] Lint, typecheck, tests, and build pass
 - [ ] Storybook/docs updated (if UI changes)
 - [ ] No TODOs / leftover `console.log`
@@ -110,6 +125,7 @@ repo-root/
 ---
 
 ## 🎨 6) Linting, Formatting & Hooks
+
 - **ESLint + Prettier** are mandatory.
 - Run `pnpm lint` & `pnpm format` before pushing.
 - Pre-commit hooks via **husky + lint-staged**:
@@ -119,6 +135,7 @@ repo-root/
 ---
 
 ## 🧪 7) Testing Policy
+
 - Unit tests for utilities/services and critical logic.
 - Component tests for UI (React Testing Library).
 - Integration tests for API boundaries where applicable.
@@ -128,6 +145,7 @@ repo-root/
 ---
 
 ## 🔐 8) Security & Secrets
+
 - Never commit secrets. Use `.env.local` and keep `.env.example` updated.
 - Validate and parse env via a schema (e.g., `zod`).
 - Don’t log PII or tokens. Scrub sensitive fields in logs.
@@ -136,6 +154,7 @@ repo-root/
 ---
 
 ## 🛠 9) Error Handling & Logging
+
 - No silent failures—either **throw** or **log** with context.
 - Centralize logging (e.g., `packages/logger`) with levels: `error`, `warn`, `info`, `debug`.
 - Wrap external calls (HTTP/DB) with retries/backoff where needed.
@@ -143,6 +162,7 @@ repo-root/
 ---
 
 ## 📑 10) Documentation & Comments
+
 - Public functions/classes in packages require **TSDoc/JSDoc**.
 - Complex business logic must include rationale and examples.
 - Each package should have a concise `README.md` covering API surface.
@@ -150,6 +170,7 @@ repo-root/
 ---
 
 ## 🧩 11) React/Next.js Component Rules
+
 - UI components: **pure & presentational**; move business logic to hooks/services.
 - Props must be fully typed; avoid `any` and over-wide types.
 - Avoid prop drilling—prefer context/hooks where appropriate.
@@ -158,6 +179,7 @@ repo-root/
 ---
 
 ## 🏎 12) Performance
+
 - Avoid unnecessary re-renders (memoize where it actually helps).
 - Use code-splitting and lazy imports for heavy modules.
 - No magic numbers; move constants to `packages/config`.
@@ -165,6 +187,7 @@ repo-root/
 ---
 
 ## ♻️ 13) Clean Code
+
 - Prefer **early returns** over deeply nested `if` ladders (max nesting: 3).
 - No dead code, commented-out blocks, or unused exports.
 - Clear function boundaries; single responsibility per file (~300 LOC guideline).
@@ -172,6 +195,7 @@ repo-root/
 ---
 
 ## 🧱 14) Turborepo Pipeline Rules
+
 - Define tasks in `turbo.json` with proper dependencies:
   - `"build"` depends on `"^build"` for packages
   - `"lint"`, `"test"`, `"typecheck"`, `"dev"` as needed
@@ -181,6 +205,7 @@ repo-root/
 ---
 
 ## 🚀 15) CI/CD
+
 - Pipelines must run: **typecheck → lint → test → build**.
 - Artifacts (builds) are produced per app and per package.
 - Deploys only from `main` (tagged releases for apps).
@@ -188,6 +213,7 @@ repo-root/
 ---
 
 ## 🔢 16) Versioning & Releases (Packages)
+
 - Follow **Semantic Versioning**: `major.minor.patch`.
 - Use **Changesets** to group and publish package releases.
 - Changelogs must be generated and committed.
@@ -195,6 +221,7 @@ repo-root/
 ---
 
 ## 📦 17) Dependencies
+
 - Workspace manager: **pnpm** only.
 - Prefer **exact versions** in packages; upgrades via PRs.
 - No direct dependency on app code from packages; packages are **app-agnostic**.
@@ -202,6 +229,7 @@ repo-root/
 ---
 
 ## 🧰 18) API Layer & Network
+
 - All HTTP calls go through `packages/api` (central client with interceptors).
 - Request/response models must be typed; parse and validate.
 - Handle errors and retries uniformly (no ad-hoc fetches in components).
@@ -209,16 +237,19 @@ repo-root/
 ---
 
 ## 🧿 19) Observability
+
 - Add basic metrics and tracing where applicable.
 - Log correlation IDs for requests in server-side code.
 
 ---
 
 ## 🧾 20) Compliance & Ownership
+
 - Each package has an **owner** (codeowners) and review path.
 - Use `CODEOWNERS` to auto-request reviews for critical areas.
 
 ---
 
 ### ✅ Final Reminder
+
 Rules can evolve, but until updated, every team member must **strictly follow** these guidelines.
