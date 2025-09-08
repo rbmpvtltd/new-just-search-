@@ -75,6 +75,7 @@ repo-root/
    ## Apps (apps/*)
    
 ## 🟡 Hire Feature
+```
 features/hire/
 ├─ create/
 │  ├─ add-hire/
@@ -111,7 +112,7 @@ features/hire/
 └─ shared/
    ├─ types.ts
    └─ constants.ts
-
+```
 - Use `create/` for new hire flows.  
   - Place multi-step forms inside `add-hire/forms/`.  
   - Example: `PersonalDetailsForm.tsx`, `EducationForm.tsx`, `PreferredPositionForm.tsx`, `DocumentsForm.tsx`.  
@@ -123,6 +124,7 @@ features/hire/
 - Place API calls inside `services/` and local state (Zustand/React Query) in `store/`.  
 
 ## 🟡 Business Feature
+```
 features/business/
 ├─ create/
 │  ├─ add-business/
@@ -159,7 +161,7 @@ features/business/
 └─ shared/
    ├─ types.ts
    └─ constants.ts
-
+```
 - Use `create/` for new business flows.  
   - Place multi-step forms inside `add-business/forms/`.  
   - Example: `AboutForm.tsx`, `AddressForm.tsx`, `BusinessTimingForm.tsx`, `ContactForm.tsx`.  
@@ -172,6 +174,7 @@ features/business/
 
 
 ## 🟡 User Feature
+```
 features/user/
 ├─ create/
 │  ├─ add-user/
@@ -195,7 +198,7 @@ features/user/
 └─ shared/
    ├─ types.ts
    └─ constants.ts
-
+```
 - Use `create/` for adding new users (`add-user/`).  
   - Example: `AddUserForm.tsx` + `AddUserPage.tsx`.  
 - Use `update/` for editing existing users (`edit-user/`).  
@@ -206,6 +209,7 @@ features/user/
 
 
 ## 🟡 Plans Feature
+```
 features/plans/
 ├─ show/
 │  ├─ PlanList.tsx
@@ -222,6 +226,7 @@ features/plans/
 │  └─ PricingTable.tsx
 └─ services/
    └─ getPlans.ts
+```
 
 - Plans are **read-only for end-users**.  
 - Use `show/` for plan listing and details.  
@@ -232,6 +237,7 @@ features/plans/
 
 
 ## 🟡 Chats Feature
+```
 features/chats/
 ├─ components/
 │  ├─ ChatUI.tsx
@@ -244,7 +250,7 @@ features/chats/
 │  └─ useChatStore.ts
 └─ utils/
    └─ formatMessage.ts
-
+```
 - Use `components/` for chat UI (e.g., `ChatUI.tsx`, `MessageList.tsx`, `MessageInput.tsx`).  
 - Place messaging logic in `services/` (API + WebSocket).  
 - Use `store/` for chat state management.  
@@ -253,6 +259,7 @@ features/chats/
 
 
 ## 🟡 Offers Feature
+```
 features/offers/ (Same for product)
 ├─ create/
 │  ├─ add-offer/
@@ -276,7 +283,7 @@ features/offers/ (Same for product)
 └─ shared/
    ├─ types.ts
    └─ constants.ts
-
+```
 - Use `create/` for adding offers (`add-offer/`).  
   - Example: `OfferForm.tsx` + `AddOfferPage.tsx`.  
 - Use `update/` for editing offers (`edit-offer/`).  
