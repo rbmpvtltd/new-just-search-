@@ -17,7 +17,7 @@ import {
   IconSettings,
   IconUsers,
 } from "@tabler/icons-react";
-
+import Link from "next/link";
 import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -31,7 +31,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
 
 const data = {
   user: {
@@ -46,24 +45,9 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Company Master",
-      url: "/company-master",
-      icon: IconDashboard,
-    },
-    {
       title: "login",
       url: "/login",
       icon: IconListDetails,
-    },
-    {
-      title: "QR Genarator",
-      url: "/generate-qr",
-      icon: IconChartBar,
-    },
-    {
-      title: "menu card",
-      url: "/menu-card",
-      icon: IconFolder,
     },
     {
       title: "Team",

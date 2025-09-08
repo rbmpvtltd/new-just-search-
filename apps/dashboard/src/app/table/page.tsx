@@ -1,6 +1,6 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
+import { DataTable } from "@/components/data-table-1";
 import type { ColumnDef } from "@tanstack/react-table";
 
 type User = {
