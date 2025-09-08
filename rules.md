@@ -22,12 +22,9 @@
   - `getUsers(): User[]`, `fetchOrders(): Order[]`
 - **Converters / Transformers** use `toX` / `fromX`:
   - `toJson(user)`, `fromJson(str)`, `toCamelCase(s)`
-- **Functions returning JSON/object** should indicate the shape:
   - `getUserJson()`, `buildConfigObject()`, `toUserDto()`
 - **Primitive returns** should read naturally:
   - `getUserName(): string`, `getRetryCount(): number`
-- **Async functions** must end with `Async`:
-  - `fetchUserAsync()`, `saveOrderAsync()`
 
 ---
 
@@ -36,16 +33,15 @@
 ```
 repo-root/
 ├─ apps/               # deployable apps (web, mobile, backend, dashboard)
-├─ packages/           # shared libraries (ui, utils, config, api, eslint-config)
-├─ turbo.json          # Turborepo pipeline & caching
-└─ tsconfig.base.json  # shared TS config & path aliases
+└─ packages/           # shared libraries (db, helper, radis, seeds,types)
 ```
 
 **Placement rules**
 
 - Each app must have a features/ folder.
 - Each feature is self-contained: keep its UI, state, hooks, services, and sub-routes together.
-- Cross-cutting/shared things still live in packages/\*.
+- If something is only for one feature, keep it inside that feature folder.
+
 
 ```
 repo-root/
@@ -62,56 +58,65 @@ repo-root/
 │     └─ (pages/)  # routing entry points (Next.js, Expo Router, etc.)
 │
 ├─ packages/           # shared libraries
-│  ├─ ui/              # UI primitives/components
 │  ├─ utils/           # cross-project helpers
-│  ├─ api/             # API client / SDK / services
-│  ├─ config/          # shared config/constants/env schema
-│  └─ eslint-config/   # linting & code style
+│  └─ biome-config/    # formatting & code style
 │
 ├─ turbo.json          # Turborepo pipeline & caching
 └─ tsconfig.base.json  # shared TS config & path aliases
 ```
 
-   ## Apps (apps/*)
-   
+## Apps (apps/*) (* == web/app/backend/dashboard)  
+
+## Naming Rule (to stay consistent)
+
+Pages / UI → use Add or Edit
+(e.g., AddHirePage.tsx, EditHirePage.tsx)
+Add/Edit = what the user interacts with
+
+Services / API → use Create or Update
+(e.g., createHire.ts, updateHire.ts)
+Create/Update = saving changes in the database (system) 
+
 ## 🟡 Hire Feature
 ```
 features/hire/
-├─ create/
-│  ├─ add-hire/
-│  │   ├─ forms/
-│  │   │   ├─ PersonalDetailsForm.tsx
-│  │   │   ├─ EducationForm.tsx
-│  │   │   ├─ PreferredPositionForm.tsx
-│  │   │   └─ DocumentsForm.tsx
-│  │   ├─ AddHirePage.tsx              # combines forms with stepper
-│  │   └─ index.ts                     # export entry
-│  ├─ services/
-│  │   └─ createHire.ts
-│  └─ store/
-│      └─ useCreateHireStore.ts
-├─ update/
-│  ├─ edit-hire/
-│  │   ├─ forms/
-│  │   │   ├─ PersonalDetailsForm.tsx
-│  │   │   ├─ EducationForm.tsx
-│  │   │   ├─ PreferredPositionForm.tsx
-│  │   │   └─ DocumentsForm.tsx
-│  │   ├─ EditHirePage.tsx             # same flow but pre-filled
-│  │   └─ index.ts
-│  ├─ services/
-│  │   └─ updateHire.ts
-│  └─ store/
-│      └─ useUpdateHireStore.ts
-├─ show/
+├─ create/                               # feature: creating a new hire
+│  ├─ add-hire/                          # UI flow for adding a hire
+│  │   ├─ forms/                         # stepper forms for hire creation
+│  │   │   ├─ PersonalDetailsForm.tsx    # form for candidate's personal info
+│  │   │   ├─ EducationForm.tsx          # form for candidate's education
+│  │   │   ├─ PreferredPositionForm.tsx  # form for job preferences
+│  │   │   └─ DocumentsForm.tsx          # form for uploading documents
+│  │   ├─ AddHirePage.tsx                # page combining forms with stepper logic
+│  │   └─ index.ts                       # entry point export for add-hire
+│  └─ services/
+│      └─ createHire.ts                  # API call: send new hire data to backend
+│
+├─ update/                               # feature: updating an existing hire
+│  ├─ edit-hire/                         # UI flow for editing hire details
+│  │   ├─ forms/                         # stepper forms, same as create but pre-filled
+│  │   │   ├─ PersonalDetailsForm.tsx    # pre-filled personal details form
+│  │   │   ├─ EducationForm.tsx          # pre-filled education form
+│  │   │   ├─ PreferredPositionForm.tsx  # pre-filled job preferences form
+│  │   │   └─ DocumentsForm.tsx          # pre-filled documents form
+│  │   ├─ EditHirePage.tsx               # page showing edit flow with pre-filled data
+│  │   └─ index.ts                       # entry point export for edit-hire
+│  └─ services/
+│      └─ updateHire.ts                  # API call: update hire data in backend
+│
+├─ show/                                 # feature: showing hire data
 │  ├─ list-hire/
-│  │   └─ HireList.tsx
+│  │   └─ HireList.tsx                   # component: show list of hires
 │  ├─ detail-hire/
-│  │   └─ HireDetails.tsx
-│  └─ index.ts
-└─ shared/
-   ├─ types.ts
-   └─ constants.ts
+│  │   └─ HireDetails.tsx                # component: show single hire details
+│  └─ index.ts                           # entry point export for show feature
+│
+└─ shared/                               # shared code across hire feature
+   ├─ types.ts                           # TypeScript types/interfaces for hire
+   ├─ constants.ts                       # constants/enums specific to hire
+   └─ store/
+       └─ useCreateHireStore.ts          # Zustand (or other) store: manage hire creation/updation state
+
 ```
 - Use `create/` for new hire flows.  
   - Place multi-step forms inside `add-hire/forms/`.  
@@ -122,178 +127,12 @@ features/hire/
 - Use `show/` for listing and detail pages.  
 - Place shared types, constants, and helpers in `shared/`.  
 - Place API calls inside `services/` and local state (Zustand/React Query) in `store/`.  
-
+2
 ## 🟡 Business Feature
-```
-features/business/
-├─ create/
-│  ├─ add-business/
-│  │   ├─ forms/
-│  │   │   ├─ AboutForm.tsx
-│  │   │   ├─ AddressForm.tsx
-│  │   │   ├─ BusinessTimingForm.tsx
-│  │   │   └─ ContactForm.tsx
-│  │   ├─ AddBusinessPage.tsx
-│  │   └─ index.ts
-│  ├─ services/
-│  │   └─ createBusiness.ts
-│  └─ store/
-│      └─ useCreateBusinessStore.ts
-├─ update/
-│  ├─ edit-business/
-│  │   ├─ forms/
-│  │   │   ├─ AboutForm.tsx
-│  │   │   ├─ AddressForm.tsx
-│  │   │   ├─ BusinessTimingForm.tsx
-│  │   │   └─ ContactForm.tsx
-│  │   ├─ EditBusinessPage.tsx
-│  │   └─ index.ts
-│  ├─ services/
-│  │   └─ updateBusiness.ts
-│  └─ store/
-│      └─ useUpdateBusinessStore.ts
-├─ show/
-│  ├─ list-business/
-│  │   └─ BusinessList.tsx
-│  ├─ detail-business/
-│  │   └─ BusinessDetails.tsx
-│  └─ index.ts
-└─ shared/
-   ├─ types.ts
-   └─ constants.ts
-```
-- Use `create/` for new business flows.  
-  - Place multi-step forms inside `add-business/forms/`.  
-  - Example: `AboutForm.tsx`, `AddressForm.tsx`, `BusinessTimingForm.tsx`, `ContactForm.tsx`.  
-  - Combine forms in `AddBusinessPage.tsx`.  
-- Use `update/` for editing existing businesses.  
-  - Same form structure as create, but pre-filled.  
-- Use `show/` for listing and detail pages.  
-- Place shared types, constants, and helpers in `shared/`.  
-- Place API calls inside `services/` and local state in `store/`.  
-
-
 ## 🟡 User Feature
-```
-features/user/
-├─ create/
-│  ├─ add-user/
-│  │   ├─ AddUserForm.tsx
-│  │   └─ AddUserPage.tsx
-│  ├─ services/
-│  │   └─ createUser.ts
-│  └─ store/
-│      └─ useCreateUserStore.ts
-├─ update/
-│  ├─ edit-user/
-│  │   ├─ EditUserForm.tsx
-│  │   └─ EditUserPage.tsx
-│  ├─ services/
-│  │   └─ updateUser.ts
-│  └─ store/
-│      └─ useUpdateUserStore.ts
-├─ show/
-│  ├─ UserList.tsx
-│  └─ UserDetails.tsx
-└─ shared/
-   ├─ types.ts
-   └─ constants.ts
-```
-- Use `create/` for adding new users (`add-user/`).  
-  - Example: `AddUserForm.tsx` + `AddUserPage.tsx`.  
-- Use `update/` for editing existing users (`edit-user/`).  
-  - Example: `EditUserForm.tsx` + `EditUserPage.tsx`.  
-- Use `show/` for user listing and profile detail pages.  
-- Place shared types, constants, and helpers in `shared/`.  
-- Place API calls inside `services/` and local state in `store/`.  
-
-
 ## 🟡 Plans Feature
-```
-features/plans/
-├─ show/
-│  ├─ PlanList.tsx
-│  ├─ PlanDetails.tsx
-│  └─ index.ts
-├─ buy/
-│  ├─ BuyPlanPage.tsx
-│  ├─ services/
-│  │   └─ buyPlan.ts
-│  └─ store/
-│      └─ useBuyPlanStore.ts
-├─ components/
-│  ├─ PlanCard.tsx
-│  └─ PricingTable.tsx
-└─ services/
-   └─ getPlans.ts
-```
-
-- Plans are **read-only for end-users**.  
-- Use `show/` for plan listing and details.  
-- Use `buy/` for checkout and purchase flow.  
-- ❌ Do **not** add `create/` or `update/` under `plans/` (those belong in **admin-only features**).  
-- Place reusable UI like `PlanCard`, `PricingTable` in `components/`.  
-- Place API calls in `services/`, and optional local state in `store/`. 
-
-
 ## 🟡 Chats Feature
-```
-features/chats/
-├─ components/
-│  ├─ ChatUI.tsx
-│  ├─ MessageList.tsx
-│  └─ MessageInput.tsx
-├─ services/
-│  ├─ chatApi.ts
-│  └─ socket.ts
-├─ store/
-│  └─ useChatStore.ts
-└─ utils/
-   └─ formatMessage.ts
-```
-- Use `components/` for chat UI (e.g., `ChatUI.tsx`, `MessageList.tsx`, `MessageInput.tsx`).  
-- Place messaging logic in `services/` (API + WebSocket).  
-- Use `store/` for chat state management.  
-- Use `utils/` for helpers (e.g., `formatMessage.ts`).  
-- ❌ No `create/` or `update/` — chats are real-time, not CRUD.  
-
-
-## 🟡 Offers Feature
-```
-features/offers/ (Same for product)
-├─ create/
-│  ├─ add-offer/
-│  │   ├─ OfferForm.tsx
-│  │   └─ AddOfferPage.tsx
-│  ├─ services/
-│  │   └─ createOffer.ts
-│  └─ store/
-│      └─ useCreateOfferStore.ts
-├─ update/
-│  ├─ edit-offer/
-│  │   ├─ OfferForm.tsx
-│  │   └─ EditOfferPage.tsx
-│  ├─ services/
-│  │   └─ updateOffer.ts
-│  └─ store/
-│      └─ useUpdateOfferStore.ts
-├─ show/
-│  ├─ OfferList.tsx
-│  └─ OfferDetails.tsx
-└─ shared/
-   ├─ types.ts
-   └─ constants.ts
-```
-- Use `create/` for adding offers (`add-offer/`).  
-  - Example: `OfferForm.tsx` + `AddOfferPage.tsx`.  
-- Use `update/` for editing offers (`edit-offer/`).  
-  - Example: `OfferForm.tsx` + `EditOfferPage.tsx`.  
-- Use `show/` for listing and viewing offers.  
-- Place shared types, constants, and helpers in `shared/`.  
-- Place API calls inside `services/` and local state in `store/`.
-
-
-```
+## 🟡 Offers/Products Feature
 
 ---
 
@@ -301,8 +140,6 @@ features/offers/ (Same for product)
 
 - Use **path aliases** from `tsconfig.base.json` (e.g. `@ui/*`, `@utils/*`). Avoid `../../../`.
 - Prefer **named exports** over default exports in packages.
-- Enable `strict`, `noImplicitAny`, `noUncheckedIndexedAccess` in TS.
-- Public APIs of each package are re-exported via a single `index.ts` barrel.
 
 ---
 
@@ -312,8 +149,7 @@ features/offers/ (Same for product)
 - Branch names:
   - `feat/<scope>-<short-desc>` → `feat/auth-login`
   - `fix/<scope>-<short-desc>` → `fix/ui-button-disabled`
-  - `chore/<scope>-<short-desc>` → `chore/deps-bump`
-- **Conventional Commits** required: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `perf:`, `build:`, `ci:`
+- **Conventional Commits** required: `feat:`, `fix:`.
 - Use **Changesets** for versioning & releases in `packages/*`.
 
 ---
@@ -326,32 +162,15 @@ features/offers/ (Same for product)
 - Include tests for new features/bugfixes.
 - Merge strategy: **squash & merge** (clean history).
 
-**PR Checklist**
-
-- [ ] Lint, typecheck, tests, and build pass
-- [ ] Storybook/docs updated (if UI changes)
-- [ ] No TODOs / leftover `console.log`
-- [ ] Appropriate changeset added (if packages changed)
-
 ---
 
 ## 🎨 6) Linting, Formatting & Hooks
 
-- **ESLint + Prettier** are mandatory.
-- Run `pnpm lint` & `pnpm format` before pushing.
+- **Biome** is mandatory (replaces ESLint + Prettier).
+- Run bun biome check (or bun format) before pushing.
 - Pre-commit hooks via **husky + lint-staged**:
-  - `typecheck`, `lint`, `format`, `test --changed`
+  biome check --apply (auto-fix lint/format issues)
 - No `any` without justification; prefer proper typing.
-
----
-
-## 🧪 7) Testing Policy
-
-- Unit tests for utilities/services and critical logic.
-- Component tests for UI (React Testing Library).
-- Integration tests for API boundaries where applicable.
-- Minimum coverage target: **80% lines** for packages.
-- Snapshots should be reviewed and stable (no noisy snapshots).
 
 ---
 
@@ -366,21 +185,11 @@ features/offers/ (Same for product)
 
 ## 🛠 9) Error Handling & Logging
 
-- No silent failures—either **throw** or **log** with context.
 - Centralize logging (e.g., `packages/logger`) with levels: `error`, `warn`, `info`, `debug`.
-- Wrap external calls (HTTP/DB) with retries/backoff where needed.
 
 ---
 
-## 📑 10) Documentation & Comments
-
-- Public functions/classes in packages require **TSDoc/JSDoc**.
-- Complex business logic must include rationale and examples.
-- Each package should have a concise `README.md` covering API surface.
-
----
-
-## 🧩 11) React/Next.js Component Rules
+## 🧩 10) React/Next.js Component Rules
 
 - UI components: **pure & presentational**; move business logic to hooks/services.
 - Props must be fully typed; avoid `any` and over-wide types.
@@ -389,11 +198,9 @@ features/offers/ (Same for product)
 
 ---
 
-## 🏎 12) Performance
+## 🏎 11) Performance
 
 - Avoid unnecessary re-renders (memoize where it actually helps).
-- Use code-splitting and lazy imports for heavy modules.
-- No magic numbers; move constants to `packages/config`.
 
 ---
 
@@ -401,29 +208,9 @@ features/offers/ (Same for product)
 
 - Prefer **early returns** over deeply nested `if` ladders (max nesting: 3).
 - No dead code, commented-out blocks, or unused exports.
-- Clear function boundaries; single responsibility per file (~300 LOC guideline).
 
 ---
-
-## 🧱 14) Turborepo Pipeline Rules
-
-- Define tasks in `turbo.json` with proper dependencies:
-  - `"build"` depends on `"^build"` for packages
-  - `"lint"`, `"test"`, `"typecheck"`, `"dev"` as needed
-- Use Turborepo **remote caching** in CI to speed up builds.
-- Only run affected tasks where possible; avoid full-repo runs locally.
-
----
-
-## 🚀 15) CI/CD
-
-- Pipelines must run: **typecheck → lint → test → build**.
-- Artifacts (builds) are produced per app and per package.
-- Deploys only from `main` (tagged releases for apps).
-
----
-
-## 🔢 16) Versioning & Releases (Packages)
+## 🔢 14) Versioning & Releases (Packages)
 
 - Follow **Semantic Versioning**: `major.minor.patch`.
 - Use **Changesets** to group and publish package releases.
@@ -431,33 +218,10 @@ features/offers/ (Same for product)
 
 ---
 
-## 📦 17) Dependencies
+## 📦 15) Dependencies
 
-- Workspace manager: **pnpm** only.
+- Workspace manager: **bun** only.
 - Prefer **exact versions** in packages; upgrades via PRs.
-- No direct dependency on app code from packages; packages are **app-agnostic**.
-
----
-
-## 🧰 18) API Layer & Network
-
-- All HTTP calls go through `packages/api` (central client with interceptors).
-- Request/response models must be typed; parse and validate.
-- Handle errors and retries uniformly (no ad-hoc fetches in components).
-
----
-
-## 🧿 19) Observability
-
-- Add basic metrics and tracing where applicable.
-- Log correlation IDs for requests in server-side code.
-
----
-
-## 🧾 20) Compliance & Ownership
-
-- Each package has an **owner** (codeowners) and review path.
-- Use `CODEOWNERS` to auto-request reviews for critical areas.
 
 ---
 
