@@ -29,25 +29,49 @@
 
 ---
 
-## 📂 2) Monorepo Structure (Turborepo + pnpm)
+## 📂 2) Monorepo Structure (Turborepo + bun)
 ```
 repo-root/
-├─ apps/               # deployable apps (web, mobile, admin)
+├─ apps/               # deployable apps (web, mobile, backend, dashboard)
 ├─ packages/           # shared libraries (ui, utils, config, api, eslint-config)
 ├─ turbo.json          # Turborepo pipeline & caching
-├─ pnpm-workspace.yaml # workspace configuration
 └─ tsconfig.base.json  # shared TS config & path aliases
 ```
 **Placement rules**
-- UI primitives/components → `packages/ui`
-- Cross-project helpers → `packages/utils`
-- API client / SDK / services → `packages/api`
-- Shared config/constants/env schema → `packages/config`
-- App-specific pages/routes only inside `apps/*`
+- Each app must have a features/ folder.
+- Each feature is self-contained: keep its UI, state, hooks, services, and sub-routes together.
+- Cross-cutting/shared things still live in packages/*.
 
-**Do not**
-- ❌ Import from one **app** into another app. Share via `packages/*` only.
-- ❌ Duplicate utilities—always check `packages/*` first.
+repo-root/
+├─ apps/               # deployable apps (web, mobile, backend, dashboard)
+│  └─ <web>/
+│     ├─ features/     # app-specific features
+│     │  ├─ auth/          # authentication (login, register, reset, etc.)
+│     │  ├─ banners/       # banners
+│     │  ├─ hire/
+│     │  │   ├─ create-hire/
+│     │  │   ├─ update-hire/
+│     │  │   └─ show-hire/
+│     │  └─ ...other features
+│     └─ (pages/)  # routing entry points (Next.js, Expo Router, etc.)
+│
+├─ packages/           # shared libraries
+│  ├─ ui/              # UI primitives/components
+│  ├─ utils/           # cross-project helpers
+│  ├─ api/             # API client / SDK / services
+│  ├─ config/          # shared config/constants/env schema
+│  └─ eslint-config/   # linting & code style
+│
+├─ turbo.json          # Turborepo pipeline & caching
+└─ tsconfig.base.json  # shared TS config & path aliases
+
+   ## Apps (apps/*)
+   apps/web/features/auth/
+  ├─ components/  # UI components for this feature only
+  ├─ types/       # TypeScript types/interfaces for this feature
+  ├─ services/    # API calls, feature-specific services
+  └─ store/       # local/global state (Zustand, Redux, Jotai, etc.)   
+
 
 ---
 
