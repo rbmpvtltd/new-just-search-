@@ -72,16 +72,220 @@ repo-root/
 └─ tsconfig.base.json  # shared TS config & path aliases
 ```
 
-```
    ## Apps (apps/*)
-```
+   
+## 🟡 Hire Feature
+features/hire/
+├─ create/
+│  ├─ add-hire/
+│  │   ├─ forms/
+│  │   │   ├─ PersonalDetailsForm.tsx
+│  │   │   ├─ EducationForm.tsx
+│  │   │   ├─ PreferredPositionForm.tsx
+│  │   │   └─ DocumentsForm.tsx
+│  │   ├─ AddHirePage.tsx              # combines forms with stepper
+│  │   └─ index.ts                     # export entry
+│  ├─ services/
+│  │   └─ createHire.ts
+│  └─ store/
+│      └─ useCreateHireStore.ts
+├─ update/
+│  ├─ edit-hire/
+│  │   ├─ forms/
+│  │   │   ├─ PersonalDetailsForm.tsx
+│  │   │   ├─ EducationForm.tsx
+│  │   │   ├─ PreferredPositionForm.tsx
+│  │   │   └─ DocumentsForm.tsx
+│  │   ├─ EditHirePage.tsx             # same flow but pre-filled
+│  │   └─ index.ts
+│  ├─ services/
+│  │   └─ updateHire.ts
+│  └─ store/
+│      └─ useUpdateHireStore.ts
+├─ show/
+│  ├─ list-hire/
+│  │   └─ HireList.tsx
+│  ├─ detail-hire/
+│  │   └─ HireDetails.tsx
+│  └─ index.ts
+└─ shared/
+   ├─ types.ts
+   └─ constants.ts
 
-```
-   apps/web/features/auth/
-  ├─ components/  # UI components for this feature only
-  ├─ types/       # TypeScript types/interfaces for this feature
-  ├─ services/    # API calls, feature-specific services
-  └─ store/       # local/global state (Zustand, Redux, Jotai, etc.)
+- Use `create/` for new hire flows.  
+  - Place multi-step forms inside `add-hire/forms/`.  
+  - Example: `PersonalDetailsForm.tsx`, `EducationForm.tsx`, `PreferredPositionForm.tsx`, `DocumentsForm.tsx`.  
+  - Combine forms in `AddHirePage.tsx`.  
+- Use `update/` for editing existing hires.  
+  - Same form structure as create, but pre-filled.  
+- Use `show/` for listing and detail pages.  
+- Place shared types, constants, and helpers in `shared/`.  
+- Place API calls inside `services/` and local state (Zustand/React Query) in `store/`.  
+
+## 🟡 Business Feature
+features/business/
+├─ create/
+│  ├─ add-business/
+│  │   ├─ forms/
+│  │   │   ├─ AboutForm.tsx
+│  │   │   ├─ AddressForm.tsx
+│  │   │   ├─ BusinessTimingForm.tsx
+│  │   │   └─ ContactForm.tsx
+│  │   ├─ AddBusinessPage.tsx
+│  │   └─ index.ts
+│  ├─ services/
+│  │   └─ createBusiness.ts
+│  └─ store/
+│      └─ useCreateBusinessStore.ts
+├─ update/
+│  ├─ edit-business/
+│  │   ├─ forms/
+│  │   │   ├─ AboutForm.tsx
+│  │   │   ├─ AddressForm.tsx
+│  │   │   ├─ BusinessTimingForm.tsx
+│  │   │   └─ ContactForm.tsx
+│  │   ├─ EditBusinessPage.tsx
+│  │   └─ index.ts
+│  ├─ services/
+│  │   └─ updateBusiness.ts
+│  └─ store/
+│      └─ useUpdateBusinessStore.ts
+├─ show/
+│  ├─ list-business/
+│  │   └─ BusinessList.tsx
+│  ├─ detail-business/
+│  │   └─ BusinessDetails.tsx
+│  └─ index.ts
+└─ shared/
+   ├─ types.ts
+   └─ constants.ts
+
+- Use `create/` for new business flows.  
+  - Place multi-step forms inside `add-business/forms/`.  
+  - Example: `AboutForm.tsx`, `AddressForm.tsx`, `BusinessTimingForm.tsx`, `ContactForm.tsx`.  
+  - Combine forms in `AddBusinessPage.tsx`.  
+- Use `update/` for editing existing businesses.  
+  - Same form structure as create, but pre-filled.  
+- Use `show/` for listing and detail pages.  
+- Place shared types, constants, and helpers in `shared/`.  
+- Place API calls inside `services/` and local state in `store/`.  
+
+
+## 🟡 User Feature
+features/user/
+├─ create/
+│  ├─ add-user/
+│  │   ├─ AddUserForm.tsx
+│  │   └─ AddUserPage.tsx
+│  ├─ services/
+│  │   └─ createUser.ts
+│  └─ store/
+│      └─ useCreateUserStore.ts
+├─ update/
+│  ├─ edit-user/
+│  │   ├─ EditUserForm.tsx
+│  │   └─ EditUserPage.tsx
+│  ├─ services/
+│  │   └─ updateUser.ts
+│  └─ store/
+│      └─ useUpdateUserStore.ts
+├─ show/
+│  ├─ UserList.tsx
+│  └─ UserDetails.tsx
+└─ shared/
+   ├─ types.ts
+   └─ constants.ts
+
+- Use `create/` for adding new users (`add-user/`).  
+  - Example: `AddUserForm.tsx` + `AddUserPage.tsx`.  
+- Use `update/` for editing existing users (`edit-user/`).  
+  - Example: `EditUserForm.tsx` + `EditUserPage.tsx`.  
+- Use `show/` for user listing and profile detail pages.  
+- Place shared types, constants, and helpers in `shared/`.  
+- Place API calls inside `services/` and local state in `store/`.  
+
+
+## 🟡 Plans Feature
+features/plans/
+├─ show/
+│  ├─ PlanList.tsx
+│  ├─ PlanDetails.tsx
+│  └─ index.ts
+├─ buy/
+│  ├─ BuyPlanPage.tsx
+│  ├─ services/
+│  │   └─ buyPlan.ts
+│  └─ store/
+│      └─ useBuyPlanStore.ts
+├─ components/
+│  ├─ PlanCard.tsx
+│  └─ PricingTable.tsx
+└─ services/
+   └─ getPlans.ts
+
+- Plans are **read-only for end-users**.  
+- Use `show/` for plan listing and details.  
+- Use `buy/` for checkout and purchase flow.  
+- ❌ Do **not** add `create/` or `update/` under `plans/` (those belong in **admin-only features**).  
+- Place reusable UI like `PlanCard`, `PricingTable` in `components/`.  
+- Place API calls in `services/`, and optional local state in `store/`. 
+
+
+## 🟡 Chats Feature
+features/chats/
+├─ components/
+│  ├─ ChatUI.tsx
+│  ├─ MessageList.tsx
+│  └─ MessageInput.tsx
+├─ services/
+│  ├─ chatApi.ts
+│  └─ socket.ts
+├─ store/
+│  └─ useChatStore.ts
+└─ utils/
+   └─ formatMessage.ts
+
+- Use `components/` for chat UI (e.g., `ChatUI.tsx`, `MessageList.tsx`, `MessageInput.tsx`).  
+- Place messaging logic in `services/` (API + WebSocket).  
+- Use `store/` for chat state management.  
+- Use `utils/` for helpers (e.g., `formatMessage.ts`).  
+- ❌ No `create/` or `update/` — chats are real-time, not CRUD.  
+
+
+## 🟡 Offers Feature
+features/offers/ (Same for product)
+├─ create/
+│  ├─ add-offer/
+│  │   ├─ OfferForm.tsx
+│  │   └─ AddOfferPage.tsx
+│  ├─ services/
+│  │   └─ createOffer.ts
+│  └─ store/
+│      └─ useCreateOfferStore.ts
+├─ update/
+│  ├─ edit-offer/
+│  │   ├─ OfferForm.tsx
+│  │   └─ EditOfferPage.tsx
+│  ├─ services/
+│  │   └─ updateOffer.ts
+│  └─ store/
+│      └─ useUpdateOfferStore.ts
+├─ show/
+│  ├─ OfferList.tsx
+│  └─ OfferDetails.tsx
+└─ shared/
+   ├─ types.ts
+   └─ constants.ts
+
+- Use `create/` for adding offers (`add-offer/`).  
+  - Example: `OfferForm.tsx` + `AddOfferPage.tsx`.  
+- Use `update/` for editing offers (`edit-offer/`).  
+  - Example: `OfferForm.tsx` + `EditOfferPage.tsx`.  
+- Use `show/` for listing and viewing offers.  
+- Place shared types, constants, and helpers in `shared/`.  
+- Place API calls inside `services/` and local state in `store/`.
+
+
 ```
 
 ---
