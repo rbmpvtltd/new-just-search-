@@ -4,10 +4,7 @@ import {
   DrawerItem,
   DrawerToggleButton,
 } from "@react-navigation/drawer";
-import {
-  HeaderBackButton,
-  type HeaderBackButtonProps,
-} from "@react-navigation/elements";
+import type { HeaderBackButtonProps } from "@react-navigation/elements";
 import { type Href, router, useSegments } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { Text, View } from "react-native";
@@ -17,7 +14,7 @@ const drawerFields: DrawerField[] = [
     name: "home",
     route: "/(root)/(home)/home",
     title: "hi",
-    headerLeft: (props) => {
+    headerLeft: () => {
       return (
         <View className="p-4 bg-primary">
           <Text className="text-secondary"> hi</Text>
