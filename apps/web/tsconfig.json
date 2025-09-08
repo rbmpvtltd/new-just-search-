@@ -11,7 +11,7 @@
     "plugins": [{ "name": "next" }],
     "composite": true,
     "incremental": true,
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
