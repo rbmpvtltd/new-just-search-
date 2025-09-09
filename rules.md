@@ -65,7 +65,7 @@ repo-root/
 └─ tsconfig.base.json  # shared TS config & path aliases
 ```
 
-## Apps (apps/*) (* == web/app/backend/dashboard)  
+## Apps (apps/**) (* == web/app/backend/dashboard)  
 
 ## Naming Rule (to stay consistent)
 
@@ -194,6 +194,49 @@ src/
 ## So basically:
 - Drawer Hire = where the user goes in the app (screens)
 - Features Hire = how everything works under the hood (logic, forms, APIs, state, etc)
+
+## 📂 Backend Structure 
+```
+backend/
+├─ src/
+│  ├─ modules/
+│  │  ├─ hire/                       # Hire feature (all code about hire here)
+│  │  │  ├─ controllers/             # Handle incoming requests (req → res)
+│  │  │  │  ├─ hire.controller.ts    # Functions for create, update, list, details
+│  │  │  │
+│  │  │  ├─ services/                # Business logic (no req/res, just pure logic)
+│  │  │  │  ├─ hire.service.ts       # Create, update, fetch hire data
+│  │  │  │
+│  │  │  ├─ models/                  # Database models (Drizzle)
+│  │  │  │  ├─ hire.model.ts         # Hire schema/table
+│  │  │  │
+│  │  │  ├─ routes/                  # API endpoints
+│  │  │  │  ├─ hire.routes.ts        # /hire, /hire/:id etc.
+│  │  │  │
+│  │  │  ├─ validators/              # Request validation (zod/joi/yup)
+│  │  │  │  ├─ hire.validator.ts     # Validation rules for forms
+│  │  │  │
+│  │  │  ├─ types/                   # TypeScript types/interfaces
+│  │  │  │  ├─ hire.types.ts         # Hire interfaces (Hire, HireInput, etc.)
+│  │  │  │
+│  │  │  └─ index.ts                 # (easy import)
+│  │  │
+│  │  └─ ...other modules            # (auth, business, etc.)
+│  │
+│  ├─ middlewares/                   # Common middlewares (auth, error handler)
+│  ├─ utils/                          # Helpers (date, file upload, etc.)
+│  ├─ config/                         # DB config, env, constants
+│  └─ app.ts                          # Main express/fastify app setup
+│
+└─ package.json
+```
+## 🔑 Explanation in simple words
+- controllers/ → Talks to the client (API request & response).
+- services/ → Actual work (CRUD logic, connect DB).
+- models/ → Database shape (Hire table/schema).
+- routes/ → Defines API endpoints (/hire/create, /hire/:id).
+- validators/ → Check request data before going to service.
+- types/ → Keep everything strongly typed (TS only).
 ---
 
 ## 🧭 3) TypeScript & Imports
