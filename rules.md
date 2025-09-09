@@ -55,7 +55,7 @@ repo-root/
 │     │  │   ├─ update-hire/
 │     │  │   └─ show-hire/
 │     │  └─ ...other features
-│     └─ (pages/)  # routing entry points (Next.js, Expo Router, etc.)
+│     └─ (app/)  # routing entry points (Next.js, Expo Router, etc.)
 │
 ├─ packages/           # shared libraries
 │  ├─ utils/           # cross-project helpers
@@ -69,7 +69,7 @@ repo-root/
 
 ## Naming Rule (to stay consistent)
 
-Pages / UI → use Add or Edit
+app / UI → use Add or Edit
 (e.g., AddHirePage.tsx, EditHirePage.tsx)
 Add/Edit = what the user interacts with
 
@@ -127,13 +127,73 @@ features/hire/
 - Use `show/` for listing and detail pages.  
 - Place shared types, constants, and helpers in `shared/`.  
 - Place API calls inside `services/` and local state (Zustand/React Query) in `store/`.  
-2
+
 ## 🟡 Business Feature
 ## 🟡 User Feature
 ## 🟡 Plans Feature
 ## 🟡 Chats Feature
 ## 🟡 Offers/Products Feature
 
+## 📂 Mobile Structure with Drawer + Features
+```
+src/
+├─ app/                           # Expo Router entry points
+│  ├─ (root)/                     # Home stack → dashboard, feed, etc.
+│  ├─ (drawer)/                   # Drawer stack → feature entry routes
+│  │   ├─ hire/                   # Hire routes (connected to features/hire)
+│  │   │   ├─ create.tsx          # Route → uses AddHirePage from features/hire/add-hire
+│  │   │   ├─ edit/[id].tsx       # Route → uses EditHirePage from features/hire/edit-hire
+│  │   │   ├─ [id].tsx            # Route → uses HireDetails from features/hire/show-hire
+│  │   │   └─ index.tsx           # Route → uses HireList from features/hire
+│  │   ├─ business/               # Business routes (similar pattern)
+│  │   └─ ...other feature routes
+│  └─ search/                     # Shared search screens (used across multiple features)
+│
+├─ features/
+│  └─ hire/                       # Hire feature (self-contained business logic)
+│     ├─ add-hire/                # Create new hire flow
+│     │  ├─ forms/                # Stepper forms for hire creation
+│     │  │   ├─ PersonalDetailsForm.tsx   # Step 1: personal info
+│     │  │   ├─ EducationForm.tsx         # Step 2: education
+│     │  │   ├─ PreferredPositionForm.tsx # Step 3: job preferences
+│     │  │   └─ DocumentsForm.tsx         # Step 4: upload documents
+│     │  ├─ AddHirePage.tsx       # Screen that combines the 4 forms into one step-by-step flow
+│     │  └─ index.ts              # Entry point exports for add-hire
+│     │
+│     ├─ edit-hire/               # Update existing hire flow
+│     │  ├─ forms/                # Same 4 steps, but pre-filled with hire data
+│     │  │   ├─ PersonalDetailsForm.tsx
+│     │  │   ├─ EducationForm.tsx
+│     │  │   ├─ PreferredPositionForm.tsx
+│     │  │   └─ DocumentsForm.tsx
+│     │  ├─ EditHirePage.tsx      # Page orchestrating pre-filled edit flow
+│     │  └─ index.ts
+│     │
+│     ├─ show-hire/               # Show hires (list + detail)
+│     │  ├─ HireList.tsx          # Screen showing all hires
+│     │  ├─ HireDetails.tsx       # Screen showing one hire’s details
+│     │  └─ index.ts
+│     │
+│     ├─ services/                # API calls to backend
+│     │  ├─ createHire.ts         # POST → /hire (create new hire)
+│     │  ├─ updateHire.ts         # PUT → /hire/:id (update hire)
+│     │  ├─ getHires.ts           # GET → /hire (list all hires)
+│     │  └─ getHireById.ts        # GET → /hire/:id (get single hire)
+│     │
+│     ├─ store/                   # Local state (Zustand, TanStack Query, etc.)
+│     │  └─ useHireStore.ts       # Stepper state for AddHire/EditHire flow
+│     │
+│     ├─ shared/                  # Shared utilities just for Hire
+│     │  ├─ types.ts              # Types/interfaces (Hire, HireFormData, etc.)
+│     │  ├─ constants.ts          # Constants/enums (HireStatus, MAX_DOCS, etc.)
+│     │  └─ validations.ts        # Zod schemas for hire forms
+│     │
+│     └─ index.ts                 # Barrel export for the whole hire feature
+
+```
+## So basically:
+- Drawer Hire = where the user goes in the app (screens)
+- Features Hire = how everything works under the hood (logic, forms, APIs, state, etc)
 ---
 
 ## 🧭 3) TypeScript & Imports
@@ -150,26 +210,12 @@ features/hire/
   - `feat/<scope>-<short-desc>` → `feat/auth-login`
   - `fix/<scope>-<short-desc>` → `fix/ui-button-disabled`
 - **Conventional Commits** required: `feat:`, `fix:`.
-- Use **Changesets** for versioning & releases in `packages/*`.
-
----
-
-## 🔍 5) Pull Requests & Reviews
-
-- At least **1 approval** required.
-- Keep PRs **small and atomic**; include screenshots for UI changes.
-- PR description must explain **what** changed and **why**.
-- Include tests for new features/bugfixes.
-- Merge strategy: **squash & merge** (clean history).
-
 ---
 
 ## 🎨 6) Linting, Formatting & Hooks
 
 - **Biome** is mandatory (replaces ESLint + Prettier).
 - Run bun biome check (or bun format) before pushing.
-- Pre-commit hooks via **husky + lint-staged**:
-  biome check --apply (auto-fix lint/format issues)
 - No `any` without justification; prefer proper typing.
 
 ---
@@ -177,9 +223,7 @@ features/hire/
 ## 🔐 8) Security & Secrets
 
 - Never commit secrets. Use `.env.local` and keep `.env.example` updated.
-- Validate and parse env via a schema (e.g., `zod`).
 - Don’t log PII or tokens. Scrub sensitive fields in logs.
-- Use HTTPS-only endpoints; verify TLS in production.
 
 ---
 
@@ -194,7 +238,7 @@ features/hire/
 - UI components: **pure & presentational**; move business logic to hooks/services.
 - Props must be fully typed; avoid `any` and over-wide types.
 - Avoid prop drilling—prefer context/hooks where appropriate.
-- Pages in Next.js handle routing; heavy logic belongs to hooks/services.
+- app in Next.js handle routing; heavy logic belongs to hooks/services.
 
 ---
 
@@ -208,20 +252,6 @@ features/hire/
 
 - Prefer **early returns** over deeply nested `if` ladders (max nesting: 3).
 - No dead code, commented-out blocks, or unused exports.
-
----
-## 🔢 14) Versioning & Releases (Packages)
-
-- Follow **Semantic Versioning**: `major.minor.patch`.
-- Use **Changesets** to group and publish package releases.
-- Changelogs must be generated and committed.
-
----
-
-## 📦 15) Dependencies
-
-- Workspace manager: **bun** only.
-- Prefer **exact versions** in packages; upgrades via PRs.
 
 ---
 
