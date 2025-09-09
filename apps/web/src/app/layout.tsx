@@ -1,4 +1,4 @@
-import Providers from "@/components/layout/providers";
+import { TRPCReactProvider } from "@/trpc/client";
 import "./globals.css";
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
       lang="en"
     >
       <body>
-        <Providers>{children}</Providers>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>
   );

@@ -7,8 +7,6 @@ import { createContext } from "./utils/context";
 
 const app = express();
 
-export type { AppRouter } from "./route";
-
 app.use(cors({ origin: "*" }));
 
 app.use(
@@ -39,3 +37,6 @@ app.get("/panel", (_, res) => {
 });
 
 app.listen(4000);
+
+export type { AppRouter } from "./route";
+export { appRouter };
