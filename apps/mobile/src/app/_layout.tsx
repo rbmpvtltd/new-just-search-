@@ -20,10 +20,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { useState } from "react";
+import superjson from "superjson";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import ErrorHandler from "@/components/layout/NativeErrorBoundry";
 import useGoogleUpdate from "@/hooks/useUpdateApplication";
 import { TRPCProvider } from "@/lib/trpc";
+import { getToken } from "@/utils/secureStore";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -75,7 +77,14 @@ function RootLayoutNav() {
     createTRPCClient<AppRouter>({
       links: [
         httpBatchLink({
-          url: "http://localhost:2022",
+          url: "http://localhost:4000/trpc",
+          transformer: superjson,
+          async headers() {
+            const token = await getToken();
+            return {
+              authorization: token ? `Bearer ${token}` : "",
+            };
+          },
         }),
       ],
     }),

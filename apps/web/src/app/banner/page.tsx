@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { bannerFourt, bannersFirst,bannersSecond, bannersThird } from "./action";
+import { bannerFourt, bannersFirst,bannersSecond, bannersThird } from "../action";
 import Image from "next/image";
 
 const BannerFirstCaraousel = async ()=>{

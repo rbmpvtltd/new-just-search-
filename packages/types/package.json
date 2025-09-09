@@ -3,6 +3,9 @@
   "module": "./src/index.ts",
   "type": "module",
   "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsc -b -w"
+  },
   "private": true,
   "devDependencies": {
     "@types/bun": "latest"

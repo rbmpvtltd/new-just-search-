@@ -1,4 +1,3 @@
-import { trpc } from "../../utils/trpc";
 
 async function bannersFirst() {
   console.log("execution comes here");

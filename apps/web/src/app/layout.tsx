@@ -1,3 +1,4 @@
+import Providers from "@/components/layout/providers";
 import "./globals.css";
 
 export default function RootLayout({
@@ -11,7 +12,9 @@ export default function RootLayout({
       data-darkreader-scheme="dark"
       lang="en"
     >
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
