@@ -11,7 +11,9 @@ import type { AppRouter } from "types/index";
 import { getToken } from "@/utils/session";
 import { getTrpcUrl } from "./helper";
 import { makeQueryClient } from "./query-client";
+
 export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
+
 let browserQueryClient: QueryClient;
 function getQueryClient() {
   if (typeof window === "undefined") {
@@ -51,11 +53,11 @@ export function TRPCReactProvider(
       ],
     }),
   );
+
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         {props.children}
-        <ReactQueryDevtools initialIsOpen={false} />
       </TRPCProvider>
     </QueryClientProvider>
   );

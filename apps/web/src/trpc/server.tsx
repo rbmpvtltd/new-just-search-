@@ -7,28 +7,15 @@ import {
 } from "@trpc/tanstack-react-query";
 import { cache } from "react";
 import superjson from "superjson";
-import { appRouter } from "types/index";
-import { getTrpcUrl } from "@/utils";
+import type { AppRouter } from "types/index";
 import { getToken } from "@/utils/session";
+import { getTrpcUrl } from "./helper";
 import { makeQueryClient } from "./query-client";
 // IMPORTANT: Create a stable getter for the query client that
 //            will return the same client during the same request.
 export const getQueryClient = cache(makeQueryClient);
 
-const getTokenContext = async () => {
-  const token = await getToken();
-  return {
-    token: token?.value, // or however you want to structure it
-  };
-};
-
-export const trpc = createTRPCOptionsProxy({
-  ctx: getTokenContext,
-  router: appRouter,
-  queryClient: getQueryClient,
-});
-
-createTRPCOptionsProxy({
+export const trpc = createTRPCOptionsProxy<AppRouter>({
   client: createTRPCClient({
     links: [
       httpBatchLink({

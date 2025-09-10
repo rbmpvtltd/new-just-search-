@@ -9,7 +9,8 @@ export default function TestTrpc() {
     trpc.testRouter.firstData.queryOptions(),
   );
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <div>loading ..</div>;
 
+  // ✅ No need for `isLoading` — Suspense handles loading state
   return <div>{data?.hello}</div>;
 }

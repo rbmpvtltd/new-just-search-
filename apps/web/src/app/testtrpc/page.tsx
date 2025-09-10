@@ -1,11 +1,29 @@
+// import { Suspense } from "react";
+// import { useQuery } from "@tanstack/react-query";
+// import { useTRPC } from "@/trpc/client";
+//
+// import { trpcServer } from "@/trpc/trpc-server";
+
 import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 import TestTrpc from "./testtrpc";
 
-export default async function TRPCTEST() {
+export default function TRPCTEST() {
   prefetch(trpc.testRouter.firstData.queryOptions());
+
+  // const data = await trpcServer.testRouter.firstData.query();
+  // const trpc = useTRPC();
+  // const { data, isLoading } = useQuery(
+  //   trpc.testRouter.firstData.queryOptions(),
+  // );
+
+  // if (isLoading) return <p>Loading...</p>;
+  //
+  // return <div>{data?.hello}</div>;
   return (
-    <HydrateClient>
-      <TestTrpc />
-    </HydrateClient>
+    <div>
+      <HydrateClient>
+        <TestTrpc />
+      </HydrateClient>
+    </div>
   );
 }
