@@ -8,7 +8,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth.schema.js";
+import { users } from "./auth.schema";
 
 // 1. Plans
 export const plans1 = pgTable("plans", {

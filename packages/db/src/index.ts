@@ -2,7 +2,6 @@ import fs from "node:fs";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-// import cloudinary from "../configs/cloudinary.config.js"; // 👈 Use centralized config
 
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",

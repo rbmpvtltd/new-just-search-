@@ -26,6 +26,8 @@
     "arctic": "^3.7.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "zod": "^4.0.17"
   }
 }

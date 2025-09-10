@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "../drizzle";
-import { users } from "../db/src/schema/auth.schema.js";
+import { db } from "@repo/db";
+import { users } from "../db/src/schema/auth.schema";
 import {
   genderEnum,
   hireCategories,
@@ -14,13 +14,13 @@ import {
   recentViewHire,
   relocateEnum,
   workShiftEnum,
-} from "../db/src/schema/hire.schema.js";
-import { cities } from "../db/src/schema/address.schema.js";
-import { categories } from "../db/src/schema/category.schema.js";
-import { subcategories } from "../db/src/schema/subcategory.schema.js";
-import { uploadOnCloudinary } from "../drizzle";
-import { fakeSeed, fakeUserSeed } from "./fake.seed.js";
-import { sql } from "./mysqldb.seed.js";
+} from "../db/src/schema/hire.schema";
+import { cities } from "../db/src/schema/address.schema";
+import { categories } from "../db/src/schema/category.schema";
+import { subcategories } from "../db/src/schema/subcategory.schema";
+import { uploadOnCloudinary } from "@repo/db";
+import { fakeSeed, fakeUserSeed } from "./fake.seed";
+import { sql } from "./mysqldb.seed";
 
 export const hireSeed = async () => {
   await cleardataofhire();

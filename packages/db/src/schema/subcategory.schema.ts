@@ -6,7 +6,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { categories } from "./category.schema.js";
+import { categories } from "./category.schema";
 
 export const subcategories = pgTable("subcategories", {
   id: serial("id").primaryKey(),

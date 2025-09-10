@@ -10,10 +10,10 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth.schema.js";
-import { cities } from "./address.schema.js";
-import { categories } from "./category.schema.js";
-import { subcategories } from "./subcategory.schema.js";
+import { users } from "./auth.schema";
+import { cities } from "./address.schema";
+import { categories } from "./category.schema";
+import { subcategories } from "./subcategory.schema";
 
 // ✅ Enums
 export const genderEnum = pgEnum("gender", ["Male", "Female", "Others"]);

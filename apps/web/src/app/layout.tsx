@@ -1,4 +1,6 @@
+import { HeroHeader } from "@/components/header";
 import "./globals.css";
+import Navbar from "@/components/navbar";
 
 export default function RootLayout({
   children,
@@ -11,7 +13,11 @@ export default function RootLayout({
       data-darkreader-scheme="dark"
       lang="en"
     >
-      <body>{children}</body>
+      <body>
+        {/* <Navbar/> */}
+        <HeroHeader />
+        {children}
+        </body>
     </html>
   );
 }
