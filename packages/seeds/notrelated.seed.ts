@@ -72,7 +72,7 @@ export const bannerSeed = async () => {
     await db.insert(banners).values({
       mysqlId: row.id,
       route: row.route ?? null,
-      photo: row.photo,
+      photo: row.photo, // TODO: set this url as cloudinary gives us
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,

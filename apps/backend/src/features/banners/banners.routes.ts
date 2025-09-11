@@ -1,26 +1,25 @@
-import { publicProcedure } from "@/utils/trpc";
-import { getFirstBannerData, getSecondBannerData,getThirdBannerData,getFourthBannerData} from "./banners.service";
+import { publicProcedure, router } from "@/utils/trpc";
+import { getFirstBannerData, getFourthBannerData, getSecondBannerData, getThirdBannerData } from "./banners.service";
 
-export const bannerRouter = {
-  firstBanner : publicProcedure.query(async ()=>{
-      const data = getFirstBannerData()
-      return data
+export const bannerRouter = router({
+  firstBanner: publicProcedure.query(async () => {
+    const data = getFirstBannerData();
+    return data;
   }),
 
   secondBanner : publicProcedure.query(async ()=>{
-      const data = getSecondBannerData()
-      return data
+    const data = getSecondBannerData();
+    return data
   }),
 
   thirdBanner : publicProcedure.query(async ()=>{
-      const data = getThirdBannerData()
-      return data
+    const data = getThirdBannerData();
+    return data
   }),
 
   fourthBanner : publicProcedure.query(async ()=>{
-      const data = getFourthBannerData()
-      return data
+    const data = getFourthBannerData();
+    return data 
   })
 
-
-}
+});
