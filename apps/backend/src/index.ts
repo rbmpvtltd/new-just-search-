@@ -1,7 +1,11 @@
+import { OpenAPIGenerator } from "@orpc/openapi";
+import { OpenAPIHandler } from "@orpc/openapi/node";
+import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
+import { toORPCRouter } from "@orpc/trpc";
+import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4"; // <-- zod v4
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
-import { renderTrpcPanel } from "trpc-ui";
 import { appRouter } from "./route";
 import { createContext } from "./utils/context";
 
@@ -17,23 +21,54 @@ app.use(
   }),
 );
 
-app.get("/panel", (_, res) => {
-  if (process.env.NODE_ENV !== "development") {
-    return res.status(404).send("Not Found");
-  }
+const orpcRouter = toORPCRouter(appRouter);
 
-  // const {renderTrpcPanel} = await import "trpc-ui"
+const openAPIGenerator = new OpenAPIGenerator({
+  schemaConverters: [
+    new ZodToJsonSchemaConverter(), // <-- if you use Zod
+  ],
+});
 
-  return res.send(
-    renderTrpcPanel(appRouter, {
-      url: "http://localhost:4000/trpc", // Base url of your trpc server
-      meta: {
-        title: "My Backend Title",
-        description:
-          "This is a description of my API, which supports [markdown](https://en.wikipedia.org/wiki/Markdown).",
+const spec = await openAPIGenerator.generate(orpcRouter, {
+  info: {
+    title: "My App",
+    version: "0.0.0",
+  },
+});
+
+const handler = new OpenAPIHandler(orpcRouter, {
+  plugins: [
+    new OpenAPIReferencePlugin({
+      docsProvider: "scalar",
+      docsPath: "/api",
+      schemaConverters: [new ZodToJsonSchemaConverter()],
+      specGenerateOptions: {
+        info: {
+          title: "ORPC Playground",
+          version: "1.0.0",
+        },
       },
     }),
-  );
+  ],
+});
+
+app.use(async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  const result = await handler.handle(req, res, {
+    context: {
+      token,
+    },
+  });
+
+  if (!result.matched) {
+    return next(); // let Express handle 404
+  }
+});
+
+app.get("/spec", (req, res) => {
+  const result = spec;
+
+  res.send(result);
 });
 
 app.listen(4000);
