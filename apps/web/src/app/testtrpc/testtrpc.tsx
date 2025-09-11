@@ -5,12 +5,9 @@ import { useTRPC } from "@/trpc/client";
 
 export default function TestTrpc() {
   const trpc = useTRPC();
-  const { data, isLoading } = useQuery(
-    trpc.testRouter.firstData.queryOptions(),
-  );
+  const { data, isLoading } = useQuery(trpc.hi.hi2.queryOptions());
 
   if (isLoading) return <div>loading ..</div>;
 
-  // ✅ No need for `isLoading` — Suspense handles loading state
-  return <div>{data?.hello}</div>;
+  return <div>{data?.itemid}</div>;
 }
