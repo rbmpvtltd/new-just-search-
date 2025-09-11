@@ -1,11 +1,7 @@
-import { OpenAPIGenerator } from "@orpc/openapi";
-import { OpenAPIHandler } from "@orpc/openapi/node";
-import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { toORPCRouter } from "@orpc/trpc";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4"; // <-- zod v4
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
+import { ORPChandler, ORPCspec } from "./lib/orpc";
 import { appRouter } from "./route";
 import { createContext } from "./utils/context";
 
@@ -13,6 +9,7 @@ const app = express();
 
 app.use(cors({ origin: "*" }));
 
+// adding trpc
 app.use(
   "/trpc",
   createExpressMiddleware({
@@ -21,57 +18,34 @@ app.use(
   }),
 );
 
-const orpcRouter = toORPCRouter(appRouter);
+// adding websocket in trpc
 
-const openAPIGenerator = new OpenAPIGenerator({
-  schemaConverters: [
-    new ZodToJsonSchemaConverter(), // <-- if you use Zod
-  ],
-});
-
-const spec = await openAPIGenerator.generate(orpcRouter, {
-  info: {
-    title: "My App",
-    version: "0.0.0",
-  },
-});
-
-const handler = new OpenAPIHandler(orpcRouter, {
-  plugins: [
-    new OpenAPIReferencePlugin({
-      docsProvider: "scalar",
-      docsPath: "/api",
-      schemaConverters: [new ZodToJsonSchemaConverter()],
-      specGenerateOptions: {
-        info: {
-          title: "ORPC Playground",
-          version: "1.0.0",
-        },
-      },
-    }),
-  ],
-});
-
+// adding Orpc
+//
+// get data on localhost:4000/api
 app.use(async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
-  const result = await handler.handle(req, res, {
+  const result = await ORPChandler.handle(req, res, {
     context: {
       token,
     },
   });
 
   if (!result.matched) {
-    return next(); // let Express handle 404
+    return next();
   }
 });
 
-app.get("/spec", (req, res) => {
-  const result = spec;
+// get data on localhost:4000/spec
+app.get("/spec", (_, res) => {
+  const result = ORPCspec;
 
   res.send(result);
 });
 
+// listening on localhost:4000
 app.listen(4000);
 
+// exporting ---
 export type { AppRouter } from "./route";
 export { appRouter };
