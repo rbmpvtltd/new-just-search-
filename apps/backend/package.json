@@ -16,6 +16,9 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@orpc/openapi": "^1.8.7",
+    "@orpc/trpc": "^1.8.7",
+    "@orpc/zod": "^1.8.7",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@repo/db": "*",
