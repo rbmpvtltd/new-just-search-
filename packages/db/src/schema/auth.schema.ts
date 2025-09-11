@@ -1,12 +1,5 @@
 import { sql } from "drizzle-orm";
-import {
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
 // import jwt, { type SignOptions } from "jsonwebtoken";
 export enum UserRole {
   visiter = "visiter",

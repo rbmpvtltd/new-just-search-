@@ -4,7 +4,7 @@ import { defineConfig } from "drizzle-kit";
 dotenv.config();
 
 export default defineConfig({
-  schema: "./src/schema/**/*.schema.ts", // 👈 schema files ka path
+  schema: "./dist/schema/**/*.schema.js", // 👈 schema files ka path
   out: "./drizzle", // migration folder
   dialect: "postgresql",
   dbCredentials: {
@@ -12,8 +12,7 @@ export default defineConfig({
     user: process.env.PGUSER ?? "postgres",
     password: process.env.PGPASSWORD ?? "12345678",
     database: process.env.PGDATABASE ?? "justsearch",
-    port: Number(process.env.PGPORT || 5432),
-
+    port: Number(process.env.PGPORT) ?? 5432,
     ssl: false,
   },
 });

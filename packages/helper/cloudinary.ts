@@ -12,3 +12,46 @@ const config = {
 cloudinary.config(config);
 
 export default cloudinary;
+
+import fs, { unlinkSync } from "fs";
+
+const uploadOnCloudinary = async (localFilePath: string, folderName = "") => {
+  if (!localFilePath) return null;
+  try {
+    // TODO: Uncomment this in production
+    // const result = await cloudinary.uploader.upload(localFilePath, {
+    //   resource_type: 'auto',
+    //   folder: folderName,
+    // });
+    //
+    const customName = `${Date.now()}.${Math.random().toString(36).substring(2, 15)}`;
+    const result = {
+      secure_url: customName,
+    };
+
+    console.log(" Upload success:", result.secure_url);
+
+    // Uncomment if you want to delete local file after upload
+    // fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
+
+    return result;
+  } catch (err) {
+    fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
+    throw new Error(`Cloudinary upload failed: ${err}`);
+  }
+};
+``;
+
+const deleteOnCloudinary = async (cloudinary_url: string) => {
+  try {
+    if (!cloudinary_url) return null;
+    const response = await cloudinary.uploader.destroy(cloudinary_url, {
+      resource_type: "auto",
+    });
+    return response;
+  } catch (error) {
+    throw new Error(`cloudinary delete failed: ${error}`);
+  }
+};
+
+export { uploadOnCloudinary, deleteOnCloudinary };
