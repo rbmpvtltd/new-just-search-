@@ -11,8 +11,7 @@ async function serverFunction() {
   setToken(token);
 }
 
-export async function banners() {
-  await trpc.banners;
+
 
 async function bannersFirst (){
   const data = await trpc.banners.firstBanner.query()
@@ -29,13 +28,11 @@ async function bannersThird (){
   return data
 }
 
-async function bannerFourt (){
+async function bannersFourt (){
   const data = await trpc.banners.fourthBanner.query()
   console.log("====================== second banners data ==================================>",data)
   return data
 
 }
 
-
-
-export {serverFunction,bannersFirst,bannersSecond,bannersThird,bannerFourt}
+export {serverFunction,bannersFirst,bannersSecond,bannersThird,bannersFourt}

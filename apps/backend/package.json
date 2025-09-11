@@ -27,6 +27,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "superjson": "^2.2.2",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "zod": "^4.0.17"
   }
 }

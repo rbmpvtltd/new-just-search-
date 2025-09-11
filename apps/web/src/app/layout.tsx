@@ -1,5 +1,7 @@
 // import { TRPCReactProvider } from "@/trpc/client";
+import { HeroHeader } from "@/components/header";
 import "./globals.css";
+import Navbar from "@/components/navbar";
 
 export default function RootLayout({
   children,
@@ -13,9 +15,10 @@ export default function RootLayout({
       lang="en"
     >
       <body>
+        {/* <Navbar/> */}
+        <HeroHeader />
         {children}
-        {/* <TRPCReactProvider>{children}</TRPCReactProvider> */}
-      </body>
+        </body>
     </html>
   );
 }

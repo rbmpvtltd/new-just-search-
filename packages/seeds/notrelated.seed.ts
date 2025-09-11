@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/src/index";
-import { cities, states } from "../db/src/schema/address.schema.js";
-import { banners } from "../db/src/schema/banner.schema.js";
-import { categories } from "../db/src/schema/category.schema.js";
-import { subcategories } from "../db/src/schema/subcategory.schema.js";
+import { cities, states } from "../db/src/schema/address.schema";
+import { banners } from "../db/src/schema/banner.schema";
+import { categories } from "../db/src/schema/category.schema";
+import { subcategories } from "../db/src/schema/subcategory.schema";
 import { uploadOnCloudinary } from "../db/src/index";
-import { sql } from "./mysqldb.seed.js";
+import { sql } from "./mysqldb.seed";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
@@ -72,7 +72,7 @@ export const bannerSeed = async () => {
     await db.insert(banners).values({
       mysqlId: row.id,
       route: row.route ?? null,
-      photo: row.photo,
+      photo: row.photo, // TODO: set this url as cloudinary gives us
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,

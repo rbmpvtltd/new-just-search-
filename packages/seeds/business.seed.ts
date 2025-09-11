@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "../drizzle";
-import { users } from "../db/src/schema/auth.schema.js";
+import { db } from "@repo/db";
+import { users } from "../db/src/schema/auth.schema";
 import {
   businessCategories,
   businessListings,
@@ -9,14 +9,14 @@ import {
   businessSubcategories,
   favourites,
   recentViewBusiness,
-} from "../db/src/schema/business.schema.js";
-import { cities } from "../db/src/schema/address.schema.js";
-import { categories } from "../db/src/schema/category.schema.js";
-import { subcategories } from "../db/src/schema/subcategory.schema.js";
-import { uploadOnCloudinary } from "../drizzle";
-import { UserRole } from "../db/src/schema/auth.schema.js";
-import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed.js";
-import { sql } from "./mysqldb.seed.js";
+} from "../db/src/schema/business.schema";
+import { cities } from "../db/src/schema/address.schema";
+import { categories } from "../db/src/schema/category.schema";
+import { subcategories } from "../db/src/schema/subcategory.schema";
+import { uploadOnCloudinary } from "@repo/db";
+import { UserRole } from "../db/src/schema/auth.schema";
+import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
+import { sql } from "./mysqldb.seed";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();

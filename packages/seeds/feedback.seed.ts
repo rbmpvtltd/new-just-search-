@@ -1,6 +1,7 @@
-import { db } from "../drizzle";
-import { feedbacks } from "../db/src/schema/user.schema.js";
-import { sql } from "./mysqldb.seed.js";
+// import { db } from "@repo/db";
+import { db } from "@repo/db";
+import { feedbacks } from "../db/src/schema/user.schema";
+import { sql } from "./mysqldb.seed";
 
 export const feedbackseed = async () => {
   await db.execute(`TRUNCATE TABLE feedbacks RESTART IDENTITY CASCADE;`);
