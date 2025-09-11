@@ -16,8 +16,7 @@ export const appRouter = router({
         about: "hi",
       };
     }),
-  }),
-  testRouter,
+  })
 });
 
 export type AppRouter = typeof appRouter;

@@ -49,7 +49,7 @@ const BannerFirstCaraousel = async () => {
 
 export default function Page() {
   return (
-    <div className="mx-auto">
+    <div className="mx-auto pt-16">
       <BannerFirstCaraousel />
     </div>
   );
