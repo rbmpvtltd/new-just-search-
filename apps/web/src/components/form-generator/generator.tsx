@@ -4,9 +4,8 @@ import type { Path, UseFormReturn } from "react-hook-form";
 import type { z } from "zod";
 
 import { Form, FormField } from "@/components/ui/form";
-
-import type { FieldDataType } from "./types";
 import FieldSelector from "./field-selector";
+import type { FieldDataType } from "./types";
 
 type FormSchema<T extends readonly FieldDataType[]> = {
   [K in T[number]["name"]]: z.infer<Extract<T[number], { name: K }>["schema"]>;

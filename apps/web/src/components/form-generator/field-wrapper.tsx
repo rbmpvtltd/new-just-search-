@@ -25,7 +25,7 @@ function FieldWrapper({
     <FormItem
       className={cn("py-2", className)}
       aria-label={label + " field"}
-      role="field"
+      // role="field"
       aria-describedby={description ? `${htmlFor}-form-item-description` : ""}
     >
       <FormLabel htmlFor={htmlFor} className="text-md">

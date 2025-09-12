@@ -1,6 +1,10 @@
 "use client";
 
-
+import type { ControllerRenderProps, Path } from "react-hook-form";
+import type { z } from "zod";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FormDescription, FormItem, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -8,22 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FormDescription, FormItem, FormMessage } from "@/components/ui/form";
-import DatePicker from "./date-picker";
-import ComboSelect from "./combo-select";
-
-import type { z } from "zod";
-import type { ControllerRenderProps, Path } from "react-hook-form";
 import { cn } from "@/lib/utils";
+import ComboSelect from "./combo-select";
+import DatePicker from "./date-picker";
 
 import FieldWrapper from "./field-wrapper";
-import { FieldType, type FieldDataType } from "./types";
+import { type FieldDataType, FieldType } from "./types";
 
 type FieldSchema<T extends FieldDataType> =
-  T["schema"] extends z.ZodType<unknown> ? z.infer<T["schema"]> : never;
+  T["schema"] extends z.ZodType<object> ? z.infer<T["schema"]> : never;
 
 interface FieldSelectorProps<T extends FieldDataType> {
   fieldData: T;
@@ -35,7 +33,7 @@ function FieldSelector<T extends FieldDataType>({
   field,
 }: FieldSelectorProps<T>) {
   switch (fieldData.type) {
-        case FieldType.Select:
+    case FieldType.Select:
       return (
         <FieldWrapper
           className={fieldData.className}
@@ -68,7 +66,7 @@ function FieldSelector<T extends FieldDataType>({
           </Select>
         </FieldWrapper>
       );
-        case FieldType.Text:
+    case FieldType.Text:
       return (
         <FieldWrapper
           className={fieldData.className}
@@ -99,7 +97,7 @@ function FieldSelector<T extends FieldDataType>({
           />
         </FieldWrapper>
       );
-        case FieldType.Textarea:
+    case FieldType.Textarea:
       return (
         <FieldWrapper
           className={fieldData.className}
@@ -117,7 +115,7 @@ function FieldSelector<T extends FieldDataType>({
           />
         </FieldWrapper>
       );
-        case FieldType.Checkbox:
+    case FieldType.Checkbox:
       return (
         <FormItem
           className={cn(
@@ -149,7 +147,7 @@ function FieldSelector<T extends FieldDataType>({
           )}
         </FormItem>
       );
-        case FieldType.DatePicker:
+    case FieldType.DatePicker:
       return (
         <FormItem
           className={cn(
@@ -182,7 +180,7 @@ function FieldSelector<T extends FieldDataType>({
           )}
         </FormItem>
       );
-        case FieldType.ComboSelect:
+    case FieldType.ComboSelect:
       return (
         <FieldWrapper
           className={fieldData.className}
@@ -203,7 +201,7 @@ function FieldSelector<T extends FieldDataType>({
           />
         </FieldWrapper>
       );
-        default:
+    default:
       return null;
   }
 }
