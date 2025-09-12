@@ -16,7 +16,6 @@ export default function RootLayout({
       lang="en"
     >
       <body>
-        {/* <Navbar/> */}
         <HeroHeader />
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>

@@ -1,6 +1,7 @@
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
+import { cloudinarySignature } from "./lib/cloudinary";
 import { ORPChandler, ORPCspec } from "./lib/orpc";
 import { appRouter } from "./route";
 import { createContext } from "./utils/context";
@@ -17,6 +18,10 @@ app.use(
     createContext,
   }),
 );
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.post("/v1/api/sign-image", cloudinarySignature);
 
 // adding websocket in trpc
 

@@ -1,5 +1,9 @@
 import { Redis } from "ioredis";
+import env from "@/utils/envaild";
+
 export const redis = new Redis({
-  port: 6379,
-  host: "127.0.0.1",
+  port: env.REDIS_POST,
+  host: env.REDIS_HOST,
+  username: env.REDIS_USERNAME,
+  password: env.REDIS_PASSWORD,
 });

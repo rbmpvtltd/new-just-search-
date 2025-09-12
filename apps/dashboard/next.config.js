@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+
+import { config as dotenvConfig } from "dotenv";
+
+dotenvConfig({ path: "../../.env" });
 const nextConfig = {
   images: {
     remotePatterns: [

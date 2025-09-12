@@ -1,7 +1,9 @@
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+  path: "../../.env",
+});
 
 const config = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,32 +17,35 @@ export default cloudinary;
 
 import fs, { unlinkSync } from "fs";
 
-const uploadOnCloudinary = async (localFilePath: string, folderName = "") => {
+const uploadOnCloudinary = async (
+  localFilePath: string,
+  folderName = "",
+  test = false,
+) => {
   if (!localFilePath) return null;
   try {
-    // TODO: Uncomment this in production
-    // const result = await cloudinary.uploader.upload(localFilePath, {
-    //   resource_type: 'auto',
-    //   folder: folderName,
-    // });
-    //
-    const customName = `${Date.now()}.${Math.random().toString(36).substring(2, 15)}`;
-    const result = {
-      secure_url: customName,
-    };
+    if (!test) {
+      const customName = `${Date.now()}.${Math.random().toString(36).substring(2, 15)}`;
+      const result = {
+        secure_url: customName,
+      };
+      return result;
+    }
 
-    console.log(" Upload success:", result.secure_url);
+    const result = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+      folder: folderName,
+    });
+
+    return result;
 
     // Uncomment if you want to delete local file after upload
     // fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
-
-    return result;
   } catch (err) {
     fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
     throw new Error(`Cloudinary upload failed: ${err}`);
   }
 };
-``;
 
 const deleteOnCloudinary = async (cloudinary_url: string) => {
   try {
