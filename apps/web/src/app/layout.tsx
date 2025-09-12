@@ -2,6 +2,7 @@
 import { HeroHeader } from "@/components/header";
 import "./globals.css";
 import Navbar from "@/components/navbar";
+import { TRPCReactProvider } from "@/trpc/client";
 
 export default function RootLayout({
   children,
@@ -17,8 +18,8 @@ export default function RootLayout({
       <body>
         {/* <Navbar/> */}
         <HeroHeader />
-        {children}
-        </body>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
+      </body>
     </html>
   );
 }

@@ -56,7 +56,7 @@ export function LoginForm({
       onSuccess: (data:string|undefined) => {
         setToken(data?.toString() || "")
         console.log("oo success ho gyo",data)
-        router.push("/")
+        router.push("/banner")
       }
      });
     

@@ -1,3 +1,4 @@
+import { TRPCReactProvider } from "@/trpc/client";
 import "./globals.css";
 
 export default function RootLayout({
@@ -11,7 +12,9 @@ export default function RootLayout({
       data-darkreader-scheme="dark"
       lang="en"
     >
-      <body>{children}</body>
+      <body>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
+      </body>
     </html>
   );
 }

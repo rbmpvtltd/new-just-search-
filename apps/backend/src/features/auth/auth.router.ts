@@ -6,7 +6,7 @@ import { createSession } from "./lib/session";
 
 export const authRouter = router({
   login: publicProcedure
-    .input(z.object({ email: z.string(), password: z.string() }))
+    .input(z.object({ email: z.string().email(), password: z.string().min(6) }))
     .mutation(async ({ input }) => {
       const isCredentialCorrect = checkUserPassword(
         input.email,
@@ -22,6 +22,9 @@ export const authRouter = router({
       const session = await createSession(isCredentialCorrect.userId);
       return session?.token;
     }),
+  verifyauth: protectedProcedure.query(async () => {
+    return {success: true};
+  }),
   logout: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.userId;
     return userId;
