@@ -28,8 +28,8 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 
 function getTrpcUrl() {
   const base = (() => {
-    if (process.env.URL) return `https://${process.env.URL}`;
-    return "http://localhost:4000";
+    // if (process.env.URL) return `https://${process.env.URL}`;
+    return "http://192.168.1.35:4000";
   })();
   return `${base}/trpc`;
 }
