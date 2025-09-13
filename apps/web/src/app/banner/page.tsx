@@ -13,9 +13,10 @@ import {
   bannersSecond,
   bannersThird,
 } from "../action";
+import { trpcServer } from "@/trpc/trpc-server";
 
 const BannerFirstCaraousel = async () => {
-  const bannerFirst = await bannersFirst();
+  const bannerFirst = await trpcServer.banners.firstBanner.query();
   const bannerSecond = await bannersSecond();
   const bannerThird = await bannersThird();
   const bannerFourth = await bannersFourt();
@@ -49,7 +50,7 @@ const BannerFirstCaraousel = async () => {
 
 export default function Page() {
   return (
-    <div className="mx-auto pt-16">
+    <div className="mx-auto">
       <BannerFirstCaraousel />
     </div>
   );

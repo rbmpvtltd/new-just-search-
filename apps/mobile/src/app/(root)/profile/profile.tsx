@@ -20,9 +20,13 @@ import Colors from "@/constants/Colors";
 import { apiUrl } from "@/constants/Variable";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import { useAuthStore } from "@/store/authStore";
+import { useQuery } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
 
 export default function TabOneScreen() {
-  const isAuthenticated = useAuthStore((state) => state.authenticated);
+  // const isAuthenticated = useAuthStore((state) => state.authenticated);
+  const isAuthenticated  = useQuery(trpc.auth.verifyauth.queryOptions());
+
   const colorScheme = useColorScheme();
   const [renderForm, setRenderForm] = useState<string>("");
   const role = useAuthStore((state) => state.role);
@@ -46,7 +50,7 @@ export default function TabOneScreen() {
     <ScrollView>
       <View className="flex-1 items-center justify-center  rounded-3xl w-[100%] ">
         <BoundaryWrapper>
-          {!isAuthenticated ? (
+          {!isAuthenticated.isSuccess ? (
             <>
               {!renderForm && (
                 <View className="mt-36 flex-1 justify-center items-center w-full gap-8">

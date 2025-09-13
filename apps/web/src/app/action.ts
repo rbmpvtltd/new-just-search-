@@ -11,10 +11,6 @@ async function serverFunction() {
   setToken(token);
 }
 
-async function bannersFirst() {
-  const data = await trpcServer.banners.firstBanner.query();
-  return data;
-}
 
 async function bannersSecond() {
   const data = await trpcServer.banners.secondBanner.query();
@@ -37,7 +33,6 @@ async function bannersFourt() {
 
 export {
   serverFunction,
-  bannersFirst,
   bannersSecond,
   bannersThird,
   bannersFourt,

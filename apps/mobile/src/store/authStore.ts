@@ -1,8 +1,8 @@
 // src/store/authStore.ts
 
 import { create } from "zustand";
-import { queryClient } from "@/app/_layout";
 import { deleteToken } from "@/utils/secureStore";
+import { queryClient } from "@/lib/trpc";
 
 export enum role {
   business = "business",

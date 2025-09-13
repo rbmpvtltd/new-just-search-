@@ -2,6 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
+import { role } from "@/store/authStore";
+
 import { fetchLogin } from "@/query/auth";
 import {
   type LoginBusinessFormData,
@@ -10,8 +12,12 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import { setToken } from "@/utils/secureStore";
 import Input from "../inputs/Input";
+import { useMutation } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
 
 export default function BusinessHireLogin() {
+  
+
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
   const {
     control: businessControl,
@@ -20,19 +26,32 @@ export default function BusinessHireLogin() {
   } = useForm<LoginBusinessFormData>({
     resolver: zodResolver(loginBusinesSchema),
     defaultValues: {
-      mobile_no: "",
+      email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: LoginBusinessFormData) => {
-    const response = await fetchLogin(data);
-    if (response.success) {
-      setAuthStoreToken(response.token, response.role);
-      await setToken(response.token);
-      return router.back();
-    }
-    Alert.alert(response.message);
+  const loginMutation = useMutation(
+    trpc.auth.login.mutationOptions({
+      onSuccess: async (data) => {
+        if (data) {
+          console.log("data is ======>",data)
+          setAuthStoreToken(data, role.visitor);
+          await setToken(data);
+          Alert.alert("Login Successfully");
+          // router.push("/(root)/(home)/home");
+          return router.back();
+        }
+      },
+      onError : async (error) => {
+        console.log("error",error)
+        Alert.alert("Something Went Wrong");
+      }
+    }),
+  );
+
+  const onSubmit = async (data: {email:string,password:string}) => {
+    loginMutation.mutate(data);
   };
 
   return (
@@ -47,7 +66,7 @@ export default function BusinessHireLogin() {
         </Text>
         <Controller
           control={businessControl}
-          name="mobile_no"
+          name="email"
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
               className="text-secondary bg-base-200"
@@ -56,13 +75,12 @@ export default function BusinessHireLogin() {
               onChangeText={onChange}
               value={value}
               autoCapitalize="none"
-              keyboardType="numeric"
             />
           )}
         />
-        {errors.mobile_no && (
+        {errors.email && (
           <Text className="text-error text-sm mb-4">
-            {errors.mobile_no.message}
+            {errors.email.message}
           </Text>
         )}
 
