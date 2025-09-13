@@ -9,9 +9,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth.schema";
-import { cities } from "./address.schema";
-import { categories } from "./category.schema";
-import { subcategories } from "./subcategory.schema";
+import { categories, cities, subcategories } from "./not-related.schema";
 
 // 1. Business Listing Interface
 export const businessListings = pgTable("business_listings", {

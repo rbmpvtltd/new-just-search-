@@ -10,8 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { users } from "./auth.schema";
 import { businessListings } from "./business.schema";
-import { categories } from "./category.schema";
-import { subcategories } from "./subcategory.schema";
+import { categories, subcategories } from "./not-related.schema";
 
 //1.offers
 export const offers = pgTable("offers", {

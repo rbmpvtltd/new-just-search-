@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
 import { db } from "@repo/db";
-import { users } from "../db/src/schema/auth.schema";
+import { eq } from "drizzle-orm";
+import { UserRole, users } from "../db/src/schema/auth.schema";
 import {
   businessCategories,
   businessListings,
@@ -10,11 +10,11 @@ import {
   favourites,
   recentViewBusiness,
 } from "../db/src/schema/business.schema";
-import { cities } from "../db/src/schema/address.schema";
-import { categories } from "../db/src/schema/category.schema";
-import { subcategories } from "../db/src/schema/subcategory.schema";
-import { uploadOnCloudinary } from "@repo/db";
-import { UserRole } from "../db/src/schema/auth.schema";
+import {
+  categories,
+  cities,
+  subcategories,
+} from "../db/src/schema/not-related.schema";
 import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 
@@ -29,7 +29,6 @@ export const businessSeed = async () => {
 };
 
 export const clearAllTablesBusiness = async () => {
-
   await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
   await db.execute(
     `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,

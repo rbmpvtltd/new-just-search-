@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -11,9 +10,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth.schema";
-import { cities } from "./address.schema";
-import { categories } from "./category.schema";
-import { subcategories } from "./subcategory.schema";
+import { categories, cities, subcategories } from "./not-related.schema";
 
 // ✅ Enums
 export const genderEnum = pgEnum("gender", ["Male", "Female", "Others"]);
