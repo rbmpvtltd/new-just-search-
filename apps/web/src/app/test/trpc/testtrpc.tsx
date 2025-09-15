@@ -5,9 +5,11 @@ import { useTRPC } from "@/trpc/client";
 
 export default function TestTrpc() {
   const trpc = useTRPC();
-  const { data, isLoading } = useQuery(trpc.hi.hi2.queryOptions());
+  const { data, isLoading, isError } = useQuery(
+    trpc.banners.firstBanner.queryOptions(),
+  );
 
-  if (isLoading) return <div>loading ..</div>;
-
-  return <div>{data?.itemid}</div>;
+  if (isLoading || !data) return <div>loading ..</div>;
+  if (isError) return <div>error ..</div>;
+  return <div>{data[0]?.id}</div>;
 }

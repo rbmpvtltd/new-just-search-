@@ -1,6 +1,8 @@
 {
   "name": "@repo/db",
-  "module": "src/index.ts",
+  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "private": true,
   "devDependencies": {

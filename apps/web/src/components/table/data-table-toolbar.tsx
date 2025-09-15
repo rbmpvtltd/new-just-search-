@@ -3,7 +3,7 @@
 import type { Table } from "@tanstack/react-table"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { Input } from "../ui/input"
-import { priorities, statuses } from "dummy/data"
+import { priorities, statuses } from "@/dummy/data"
 import { Button } from "../ui/button"
 import { X } from "lucide-react"
 import { DataTableViewOptions } from "./data-table-view-options"

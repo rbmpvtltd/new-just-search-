@@ -1,9 +1,9 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { labels, priorities, statuses } from "dummy/data";
-import type { Task } from "dummy/schema";
 import { Badge } from "lucide-react";
+import { labels, priorities, statuses } from "@/dummy/data";
+import type { Task } from "@/dummy/schema";
 import { Checkbox } from "../ui/checkbox";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";

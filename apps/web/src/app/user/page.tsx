@@ -1,7 +1,7 @@
-import { trpc } from "@/utils/trpc";
+import { trpcServer } from "@/trpc/trpc-server";
 
 export default async function user() {
-  const userId = await trpc.auth.logout.query();
+  const userId = await trpcServer.auth.logout.query();
 
   if (userId) {
     return <div>user id {userId}</div>;

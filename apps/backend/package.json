@@ -1,6 +1,6 @@
 {
-  "name": "backend",
-  "module": "src/index.ts",
+  "name": "@repo/backend",
+  "module": "./dist/index.js",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",

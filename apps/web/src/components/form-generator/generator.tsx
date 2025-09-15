@@ -7,6 +7,10 @@ import { Form, FormField } from "@/components/ui/form";
 import FieldSelector from "./field-selector";
 import type { FieldDataType } from "./types";
 
+// type FormSchema<T extends readonly FieldDataType[]> = {
+//   [K in T[number]["name"]]: z.infer<Extract<T[number], { name: K }>["schema"]>;
+// };
+
 type FormSchema<T extends readonly FieldDataType[]> = {
   [K in T[number]["name"]]: z.infer<Extract<T[number], { name: K }>["schema"]>;
 };
@@ -52,9 +56,11 @@ class FormGenerator<T extends readonly FieldDataType[]> {
               key={fieldData.name}
               control={form.control}
               name={fieldData.name as Path<FormSchema<T>>}
-              render={({ field }) => (
-                <FieldSelector fieldData={fieldData} field={field} />
-              )}
+              render={({ field }) => {
+                if (!field)
+                  return <FieldSelector fieldData={fieldData} field={field} />;
+                return <div></div>;
+              }}
             />
           ),
         )}

@@ -7,13 +7,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import {
-  bannersFirst,
-  bannersFourt,
-  bannersSecond,
-  bannersThird,
-} from "../action";
 import { trpcServer } from "@/trpc/trpc-server";
+import { bannersFourt, bannersSecond, bannersThird } from "../action";
 
 const BannerFirstCaraousel = async () => {
   const bannerFirst = await trpcServer.banners.firstBanner.query();

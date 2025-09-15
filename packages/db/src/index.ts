@@ -1,7 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
   port: +(process.env.PGPORT ?? 5432),
@@ -54,4 +53,11 @@ const pool = new Pool({
 //
 export const db = drizzle({ client: pool });
 
-export * from "./schema/banner.schema";
+export * from "./schema/auth.schema";
+export * from "./schema/business.schema";
+export * from "./schema/hire.schema";
+export * from "./schema/not-related.schema";
+export * from "./schema/offer.schema";
+export * from "./schema/plan.schema";
+export * from "./schema/product.shema";
+export * from "./schema/user.schema";

@@ -1,6 +1,6 @@
+import type { AppRouter } from "@repo/types";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
-import type { AppRouter } from "types/index";
 import { getToken } from "@/utils/session";
 import { getTrpcUrl } from "./helper";
 

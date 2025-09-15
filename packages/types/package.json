@@ -1,14 +1,15 @@
 {
   "name": "@repo/types",
-  "module": "./src/index.ts",
-  "type": "module",
-  "main": "./src/index.ts",
+  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "tsc -b -w"
   },
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@repo/backend": "*"
   },
   "peerDependencies": {
     "typescript": "^5"

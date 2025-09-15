@@ -1,20 +1,15 @@
 "use client";
 
 import type { Row } from "@tanstack/react-table";
-import { labels } from "dummy/data";
-import { taskSchema } from "dummy/schema";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
-  DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
@@ -26,8 +21,6 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const task = taskSchema;
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
