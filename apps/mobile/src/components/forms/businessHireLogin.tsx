@@ -36,7 +36,7 @@ export default function BusinessHireLogin() {
       onSuccess: async (data) => {
         if (data) {
           console.log("data is ======>",data)
-          setAuthStoreToken(data, role.visitor);
+          setAuthStoreToken(data, role.visitor); // TODO : set role as the response comes in future
           await setToken(data);
           Alert.alert("Login Successfully");
           // router.push("/(root)/(home)/home");
