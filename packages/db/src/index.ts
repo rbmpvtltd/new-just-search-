@@ -54,4 +54,5 @@ const pool = new Pool({
 //
 export const db = drizzle({ client: pool });
 
-export * from "./schema/banner.schema";
+export * from "./schema/business.schema";
+export * from "./schema/not-related.schema"

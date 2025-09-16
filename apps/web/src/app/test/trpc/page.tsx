@@ -2,15 +2,29 @@
 // import { useQuery } from "@tanstack/react-query";
 // import { useTRPC } from "@/trpc/client";
 //
-// import { trpcServer } from "@/trpc/trpc-server";
+import { trpcServer } from "@/trpc/trpc-server";
 
-import { HydrateClient, prefetch, trpc } from "@/trpc/server";
+// import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 import TestTrpc from "./testtrpc";
+import { isTRPCClientError } from "@trpc/client";
 
 export default async function TRPCTEST() {
-  prefetch(trpc.hi.hi2.queryOptions());
+  // prefetch(trpc.hi.hi2.queryOptions());
+  async function getData() {
+    try {
+      const data = await trpcServer.banners.firstBanner.query();
+      return data;
+    } catch (error) {
+      if (isTRPCClientError(error)) {
+        return {
+          message: error.message,
+          success: false,
+          statusCode : error.data.httpStatus
+        };
+      }
+    }
+  }
 
-  // const data = await trpcServer.hi.hi2.query();
   // const trpc = useTRPC();
   // const { data, isLoading } = useQuery(
   //   trpc.testRouter.firstData.queryOptions(),
@@ -21,9 +35,9 @@ export default async function TRPCTEST() {
   // return <div>{data?.hello}</div>;
   return (
     <div>
-      <HydrateClient>
+      {/* <HydrateClient>
         <TestTrpc />
-      </HydrateClient>
+      </HydrateClient> */}
     </div>
   );
 }
