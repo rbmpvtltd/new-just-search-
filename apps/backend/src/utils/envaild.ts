@@ -1,3 +1,4 @@
+import { log } from "node:console";
 import dotenv from "dotenv";
 import { cleanEnv, num, str } from "envalid";
 
