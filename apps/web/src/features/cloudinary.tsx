@@ -1,24 +1,31 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
-import { CldUploadWidget } from "next-cloudinary";
 import { useState } from "react";
-import env from "../../../backend/src/utils/envaild";
 import Image from "next/image";
 
 
 export default function Cloudinary() {
-  const [resource, setResource] = useState();
+  const [resource, setResource] = useState<any>();
+
+
   const trpc = useTRPC();
-  const {mutate,isSuccess,isError} = useMutation(trpc.cloudinarySign.uploadImage.mutationOptions())
+  const { mutate, isSuccess, isError } = useMutation(
+    trpc.cloudinarySign.uploadImage.mutationOptions(),
+  );
+
 
   const handleUpload = async () => {
-
     const widget = window.cloudinary.createUploadWidget(
       {
         cloudName: "dra2pandx",
         apiKey: "322325555249722",
-        uploadSignature: (callback:(result: { signature: string }) => void, paramsToSign:any) => {
+        uploadSignature: (
+          callback: (result: { signature: string }) => void,
+          paramsToSign: any,
+        ) => {
+
+
           mutate(
             { paramsToSign },
             {
@@ -28,7 +35,7 @@ export default function Cloudinary() {
               onError: (err) => {
                 console.error("signature miliyoy koni", err);
               },
-            }
+            },
           );
         },
       },
@@ -42,22 +49,27 @@ export default function Cloudinary() {
     widget.open();
   };
 
-
-
   console.log(resource);
   return (
-    <div>
-       <div>
-      <button type="button" onClick={handleUpload}>Upload with Cloudinary</button>
-      {resource && (
-        <>
-        <div>
-          <p>Uploaded {resource?.url}</p>
-        </div>
-        <Image src={resource?.url} alt="uploaded image" width={400} height={400} />
-        </>
-      )}
-    </div>
+    <div className="w-full">
+      <div>
+        <button type="button" onClick={handleUpload}>
+          Upload with Cloudinary
+        </button>
+        {resource && (
+          <>
+            <div className="w-full">
+              <p className="w-[50%] break-words">Uploaded {resource?.url}</p>
+            </div>
+            <Image
+              src={resource?.url}
+              alt="uploaded image"
+              width={400}
+              height={400}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }

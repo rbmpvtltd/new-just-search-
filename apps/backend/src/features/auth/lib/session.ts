@@ -3,6 +3,7 @@ import { encodeBase32 } from "@oslojs/encoding";
 import { redis } from "@/lib/redis";
 
 interface Session {
+  token : string;
   id: string;
   secretHash: Uint8Array; // Uint8Array is a byte array
   createdAt: Date;
@@ -105,6 +106,7 @@ async function getSession(sessionId: string): Promise<Session | null> {
   const uint8 = Uint8Array.from(Buffer.from(base64, "base64"));
 
   return {
+    token : jsonParseData.token,
     id: jsonParseData.id,
     userId: jsonParseData.userId,
     secretHash: uint8,
