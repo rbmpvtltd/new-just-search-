@@ -10,7 +10,7 @@ export default function Cloudinary() {
 
 
   const trpc = useTRPC();
-  const { mutate, isSuccess, isError } = useMutation(
+  const { mutate } = useMutation(
     trpc.cloudinarySign.uploadImage.mutationOptions(),
   );
 
@@ -22,7 +22,7 @@ export default function Cloudinary() {
         apiKey: "322325555249722",
         uploadSignature: (
           callback: (result: { signature: string }) => void,
-          paramsToSign: any,
+          paramsToSign: {timestamp: number, source: string},
         ) => {
 
 
@@ -41,7 +41,7 @@ export default function Cloudinary() {
       },
       (error: any, result: any) => {
         if (!error && result?.event === "success") {
-          setResource(result.info); // { public_id, secure_url, etc }
+          setResource(result.info); 
         }
       },
     );
