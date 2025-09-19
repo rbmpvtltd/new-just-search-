@@ -66,7 +66,7 @@ import Carousel from "react-native-reanimated-carousel";
 const { width } = Dimensions.get("window");
 
 type CarouselProps = {
-  data: any[];
+  data: {id:number,photo:string|null}[];
   renderItem: ({ item, index }: { item: any; index: number }) => JSX.Element;
   itemWidth?: number;
   height?: number;

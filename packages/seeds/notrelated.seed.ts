@@ -4,7 +4,7 @@ import { cities, states } from "../db/src/schema/address.schema";
 import { banners } from "../db/src/schema/banner.schema";
 import { categories } from "../db/src/schema/category.schema";
 import { subcategories } from "../db/src/schema/subcategory.schema";
-import { uploadOnCloudinary } from "../db/src/index";
+// import { uploadOnCloudinary } from "../db/src/index";
 import { sql } from "./mysqldb.seed";
 
 export const notRelated = async () => {
@@ -65,10 +65,11 @@ export const bannerSeed = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM `banners`");
   for (const row of rows) {
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
-    const bannerPhotoUrl =
-      row.photo &&
-      (await uploadOnCloudinary(liveProfileImageUrl, "Banner"))?.secure_url;
+    // const bannerPhotoUrl =
+    //   row.photo &&
+    //   (await uploadOnCloudinary(liveProfileImageUrl, "Banner"))?.secure_url;
 
+    console.log
     await db.insert(banners).values({
       mysqlId: row.id,
       route: row.route ?? null,
