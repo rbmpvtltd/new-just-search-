@@ -19,7 +19,7 @@ const env = cleanEnv(process.env, {
   REDIS_HOST: str({
     default: "127.0.0.1",
   }),
-  REDIS_POST: num({
+  REDIS_PORT: num({
     default: 6379,
   }),
 });

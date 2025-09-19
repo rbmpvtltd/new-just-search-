@@ -12,6 +12,12 @@ const nextConfig = {
         port: "",
         pathname: "/assets/**",
       },
+      {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+        port: "",
+        pathname: "/dra2pandx/image/**",
+      },
     ],
   },
 };
