@@ -13,6 +13,7 @@
   },
   "scripts": {
     "dev": "bunx drizzle-kit studio",
+    "build": "bunx tsc -b && bunx drizzle-kit generate && bunx drizzle-kit migrate",
     "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"
   },
   "peerDependencies": {
@@ -23,7 +24,6 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "cloudinary": "^2.7.0",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.4",
     "mysql2": "^3.14.4",
