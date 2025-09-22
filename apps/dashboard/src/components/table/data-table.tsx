@@ -1,6 +1,10 @@
 "use client";
 
-import { type QueryOptions, useQuery } from "@tanstack/react-query";
+import {
+  type QueryFunctionContext,
+  type QueryOptions,
+  useQuery,
+} from "@tanstack/react-query";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -25,15 +29,40 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataTablePagination } from "./data-table-pagination";
-import { DataTableToolbar } from "./data-table-toolbar";
+
+// import { DataTableToolbar } from "./data-table-toolbar";
+
+interface QueryData<TData> {
+  data: TData[];
+  totalPages: number;
+  totalCount: number;
+}
+
+interface QueryContext extends QueryFunctionContext {
+  pagination: { pageIndex: number; pageSize: number };
+  sorting: SortingState;
+  filters: ColumnFiltersState;
+}
+
+interface CustomQueryOptions<TData> extends QueryOptions<QueryData<TData>> {
+  queryFn: (context: QueryContext) => Promise<QueryData<TData>>;
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  queryConfig: QueryOptions;
+  queryConfig: CustomQueryOptions<TData>;
   manualPagination?: boolean;
   manualSorting?: boolean;
   manualFiltering?: boolean;
 }
+
+// interface DataTableProps<TData, TValue> {
+//   columns: ColumnDef<TData, TValue>[];
+//   queryConfig: QueryOptions;
+//   manualPagination?: boolean;
+//   manualSorting?: boolean;
+//   manualFiltering?: boolean;
+// }
 
 export function DataTable<TData, TValue>({
   columns,
@@ -71,7 +100,6 @@ export function DataTable<TData, TValue>({
         sorting,
         filters: columnFilters,
       }),
-    keepPreviousData: true, // Add this for better UX
   });
 
   // ALWAYS call useReactTable immediately after state hooks - never after conditional returns

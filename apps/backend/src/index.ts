@@ -1,4 +1,5 @@
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import { cloudinarySignature } from "./lib/cloudinary";
@@ -9,6 +10,7 @@ import { createContext } from "./utils/context";
 const app = express();
 
 app.use(cors({ origin: "*" }));
+app.use(cookieParser());
 
 // adding trpc
 app.use(

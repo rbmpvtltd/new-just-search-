@@ -1,32 +1,32 @@
 "use client";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useId } from "react";
 import { useForm } from "react-hook-form";
+import z from "zod";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
-import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod"
-import z from "zod";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
 import { setToken } from "@/utils/session";
-import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." }),
-})
+});
 
 export function LoginForm({
   className,
@@ -35,31 +35,29 @@ export function LoginForm({
   const router = useRouter();
   const id = useId();
   const trpc = useTRPC();
-  const {mutate ,isSuccess , isError} = useMutation(trpc.auth.login.mutationOptions());
-  const form = useForm<z.infer <typeof formSchema>>({
+  const { mutate, isSuccess, isError } = useMutation(
+    trpc.auth.login.mutationOptions(),
+  );
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: ""
-    }
+      password: "",
+    },
   });
 
- 
-  if(isError){
-    console.log("oo error ho gyo")
+  if (isError) {
+    console.log("oo error ho gyo");
   }
 
-  
-
   function onSubmit(data: { email: string; password: string }) {
-     mutate(data,{
-      onSuccess: (data:string|undefined) => {
-        setToken(data?.toString() || "")
-        console.log("oo success ho gyo",data)
-        router.push("/banner")
-      }
-     });
-    
+    mutate(data, {
+      onSuccess: (data: string | undefined) => {
+        setToken(data?.toString() || "");
+        console.log("oo success ho gyo", data);
+        router.push("/banner");
+      },
+    });
   }
 
   return (
@@ -122,10 +120,7 @@ export function LoginForm({
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="w-full"
-                >
+                <Button type="submit" className="w-full">
                   Login
                 </Button>
               </div>
