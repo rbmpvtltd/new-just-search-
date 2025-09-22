@@ -11,6 +11,6 @@
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "../web/src/utils/asyncHandler.ts"],
   "exclude": ["node_modules", "dist"]
 }

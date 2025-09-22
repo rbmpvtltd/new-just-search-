@@ -1,7 +1,14 @@
+import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { publicProcedure, router } from "@/utils/trpc";
 
 export const testRouter = router({
+  test: publicProcedure.query(() => {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "cannot find token",
+    });
+  }),
   table: publicProcedure
     .input(
       z.object({
