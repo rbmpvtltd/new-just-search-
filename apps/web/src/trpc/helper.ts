@@ -5,3 +5,11 @@ export function getTrpcUrl() {
   })();
   return `${base}/trpc`;
 }
+
+export function getWsUrl(){
+  const wsUrl = (()=>{
+    if (process.env.WSURL) return process.env.WSURL;
+    return "ws://localhost:5500";
+  })()
+  return wsUrl
+}
