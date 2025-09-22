@@ -3,61 +3,42 @@ import { Pool } from "pg";
 
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
-  port: Number(process.env.PGPORT) ?? 5432,
   user: process.env.PGUSER ?? "postgres",
   password: process.env.PGPASSWORD ?? "12345678",
   database: process.env.PGDATABASE ?? "justsearch",
+  port: Number(process.env.PGPORT) ?? 5432,
 });
-//
-// const uploadOnCloudinary = async (localFilePath: string, folderName = "") => {
-//   if (!localFilePath) return null;
-//   try {
-//     // TODO: Uncomment this in production
-//     // const result = await cloudinary.uploader.upload(localFilePath, {
-//     //   resource_type: 'auto',
-//     //   folder: folderName,
-//     // });
-//     //
-//     const customName = `${Date.now()}.${Math.random().toString(36).substring(2, 15)}`;
-//     const result = {
-//       secure_url: customName,
-//     };
-//
-//     console.log(" Upload success:", result.secure_url);
-//
-//     // Uncomment if you want to delete local file after upload
-//     // fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
-//
-//     return result;
-//   } catch (err: any) {
-//     console.error("Cloudinary upload failed:", err);
-//     fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
-//     return null;
-//   }
-// };
-// ``;
-//
-// const deleteOnCloudinary = async (cloudinary_url: any) => {
-//   try {
-//     if (!cloudinary_url) return null;
-//     const response = await cloudinary.uploader.destroy(cloudinary_url, {
-//       resource_type: "auto",
-//     });
-//     return response;
-//   } catch (error) {
-//     throw new Error(`cannot delete file in cloudinary ${error}`);
-//   }
-// };
-//
-// export { uploadOnCloudinary, deleteOnCloudinary };
-//
-export const db = drizzle({ client: pool });
 
-export * from "./schema/auth.schema";
-export * from "./schema/business.schema";
-export * from "./schema/hire.schema";
-export * from "./schema/not-related.schema";
-export * from "./schema/offer.schema";
-export * from "./schema/plan.schema";
-export * from "./schema/product.shema";
-export * from "./schema/user.schema";
+import * as auth from "./schema/auth.schema";
+import * as business from "./schema/business.schema";
+import * as hire from "./schema/hire.schema";
+import * as not_related from "./schema/not-related.schema";
+import * as offer from "./schema/offer.schema";
+import * as plan from "./schema/plan.schema";
+import * as product from "./schema/product.shema";
+import * as user from "./schema/user.schema";
+
+export const schemas = {
+  auth,
+  business,
+  hire,
+  not_related,
+  offer,
+  plan,
+  product,
+  user,
+};
+
+export const db = drizzle({
+  client: pool,
+  schema: {
+    ...auth,
+    ...business,
+    ...hire,
+    ...not_related,
+    ...offer,
+    ...plan,
+    ...product,
+    ...user,
+  },
+});

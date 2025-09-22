@@ -1,30 +1,35 @@
+import { log, uploadOnCloudinary } from "@repo/helper";
 import { eq } from "drizzle-orm";
 import { db } from "../db/src/index";
-import { cities, states } from "../db/src/schema/address.schema";
-import { banners } from "../db/src/schema/banner.schema";
-import { categories } from "../db/src/schema/category.schema";
-import { subcategories } from "../db/src/schema/subcategory.schema";
+import {
+  banners,
+  categories,
+  cities,
+  states,
+  subcategories,
+} from "../db/src/schema/not-related.schema";
 // import { uploadOnCloudinary } from "../db/src/index";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  // await state();
-  // await citie();
+  await state();
+  await citie();
   await bannerSeed();
-  // await seedCategories();
-  // await seedSubcategories();
+  await seedCategories();
+  await seedSubcategories();
 };
 
 export const clearAllTablesNotRelated = async () => {
-  console.log("================== execution comes here ====================")
-  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  log.info("================== execution comes here ====================");
+  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
-  console.log(" All tables cleared successfully!");
+  log.info(" All tables cleared successfully!");
 };
 
 const state = async () => {
@@ -65,15 +70,18 @@ export const bannerSeed = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM `banners`");
   for (const row of rows) {
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
-    // const bannerPhotoUrl =
-    //   row.photo &&
-    //   (await uploadOnCloudinary(liveProfileImageUrl, "Banner"))?.secure_url;
+    const bannerPhotoUrl =
+      row.photo &&
+      (await uploadOnCloudinary(
+        liveProfileImageUrl,
+        "Banner",
+        clouadinaryFake,
+      ));
 
-    console.log
     await db.insert(banners).values({
       mysqlId: row.id,
       route: row.route ?? null,
-      photo: row.photo, // TODO: set this url as cloudinary gives us
+      photo: bannerPhotoUrl,
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,
@@ -89,12 +97,12 @@ export const seedCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM categories");
   for (const row of rows) {
     const liveProfileImageUrl = `https://justsearch.net.in/assets/images/categories/${row.photo}`;
-    const uploaded =
-      row.photo &&
-      (await uploadOnCloudinary(liveProfileImageUrl, "categories"));
-    const categoriesPhotoUrl = uploaded?.secure_url;
-
-    console.log(categoriesPhotoUrl);
+    const categoriesPhotoUrl =
+      (await uploadOnCloudinary(
+        liveProfileImageUrl,
+        "categories",
+        clouadinaryFake,
+      )) ?? dummyImageUrl;
 
     await db.insert(categories).values({
       id: row.id,
@@ -108,8 +116,6 @@ export const seedCategories = async () => {
       updatedAt: row.updated_at,
     });
   }
-
-  console.log("Categories migrated successfully!");
 };
 
 // sub_categories

@@ -1,5 +1,12 @@
 import { sql } from "drizzle-orm";
-import { pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export enum UserRole {
   visiter = "visiter",
@@ -10,13 +17,17 @@ export enum UserRole {
   salesman = "salesman",
 }
 
+const USER_ROLE_VALUES = Object.values(UserRole) as [string, ...string[]];
+
+const userRoleEnum = pgEnum("user_role", USER_ROLE_VALUES);
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: varchar("username", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }),
   phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
   password: text("password"),
-  role: varchar("role", { length: 50 }).$type<UserRole>().notNull(),
+  role: userRoleEnum("role"),
   googleId: varchar("google_id", { length: 255 }),
   refreshToken: text("refresh_token"),
   createdAt: timestamp("created_at").default(sql`NOW()`),

@@ -13,8 +13,8 @@ import { users } from "./auth.schema";
 import { categories, cities, subcategories } from "./not-related.schema";
 
 // ✅ Enums
-export const genderEnum = pgEnum("gender", ["Male", "Female", "Others"]);
-export const maritalStatusEnum = pgEnum("marital_status", [
+export const genderEnum = pgEnum("hire_gender", ["Male", "Female", "Others"]);
+export const maritalStatusEnum = pgEnum("hire_marital_status", [
   "Married",
   "Unmarried",
   "Widowed",
@@ -22,21 +22,25 @@ export const maritalStatusEnum = pgEnum("marital_status", [
   "Others",
 ]);
 
-export const qualificationEnum = pgEnum("highest_qualification", [
+export const qualificationEnum = pgEnum("hire_highest_qualification", [
   "PostGraduation",
   "Graduation",
   "Diploma",
 ]);
 
-export const jobTypeEnum = pgEnum("job_type", ["FullTime", "PartTime", "Both"]);
+export const jobTypeEnum = pgEnum("hire_job_type", [
+  "FullTime",
+  "PartTime",
+  "Both",
+]);
 
-export const workShiftEnum = pgEnum("work_shift", [
+export const workShiftEnum = pgEnum("hire_work_shift", [
   "Morning",
   "Evening",
   "Night",
 ]);
 
-export const jobDurationEnum = pgEnum("job_duration", [
+export const jobDurationEnum = pgEnum("hire_job_duration", [
   "Day",
   "Week",
   "Month",
@@ -44,9 +48,9 @@ export const jobDurationEnum = pgEnum("job_duration", [
   "Few Years",
 ]);
 
-export const relocateEnum = pgEnum("relocate", ["Yes", "No"]);
+export const relocateEnum = pgEnum("hire_relocate", ["Yes", "No"]);
 
-export const idProofEnum = pgEnum("id_proof", [
+export const idProofEnum = pgEnum("hire_id_proof", [
   "AadharCard",
   "PanCard",
   "VoterCard",

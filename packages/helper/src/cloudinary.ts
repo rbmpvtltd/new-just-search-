@@ -23,12 +23,12 @@ const uploadOnCloudinary = async (
 ) => {
   if (!localFilePath) return null;
   try {
-    if (!test) {
+    if (test) {
       const customName = `${Date.now()}.${Math.random().toString(36).substring(2, 15)}`;
       const result = {
-        secure_url: customName,
+        public_id: customName,
       };
-      return result;
+      return result.public_id;
     }
 
     const result = await cloudinary.uploader.upload(localFilePath, {
@@ -36,7 +36,7 @@ const uploadOnCloudinary = async (
       folder: folderName,
     });
 
-    return result;
+    return result.public_id;
 
     // Uncomment if you want to delete local file after upload
     // fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);

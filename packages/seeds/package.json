@@ -1,0 +1,14 @@
+{
+  "name": "seeds",
+  "private": true,
+  "dependencies": {
+    "@repo/db": "*",
+    "@repo/helper": "*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
