@@ -6,7 +6,11 @@ import express from "express";
 import { cloudinarySignature } from "./lib/cloudinary";
 import { ORPChandler, ORPCspec } from "./lib/orpc";
 import { appRouter } from "./route";
-import { createContext } from "./utils/context";
+import { createContext, createWSContext } from "./utils/context";
+import { applyWSSHandler } from '@trpc/server/adapters/ws';
+import * as ws from "ws";
+
+
 
 const app = express();
 
@@ -25,11 +29,38 @@ app.use(
   }),
 );
 
+-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.post("/v1/api/sign-image", cloudinarySignature);
 
 // adding websocket in trpc
+const wsServer = new ws.WebSocketServer({ port: 5500 });
+
+const handler = applyWSSHandler({
+  wss : wsServer,
+  router: appRouter,
+  createContext : createWSContext,
+  keepAlive : {
+    enabled : true,
+    pingMs : 30000,
+    pongWaitMs : 5000
+  }
+});
+
+wsServer.on("connection",(ws)=>{
+  console.log(`connection created`,ws)
+  ws.once('close', () => {
+    console.log(`Connection (${wsServer.clients.size})`);
+  });
+})
+console.log('WebSocket Server listening on ws://localhost:5500');
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM');
+  handler.broadcastReconnectNotification();
+  wsServer.close();
+});
 
 // adding Orpc
 //
