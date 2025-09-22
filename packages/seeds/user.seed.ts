@@ -1,14 +1,11 @@
+import { db } from "@repo/db";
+import { uploadOnCloudinary } from "@repo/helper";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@repo/db";
-import { users ,UserRole} from "../db/src/schema/auth.schema";
-import {
-  franchises,
-  profiles,
-  salesmen,
-} from "../db/src/schema/user.schema";
-import { uploadOnCloudinary } from "@repo/db";
+import { UserRole, users } from "../db/src/schema/auth.schema";
+import { franchises, profiles, salesmen } from "../db/src/schema/user.schema";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
 dotenv.config();
 export const userSeed = async () => {
@@ -51,12 +48,14 @@ export const seedUsers = async () => {
     const [insertedUser] = await db.insert(users).values(user).returning();
 
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
-    const uploaded = row.photo
-      ? await uploadOnCloudinary(liveProfileImageUrl, "Profile")
-      : null;
-    const profilePhotoUrl = uploaded?.secure_url;
+    const profilePhotoUrl =
+      (await uploadOnCloudinary(
+        liveProfileImageUrl,
+        "Profile",
+        clouadinaryFake,
+      )) ?? dummyImageUrl;
 
-    // 5️⃣ Insert profile
+    // 5 Insert profile
     const profileData = {
       userId: insertedUser!.id,
       firstName: row.first_name ?? "null",
@@ -143,9 +142,9 @@ export const seedOfSalesman = async () => {
 
     const [franchises1]: any[] = await sql.execute("SELECT * FROM franchises");
     const str = franchises1.refer_code;
-    console.info("========================>",str)
-    const refer_prifixed = str ?  str.slice(0, -4) : "RBMHORJ00"; // "RBMHORJ00"
-    const refer_suffix =str ?  str.slice(-4) : "0000" ; // "0000"
+    console.info("========================>", str);
+    const refer_prifixed = str ? str.slice(0, -4) : "RBMHORJ00"; // "RBMHORJ00"
+    const refer_suffix = str ? str.slice(-4) : "0000"; // "0000"
     const refer_code = refer_prifixed + refer_suffix + row.id;
 
     await db.insert(salesmen).values({

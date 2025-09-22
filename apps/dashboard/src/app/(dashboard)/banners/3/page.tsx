@@ -5,7 +5,7 @@ import { z } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { trpcServer } from "@/trpc/trpc-server";
-import { DataTable } from "@/components/table/data-table";
+import { DataTable, type QueryFnContext } from "@/components/table/data-table";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -57,16 +57,47 @@ export const columns: ColumnDef<Task>[] = [
   },
 ];
 
+// export default function Page() {
+//   const queryConfig = {
+//     queryKey: ["tasks"],
+//     queryFn: async ({ pagination, sorting, filters }: any) => {
+//       return await trpcServer.test.table.query({
+//         pagination: {
+//           pageIndex: pagination?.pageIndex || 0,
+//           pageSize: pagination?.pageSize || 10,
+//         },
+//       });
+//     },
+//   };
+//   return (
+//     <div className="container mx-auto py-10">
+//       <DataTable
+//         columns={columns}
+//         queryConfig={queryConfig}
+//         manualPagination={true}
+//         manualSorting={true}
+//         manualFiltering={true}
+//       />
+//     </div>
+//   );
+// }
+
 export default function Page() {
   const queryConfig = {
     queryKey: ["tasks"],
-    queryFn: async ({ pagination, sorting, filters }: any) => {
-      return await trpcServer.test.table.query({
+    queryFn: async ({ pagination }: QueryFnContext) => {
+      const result = await trpcServer.test.table.query({
         pagination: {
           pageIndex: pagination?.pageIndex || 0,
           pageSize: pagination?.pageSize || 10,
         },
       });
+
+      return {
+        data: result?.data || [],
+        totalPages: result?.totalPages || 0,
+        totalCount: result?.totalCount || 0,
+      };
     },
   };
   return (

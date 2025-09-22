@@ -1,6 +1,7 @@
-import { banners, db } from "@repo/db";
+import { db, schemas } from "@repo/db";
 import { eq } from "drizzle-orm";
 
+const banners = schemas.not_related.banners;
 async function getFirstBannerData() {
   const banner1 = await db
     .select({ photo: banners.photo, id: banners.id })

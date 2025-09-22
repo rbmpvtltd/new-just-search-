@@ -1,3 +1,4 @@
+import { log } from "@repo/helper";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
@@ -16,6 +17,9 @@ app.use(
   createExpressMiddleware({
     router: appRouter,
     createContext,
+    onError: (opts) => {
+      log.error(opts.error.code);
+    },
   }),
 );
 
