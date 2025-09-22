@@ -1,5 +1,5 @@
 "use client";
 
-export default function ErrorComponent() {
-  return <div></div>;
+export function ErrorComponent({ error }: { error: string }) {
+	return <div>{error}</div>;
 }
