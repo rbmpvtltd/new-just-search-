@@ -4,6 +4,7 @@ import { setCountUploadImage } from "@/utils/cloudinaryCount";
 import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
 
 export const testRouter = router({
+  
   addImage: protectedProcedure.query(async ({ ctx }) => {
     await setCountUploadImage(ctx.userId, 2);
     return;

@@ -1,6 +1,6 @@
 import "server-only"; // <-- ensure this file cannot be imported from the client
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCClient, createWSClient, httpBatchLink, wsLink } from "@trpc/client";
 import {
   createTRPCOptionsProxy,
   type TRPCQueryOptions,
@@ -9,7 +9,7 @@ import { cache } from "react";
 import superjson from "superjson";
 import type { AppRouter } from "types/index";
 import { getToken } from "@/utils/session";
-import { getTrpcUrl } from "./helper";
+import { getTrpcUrl, getWsUrl } from "./helper";
 import { makeQueryClient } from "./query-client";
 // IMPORTANT: Create a stable getter for the query client that
 //            will return the same client during the same request.
@@ -28,6 +28,12 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
           };
         },
       }),
+      wsLink({
+        client: createWSClient({
+          url : getWsUrl()
+        }),
+        transformer : superjson
+      })
     ],
   }),
   queryClient: getQueryClient,
