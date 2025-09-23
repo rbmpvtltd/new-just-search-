@@ -4,6 +4,9 @@ import { setCountUploadImage } from "@/utils/cloudinaryCount";
 import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
 
 export const testRouter = router({
+  test: publicProcedure.query(async () => {
+    throw new TRPCError({ code: "FORBIDDEN", message: "cannot find token" });
+  }),
   addImage: protectedProcedure.query(async ({ ctx }) => {
     await setCountUploadImage(ctx.userId, 2);
     return;

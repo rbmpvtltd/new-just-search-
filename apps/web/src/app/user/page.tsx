@@ -1,27 +1,20 @@
-import { redirect } from "next/navigation";
-import { TRPCClientError } from "@trpc/client";
-import type { errorCodeMap } from "@/utils/error/errorCode";
+import { log } from "util";
+import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 
-// Fake tRPC server for testing
-const mockTRPC = {
-  auth: {
-    getUser: {
-      query: async (code: keyof typeof errorCodeMap) => {
-        // Simulate error
-        throw new TRPCClientError({ data: { code } } as any);
-      },
-    },
-  },
-};
-
 export default async function UserPage() {
-  // Choose the error code to test
-  const testCode: keyof typeof errorCodeMap = "BAD_REQUEST"; // change this to test other codes
+	console.log("user page");
 
-  const user = await asyncHandler(mockTRPC.auth.getUser.query(testCode));
+	const result = await asyncHandler(trpcServer.auth.logout.query());
+	console.log("result", result);
 
-  if (!user) return <div>Error occurred (redirect handled)</div>;
+	if (result.error) {
+		return <div style={{ color: "red" }}>{result.error}</div>;
+	}
 
-  return <div>Welcome {user.name}</div>;
+	if (result.data) {
+		return <div>user id {result.data}</div>;
+	}
+
+	return <div>not login</div>;
 }
