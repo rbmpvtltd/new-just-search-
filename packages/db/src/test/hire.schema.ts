@@ -10,7 +10,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth.schema";
-import { categories, cities, subcategories } from "./not-related.schema";
+import { categories, cities, subcategories } from "../schema/not-related.schema";
 
 // ✅ Enums
 export const genderEnum = pgEnum("hire_gender", ["Male", "Female", "Others"]);
