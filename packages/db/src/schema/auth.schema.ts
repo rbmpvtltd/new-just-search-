@@ -9,12 +9,13 @@ import {
 } from "drizzle-orm/pg-core";
 
 export enum UserRole {
+	guest = "guest",
 	visiter = "visiter",
-	admin = "admin",
 	hire = "hire",
 	business = "business",
-	franchises = "franchises",
 	salesman = "salesman",
+	franchises = "franchises",
+	admin = "admin",
 }
 
 export const userRoleEnum = pgEnum("user_role", UserRole);

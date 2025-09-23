@@ -1,21 +1,27 @@
 "use server";
 import { cookies } from "next/headers";
 
-export async function setToken(token: string) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const cookieStore = await cookies();
+export async function setToken(token: string, persist: boolean = false) {
+	const tempTime = 5 * 1000;
+	const week = 7 * 24 * 60 * 60 * 1000;
+	const expiresAt = new Date(Date.now() + tempTime);
+	const cookieStore = await cookies();
+	if (persist) {
+		cookieStore.set("token", token, {
+			httpOnly: true,
+			secure: true,
+			expires: expiresAt,
+			sameSite: "lax",
+			path: "/",
+		});
+	} else {
+		cookieStore.set("token", token);
+	}
 
-  cookieStore.set("token", token, {
-    httpOnly: true,
-    secure: true,
-    expires: expiresAt,
-    sameSite: "lax",
-    path: "/",
-  });
-  return true;
+	return true;
 }
 
 export async function getToken() {
-  const cookieStore = await cookies();
-  return cookieStore.get("token");
+	const cookieStore = await cookies();
+	return cookieStore.get("token");
 }
