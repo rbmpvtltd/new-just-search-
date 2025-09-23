@@ -1,15 +1,16 @@
-import { log } from "util";
+import { Toaster } from "@/components/ui/sonner";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import ClientComponent from "./clinet";
 
 export default async function UserPage() {
 	console.log("user page");
 
-	const result = await asyncHandler(trpcServer.auth.logout.query());
+	const result = await asyncHandler(trpcServer.test.test.query());
 	console.log("result", result);
 
 	if (result.error) {
-		return <div style={{ color: "red" }}>{result.error}</div>;
+		return <ClientComponent error={result.error} />;
 	}
 
 	if (result.data) {
