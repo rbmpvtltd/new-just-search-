@@ -1,16 +1,18 @@
-import { Toaster } from "@/components/ui/sonner";
+import { redirect } from "next/navigation";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
-import ClientComponent from "./clinet";
+import ErrorComponent from "@/utils/error/ErrorComponent";
 
 export default async function UserPage() {
-	console.log("user page");
-
 	const result = await asyncHandler(trpcServer.test.test.query());
-	console.log("result", result);
 
+	if (result.redirect) {
+		redirect(result.redirect);
+	}
 	if (result.error) {
-		return <ClientComponent error={result.error} />;
+		console.log("error", result.error);
+		
+		return <ErrorComponent error={result.error} />;
 	}
 
 	if (result.data) {

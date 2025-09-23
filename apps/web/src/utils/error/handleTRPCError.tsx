@@ -2,16 +2,18 @@ import type { AppRouter } from "@repo/types";
 import type { TRPCClientError } from "@trpc/client";
 import { errorCodeMap } from "./errorCode";
 
-export function handleTRPCError(error: TRPCClientError<AppRouter>): string {
-	console.log("error", error);
-
+export function handleTRPCError(error: TRPCClientError<AppRouter>) {
 	const code = error.data?.code;
+	const errorMessage = error.message;
 	const config = errorCodeMap[code ?? "undefined"];
 
 	if (!config) {
 		console.error("Unknown error code:", code);
-		return "Something went wrong!";
+		return { message: "Something went wrong!", redirect: undefined };
 	}
 
-	return config.message || error.message || "An error occurred";
+	return {
+		message: errorMessage || config.message || "An error occurred",
+		redirect: config.redirect,
+	};
 }
