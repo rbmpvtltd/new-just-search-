@@ -17,9 +17,7 @@ export enum UserRole {
 	salesman = "salesman",
 }
 
-const USER_ROLE_VALUES = Object.values(UserRole) as [string, ...string[]];
-
-const userRoleEnum = pgEnum("role", USER_ROLE_VALUES);
+export const userRoleEnum = pgEnum("user_role", UserRole);
 
 export const users = pgTable("users", {
 	id: serial("id").primaryKey(),

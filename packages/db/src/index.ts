@@ -9,36 +9,36 @@ const pool = new Pool({
 	port: Number(process.env.PGPORT) ?? 5432,
 });
 
+import * as auth from "./schema/auth.schema";
 import * as not_related from "./schema/not-related.schema";
-import * as auth from "./test/auth.schema";
-import * as business from "./test/business.schema";
-import * as hire from "./test/hire.schema";
-import * as offer from "./test/offer.schema";
-import * as plan from "./test/plan.schema";
-import * as product from "./test/product.shema";
-import * as user from "./test/user.schema";
+// import * as business from "./schema/business.schema";
+// import * as hire from "./schema/hire.schema";
+// import * as offer from "./schema/offer.schema";
+// import * as plan from "./schema/plan.schema";
+// import * as product from "./schema/product.shema";
+// import * as user from "./schema/user.schema";
 
 export const schemas = {
-	auth,
-	business,
-	hire,
 	not_related,
-	offer,
-	plan,
-	product,
-	user,
+	auth,
+	// business,
+	// hire,
+	// offer,
+	// plan,
+	// product,
+	// user,
 };
 
 export const db = drizzle({
 	client: pool,
 	schema: {
-		...auth,
-		...business,
-		...hire,
 		...not_related,
-		...offer,
-		...plan,
-		...product,
-		...user,
+		...auth,
+		// ...business,
+		// ...hire,
+		// ...offer,
+		// ...plan,
+		// ...product,
+		// ...user,
 	},
 });

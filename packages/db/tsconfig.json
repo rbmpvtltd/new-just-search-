@@ -1,17 +1,17 @@
 {
-  "extends": "@repo/typescript-config/base.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "types/*": ["../../packages/types/src/*"]
-    },
-    "composite": true,
-    "incremental": true,
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
-  },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "dist"]
+	"extends": "@repo/typescript-config/base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"],
+			"types/*": ["../../packages/types/src/*"]
+		},
+		"composite": true,
+		"incremental": true,
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
+	},
+	"include": ["./src/**/*", "test/offer.schema.ts", "test/business.schema.ts", "test/user.schema.ts", "test/hire.schema.ts", "test/plan.schema.ts", "test/product.shema.ts"],
+	"exclude": ["node_modules", "dist", "test"]
 }
