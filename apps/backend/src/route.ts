@@ -1,5 +1,6 @@
 import { authRouter } from "./features/auth/auth.router";
 import { bannerRouter } from "./features/banners/banners.routes";
+import { chatRouter } from "./features/chats/test.routes";
 import { cloudinarySignature } from "./features/cloudinary/cloudinarySing.route";
 import { setImageUploads } from "./features/cloudinary/imageUploads.route";
 import { testRouter } from "./features/test/test.routes";
@@ -11,8 +12,11 @@ export const appRouter = router({
   banners: bannerRouter,
   cloudinarySign : cloudinarySignature,
   setImageUploads : setImageUploads,
+  chatRouter : chatRouter,
   // cloudinary: cloudinaryRouter,
-  test: testRouter,
+  // test: testRouter,
+  // test : chatRouter,
+
 });
 
 export type AppRouter = typeof appRouter;
