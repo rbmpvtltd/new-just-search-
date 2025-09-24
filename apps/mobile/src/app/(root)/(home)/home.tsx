@@ -25,27 +25,14 @@ export default function TabOneScreen() {
   // console.log("==============data from trpc============",data)
   //
   // const trpc = useTRPC();
-  const { data, isLoading, error }  = useQuery(trpc.hi.hi2.queryOptions());
-  if (isLoading) {
-    <Loading position="center" />;
-  }
-  console.log(data)
-  if (error) {
-    console.log(error)
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="bg-base-100 text-secondary">{error.message}</Text>
-      </View>
-    )
-  }
+
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View className="flex items-center r rounded-4xl">
         <Text className="text-secondary">hi</Text>
-        <Text className="text-secondary">{data?.itemid}</Text>
 
-        {/* <Banner1 /> */}
+        <Banner1 />
         {/* <SearchForm /> */}
         {/* <Banner4 /> */}
         {/* <BoundaryWrapper> */}

@@ -51,6 +51,7 @@
 		"@types/react-native": "^0.73.0",
 		"@types/react-native-version-check": "^3.4.8",
 		"axios": "^1.9.0",
+		"cloudinary-react-native": "^1.2.1",
 		"country-state-city": "^3.2.1",
 		"date-fns": "^4.1.0",
 		"eslint-config-prettier": "^10.1.5",
