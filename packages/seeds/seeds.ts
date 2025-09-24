@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-// import { notRelated } from "./notrelated.seed";
+import { notRelated } from "./notrelated.seed";
 
 // import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
@@ -13,16 +13,16 @@ import dotenv from "dotenv";
 // import { planSeed } from "./plan.seed";
 // import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
-import { userSeed } from "./user.seed";
+// import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = true;
+export const clouadinaryFake = false;
 export const dummyImageUrl = "dummyImageUrl";
 dotenv.config();
 (async () => {
   try {
     // Postgres seeding
-    // await notRelated();
-    await userSeed();
+    await notRelated();
+    // await userSeed();
     // await fakeSeed();
     // await businessSeed();
     // await hireSeed();

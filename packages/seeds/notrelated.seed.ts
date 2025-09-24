@@ -1,4 +1,4 @@
-import { log, uploadOnCloudinary } from "@repo/helper";
+import { cloudinary, log, uploadOnCloudinary } from "@repo/helper";
 import { eq } from "drizzle-orm";
 import { db } from "../db/src/index";
 import {
@@ -14,20 +14,20 @@ import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  await state();
-  await citie();
+  // await state();
+  // await citie();
   await bannerSeed();
-  await seedCategories();
-  await seedSubcategories();
+  // await seedCategories();
+  // await seedSubcategories();
 };
 
 export const clearAllTablesNotRelated = async () => {
   log.info("================== execution comes here ====================");
-  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
   log.info(" All tables cleared successfully!");
 };
@@ -70,18 +70,25 @@ export const bannerSeed = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM `banners`");
   for (const row of rows) {
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
-    const bannerPhotoUrl =
-      row.photo &&
-      (await uploadOnCloudinary(
-        liveProfileImageUrl,
-        "Banner",
-        clouadinaryFake,
-      ));
+
+    let bannerPhotoPublicId: string | null = null;
+
+    if (row.photo) {
+      const result = await cloudinary.uploader.upload( liveProfileImageUrl, {
+			resource_type: "auto",
+			folder: "Banner",
+		});
+
+      // Cloudinary upload response usually contains: url, secure_url, public_id, etc.
+      console.log("Banner photo public id", result);
+      bannerPhotoPublicId = result.public_id ?? null;
+    }
+    console.log("Banner photo public id", bannerPhotoPublicId);
 
     await db.insert(banners).values({
       mysqlId: row.id,
       route: row.route ?? null,
-      photo: bannerPhotoUrl,
+      photo: bannerPhotoPublicId,
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,
