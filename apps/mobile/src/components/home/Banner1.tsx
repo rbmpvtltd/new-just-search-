@@ -5,16 +5,20 @@ import { trpc } from "@/lib/trpc";
 import { Loading } from "../ui/Loading";
 import { Text } from "react-native";
 
+
+
 function Banner1() {
   // const { data } = useSuspenceData(BANNER_URL.url, BANNER_URL.key);
   const { data, isLoading, error, isError } = useQuery(
     trpc.banners.firstBanner.queryOptions(),
   );
+  console.log(data)
   if (isLoading) {
-    return <Loading position="center" />;
+    return <Loading position="center" />
+
   }
   if (isError) {
-    return <Text className="text-secondary">{error.message}</Text>;
+    return <Text className="text-secondary"> {error.message}dfasdf</Text>;
   }
 
   console.log(data);

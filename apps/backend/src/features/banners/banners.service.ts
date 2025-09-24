@@ -11,7 +11,7 @@ async function getFirstBannerData() {
 }
 
 async function getSecondBannerData() {
-  const banner2 = await db.select().from(banners).where(eq(banners.type, 2));
+  const banner2 = await db.select({photo : banners.photo}).from(banners).where(eq(banners.type, 2));
   return banner2;
 }
 
