@@ -1,25 +1,20 @@
 import type { AppRouter } from "@repo/types";
-import { TRPCClientError } from "@trpc/client";
-import type { AxiosError } from "axios";
-import { redirect } from "next/navigation";
+import type { TRPCClientError } from "@trpc/client";
 import { handleTRPCError } from "./handleTRPCError";
-import { log } from "@repo/helper";
 
-export async function asyncHandler<T>(promise: Promise<T>): Promise<T | void> {
+export async function asyncHandler<T>(
+	promise: Promise<T>,
+): Promise<{ data: T | null; error: string | null; redirect?: string }> {
 	try {
-		return await promise;
-	} catch (error) {
-		if (error instanceof TRPCClientError) {
-			return handleTRPCError(error, redirect);
+		const data = await promise;
+		return { data, error: null };
+	} catch (error: unknown) {
+		if ((error as TRPCClientError<AppRouter>)?.data) {
+			const { message, redirect } = handleTRPCError(
+				error as TRPCClientError<AppRouter>,
+			);
+			return { data: null, error: message, redirect };
 		}
-		//  else if ((error as AxiosError).isAxiosError) {
-		//   handleTRPCError(error as AxiosError);
-		// }
-		else {
-			// TODO: handle unexpected errors
-			//
-			log.info("asdfasdf");
-			console.error("Unkaown error");
-		}
+		return { data: null, error: "Unknown error occurred" };
 	}
 }
