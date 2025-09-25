@@ -2,51 +2,47 @@ import fs from "fs";
 import path from "path";
 import winston from "winston";
 
+const {
+  combine,
+  timestamp,
+  json,
+  errors,
+  splat,
+  colorize,
+  simple,
+  prettyPrint,
+} = winston.format;
+
 const logDir = path.resolve(process.cwd(), "logs");
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
-}
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
 
 const logger = winston.createLogger({
   level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    winston.format.printf(({ level, message, timestamp }) => {
-      return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
-    }),
+  format: combine(
+    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    errors({ stack: true }), // handle Error objects
+    splat(), // support multiple args
+    json(), // serialize objects
+    prettyPrint(),
   ),
   transports: [
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(
-          ({ level, message, timestamp }) =>
-            `[${timestamp}] ${level}: ${message}`,
-        ),
+      level: "debug",
+      format: combine(
+        colorize(),
+        simple(), // readable console output
       ),
     }),
-
     new winston.transports.File({
       filename: path.join(logDir, "error.log"),
       level: "error",
     }),
-
     new winston.transports.File({
       filename: path.join(logDir, "info.log"),
       level: "info",
     }),
-
-    new winston.transports.File({
-      filename: path.join(logDir, "combine.log"),
-    }),
+    new winston.transports.File({ filename: path.join(logDir, "combine.log") }),
   ],
 });
-
-export const log = {
-  error: (msg: string) => logger.error(msg),
-  warn: (msg: string) => logger.warn(msg),
-  info: (msg: string) => logger.info(msg),
-  debug: (msg: string) => logger.info(msg),
-};
-
+logger.info("Logger initialized", { dir: logDir, data: { adahd: "adahd" } });
 export { logger };
