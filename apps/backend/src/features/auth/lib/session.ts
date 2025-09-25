@@ -1,11 +1,14 @@
 import crypto from "node:crypto";
 import { encodeBase32 } from "@oslojs/encoding";
+import type { UserRole } from "@repo/db";
 import { redis } from "@/lib/redis";
+import { getUserById } from "../auth.service";
 
 interface Session {
-  token : string;
+  token: string;
   id: string;
-  secretHash: Uint8Array; // Uint8Array is a byte array
+  role: UserRole;
+  secretHash: Uint8Array;
   createdAt: Date;
   userId: number;
 }
@@ -28,11 +31,7 @@ async function createSession(userId: number): Promise<SessionWithToken | null> {
   const secretHash = await hashSecret(secret);
 
   const token = `${id}.${secret}`;
-  const user = {
-    userId,
-    email: "otherritik000@gmail.com",
-    password: "12345678",
-  }; // TODO: get this from db
+  const user = await getUserById(userId);
 
   if (!user) {
     return null;
@@ -43,7 +42,8 @@ async function createSession(userId: number): Promise<SessionWithToken | null> {
     secretHash,
     createdAt: now,
     token,
-    userId: user.userId,
+    userId: user.id,
+    role: user.role,
   };
 
   const sessionData = {
@@ -51,7 +51,8 @@ async function createSession(userId: number): Promise<SessionWithToken | null> {
     secretHash: Buffer.from(session.secretHash).toString("base64"),
     createdAt: session.createdAt.toISOString(),
     token: session.token,
-    userId,
+    userId: user.id,
+    role: user.role,
   };
 
   // Save in Redis with TTL (optional, e.g., 1 day = 86400 seconds)
@@ -62,6 +63,7 @@ async function createSession(userId: number): Promise<SessionWithToken | null> {
     60 * 60 * 24,
   );
 
+  // TODO: remembering to delete all sessions when deleting user form admin
   await redis.set(
     `usersessionid:${userId}`,
     `session:${id}`,
@@ -106,9 +108,10 @@ async function getSession(sessionId: string): Promise<Session | null> {
   const uint8 = Uint8Array.from(Buffer.from(base64, "base64"));
 
   return {
-    token : jsonParseData.token,
+    token: jsonParseData.token,
     id: jsonParseData.id,
     userId: jsonParseData.userId,
+    role: jsonParseData.role,
     secretHash: uint8,
     createdAt: jsonParseData.createdAt,
   };

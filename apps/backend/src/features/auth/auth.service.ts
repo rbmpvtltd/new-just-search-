@@ -1,17 +1,22 @@
-const getUserByEmail = (email: string) => {
-  // TODO: get it form db
-  if (email !== "otherritik000@gmail.com") {
-    return false;
-  }
-  return {
-    userId: 10,
-    email: "otherritik000@gmail.com",
-    password: "12345678",
-  };
+import { db } from "@repo/db";
+
+const getUserByUserName = async (username: string) => {
+  const user = await db.query.users.findFirst({
+    where: (user, { eq, or }) =>
+      or(eq(user.email, username), eq(user.phoneNumber, username)),
+  });
+  return user;
 };
 
-const checkUserPassword = (email: string, password: string) => {
-  const user = getUserByEmail(email);
+const getUserById = async (id: number) => {
+  const user = await db.query.users.findFirst({
+    where: (user, { eq }) => eq(user.id, id),
+  });
+  return user;
+};
+
+const checkPasswordGetUser = async (email: string, password: string) => {
+  const user = await getUserByUserName(email);
   if (!user) {
     return false;
   }
@@ -22,4 +27,4 @@ const checkUserPassword = (email: string, password: string) => {
   return user;
 };
 
-export { type getUserByEmail, checkUserPassword };
+export { getUserByUserName, getUserById, checkPasswordGetUser };

@@ -1,34 +1,34 @@
 import { sql } from "drizzle-orm";
 import {
-	pgEnum,
-	pgTable,
-	serial,
-	text,
-	timestamp,
-	varchar,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
 } from "drizzle-orm/pg-core";
 
-export enum UserRole {
-	guest = "guest",
-	visiter = "visiter",
-	hire = "hire",
-	business = "business",
-	salesman = "salesman",
-	franchises = "franchises",
-	admin = "admin",
-}
+export const UserRole = {
+  guest: "guest",
+  visiter: "visiter",
+  hire: "hire",
+  business: "business",
+  salesman: "salesman",
+  franchises: "franchises",
+  admin: "admin",
+} as const;
 
 export const userRoleEnum = pgEnum("user_role", UserRole);
 
 export const users = pgTable("users", {
-	id: serial("id").primaryKey(),
-	username: varchar("username", { length: 100 }).notNull(),
-	email: varchar("email", { length: 255 }),
-	phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
-	password: text("password"),
-	role: userRoleEnum("role"),
-	googleId: varchar("google_id", { length: 255 }),
-	refreshToken: text("refresh_token"),
-	createdAt: timestamp("created_at").default(sql`NOW()`),
-	updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 100 }).notNull(),
+  email: varchar("email", { length: 255 }),
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  password: text("password"),
+  role: userRoleEnum("role").default(UserRole.guest).notNull(),
+  googleId: varchar("google_id", { length: 255 }),
+  refreshToken: text("refresh_token"),
+  createdAt: timestamp("created_at").default(sql`NOW()`),
+  updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
