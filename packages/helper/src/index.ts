@@ -1,7 +1,7 @@
 import cloudinary, {
-  deleteOnCloudinary,
-  uploadOnCloudinary,
+	deleteOnCloudinary,
+	uploadOnCloudinary,
 } from "./cloudinary";
-import { log } from "./logger";
+import { logger } from "./logger";
 
-export { log, cloudinary, uploadOnCloudinary, deleteOnCloudinary };
+export { logger, cloudinary, uploadOnCloudinary, deleteOnCloudinary };

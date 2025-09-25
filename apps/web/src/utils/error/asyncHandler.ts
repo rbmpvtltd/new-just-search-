@@ -1,20 +1,20 @@
-import type { AppRouter } from "@repo/types";
-import type { TRPCClientError } from "@trpc/client";
+// asyncHandler.ts
+import { TRPCClientError } from "@trpc/client";
+import { redirect } from "next/navigation";
 import { handleTRPCError } from "./handleTRPCError";
 
 export async function asyncHandler<T>(
-	promise: Promise<T>,
+  promise: Promise<T>,
 ): Promise<{ data: T | null; error: string | null; redirect?: string }> {
-	try {
-		const data = await promise;
-		return { data, error: null };
-	} catch (error: unknown) {
-		if ((error as TRPCClientError<AppRouter>)?.data) {
-			const { message, redirect } = handleTRPCError(
-				error as TRPCClientError<AppRouter>,
-			);
-			return { data: null, error: message, redirect };
-		}
-		return { data: null, error: "Unknown error occurred" };
-	}
+  try {
+    const data = await promise;
+    return { data, error: null };
+  } catch (error) {
+    if (error instanceof TRPCClientError) {
+      return handleTRPCError<T>(error, redirect);
+    } else {
+      console.error("Unknown error", error);
+      return { data: null, error: "Unknown error occurred" };
+    }
+  }
 }
