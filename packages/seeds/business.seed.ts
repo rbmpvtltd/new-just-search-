@@ -1,3 +1,4 @@
+import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
 import { eq } from "drizzle-orm";
 import { UserRole, users } from "../db/src/schema/auth.schema";
@@ -186,7 +187,7 @@ const addBusiness = async () => {
               liveBusinessImageUrl,
               "Business",
             );
-            const businessPhotoUrl = uploaded?.secure_url;
+            const businessPhotoUrl = uploaded;
 
             if (businessPhotoUrl) {
               await db.insert(businessPhotos).values({
