@@ -15,20 +15,20 @@ import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  // await state();
-  // await citie();
+  await state();
+  await citie();
   await bannerSeed();
-  // await seedCategories();
-  // await seedSubcategories();
+  await seedCategories();
+  await seedSubcategories();
 };
 
 export const clearAllTablesNotRelated = async () => {
   logger.info("================== execution comes here ====================");
-  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
   logger.info(" All tables cleared successfully!");
 };
@@ -75,14 +75,11 @@ export const bannerSeed = async () => {
     let bannerPhotoPublicId: string | null = null;
 
     if (row.photo) {
-      const result = await cloudinary.uploader.upload(liveProfileImageUrl, {
-        resource_type: "auto",
-        folder: "Banner",
-      });
-
-      // Cloudinary upload response usually contains: url, secure_url, public_id, etc.
-      console.log("Banner photo public id", result);
-      bannerPhotoPublicId = result.public_id ?? null;
+      bannerPhotoPublicId = await uploadOnCloudinary(
+        liveProfileImageUrl,
+        "Banner",
+        clouadinaryFake,
+      );
     }
     console.log("Banner photo public id", bannerPhotoPublicId);
 

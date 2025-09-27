@@ -22,7 +22,7 @@ export const userRoleEnum = pgEnum("user_role", UserRole);
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: varchar("username", { length: 100 }).notNull(),
+  displayName: varchar("display_name", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }),
   phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
   password: text("password"),

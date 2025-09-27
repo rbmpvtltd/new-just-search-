@@ -15,8 +15,8 @@ const getUserById = async (id: number) => {
   return user;
 };
 
-const checkPasswordGetUser = async (email: string, password: string) => {
-  const user = await getUserByUserName(email);
+const checkPasswordGetUser = async (username: string, password: string) => {
+  const user = await getUserByUserName(username);
   if (!user) {
     return false;
   }

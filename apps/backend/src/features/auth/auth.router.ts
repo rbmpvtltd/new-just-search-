@@ -1,3 +1,4 @@
+import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
@@ -6,10 +7,20 @@ import { createSession } from "./lib/session";
 
 export const authRouter = router({
   login: publicProcedure
-    .input(z.object({ username: z.string(), password: z.string().min(6) }))
-    .query(async ({ input }) => {
-      const user = await checkPasswordGetUser(input.username, input.password);
+    .input(
+      z.object({
+        name: z.string(),
+      }),
+    )
+    .query(async (opts) => {
+      const input = opts.input;
 
+      logger.info("---------,,,,,-----------", input.name);
+
+      return "hi" + input.name;
+      const user = {
+        id: 13,
+      };
       if (!user) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -19,7 +30,11 @@ export const authRouter = router({
       const session = await createSession(user.id);
       return session?.token;
     }),
-  sendOTP: publicProcedure.input(z.object({phoneNumber: z.string()})).query(hh)
+  sendOTP: publicProcedure
+    .input(z.object({ phoneNumber: z.string() }))
+    .query(() => {
+      // TODO: OTP in not complete
+    }),
   register: publicProcedure
     .input(z.object({ username: z.string(), password: z.string().min(6) }))
     .mutation(async ({ input }) => {

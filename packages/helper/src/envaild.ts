@@ -1,10 +1,11 @@
-import { log } from "node:console";
 import dotenv from "dotenv";
 import { cleanEnv, num, str } from "envalid";
 
-dotenv.config({
-  path: "../../.env",
-});
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({
+    path: "../../.env",
+  });
+}
 
 const env = cleanEnv(process.env, {
   NODE_ENV: str({
@@ -21,6 +22,9 @@ const env = cleanEnv(process.env, {
   }),
   REDIS_PORT: num({
     default: 6379,
+  }),
+  BCRYPT_SALT: num({
+    default: 10,
   }),
 });
 

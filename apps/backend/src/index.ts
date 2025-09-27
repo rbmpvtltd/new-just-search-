@@ -27,7 +27,7 @@ app.use(
   }),
 );
 
--app.use(express.json());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.post("/v1/api/sign-image", cloudinarySignature);
 
@@ -51,10 +51,8 @@ wsServer.on("connection", (ws) => {
     console.log(`Connection (${wsServer.clients.size})`);
   });
 });
-console.log("WebSocket Server listening on ws://localhost:5500");
 
 process.on("SIGTERM", () => {
-  console.log("SIGTERM");
   handler.broadcastReconnectNotification();
   wsServer.close();
 });
