@@ -3,7 +3,8 @@
   "private": true,
   "dependencies": {
     "@repo/db": "*",
-    "@repo/helper": "*"
+    "@repo/helper": "*",
+    "@repo/cloudinary": "*"
   },
   "devDependencies": {
     "@types/bun": "latest"

@@ -1,4 +1,5 @@
-import { cloudinary, log, uploadOnCloudinary } from "@repo/helper";
+import { cloudinary, uploadOnCloudinary } from "@repo/cloudinary";
+import { logger } from "@repo/helper";
 import { eq } from "drizzle-orm";
 import { db } from "../db/src/index";
 import {
@@ -22,14 +23,14 @@ export const notRelated = async () => {
 };
 
 export const clearAllTablesNotRelated = async () => {
-  log.info("================== execution comes here ====================");
+  logger.info("================== execution comes here ====================");
   // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
-  log.info(" All tables cleared successfully!");
+  logger.info(" All tables cleared successfully!");
 };
 
 const state = async () => {
@@ -74,10 +75,10 @@ export const bannerSeed = async () => {
     let bannerPhotoPublicId: string | null = null;
 
     if (row.photo) {
-      const result = await cloudinary.uploader.upload( liveProfileImageUrl, {
-			resource_type: "auto",
-			folder: "Banner",
-		});
+      const result = await cloudinary.uploader.upload(liveProfileImageUrl, {
+        resource_type: "auto",
+        folder: "Banner",
+      });
 
       // Cloudinary upload response usually contains: url, secure_url, public_id, etc.
       console.log("Banner photo public id", result);
