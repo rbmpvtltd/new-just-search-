@@ -17,6 +17,7 @@
       "cache": false,
       "persistent": true
     },
+    "prebuild": {},
     "dbsync": {
       "cache": false,
       "persistent": false
