@@ -15,7 +15,7 @@ const menuItems = [
 export const HeroHeader = () => {
   const [menuState, setMenuState] = React.useState(false);
   return (
-    <header className="sticky top-0">
+    <header className="sticky top-0 z-50">
       <nav
         data-state={menuState && "active"}
         className="bg-background/50 z-20 w-full border-b backdrop-blur-3xl"

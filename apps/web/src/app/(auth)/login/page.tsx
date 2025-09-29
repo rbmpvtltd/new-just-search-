@@ -2,8 +2,8 @@
 
 import { TRPCClientError } from "@trpc/client";
 import { redirect } from "next/navigation";
-import { LoginForm } from "@/components/login-form";
 import { trpcServer } from "@/trpc/trpc-server";
+import { LoginForm } from "@/features/auth/login/login-form";
 export default async function Login() {
   let session = null;
 

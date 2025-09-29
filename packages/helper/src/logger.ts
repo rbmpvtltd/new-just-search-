@@ -1,3 +1,4 @@
+// packages/helper/logger.ts
 import fs from "fs";
 import path from "path";
 import winston from "winston";
@@ -16,33 +17,30 @@ const {
 const logDir = path.resolve(process.cwd(), "logs");
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
   level: "info",
   format: combine(
     timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    errors({ stack: true }), // handle Error objects
-    splat(), // support multiple args
-    json(), // serialize objects
+    errors({ stack: true }),
+    splat(),
+    json(),
     prettyPrint(),
   ),
-  transports: [
-    new winston.transports.Console({
-      level: "debug",
-      format: combine(
-        colorize(),
-        simple(), // readable console output
-      ),
-    }),
-    new winston.transports.File({
-      filename: path.join(logDir, "error.log"),
-      level: "error",
-    }),
-    new winston.transports.File({
-      filename: path.join(logDir, "info.log"),
-      level: "info",
-    }),
-    new winston.transports.File({ filename: path.join(logDir, "combine.log") }),
-  ],
+  // transports: [
+  //   new winston.transports.Console({
+  //     level: "debug",
+  //     format: combine(colorize(), simple()),
+  //   }),
+  //   new winston.transports.File({
+  //     filename: path.join(logDir, "error.log"),
+  //     level: "error",
+  //   }),
+  //   new winston.transports.File({
+  //     filename: path.join(logDir, "info.log"),
+  //     level: "info",
+  //   }),
+  //   new winston.transports.File({ filename: path.join(logDir, "combine.log") }),
+  // ],
 });
-logger.info("Logger initialized", { dir: logDir, data: { adahd: "adahd" } });
-export { logger };
+
+export default logger;
