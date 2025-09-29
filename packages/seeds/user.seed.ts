@@ -1,5 +1,5 @@
+import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { uploadOnCloudinary } from "@repo/helper";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { UserRole, users } from "../db/src/schema/auth.schema";

@@ -1,10 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 import {
-  adminProcedure,
   protectedProcedure,
   publicProcedure,
   router,
+  visitorProcedure,
 } from "@/utils/trpc";
 import { checkPasswordGetUser } from "./auth.service";
 import { createSession } from "./lib/session";
@@ -24,7 +24,7 @@ export const authRouter = router({
       const session = await createSession(user.id);
       return session?.token;
     }),
-  testadmin: adminProcedure.query(() => {
+  testadmin: visitorProcedure.query(({ ctx }) => {
     return "yes";
   }),
   sendOTP: publicProcedure

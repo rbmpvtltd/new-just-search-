@@ -26,21 +26,21 @@ export const logger = winston.createLogger({
     json(),
     prettyPrint(),
   ),
-  // transports: [
-  //   new winston.transports.Console({
-  //     level: "debug",
-  //     format: combine(colorize(), simple()),
-  //   }),
-  //   new winston.transports.File({
-  //     filename: path.join(logDir, "error.log"),
-  //     level: "error",
-  //   }),
-  //   new winston.transports.File({
-  //     filename: path.join(logDir, "info.log"),
-  //     level: "info",
-  //   }),
-  //   new winston.transports.File({ filename: path.join(logDir, "combine.log") }),
-  // ],
+  transports: [
+    new winston.transports.Console({
+      level: "debug",
+      format: combine(colorize(), simple()),
+    }),
+    new winston.transports.File({
+      filename: path.join(logDir, "error.log"),
+      level: "error",
+    }),
+    new winston.transports.File({
+      filename: path.join(logDir, "info.log"),
+      level: "info",
+    }),
+    new winston.transports.File({ filename: path.join(logDir, "combine.log") }),
+  ],
 });
 
 export default logger;
