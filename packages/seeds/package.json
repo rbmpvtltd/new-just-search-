@@ -2,9 +2,10 @@
   "name": "seeds",
   "private": true,
   "dependencies": {
+    "@repo/cloudinary": "*",
     "@repo/db": "*",
     "@repo/helper": "*",
-    "@repo/cloudinary": "*"
+    "bcryptjs": "^3.0.2"
   },
   "devDependencies": {
     "@types/bun": "latest"

@@ -2,7 +2,9 @@
 
 import { config as dotenvConfig } from "dotenv";
 
+// TODO: try to add valid env or not use in production;
 dotenvConfig({ path: "../../.env" });
+
 const nextConfig = {
   images: {
     remotePatterns: [

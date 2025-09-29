@@ -12,7 +12,7 @@ export default async function TRPCTEST() {
   // prefetch(trpc.hi.hi2.queryOptions());
   async function getData() {
     try {
-      const data = await trpcServer.banners.firstBanner.query();
+      const data = await trpcServer.query();
       return data;
     } catch (error) {
       if (isTRPCClientError(error)) {

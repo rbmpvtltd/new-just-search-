@@ -1,25 +1,34 @@
-const getUserByEmail = (email: string) => {
-  // TODO: get it form db
-  if (email !== "otherritik000@gmail.com") {
-    return false;
-  }
-  return {
-    userId: 10,
-    email: "otherritik000@gmail.com",
-    password: "12345678",
-  };
+import { db } from "@repo/db";
+import { logger } from "@repo/helper";
+import bcrypt from "bcryptjs";
+
+const getUserByUserName = async (username: string) => {
+  const user = await db.query.users.findFirst({
+    where: (user, { eq, or }) =>
+      or(eq(user.email, username), eq(user.phoneNumber, username)),
+  });
+  return user;
 };
 
-const checkUserPassword = (email: string, password: string) => {
-  const user = getUserByEmail(email);
-  if (!user) {
+const getUserById = async (id: number) => {
+  const user = await db.query.users.findFirst({
+    where: (user, { eq }) => eq(user.id, id),
+  });
+  return user;
+};
+
+const checkPasswordGetUser = async (username: string, password: string) => {
+  const user = await getUserByUserName(username);
+  if (!user || !user.password) {
     return false;
   }
-  // TODO: get hash password;
-  if (user.password !== password) {
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
     return false;
   }
   return user;
 };
 
-export { type getUserByEmail, checkUserPassword };
+export { getUserByUserName, getUserById, checkPasswordGetUser };

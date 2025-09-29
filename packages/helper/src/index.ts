@@ -1,3 +1,4 @@
+import env from "./envaild";
 import { logger } from "./logger";
 
-export { logger };
+export { logger, env };

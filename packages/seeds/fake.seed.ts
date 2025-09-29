@@ -241,22 +241,31 @@
 //   }
 // };
 
+import { db, schemas } from "@repo/db";
+import { env, logger } from "@repo/helper";
+import bcrypt from "bcryptjs";
+import { hash } from "bun";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@repo/db";
-import { users } from "../db/src/schema/auth.schema";
-import { businessListings } from "../db/src/schema/business.schema";
-import { cities } from "../db/src/schema/address.schema";
-import { UserRole } from "../db/src/schema/auth.schema";
+
+// import { UserRole } from "../db/src/schema/auth.schema";
+
 // import { hireListing } from "@/features/hire/hire.model";
+
+const users = schemas.auth.users;
+const businessListings = schemas.business.businessListings;
+const cities = schemas.not_related.cities;
 
 dotenv.config();
 
 export const fakeSeed = async () => {
   try {
-    const user = await seedFakeUser(1);
-    const business = await seedFakeBusiness(user!.id);
-    return { user, business };
+    // const user = await seedFakeUser();
+    // const business = await seedFakeBusiness(user!.id);
+    logger.info("adding fake admin");
+    await seedAdminUser();
+    logger.info("added fake admin");
+    return;
   } catch (error) {
     console.error("Error in fakeSeed:", error);
     throw error;
@@ -267,7 +276,7 @@ export const fakeUserSeed = async () => {
   const [fakeUser] = await db
     .select()
     .from(users)
-    .where(eq(users.username, "fake"));
+    .where(eq(users.email, "fake"));
   return fakeUser;
 };
 
@@ -279,23 +288,63 @@ export const fakeBusinessSeed = async () => {
   return fakeBusiness;
 };
 
-const seedFakeUser = async (userId: number) => {
+const seedAdminUser = async () => {
+  try {
+    logger.info("....start");
+    // Pehle associated business listings delete karo
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, "admin@gmail.com"))
+      .limit(1);
+
+    if (existingUser) {
+      logger.info(existingUser);
+
+      return;
+    }
+    const salt = await bcrypt.genSalt(env.BCRYPT_SALT);
+    const hashPassword = await bcrypt.hash("admin@123", salt);
+
+    logger.info("....start ...");
+    const [insertedAdmin] = await db
+      .insert(users)
+      .values({
+        displayName: "admin",
+        phoneNumber: "fake",
+        email: "admin@gmail.com",
+        password: hashPassword,
+        role: "visiter",
+        googleId: "fake",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    return insertedAdmin;
+  } catch (error) {
+    console.error("Error in seedFakeUser:", error);
+    throw error;
+  }
+};
+
+const seedFakeUser = async () => {
   try {
     // Pehle associated business listings delete karo
     const [existingUser] = await db
       .select()
       .from(users)
-      .where(eq(users.username, "fake"))
+      .where(eq(users.displayName, "fake user"))
       .limit(1);
 
     if (existingUser) {
-            // await db.delete(hireListing).where(eq(hireListing.userId, existingUser.id))
+      // await db.delete(hireListing).where(eq(hireListing.userId, existingUser.id))
       await db
         .delete(businessListings)
         .where(eq(businessListings.userId, existingUser.id));
 
       // Ab user delete karo
-      await db.delete(users).where(eq(users.username, "fake"));
+      await db.delete(users).where(eq(users.displayName, "fake user"));
     }
 
     const uniqueEmail = `fake${Math.floor(Math.random() * 1000)}@example.com`;
@@ -303,11 +352,11 @@ const seedFakeUser = async (userId: number) => {
     const [insertedUser] = await db
       .insert(users)
       .values({
-        username: "fake",
+        displayName: "fake user",
         phoneNumber: "fake",
         email: uniqueEmail,
         password: "fake",
-        role: UserRole.visiter,
+        role: "visiter",
         googleId: "fake",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -345,20 +394,20 @@ const seedFakeBusiness = async (userId: number) => {
         specialities: "fake",
         description: "fake",
         homeDelivery: true,
-        latitude: "26.2389", 
+        latitude: "26.2389",
         longitude: "73.0243",
         buildingName: "fake",
         streetName: "fake",
         area: "fake",
         landmark: "fake",
-        pincode: 342001, 
+        pincode: 342001,
         cityId: city.id,
         schedules: {},
         status: true,
-        email: "fake@example.com", 
-        phoneNumber: "1234567890", 
-        whatsappNo: "1234567890", 
-        alternativeMobileNumber: "1234567890", 
+        email: "fake@example.com",
+        phoneNumber: "1234567890",
+        whatsappNo: "1234567890",
+        alternativeMobileNumber: "1234567890",
         facebook: "https://facebook.com/fake",
         twitter: "https://twitter.com/fake",
         linkedin: "https://linkedin.com/fake",

@@ -21,44 +21,38 @@ app.use(
   createExpressMiddleware({
     router: appRouter,
     createContext,
+    middleware: cors({ origin: "*" }),
     onError: (opts) => {
       logger.error(opts.error.code);
     },
   }),
 );
 
--app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.post("/v1/api/sign-image", cloudinarySignature);
-
 // adding websocket in trpc
-const wsServer = new ws.WebSocketServer({ port: 5500 });
+// const wsServer = new ws.WebSocketServer({ port: 5500 });
+// const handler = applyWSSHandler({
+//   wss: wsServer,
+//   router: appRouter,
+//   createContext: createWSContext,
+//   keepAlive: {
+//     enabled: true,
+//     pingMs: 30000,
+//     pongWaitMs: 5000,
+//   },
+// });
+//
+// wsServer.on("connection", (ws) => {
+//   console.log(`connection created`, ws);
+//   ws.once("close", () => {
+//     console.log(`Connection (${wsServer.clients.size})`);
+//   });
+// });
 
-const handler = applyWSSHandler({
-  wss: wsServer,
-  router: appRouter,
-  createContext: createWSContext,
-  keepAlive: {
-    enabled: true,
-    pingMs: 30000,
-    pongWaitMs: 5000,
-  },
-});
-
-wsServer.on("connection", (ws) => {
-  console.log(`connection created`, ws);
-  ws.once("close", () => {
-    console.log(`Connection (${wsServer.clients.size})`);
-  });
-});
-console.log("WebSocket Server listening on ws://localhost:5500");
-
-process.on("SIGTERM", () => {
-  console.log("SIGTERM");
-  handler.broadcastReconnectNotification();
-  wsServer.close();
-});
-
+// process.on("SIGTERM", () => {
+//   handler.broadcastReconnectNotification();
+//   wsServer.close();
+// });
+//
 // adding Orpc
 //
 // get data on localhost:4000/api
@@ -82,7 +76,9 @@ app.get("/spec", (_, res) => {
   res.send(result);
 });
 
-// listening on localhost:4000
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.post("/v1/api/sign-image", cloudinarySignature);
 app.listen(4000);
 
 // exporting ---
