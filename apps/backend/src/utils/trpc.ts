@@ -1,9 +1,10 @@
+import type { ORPCMeta } from "@orpc/trpc";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { validateSessionToken } from "@/features/auth/lib/session";
 import type { Context } from "./context";
 
-export const t = initTRPC.context<Context>().create({
+export const t = initTRPC.context<Context>().meta<ORPCMeta>().create({
   transformer: superjson,
 });
 
@@ -30,6 +31,7 @@ export const protectedProcedure = publicProcedure.use(async (opts) => {
     ctx: {
       userId: session.userId,
       role: session.role,
+      sessionId: session.id,
     },
   });
 });

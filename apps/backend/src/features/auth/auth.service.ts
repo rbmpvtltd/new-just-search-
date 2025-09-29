@@ -1,4 +1,6 @@
 import { db } from "@repo/db";
+import { logger } from "@repo/helper";
+import bcrypt from "bcryptjs";
 
 const getUserByUserName = async (username: string) => {
   const user = await db.query.users.findFirst({
@@ -17,11 +19,13 @@ const getUserById = async (id: number) => {
 
 const checkPasswordGetUser = async (username: string, password: string) => {
   const user = await getUserByUserName(username);
-  if (!user) {
+  if (!user || !user.password) {
     return false;
   }
-  // TODO: get hash password;
-  if (user.password !== password) {
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
     return false;
   }
   return user;

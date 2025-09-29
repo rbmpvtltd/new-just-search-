@@ -100,11 +100,11 @@ async function validateSessionToken(token: string): Promise<Session | null> {
 async function getSession(sessionId: string): Promise<Session | null> {
   const data = await redis.get(`session:${sessionId}`);
   if (!data) {
-    return null; // not found or expired
+    return null;
   }
   const jsonParseData = JSON.parse(data);
 
-  const base64 = jsonParseData.secretHash; // "hello world"
+  const base64 = jsonParseData.secretHash;
   const uint8 = Uint8Array.from(Buffer.from(base64, "base64"));
 
   return {
@@ -115,6 +115,34 @@ async function getSession(sessionId: string): Promise<Session | null> {
     secretHash: uint8,
     createdAt: jsonParseData.createdAt,
   };
+}
+
+async function changeRoleInSession(sessionId: string, role: UserRole) {
+  const data = await redis.get(`session:${sessionId}`);
+  if (!data) {
+    return null;
+  }
+
+  const jsonParseData = JSON.parse(data);
+
+  const sessionData = {
+    id: jsonParseData.id,
+    secretHash: Buffer.from(jsonParseData.secretHash).toString("base64"),
+    createdAt: jsonParseData.createdAt.toISOString(),
+    token: jsonParseData.token,
+    userId: jsonParseData.id,
+    role: role,
+  };
+
+  // Save in Redis with TTL (optional, e.g., 1 day = 86400 seconds)
+  await redis.set(
+    `session:${sessionId}`,
+    JSON.stringify(sessionData),
+    "EX",
+    60 * 60 * 24,
+  );
+
+  return true;
 }
 
 async function deleteSession(sessionId: string): Promise<void> {
@@ -131,4 +159,10 @@ function validSecret(a: Uint8Array, b: Uint8Array): boolean {
   return crypto.timingSafeEqual(a, b);
 }
 
-export { createSession, getSession, deleteSession, validateSessionToken };
+export {
+  changeRoleInSession,
+  createSession,
+  getSession,
+  deleteSession,
+  validateSessionToken,
+};
