@@ -7,10 +7,11 @@
   "devDependencies": {
     "@repo/typescript-config": "*",
     "@types/bun": "latest",
+    "concurrently": "^9.2.1",
     "trpc-ui": "^1.0.15"
   },
   "scripts": {
-    "dev": "bun --watch src/index",
+    "dev": "concurrently \"tsc -b -w\" \"bun run dist/index.js\"",
     "prebuild": "tsc -b"
   },
   "peerDependencies": {

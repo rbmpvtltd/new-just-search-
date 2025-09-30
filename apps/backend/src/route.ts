@@ -4,7 +4,7 @@ import { chatRouter } from "./features/chats/test.routes";
 import { cloudinarySignature } from "./features/cloudinary/cloudinarySing.route";
 import { setImageUploads } from "./features/cloudinary/imageUploads.route";
 import { hirerouter } from "./features/hire/hire.router";
-// import { cloudinaryRouter } from "./lib/cloudinary";
+import { testRouter } from "./features/test/test.routes";
 import { router } from "./utils/trpc";
 
 export const appRouter = router({
@@ -14,9 +14,7 @@ export const appRouter = router({
   setImageUploads,
   chatRouter,
   hirerouter,
-  // cloudinary: cloudinaryRouter,
-  // test: testRouter,
-  // test : chatRouter,
+  test: testRouter,
 });
 
 export type AppRouter = typeof appRouter;
