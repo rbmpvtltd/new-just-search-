@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-// import { businessSeed } from "./business.seed";
+import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
 // import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
@@ -22,8 +22,8 @@ dotenv.config();
     // Postgres seeding
     // await notRelated();
     // await userSeed();
-    await fakeSeed();
-    // await businessSeed();
+    // await fakeSeed();
+    await businessSeed();
     // await hireSeed();
     // await productSeed();
     // await offerSeed();

@@ -1,4 +1,4 @@
-import { logger } from "@repo/helper";
+// import { logger } from "@repo/helper";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import cookieParser from "cookie-parser";
@@ -11,6 +11,7 @@ import { appRouter } from "./route";
 import { createContext, createWSContext } from "./utils/context";
 
 const app = express();
+// console.log("rerun");
 
 app.use(cors({ origin: "*" }));
 app.use(cookieParser());
@@ -23,7 +24,7 @@ app.use(
     createContext,
     middleware: cors({ origin: "*" }),
     onError: (opts) => {
-      logger.error(opts.error.code);
+      // logger.error(opts.error.code);
     },
   }),
 );

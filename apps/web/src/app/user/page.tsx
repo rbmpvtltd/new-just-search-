@@ -31,8 +31,8 @@ export default async function UserPage() {
   //
   return (
     <div>
-      {/* <AddHirePage /> */}
-      <AddBusinessPage />
+      <AddHirePage />
+      {/* <AddBusinessPage /> */}
     </div>
   );
 }

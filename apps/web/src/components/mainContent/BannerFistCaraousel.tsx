@@ -15,12 +15,12 @@ type BannerFirstCaraousel = {
 function FirstCaraousel({
 	bannerFirst,
 }: {
-	bannerFirst: BannerFirstCaraousel[];
+	bannerFirst: BannerFirstCaraousel[] | undefined;
 }) {
 	return (
 		<Carousel className="w-full ">
 			<CarouselContent className="ml-10">
-				{bannerFirst.map((item, index: number) => (
+				{bannerFirst?.map((item, index: number) => (
 					<CarouselItem
 						key={index.toString()}
 						className="pl-1 md:basis-1/2 lg:basis-1/4"

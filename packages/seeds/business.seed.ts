@@ -18,9 +18,10 @@ import {
 } from "../db/src/schema/not-related.schema";
 import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
-  await clearAllTablesBusiness();
+  // await clearAllTablesBusiness();
   await addBusiness();
   await seedFavourites();
   await businessesSubcategory();
@@ -51,23 +52,22 @@ export const clearAllTablesBusiness = async () => {
 // business listing
 const addBusiness = async () => {
   const [businessRows] = await (sql as any).execute("SELECT * FROM listings");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
+  const fakeUser = (await fakeUserSeed()) || (await fakeSeed());
   for (const row of businessRows) {
     if (Number(row.type) === 1) {
-      const [user] = await (sql as any).execute(
+      const [user] =await (sql as any).execute(
         "SELECT * FROM users WHERE id = ?",
-        [row.user_id],
+        [row.user_id]
       );
 
-      let mysqlUser = (user as any[])[0];
+      let mysqlUser = user[0];
 
       if (mysqlUser) {
         try {
           await db
             .insert(users)
             .values({
-              id: mysqlUser.id,
-              username: mysqlUser.username ?? `user_${mysqlUser.id}`,
+              displayName: mysqlUser.username ?? `user_${mysqlUser.id}`,
               phoneNumber: mysqlUser.phone,
               email: mysqlUser.email ?? `business${mysqlUser.id}@example.com`,
               password: mysqlUser.password,
@@ -174,6 +174,8 @@ const addBusiness = async () => {
           })
           .returning();
       } catch (e) {
+        console.log("========================",user)
+
         console.error("row id is ", row.id, "user id", row.user_id);
       }
 
@@ -186,6 +188,7 @@ const addBusiness = async () => {
             const uploaded = await uploadOnCloudinary(
               liveBusinessImageUrl,
               "Business",
+              clouadinaryFake
             );
             const businessPhotoUrl = uploaded;
 
