@@ -54,7 +54,7 @@ export const HeroHeader = () => {
                         href={item.href}
                         className="text-muted-foreground hover:text-accent-foreground block duration-150"
                       >
-                        <span className="text-amber-600 font-semibold">
+                        <span className="text-primary font-semibold">
                           {item.name}
                         </span>
                       </Link>
@@ -73,7 +73,7 @@ export const HeroHeader = () => {
                         href={item.href}
                         className=" text-muted-foreground hover:text-accent-foreground block duration-150"
                       >
-                        <span className="text-amber-600">{item.name}</span>
+                        <span className="text-primary">{item.name}</span>
                       </Link>
                     </li>
                   ))}
@@ -83,14 +83,14 @@ export const HeroHeader = () => {
                 <Button
                   asChild
                   variant="outline"
-                  className=" text-amber-600"
+                  className=" text-primary"
                   size="sm"
                 >
                   <Link href="#">
                     <span>Login</span>
                   </Link>
                 </Button>
-                <Button asChild className="bg-amber-600 text-white" size="sm">
+                <Button asChild className="bg-primary text-white" size="sm">
                   <Link href="#">
                     <span>Sign Up</span>
                   </Link>
