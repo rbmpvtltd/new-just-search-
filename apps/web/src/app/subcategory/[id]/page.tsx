@@ -22,7 +22,6 @@ function Subcategory({ params }: { params: { id: string } }) {
   const { id } = params;
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page") ?? 2);
-  console.log("==================>", page);
   const trpc = useTRPC();
   const { data, isLoading } = useQuery(
     trpc.subcategoryRouter.subcategory.queryOptions({
@@ -119,7 +118,7 @@ function Subcategory({ params }: { params: { id: string } }) {
                 <div className="flex items-center gap-2 ">
                   <MdLocationPin />
                   <p className="text-sm">
-                    163, near Circuit House Road,, Ajit Colony,
+                    {item?.area} {item?.streetName} {item?.buildingName}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -133,6 +132,9 @@ function Subcategory({ params }: { params: { id: string } }) {
                 <div className="flex gap-4 items-center">
                   <div className="tems-center gap-2 bg-amber-600 w-full text-center py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300">
                     <button
+                    onClick={()=>{
+                      console.log("clicked",item.latitude,item.longitude)
+                    }}
                       type="button"
                       className="mx-auto whitespace-nowrap flex items-center text-white font-semibold gap-2"
                     >
@@ -142,6 +144,9 @@ function Subcategory({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center gap-2 bg-amber-600 w-full text-center py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300">
                     <button
+                    onClick={()=>{
+                      console.log("chatting with",item.id)
+                    }}
                       type="button"
                       className="mx-auto whitespace-nowrap flex items-center text-white font-semibold gap-2"
                     >
@@ -151,6 +156,9 @@ function Subcategory({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center gap-2 bg-amber-600 w-full text-center py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300">
                     <button
+                    onClick={()=>{
+                      console.log("calling on",item.phoneNumber)
+                    }}
                       type="button"
                       className="mx-auto flex whitespace-nowrap items-center text-white font-semibold gap-2"
                     >
