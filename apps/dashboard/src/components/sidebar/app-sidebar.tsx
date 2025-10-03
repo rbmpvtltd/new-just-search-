@@ -1,10 +1,7 @@
 "use client";
 
 import {
-  IconCamera,
   IconDatabase,
-  IconFileAi,
-  IconFileDescription,
   IconFileWord,
   IconHelp,
   IconInnerShadowTop,
@@ -12,17 +9,10 @@ import {
   IconSearch,
   IconSettings,
 } from "@tabler/icons-react";
-import {
-  BookOpen,
-  Bot,
-  Settings,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { BookOpen, Bot, Settings2, SquareTerminal } from "lucide-react";
 import Link from "next/link";
 import { NavDocuments } from "@/components/sidebar/nav-documents";
 import { NavMain } from "@/components/sidebar/nav-main";
-import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
 import {
   Sidebar,
@@ -36,9 +26,9 @@ import {
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Just Search",
+    email: "justsearch@gmail.com",
+    avatar: "/images/favicon.png",
   },
   navMain: [
     {
