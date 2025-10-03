@@ -1,12 +1,11 @@
 import { db, schemas } from "@repo/db";
 import { logger } from "@repo/helper";
-import { and, ilike, or, sql } from "drizzle-orm";
+import { and, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import z from "zod";
 import { publicProcedure, router } from "@/utils/trpc";
 
 const banners = schemas.not_related.banners;
 
-// Define input and output schemas
 const inputSchema = z.object({
   pagination: z.object({
     pageIndex: z.number(),
@@ -24,13 +23,101 @@ const inputSchema = z.object({
       value: z.unknown(),
     }),
   ),
-  globalFilter: z.string(),
+  globalFilter: z.string().optional(), // optional to allow empty
 });
 
 type InputType = z.infer<typeof inputSchema>;
 
+// Helper: map filter ID to actual Drizzle column
+const getColumnFromId = (id: string) => {
+  const columnMap = {
+    id: banners.id,
+    route: banners.route,
+    photo: banners.photo,
+    isActive: banners.isActive,
+    type: banners.type,
+  };
+
+  return columnMap[id as keyof typeof columnMap] ?? null;
+};
+
+// Helper: build condition for a single filter
+//
+const buildFilterCondition = (filter: { id: string; value: unknown }) => {
+  const { id, value } = filter;
+
+  // Skip empty, null, or empty arrays
+  if (
+    value == null ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
+    return null;
+  }
+
+  const column = getColumnFromId(id);
+  if (!column) {
+    logger.warn(`No column found for filter id: ${id}`);
+    return null;
+  }
+
+  // Handle array values (multi-select)
+  if (Array.isArray(value)) {
+    if (value.length === 0) return null;
+
+    // Special handling per column type
+    if (id === "is_active") {
+      // Convert string booleans to actual booleans
+      const boolValues = value.map((v) =>
+        typeof v === "string" ? v.toLowerCase() === "true" : Boolean(v),
+      );
+      return inArray(column, boolValues);
+    }
+
+    if (id === "type" || id === "id") {
+      // Convert to numbers if possible
+      const numValues = value.map((v) => {
+        if (typeof v === "string") {
+          const num = Number(v);
+          return Number.isNaN(num) ? v : num; // fallback to string if not a number
+        }
+        return v;
+      });
+      return inArray(column, numValues);
+    }
+
+    // Default: treat as strings (for text columns like route, photo)
+    const stringValues = value.map((v) => String(v));
+    return inArray(column, stringValues);
+  }
+
+  // Handle single values (non-array)
+  if (typeof value === "string") {
+    if (id === "is_active") {
+      const boolValue = value.toLowerCase() === "true";
+      return eq(column, boolValue);
+    }
+    if (id === "type" || id === "id") {
+      const numValue = Number(value);
+      if (!Number.isNaN(numValue)) {
+        return eq(column, numValue);
+      }
+    }
+    return ilike(column, `%${value}%`);
+  }
+
+  if (typeof value === "boolean" && id === "is_active") {
+    return eq(column, value);
+  }
+
+  if (typeof value === "number") {
+    return eq(column, value);
+  }
+
+  return null;
+};
+
 export const adminBannerRouter = router({
-  // TODO: use adminProcedure;
   thirdBanner: publicProcedure
     .input(inputSchema)
     .query(async ({ input }: { input: InputType }) => {
@@ -38,13 +125,35 @@ export const adminBannerRouter = router({
       const pageSize = input.pagination.pageSize;
       const offset = pageIndex * pageSize;
 
-      input.filters.map((item) => {
-        item.id;
-        item.value;
-      });
+      // --- Build WHERE conditions ---
+      const whereConditions = [];
 
+      // 1. Global filter (if provided)
+      if (input.globalFilter) {
+        whereConditions.push(
+          or(
+            ilike(banners.photo, `%${input.globalFilter}%`),
+            ilike(banners.route, `%${input.globalFilter}%`),
+          ),
+        );
+      }
+
+      // 2. Column-specific filters
+      // NOTE: needed to understand
+      const columnFilterConditions = input.filters
+        .map(buildFilterCondition)
+        .filter((cond): cond is NonNullable<typeof cond> => cond !== null);
+
+      whereConditions.push(...columnFilterConditions);
+
+      // Combine all with `and`; if none, leave as undefined
+      const finalWhere =
+        whereConditions.length > 0 ? and(...whereConditions) : undefined;
+
+      // --- Build ORDER BY ---
       const allowedColumns = ["id", "route", "photo", "is_active", "type"];
       let orderByClause = sql`id DESC`;
+
       if (input.sorting.length > 0) {
         const orderExpressions = input.sorting
           .filter((sort) => allowedColumns.includes(sort.id))
@@ -53,57 +162,34 @@ export const adminBannerRouter = router({
             return sort.desc ? sql`${column} DESC` : sql`${column} ASC`;
           });
 
-        logger.info(orderExpressions);
-
         if (orderExpressions.length > 0) {
           orderByClause = sql`${sql.join(orderExpressions, sql`, `)}`;
         }
       }
 
-      console.log({
-        // orderByClause,
-        pageSize,
-        offset,
-        global: input.globalFilter,
-      });
-
+      // --- Execute query ---
       const data = await db
         .select()
         .from(banners)
-        .where(
-          and(
-            or(
-              ilike(banners.photo, `%${input.globalFilter}%`),
-              ilike(banners.route, `%${input.globalFilter}%`),
-            ),
-          ),
-        )
+        .where(finalWhere)
         .orderBy(orderByClause)
         .limit(pageSize)
         .offset(offset);
 
+      // --- Count total (for pagination) ---
       const totalResult = await db
         .select({ count: sql<number>`count(*)` })
         .from(banners)
-        .where(
-          or(
-            ilike(banners.photo, `%${input.globalFilter}%`),
-            ilike(banners.route, `%${input.globalFilter}%`),
-          ),
-        );
-      // .where(eq(banners.type, 3)); // TODO: undo this after testing
+        .where(finalWhere); // 👈 use same where clause!
 
       const total = Number(totalResult[0]?.count ?? 0);
       const totalPages = Math.ceil(total / pageSize);
-      logger.info({ total, totalPages });
 
-      const result = {
-        pageCount: input.pagination.pageIndex,
+      return {
+        pageCount: totalPages, // ! you had pageIndex here — likely a bug!
         data,
         totalCount: total,
         totalPages,
       };
-
-      return result;
     }),
 });
