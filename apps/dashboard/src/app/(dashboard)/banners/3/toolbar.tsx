@@ -2,11 +2,11 @@
 
 import type { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
-import { priorities, statuses } from "@/dummy/data";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { DataTableViewOptions } from "./data-table-view-options";
+import { Input } from "@/components/ui/input";
+import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-filter";
+import { Button } from "@/components/ui/button";
+import { DataTableViewOptions } from "@/components/table/data-table-view-options";
+import { type, active } from "./data";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -21,27 +21,27 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center gap-2">
         <Input
-          placeholder="Filter tasks..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          placeholder="Search ..."
+          value={(table.getState().globalFilter as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.setGlobalFilter(String(event.target.value))
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
 
         {/* const allowedColumns = ["id", "route", "photo", "is_active", "type"]; */}
-        {table.getColumn("is_active") && (
+        {table.getColumn("isActive") && (
           <DataTableFacetedFilter
-            column={table.getColumn("is_active")}
+            column={table.getColumn("isActive")}
             title="is_active"
-            options={statuses}
+            options={active}
           />
         )}
-        {table.getColumn("route") && (
+        {table.getColumn("type") && (
           <DataTableFacetedFilter
-            column={table.getColumn("route")}
-            title="Route"
-            options={priorities}
+            column={table.getColumn("type")}
+            title="type"
+            options={type}
           />
         )}
         {isFiltered && (

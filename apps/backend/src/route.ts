@@ -1,4 +1,5 @@
 import { authRouter } from "./features/auth/auth.router";
+import { adminBannerRouter } from "./features/banners/banners.admin.routes";
 import { bannerRouter } from "./features/banners/banners.routes";
 import { chatRouter } from "./features/chats/test.routes";
 import { cloudinarySignature } from "./features/cloudinary/cloudinarySing.route";
@@ -13,6 +14,7 @@ import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 export const appRouter = router({
   auth: authRouter,
   banners: bannerRouter,
+  adminBanner: adminBannerRouter,
   cloudinarySign: cloudinarySignature,
   setImageUploads,
   chatRouter,
