@@ -28,7 +28,7 @@ export default function BussinessList({ business, page, totalPages, id }: any) {
               <PaginationItem>
                 <PaginationPrevious
                   href={{
-                    pathname: `/subcategory/${id}`,
+                    pathname: `/business/listings/${id}`,
                     query: { page: page - 1 },
                   }}
                 />
@@ -49,7 +49,7 @@ export default function BussinessList({ business, page, totalPages, id }: any) {
                 >
                   <PaginationLink
                     href={{
-                      pathname: `/subcategory/${id}`,
+                      pathname: `/business/listings/${id}`,
                       query: { page: item },
                     }}
                   >
@@ -62,7 +62,7 @@ export default function BussinessList({ business, page, totalPages, id }: any) {
               <PaginationItem>
                 <PaginationNext
                   href={{
-                    pathname: `/subcategory/${id}`,
+                    pathname: `/business/listings/${id}`,
                     query: { page: page + 1 },
                   }}
                 />
