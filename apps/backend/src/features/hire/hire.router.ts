@@ -1,11 +1,18 @@
-import { db, schemas } from "@repo/db";
+import {
+  db,
+  GENDER,
+  ID_PROOF,
+  JOB_DURATION,
+  JOB_TYPE,
+  MARITAL_STATUS,
+  QUALIFICATION,
+  RELOCATE,
+  schemas,
+  WORK_SHIFT,
+} from "@repo/db";
 import { TRPCError } from "@trpc/server";
-import z, { email } from "zod";
+import z from "zod";
 import { hireProcedure, router, visitorProcedure } from "@/utils/trpc";
-import { maritalStatusEnum } from "../../../../../packages/db/src/schema/user.schema";
-
-maritalStatusEnum
-
 export const hirerouter = router({
   add: hireProcedure.query(async ({ ctx }) => {
     const getHireCategories = await db.query.hireCategories.findMany();
@@ -29,11 +36,13 @@ export const hirerouter = router({
       z.object({
         name: z.string(),
         slug: z.string(),
+        categoryId: z.number(),
+        subcategoryId: z.array(z.number()),
         fatherName: z.string(),
         dob: z.string(),
-        gender: z.string(),
-        maritalStatus: z.enum(MaritalStatus),
-        languages: z.array(z.string()),
+        gender: z.enum(Object.values(GENDER)),
+        maritalStatus: z.enum(Object.values(MARITAL_STATUS)),
+        languages: z.string(),
         specialities: z.string(),
         description: z.string(),
         latitude: z.string(),
@@ -59,7 +68,7 @@ export const hirerouter = router({
         mobileNumber: z.string(),
         whatsappNumber: z.string(),
         alternativeMobileNumber: z.string(),
-        highestQualification: z.string(),
+        highestQualification: z.enum(Object.values(QUALIFICATION)),
         employmentStatus: z.string(),
         workExperienceYear: z.number(),
         workExperienceMonth: z.number(),
@@ -68,17 +77,17 @@ export const hirerouter = router({
         expertise: z.string(),
         skillset: z.string(),
         abilities: z.string(),
-        jobType: z.string(),
+        jobType: z.enum(Object.values(JOB_TYPE)),
         locationPreferred: z.string(),
         certificates: z.string(),
-        workShift: z.string(),
+        workShift: z.enum(Object.values(WORK_SHIFT)),
         expectedSalaryFrom: z.string(),
         expectedSalaryTo: z.string(),
         preferredWorkingHours: z.string(),
-        jobDuration: z.string(),
-        relocate: z.string(),
+        jobDuration: z.enum(Object.values(JOB_DURATION)),
+        relocate: z.enum(Object.values(RELOCATE)),
         availability: z.string(),
-        idProof: z.string(),
+        idProof: z.enum(Object.values(ID_PROOF)),
         idProofPhoto: z.string(),
         resume: z.string(),
         resumePhoto: z.string(),
@@ -148,57 +157,85 @@ export const hirerouter = router({
         });
       }
 
-      const [createHire] = await db.insert(schemas.hire.hireListing).values({
-        userId: ctx.userId,
-        name: input.name,
-        photo: input.photo,
-        fatherName: input.fatherName,
-        dob: input.dob,
-        gender: input.gender,
-        maritalStatus: input.maritalStatus,
-        languages: input.languages,
-        slug: input.slug,
-        specialities: input.specialities,
-        description: input.description,
-        latitude: input.latitude,
-        longitude: input.longitude,
-        buildingName: input.buildingName,
-        streetName: input.streetName,
-        area: input.area,
-        landmark: input.landmark,
-        pincode: Number(input.pincode),
-        state: Number(input.state),
-        city: Number(input.city),
-        schedules: input.schedules,
-        email: input.email,
-        mobileNumber: input.mobileNumber,
-        whatsappNo: input.whatsappNumber,
-        alternativeMobileNumber: input.alternativeMobileNumber,
-        highestQualification: input.highestQualification,
-        employmentStatus: input.employmentStatus,
-        workExperienceYear: input.workExperienceYear,
-        workExperienceMonth: input.workExperienceMonth,
-        jobRole: input.jobRole,
-        previousJobRole: input.previousJobRole,
-        expertise: input.expertise,
-        skillset: input.skillset,
-        abilities: input.abilities,
-        jobType: input.jobType,
-        locationPreferred: input.locationPreferred,
-        certificates: input.certificates,
-        workShift: input.workShift,
-        expectedSalaryFrom: input.expectedSalaryFrom,
-        expectedSalaryTo: input.expectedSalaryTo,
-        preferredWorkingHours: input.preferredWorkingHours,
-        jobDuration: input.jobDuration,
-        relocate: input.relocate,
-        availability: input.availability,
-        idProof: input.idProof,
-        idProofPhoto: input.idProofPhoto,
-        resume: input.resume,
-        resumePhoto: input.resumePhoto,
-        aboutYourself: input.aboutYourself,
-        isFeature: input.isFeature === true,
+      const [createHire] = await db
+        .insert(schemas.hire.hireListing)
+        .values({
+          userId: ctx.userId,
+          name: input.name,
+          photo: input.photo,
+          fatherName: input.fatherName,
+          dob: input.dob,
+          gender: input.gender,
+          maritalStatus: input.maritalStatus,
+          languages: input.languages,
+          slug: input.slug,
+          specialities: input.specialities,
+          description: input.description,
+          latitude: input.latitude,
+          longitude: input.longitude,
+          buildingName: input.buildingName,
+          streetName: input.streetName,
+          area: input.area,
+          landmark: input.landmark,
+          pincode: input.pincode,
+          state: input.state,
+          city: input.city,
+          schedules: JSON.stringify(input.schedules),
+          email: input.email,
+          mobileNumber: input.mobileNumber,
+          whatsappNo: input.whatsappNumber,
+          alternativeMobileNumber: input.alternativeMobileNumber,
+          highestQualification: input.highestQualification,
+          employmentStatus: input.employmentStatus,
+          workExperienceYear: input.workExperienceYear,
+          workExperienceMonth: input.workExperienceMonth,
+          jobRole: input.jobRole,
+          previousJobRole: input.previousJobRole,
+          expertise: input.expertise,
+          skillset: input.skillset,
+          abilities: input.abilities,
+          jobType: input.jobType,
+          locationPreferred: input.locationPreferred,
+          certificates: input.certificates,
+          workShift: input.workShift,
+          expectedSalaryFrom: input.expectedSalaryFrom,
+          expectedSalaryTo: input.expectedSalaryTo,
+          preferredWorkingHours: input.preferredWorkingHours,
+          jobDuration: input.jobDuration,
+          relocate: input.relocate,
+          availability: input.availability,
+          idProof: input.idProof,
+          idProofPhoto: input.idProofPhoto,
+          resume: input.resume,
+          resumePhoto: input.resumePhoto,
+          aboutYourself: input.aboutYourself,
+        })
+        .returning({
+          id: schemas.hire.hireListing.id,
+        });
+
+      if (!createHire) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
+
+      const hireId = createHire.id;
+
+      await db.insert(schemas.hire.hireCategories).values({
+        hireId,
+        categoryId: input.categoryId,
       });
+      if (input.subcategoryId.length > 0) {
+        await db.insert(schemas.hire.hireSubcategories).values(
+          input.subcategoryId.map((subCategoryId) => ({
+            hireId,
+            subcategoryId: subCategoryId,
+          })),
+        );
+      }
+
+      await db.insert(schemas.hire)
     }),
 });

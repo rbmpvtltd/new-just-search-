@@ -23,6 +23,7 @@ import {
 } from "../db/src/schema/not-related.schema";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake } from "./seeds";
 
 export const hireSeed = async () => {
   await cleardataofhire();
@@ -33,13 +34,13 @@ export const hireSeed = async () => {
 };
 
 const cleardataofhire = async () => {
-  await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE  TABLE recent_view_hire RESTART IDENTITY CASCADE;`,
-  );
-  await db.execute(
-    `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE  TABLE recent_view_hire RESTART IDENTITY CASCADE;`,
+  // );
+  // await db.execute(
+  //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
+  // );
   await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
 };
 
@@ -58,12 +59,16 @@ export const addHire = async () => {
 
   for (const row of rows) {
     if (row.type === 1) continue;
+    // console.log(row);
 
+    console.log("");
+    
     let [createUser] = await db
       .select()
       .from(users)
       .where(eq(users.id, row.user_id));
 
+      console.log("createUser", createUser);
     if (!createUser) {
       console.log("User not found" + row.id);
       createUser = fakeUser;
@@ -86,6 +91,8 @@ export const addHire = async () => {
       "15017575881740386618.jpg",
       "9027662451740469698.jpg",
       "3709273371738146929.jpeg",
+      "20260775971740747578.jpg",
+      "21306861181742460413.jpg",
     ];
 
     if (invalidPhotos.includes(row.photo)) {
@@ -94,7 +101,8 @@ export const addHire = async () => {
 
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     const uploaded =
-      row.photo && (await uploadOnCloudinary(liveHireImageUrl, "Hire"));
+      row.photo &&
+      (await uploadOnCloudinary(liveHireImageUrl, "Hire", clouadinaryFake));
     console.log("-----");
 
     const profilePhotoUrl = uploaded?.secure_url;
