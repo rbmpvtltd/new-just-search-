@@ -180,7 +180,7 @@ export const adminBannerRouter = router({
       const totalResult = await db
         .select({ count: sql<number>`count(*)` })
         .from(banners)
-        .where(finalWhere); // 👈 use same where clause!
+        .where(finalWhere);
 
       const total = Number(totalResult[0]?.count ?? 0);
       const totalPages = Math.ceil(total / pageSize);
