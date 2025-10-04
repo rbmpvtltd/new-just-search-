@@ -1,9 +1,6 @@
-import { getPagination } from "@/utils/getPagination";
-
 import { asyncHandler } from "@/utils/error/asyncHandler";
 import { trpcServer } from "@/trpc/trpc-server";
 import { ErrorComponent } from "@/utils/error/ErrorComponent";
-import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
 import BussinessList from "@/features/business/show/BussinessList";
 
 async function Subcategory({
@@ -25,10 +22,6 @@ async function Subcategory({
   if(error){
     return <ErrorComponent error={error} />
   }
-
-  console.log({data});
-  console.log({page ,id});
-
   return (
     <BussinessList business={data?.data} page={data?.page} totalPages={data?.totalPages} id={id}/>
   );

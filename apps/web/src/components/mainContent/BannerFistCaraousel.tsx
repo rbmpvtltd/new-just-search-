@@ -10,12 +10,12 @@ import {
 type BannerFirstCaraousel = {
 	photo: string | null;
 	id: number;
-};
+} ;
 
 function FirstCaraousel({
 	bannerFirst,
 }: {
-	bannerFirst: BannerFirstCaraousel[] | undefined;
+	bannerFirst: BannerFirstCaraousel[] | null;
 }) {
 	return (
 		<Carousel className="w-full ">
@@ -32,7 +32,7 @@ function FirstCaraousel({
 										width={400}
 										height={400}
 										alt="banner image"
-										src={item.photo ?? ""}
+										src={item?.photo ?? ""}
 									/>
 								</CardContent>
 							</Card>

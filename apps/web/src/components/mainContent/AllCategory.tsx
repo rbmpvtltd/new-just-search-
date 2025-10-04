@@ -6,7 +6,7 @@ import { IoCloseCircleOutline } from "react-icons/io5";
 interface AllCategoryProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  data: { photo: string; title: string }[] | undefined;
+  data: { photo: string; title: string }[] | null;
 }
 
 function AllCategory({ isOpen, setIsOpen, data }: AllCategoryProps) {
