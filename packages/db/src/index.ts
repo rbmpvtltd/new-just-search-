@@ -3,9 +3,9 @@ import { Pool } from "pg";
 
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
-  user: process.env.PGUSER ?? "postgres",
-  password: process.env.PGPASSWORD ?? "12345678",
-  database: process.env.PGDATABASE ?? "justsearch",
+  user: process.env.PGUSER ?? "myuser",
+  password: process.env.PGPASSWORD ?? "mypassword",
+  database: process.env.PGDATABASE ?? "mydb",
   port: Number(process.env.PGPORT) ?? 5432,
 });
 
@@ -19,6 +19,10 @@ import * as product from "./schema/product.shema";
 import * as user from "./schema/user.schema";
 
 export type UserRole = (typeof auth.UserRole)[keyof typeof auth.UserRole];
+export type MaritalStatus =
+  (typeof user.MaritalStatus)[keyof typeof user.MaritalStatus];
+
+export const MARITAL_STATUS = user.MaritalStatus;
 
 export const schemas = {
   not_related,

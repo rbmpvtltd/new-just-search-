@@ -51,6 +51,7 @@ const multiSelectStyles: StylesConfig<Option, true> = {
 };
 
 export const MultiSelect: React.FC<MultiSelectProps> = ({
+  
   options,
   defaultValues,
   onChange,

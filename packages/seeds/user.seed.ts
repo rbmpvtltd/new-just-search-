@@ -1,9 +1,8 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
-import { db } from "@repo/db";
+import { db, schemas } from "@repo/db";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { UserRole, users } from "../db/src/schema/auth.schema";
-import { franchises, profiles, salesmen } from "../db/src/schema/user.schema";
+import { UserRole } from "../db/src/schema/auth.schema";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
@@ -11,12 +10,17 @@ dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
   await seedUsers();
-  await seedfranchises();
-  await seedOfSalesman();
+  // await seedfranchises();
+  // await seedOfSalesman();
 };
 
+const users = schemas.auth.users;
+const profiles = schemas.user.profiles;
+const franchises = schemas.user.franchises;
+const salesmen = schemas.user.salesmen;
+
 export const clearAllTablesUser = async () => {
-  await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE profiles RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE users RESTART IDENTITY CASCADE;`);
 
@@ -33,6 +37,7 @@ export const seedUsers = async () => {
 
     const user = {
       id: row.id,
+      displayName: row.display_name ?? "null",
       username: row.username ?? "null",
       phoneNumber: row.phone ?? "null",
       email: row.email ?? `example${row.id}@mail.com`,
@@ -44,10 +49,28 @@ export const seedUsers = async () => {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
+    console.log("user", user);
 
-    const [insertedUser] = await db.insert(users).values(user).returning();
+    let [insertedUser] = await db
+      .insert(users)
+      .values(user)
+      .onConflictDoNothing()
+      .returning();
+
+    if (!insertedUser) {
+      // fallback: fetch existing user by unique key (email is usually safe)
+      insertedUser = await db.query.users.findFirst({
+        where: (u, { eq }) => eq(u.email, user.email),
+      });
+    }
+
+    if (!insertedUser) {
+      throw new Error(`User could not be inserted or found: ${user.email}`);
+    }
+    console.log("insertedUser", insertedUser);
 
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
+
     const profilePhotoUrl =
       (await uploadOnCloudinary(
         liveProfileImageUrl,
@@ -55,12 +78,23 @@ export const seedUsers = async () => {
         clouadinaryFake,
       )) ?? dummyImageUrl;
 
+    // resolve city id
+    let cityId: number;
+    if (row.city) {
+      const cityRecord = await db.query.cities.findFirst({
+        where: (c, { eq }) => eq(c.city, row.city),
+      });
+      cityId = cityRecord?.id ?? 1; // 👈 fallback to "Unknown" city id
+    } else {
+      cityId = 1; // 👈 fallback
+    }
+
     // 5 Insert profile
     const profileData = {
       userId: insertedUser!.id,
       firstName: row.first_name ?? "null",
       lastName: row.last_name ?? "null",
-      city: row.city ?? "null",
+      city: cityId,
       photo: profilePhotoUrl,
       address: row.address ?? "null",
       dob: row.dob ?? null,
@@ -91,7 +125,7 @@ const seedfranchises = async () => {
     const [user] = await db
       .insert(users)
       .values({
-        username: row.name,
+        displayName: row.display_name,
         role: UserRole.franchises,
         email: row.email,
         phoneNumber: row.phone,
@@ -130,7 +164,7 @@ export const seedOfSalesman = async () => {
     const [user] = await db
       .insert(users)
       .values({
-        username: row.name,
+        displayName: row.display_name,
         role: UserRole.salesman,
         email: row.email,
         phoneNumber: row.mobile_no,

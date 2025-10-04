@@ -3,6 +3,7 @@ import {
   boolean,
   date,
   integer,
+  pgEnum,
   pgTable,
   serial,
   text,
@@ -10,13 +11,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth.schema";
+import { cities, states } from "./not-related.schema";
 
 // 1. Profiles
-export enum MaritalStatus {
-  // SINGLE = "single",
-  MARRIED = "married",
-  UNMARRIED = "unmarried",
-}
+export const MaritalStatus = {
+  married: "married",
+  unmarried: "unmarried",
+  widowed: "widowed",
+  divorced: "divorced",
+} as const;
+
+export const maritalStatusEnum = pgEnum("user_marital_status", MaritalStatus);
 
 export const profiles = pgTable("profiles", {
   id: serial("id").primaryKey(),
@@ -24,21 +29,21 @@ export const profiles = pgTable("profiles", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   mysqlUserId: integer("mysql_user_id"),
-  photo: varchar("photo", { length: 255 }),
+  profileImage: varchar("profileImage", { length: 255 }),
+  salutation: varchar("salutation", { length: 100 }),
   firstName: varchar("first_name", { length: 100 }).notNull(),
   lastName: varchar("last_name", { length: 100 }),
-  city: varchar("city", { length: 100 }),
-  address: varchar("address", { length: 255 }),
+  email: varchar("email", { length: 255 }),
   dob: date("dob"),
-  maritalStatus: varchar("marital_status", {
-    length: 20,
-  }).$type<MaritalStatus>(),
   occupation: varchar("occupation", { length: 100 }),
-  state: varchar("state", { length: 100 }),
-  website: varchar("website", { length: 255 }),
+  maritalStatus: maritalStatusEnum("marital_status"),
+  address: varchar("address", { length: 255 }),
+  pincode: varchar("pincode", { length: 10 }).default("000000"),
+  city: integer("city")
+    .notNull()
+    .references(() => cities.id),
+  // website: varchar("website", { length: 255 }), TODO: Ask About this Akki sir
   area: varchar("area", { length: 100 }),
-  gstNo: varchar("gst_no", { length: 50 }).unique(),
-  zipcode: varchar("zipcode", { length: 10 }).default("000000"),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
@@ -73,6 +78,7 @@ export const franchises = pgTable("franchises", {
     .notNull()
     .references(() => users.id),
   referPrifixed: varchar("refer_prifixed", { length: 255 }).notNull(),
+  gstNo: varchar("gst_no", { length: 50 }).unique(),
   status: boolean("status").notNull().default(true),
   employeeLimit: integer("employee_limit").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
@@ -82,7 +88,6 @@ export const franchises = pgTable("franchises", {
 // 5. salesmen
 export const salesmen = pgTable("salesmen", {
   id: serial("id").primaryKey(),
-
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),

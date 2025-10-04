@@ -5,6 +5,7 @@
 "use client";
 import AddBusinessPage from "@/features/business/create/add-business/AddBusinessPage";
 import AddHirePage from "@/features/hire/create/add-hire/AddHirePage";
+import UserProfile from "@/features/user/profile/UserProfile";
 
 // logger.info("test", { test: "test" }, { newline: true }, { color: "red" });
 export default async function UserPage() {
@@ -33,6 +34,7 @@ export default async function UserPage() {
     <div>
       {/* <AddHirePage /> */}
       <AddBusinessPage />
+      {/* <UserProfile /> */}
     </div>
   );
 }

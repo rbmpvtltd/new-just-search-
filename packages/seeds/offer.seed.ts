@@ -1,17 +1,16 @@
+import { db, uploadOnCloudinary } from "@repo/db";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@repo/db";
 import { users } from "../db/src/schema/auth.schema";
-import { businessListings } from "../db/src/schema/business.schema";
 import { categories } from "../db/src/schema/category.schema";
 import { subcategories } from "../db/src/schema/subcategory.schema";
+import { businessListings } from "../db/test/business.schema";
 import {
   offerPhotos,
   offerReviews,
   offerSubcategory,
   offers,
-} from "../db/src/schema/offer.schema";
-import { uploadOnCloudinary } from "@repo/db";
+} from "../db/test/offer.schema";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 

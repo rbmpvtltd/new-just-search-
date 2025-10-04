@@ -1,5 +1,6 @@
-import { eq } from "drizzle-orm";
+import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
+import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
   genderEnum,
@@ -15,19 +16,20 @@ import {
   relocateEnum,
   workShiftEnum,
 } from "../db/src/schema/hire.schema";
-import { cities } from "../db/src/schema/address.schema";
-import { categories } from "../db/src/schema/category.schema";
-import { subcategories } from "../db/src/schema/subcategory.schema";
-import { uploadOnCloudinary } from "@repo/db";
+import {
+  categories,
+  cities,
+  subcategories,
+} from "../db/src/schema/not-related.schema";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 
 export const hireSeed = async () => {
   await cleardataofhire();
   await addHire();
-  await seedRecentViewsHire();
-  await seedHireSubcategories();
-  await seedHireCategories();
+  // await seedRecentViewsHire();
+  // await seedHireSubcategories();
+  // await seedHireCategories();
 };
 
 const cleardataofhire = async () => {
@@ -43,7 +45,17 @@ const cleardataofhire = async () => {
 
 export const addHire = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listings");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
+  let fakeUser = await fakeUserSeed();
+
+  if (!fakeUser) {
+    const seed = await fakeSeed();
+    fakeUser = seed?.user;
+  }
+
+  if (!fakeUser) {
+    throw new Error("Failed to generate a fake user!");
+  }
+
   for (const row of rows) {
     if (row.type === 1) continue;
 
@@ -63,16 +75,35 @@ export const addHire = async () => {
       console.log("City not found", row.id);
       [city] = await db.select().from(cities).where(eq(cities.city, "Jodhpur"));
     }
+    const invalidPhotos = [
+      "20469712961736937230.jpg",
+      "9233936721737361584.jpeg",
+      "8263138481737439311.jpeg",
+      "2542177821738044989.jpeg",
+      "11006388771738843807.jpeg",
+      "6708903161739015419.PNG",
+      "460541731739343371.jpg",
+      "15017575881740386618.jpg",
+      "9027662451740469698.jpg",
+      "3709273371738146929.jpeg",
+    ];
+
+    if (invalidPhotos.includes(row.photo)) {
+      row.photo = "82291101735900048.jpg";
+    }
 
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     const uploaded =
       row.photo && (await uploadOnCloudinary(liveHireImageUrl, "Hire"));
+    console.log("-----");
 
     const profilePhotoUrl = uploaded?.secure_url;
+    console.log("=====");
+
     try {
       await db.insert(hireListing).values({
         id: row.id,
-        userId: createUser!.id,
+        userId: createUser.id,
         city: city!.id,
         name: row.name,
         slug: row.slug,

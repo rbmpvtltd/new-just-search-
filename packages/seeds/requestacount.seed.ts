@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
 import { db } from "@repo/db";
+import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema.js";
-import { request_accounts } from "../db/src/schema/user.schema.js";
+import { request_accounts } from "../db/test/user.schema.js";
 import { sql } from "./mysqldb.seed.js";
 
 export const seedRequestAccounts = async () => {

@@ -51,7 +51,7 @@ export const clearAllTablesBusiness = async () => {
 // business listing
 const addBusiness = async () => {
   const [businessRows] = await (sql as any).execute("SELECT * FROM listings");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
+  // const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
   for (const row of businessRows) {
     if (Number(row.type) === 1) {
       const [user] = await (sql as any).execute(
@@ -59,15 +59,14 @@ const addBusiness = async () => {
         [row.user_id],
       );
 
-      let mysqlUser = (user as any[])[0];
+      const mysqlUser = (user as any[])[0];
 
       if (mysqlUser) {
         try {
           await db
             .insert(users)
             .values({
-              id: mysqlUser.id,
-              username: mysqlUser.username ?? `user_${mysqlUser.id}`,
+              displayName: mysqlUser.display_name,
               phoneNumber: mysqlUser.phone,
               email: mysqlUser.email ?? `business${mysqlUser.id}@example.com`,
               password: mysqlUser.password,
@@ -88,7 +87,7 @@ const addBusiness = async () => {
 
       if (!mysqlUser) {
         console.log(`User not found for business ${row.id}, using fake user`);
-        mysqlUser = fakeUser;
+        // mysqlUser = fakeUser;
       }
       //  Slug skip logic
       const skipSlug = [
@@ -138,6 +137,7 @@ const addBusiness = async () => {
       }
 
       let businessListing: any;
+      
       try {
         [businessListing] = await db
           .insert(businessListings)

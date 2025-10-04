@@ -1,7 +1,7 @@
 import { cloudinary, uploadOnCloudinary } from "@repo/cloudinary";
+import { db } from "@repo/db";
 import { logger } from "@repo/helper";
 import { eq } from "drizzle-orm";
-import { db } from "../db/src/index";
 import {
   banners,
   categories,
@@ -23,7 +23,7 @@ export const notRelated = async () => {
 };
 
 export const clearAllTablesNotRelated = async () => {
-  logger.info("================== execution comes here ====================");
+  // logger.info("================== execution comes here ====================");
   await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
@@ -35,7 +35,11 @@ export const clearAllTablesNotRelated = async () => {
 
 const state = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM states");
+  // console.log("rows", rows);
+
   for (const row of rows) {
+    // console.log("row.id", row.id, "row.name", row.name);
+
     await db.insert(states).values({
       id: row.id,
       name: row.name,

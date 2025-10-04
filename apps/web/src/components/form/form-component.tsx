@@ -4,7 +4,9 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
+import { Calendar } from "../ui/calendar";
 import { Checkbox } from "../ui/checkbox";
+import { DatePicker } from "../ui/date-picker";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { MultiSelect, type Option } from "../ui/multiselect";
@@ -21,7 +23,13 @@ export interface FormFieldProps<T extends FieldValues> {
   section?: string;
   error?: string;
   options?: Option[] | undefined;
-  component: "input" | "multiselect" | "select" | "checkbox" | "textarea";
+  component:
+    | "input"
+    | "multiselect"
+    | "select"
+    | "checkbox"
+    | "textarea"
+    | "calendar";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -54,7 +62,7 @@ export const FormField = <T extends FieldValues>({
                 <Input
                   type={type}
                   name={name}
-                  className={className}
+                  className={`h-[41px] ${className}`}
                   placeholder={placeholder}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -64,10 +72,23 @@ export const FormField = <T extends FieldValues>({
               );
 
             case "multiselect":
-              return <MultiSelect options={options} />;
+              return (
+                <MultiSelect
+                  options={options}
+                  defaultValues={value}
+                  onChange={onChange}
+                />
+              );
 
             case "select":
-              return <SingleSelect options={options} />;
+              return (
+                <SingleSelect
+                  options={options}
+                  className="h-12"
+                  value={value}
+                  onChange={onChange}
+                />
+              );
             case "checkbox":
               return (
                 <div className="flex gap-3 flex-wrap">
@@ -95,8 +116,10 @@ export const FormField = <T extends FieldValues>({
               );
 
             case "textarea":
-              return <Textarea />;
+              return <Textarea value={value} onChange={onChange} />;
 
+            case "calendar":
+              return <DatePicker value={value} onChange={onChange} />;
             default:
               return <div>no component</div>;
           }
