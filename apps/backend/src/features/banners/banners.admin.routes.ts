@@ -26,8 +26,6 @@ const inputSchema = z.object({
   globalFilter: z.string().optional(), // optional to allow empty
 });
 
-type InputType = z.infer<typeof inputSchema>;
-
 // Helper: map filter ID to actual Drizzle column
 const getColumnFromId = (id: string) => {
   const columnMap = {
@@ -119,8 +117,12 @@ const buildFilterCondition = (filter: { id: string; value: unknown }) => {
 
 export const adminBannerRouter = router({
   thirdBanner: publicProcedure
-    .input(inputSchema)
-    .query(async ({ input }: { input: InputType }) => {
+    .input(
+      inputSchema.extend({
+        hello: z.string(),
+      }),
+    )
+    .query(async ({ input }) => {
       const pageIndex = input.pagination.pageIndex;
       const pageSize = input.pagination.pageSize;
       const offset = pageIndex * pageSize;
