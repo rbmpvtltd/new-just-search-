@@ -64,7 +64,7 @@ function HandleTRPCError(
   }
 
   if (config.toast) {
-    toast.error(error.message, {
+    toast.error(error.message ?? config.message, {
       style: {
         background: "red",
         color: "white",

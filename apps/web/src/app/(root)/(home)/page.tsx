@@ -2,17 +2,25 @@ import FirstCaraousel from "@/components/mainContent/BannerFistCaraousel";
 import Category from "@/components/mainContent/Category";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
-
+import { ErrorComponent } from "@/utils/error/ErrorComponent";
 
 export default async function Page() {
-  
-  const { data: bannerFirst } = await asyncHandler(trpcServer.banners.getBannerData.query({type : 1}))
-  const { data: category } = await asyncHandler(trpcServer.categoryRouter.popularCategories.query());
-  const { data: allCategory } = await asyncHandler(trpcServer.categoryRouter.allCategories.query());
+  const { data: bannerFirst } = await asyncHandler(
+    trpcServer.banners.getBannerData.query({ type: 1 }),
+  );
+  const { data: category , error } = await asyncHandler(
+    trpcServer.categoryRouter.popularCategories.query(),
+  );
+  const { data: allCategory } = await asyncHandler(
+    trpcServer.categoryRouter.allCategories.query(),
+  );
+
+  if(error) return <ErrorComponent error={error} />
+
   return (
     <div className="mx-auto">
-      <FirstCaraousel bannerFirst={bannerFirst}/>
-      <Category category={category} allCategory={allCategory}/>
+      <FirstCaraousel bannerFirst={bannerFirst} />
+      <Category category={category} allCategory={allCategory} />
     </div>
   );
 }

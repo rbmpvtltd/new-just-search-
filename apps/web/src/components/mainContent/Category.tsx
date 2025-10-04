@@ -1,19 +1,26 @@
-"use client"
+"use client";
 import { useState } from "react";
+import type { OutputTrpcType } from "@/trpc/type";
 import AllCategory from "./AllCategory";
 import { PopularCategoryCard } from "./PopularCategoryCard";
-import type { OutputTrpcType } from "@/trpc/type";
 
-type PopularCategoriesType = OutputTrpcType["categoryRouter"]["popularCategories"];
-type AllCategoryType = OutputTrpcType["categoryRouter"]["allCategories"];
+type PopularCategoriesType =
+  | OutputTrpcType["categoryRouter"]["popularCategories"]
+  | null;
+type AllCategoryType = OutputTrpcType["categoryRouter"]["allCategories"] | null;
 
+function Category({
+  category,
+  allCategory,
+}: {
+  category: PopularCategoriesType;
+  allCategory: AllCategoryType;
+}) {
+  const [isAllCategoryOpen, setIsAllCategoryOpen] = useState(false);
 
-function Category({ category,allCategory }: {category :PopularCategoriesType|null,allCategory :AllCategoryType|null}) {
-    const [isAllCategoryOpen, setIsAllCategoryOpen] = useState(false);
-    
-      const toggleAllCategory = () => {
-        setIsAllCategoryOpen(!isAllCategoryOpen);
-      };
+  const toggleAllCategory = () => {
+    setIsAllCategoryOpen(!isAllCategoryOpen);
+  };
   return (
     <>
       <div className="grid lg:grid-cols-8 md:grid-cols-4 grid-cols-2 mt-10  px-36 mx-auto gap-4 place-content-center">
