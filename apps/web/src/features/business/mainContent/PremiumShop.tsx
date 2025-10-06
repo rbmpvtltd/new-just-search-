@@ -1,18 +1,17 @@
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
-import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
-import { Card, CardContent } from "../ui/card";
+import { Carousel, CarouselContent, CarouselItem } from "../../../components/ui/carousel";
+import { Card, CardContent } from "../../../components/ui/card";
 import Image from "next/image";
 import { GoHeart } from "react-icons/go";
-import Rating from "../ui/Rating";
-import { Badge } from "../ui/badge";
+import Rating from "../../../components/ui/Rating";
+import { Badge } from "../../../components/ui/badge";
 import { MdLocationPin } from "react-icons/md";
 
 async function PremiumShop() {
   const { data } = await asyncHandler(trpcServer.banners.premiumShops.query());
-  console.log("data is here ============================>", data);
   return (
-    <div className="p-4 mt-5">
+    <div className="py-4 mt-5">
       <h1 className="text-4xl text-primary font-bold text-center">Premium Shops </h1>
       <Carousel className="w-full ">
         <CarouselContent className="ml-10">
@@ -24,7 +23,7 @@ async function PremiumShop() {
               <div className="p-1">
                 <Card>
                   <CardContent className="flex aspect-square items-center justify-center">
-                    <div className="p-2">
+                    <div className="p-2 shadow-2xl">
                       <div className="relative py-2">
                         <Image
                           width={400}
