@@ -12,7 +12,7 @@ import { createSession } from "./lib/session";
 export const authRouter = router({
   login: publicProcedure
     .input(z.object({ username: z.string(), password: z.string().min(6) }))
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       const user = await checkPasswordGetUser(input.username, input.password);
 
       if (!user) {

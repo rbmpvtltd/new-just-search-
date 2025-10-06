@@ -20,9 +20,10 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { setToken } from "@/utils/session";
+import Link from "next/link";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  username: z.string(),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." }),
@@ -36,12 +37,12 @@ export function LoginForm({
   const id = useId();
   const trpc = useTRPC();
   const { mutate, isSuccess, isError } = useMutation(
-    trpc.auth.login.mutationOptions(),
+    trpc.auth.login.mutationOptions()
   );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -50,7 +51,7 @@ export function LoginForm({
     console.log("oo error ho gyo");
   }
 
-  function onSubmit(data: { email: string; password: string }) {
+  function onSubmit(data: { username: string; password: string }) {
     mutate(data, {
       onSuccess: (data: string | undefined) => {
         setToken(data?.toString() || "", false);
@@ -75,15 +76,15 @@ export function LoginForm({
                 </div>
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          id={`email-${id}`}
-                          type="email"
+                          id={`username-${id}`}
+                          type="text"
                           min={8}
                           placeholder="m@example.com"
                           required
@@ -100,12 +101,12 @@ export function LoginForm({
                     <FormItem>
                       <div className="flex items-center">
                         <FormLabel>Password</FormLabel>
-                        <a
+                        <Link
                           href="#"
                           className="ml-auto text-sm underline-offset-2 hover:underline"
                         >
                           Forgot your password?
-                        </a>
+                        </Link>
                       </div>
                       <FormControl>
                         <Input
@@ -138,8 +139,8 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <Link href="#">Terms of Service</Link>{" "}
+        and <Link href="#">Privacy Policy</Link>.
       </div>
     </div>
   );

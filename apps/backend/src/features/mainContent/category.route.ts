@@ -1,5 +1,5 @@
 import { publicProcedure,router } from "@/utils/trpc";
-import { getAllCategories, getPopularCategories } from "./category.service";
+import { getAllCategories, getPopularBannerCategory, getPopularCategories } from "./category.service";
 
 export const categoryRouter = router({
     popularCategories : publicProcedure.query(async ()=>{
@@ -9,5 +9,10 @@ export const categoryRouter = router({
     allCategories : publicProcedure.query(async ()=>{
         const data = getAllCategories();
         return data
+    }),
+
+    popularBannerCategory : publicProcedure.query(async ()=>{
+        const data = getPopularBannerCategory();
+        return data 
     })
 })

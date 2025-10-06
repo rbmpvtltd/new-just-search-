@@ -32,6 +32,7 @@ export const subcategoryRouter = router({
           longitude: businessListings.longitude,
           latitude: businessListings.latitude,
           phoneNumber: businessListings.phoneNumber,
+          rating: sql<string[]>`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
           subcategories: sql<string[]>`
           COALESCE(
             ARRAY_AGG(DISTINCT subcategories.name) 
@@ -69,6 +70,7 @@ export const subcategoryRouter = router({
             schemas.not_related.categories.id,
           ),
         )
+        .leftJoin(schemas.business.businessReviews, eq(businessListings.id, schemas.business.businessReviews.businessId))
         .where(eq(businessCategories.categoryId, input.categoryId))
         .groupBy(businessListings.id)
         .limit(limit)
