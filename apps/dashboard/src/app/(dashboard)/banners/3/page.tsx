@@ -13,7 +13,7 @@ export default function Page() {
       filters,
       globalFilter,
     }: QueryFnContext) => {
-      const result = await trpcServer.adminBanner.thirdBanner.query({
+      const result = await trpcServer.adminBanner.list.query({
         sorting,
         pagination: {
           pageIndex: pagination?.pageIndex || 0,

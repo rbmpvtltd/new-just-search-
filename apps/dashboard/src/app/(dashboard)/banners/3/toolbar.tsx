@@ -7,6 +7,7 @@ import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-fi
 import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 import { type, active } from "./data";
+import { AddBanner } from "./add.from";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -57,7 +58,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         <DataTableViewOptions table={table} />
-        <Button size="sm">Add Task</Button>
+        <AddBanner />
       </div>
     </div>
   );

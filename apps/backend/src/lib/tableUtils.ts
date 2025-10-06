@@ -1,8 +1,7 @@
 // lib/tableUtils.ts
 
-import { db } from "@repo/db";
 import { and, eq, ilike, inArray, or, type SQL, sql } from "drizzle-orm";
-import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import z from "zod";
 
 // Reusable input schema
@@ -28,12 +27,10 @@ export const tableInputSchema = z.object({
 
 export type TableInput = z.infer<typeof tableInputSchema>;
 
-// Generic column map type
 export type ColumnMap<T extends Record<string, AnyPgColumn>> = {
   [K in keyof T]: T[K];
 };
 
-// Build WHERE clause
 export function buildWhereClause<T extends Record<string, AnyPgColumn>>(
   filters: { id: string; value: unknown }[],
   globalFilter: string | undefined,
@@ -49,7 +46,6 @@ export function buildWhereClause<T extends Record<string, AnyPgColumn>>(
     );
   }
 
-  // Column-specific filters
   const columnFilterConditions = filters
     .map((filter) => buildFilterCondition(filter, columnMap))
     .filter((cond): cond is SQL => cond !== null);
@@ -150,39 +146,4 @@ export function buildOrderByClause(
   return orderExpressions.length > 0
     ? sql`${sql.join(orderExpressions, sql`, `)}`
     : defaultOrder;
-}
-
-// Generic paginated query for PostgreSQL
-export async function queryTableWithPagination(
-  table: PgTable,
-  where: SQL | undefined,
-  orderBy: SQL,
-  pageIndex: number,
-  pageSize: number,
-) {
-  const offset = pageIndex * pageSize;
-
-  const data = await db
-    .select()
-    .from(table)
-    .where(where)
-    .orderBy(orderBy)
-    .limit(pageSize)
-    .offset(offset);
-
-  // PostgreSQL returns `bigint` for count → cast to number
-  const totalResult = await db
-    .select({ count: sql<number>`count(*)::int` }) // 👈 cast to int
-    .from(table)
-    .where(where);
-
-  const total = totalResult[0]?.count ?? 0;
-  const totalPages = Math.ceil(total / pageSize);
-
-  return {
-    data,
-    totalCount: total,
-    totalPages,
-    pageCount: totalPages, // compatible with TanStack Table
-  };
 }
