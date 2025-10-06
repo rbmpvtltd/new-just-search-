@@ -15,37 +15,41 @@ import {
   relocateEnum,
   workShiftEnum,
 } from "../db/src/schema/hire.schema";
-import { cities } from "../db/src/schema/address.schema";
-import { categories } from "../db/src/schema/category.schema";
-import { subcategories } from "../db/src/schema/subcategory.schema";
-import { uploadOnCloudinary } from "@repo/db";
+import {
+  categories,
+  cities,
+  subcategories,
+} from "../db/src/schema/not-related.schema";
+import { uploadOnCloudinary } from "@repo/cloudinary";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake } from "./seeds";
+
 
 export const hireSeed = async () => {
   await cleardataofhire();
-  await addHire();
-  await seedRecentViewsHire();
+  // await addHire();
+  // await seedRecentViewsHire();
   await seedHireSubcategories();
-  await seedHireCategories();
+  // await seedHireCategories();
 };
 
 const cleardataofhire = async () => {
-  await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE  TABLE recent_view_hire RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE  TABLE recent_view_hire RESTART IDENTITY CASCADE;`,
+  // );
   await db.execute(
     `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
   );
-  await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
 };
 
 export const addHire = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listings");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
+  const fakeUser = (await fakeUserSeed()) || (await fakeSeed());
   for (const row of rows) {
-    if (row.type === 1) continue;
+    if (Number(row.type) === 1) continue;
 
     let [createUser] = await db
       .select()
@@ -66,7 +70,7 @@ export const addHire = async () => {
 
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     const uploaded =
-      row.photo && (await uploadOnCloudinary(liveHireImageUrl, "Hire"));
+      row.photo && (await uploadOnCloudinary(liveHireImageUrl, "Hire",clouadinaryFake));
 
     const profilePhotoUrl = uploaded?.secure_url;
     try {
@@ -263,7 +267,7 @@ export const seedHireCategories = async () => {
       .where(eq(hireListing.id, row.listing_id));
 
     if (!hire) {
-      console.log("hire not found");
+      console.log("hire not found",hire);
       continue;
     }
 
