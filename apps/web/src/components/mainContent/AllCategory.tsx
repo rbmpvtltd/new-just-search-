@@ -12,7 +12,7 @@ interface AllCategoryProps {
 function AllCategory({ isOpen, setIsOpen, data }: AllCategoryProps) {
   return (
     <div
-      className={`fixed top-0 shadow-2xl right-0 h-full w-[90%] bg-white z-50 transform transition-transform duration-500 ease-in-out ${
+      className={`fixed top-0 shadow-2xl right-0 h-full w-[90%] bg-white z-50 transform transition-transform duration-700 ease-in-out ${
         isOpen ? "translate-x-0" : "translate-x-full"
       }`}
     >

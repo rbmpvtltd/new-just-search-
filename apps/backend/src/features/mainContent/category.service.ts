@@ -14,4 +14,13 @@ async function getAllCategories(){
     return data
 }
 
-export {getPopularCategories,getAllCategories}
+async function getPopularBannerCategory(){
+    const hireCategories = await db.select({photo : category.photo,title : category.title,id:category.id,type:category.type}).from(category).where(eq(category.type,2)).limit(4);
+    const businessCategory = await db.select({photo : category.photo,title : category.title,id:category.id}).from(category).where(eq(category.type,1)).limit(4);
+    console.log("hireCategories",hireCategories)
+    console.log("businessCategory",businessCategory)
+    const data = [hireCategories,businessCategory]
+    return data;
+}
+
+export {getPopularCategories,getAllCategories,getPopularBannerCategory}

@@ -6,6 +6,7 @@ import { IoChatbubbleEllipses } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import type { OutputTrpcType } from "@/trpc/type";
 import { Badge } from "@/components/ui/badge";
+import Rating from "@/components/ui/Rating";
 
 
 
@@ -44,14 +45,7 @@ export const BussinessListingCard = ({ item }: {item : business}) => {
                 {item?.area} {item?.streetName} {item?.buildingName}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <FaStar
-                  className="text-yellow-300 text-xl"
-                  key={index.toString()}
-                />
-              ))}
-            </div>
+            <Rating rating={Math.ceil(Number(item.rating))} />
             <div className="flex gap-4 ">
                 <Button
                   onClick={() => {
