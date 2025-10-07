@@ -1,6 +1,10 @@
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
-import { Carousel, CarouselContent, CarouselItem } from "../../../components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "../../../components/ui/carousel";
 import { Card, CardContent } from "../../../components/ui/card";
 import Image from "next/image";
 import { GoHeart } from "react-icons/go";
@@ -12,7 +16,9 @@ async function PremiumShop() {
   const { data } = await asyncHandler(trpcServer.banners.premiumShops.query());
   return (
     <div className="py-4 mt-5">
-      <h1 className="text-4xl text-primary font-bold text-center">Premium Shops </h1>
+      <h1 className="text-4xl text-primary font-bold text-center">
+        Premium Shops{" "}
+      </h1>
       <Carousel className="w-full ">
         <CarouselContent className="ml-10">
           {data?.map((item, index: number) => (
@@ -21,10 +27,10 @@ async function PremiumShop() {
               className="pl-1 md:basis-1/2 lg:basis-1/3"
             >
               <div className="p-1">
-                <Card>
-                  <CardContent className="flex aspect-square items-center justify-center">
-                    <div className="p-2 shadow-2xl">
-                      <div className="relative py-2">
+                <Card className="">
+                  <CardContent className="flex  justify-center ">
+                    <div className="p-2 shadow-2xl ">
+                      <div className="relative max-w-[400px] mx-auto ">
                         <Image
                           width={400}
                           height={200}
@@ -32,7 +38,7 @@ async function PremiumShop() {
                           alt="Bussiness Image"
                           src="https://www.justsearch.net.in/assets/images/banners/uDgo0nRB1738750520.png"
                         />
-                        <div className="absolute top-4 right-2 bg-primary rounded-full p-2">
+                        <div className="absolute top-2 right-2 bg-primary rounded-full p-2">
                           <GoHeart />
                         </div>
                       </div>
@@ -55,7 +61,7 @@ async function PremiumShop() {
                       </div>
                       <div className="flex p-2">
                         <MdLocationPin />
-                        <p className="px-2 text-[12px] flex text-secondary-text break-words w-full ">
+                        <p className="px-2 text-[12px] flex text-secondary-text break-words w-[80%] ">
                           {item.area} {item.streetName} {item.buildingName}
                         </p>
                       </div>

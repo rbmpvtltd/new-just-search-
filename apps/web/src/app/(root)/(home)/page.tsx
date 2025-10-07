@@ -1,3 +1,5 @@
+import AddvertiseBanner from "@/features/business/mainContent/AddvertiseBanner";
+import AddvertiseBanner2 from "@/features/business/mainContent/AddvertiseBanner2";
 import FirstCaraousel from "@/features/business/mainContent/BannerFistCaraousel";
 import Category from "@/features/business/mainContent/Category";
 import PopularaBanner from "@/features/business/mainContent/PopularaBanner";
@@ -19,6 +21,12 @@ export default async function Page() {
   const { data: allCategory } = await asyncHandler(
     trpcServer.categoryRouter.allCategories.query(),
   );
+  const { data: addvertiseBanner } = await asyncHandler(
+    trpcServer.banners.getBannerData.query({ type: 2 }),
+  );
+  const { data: addvertiseBanner2 } = await asyncHandler(
+    trpcServer.banners.getBannerData.query({ type: 3 }),
+  );
 
   if (error) return <ErrorComponent error={error} />;
 
@@ -27,7 +35,12 @@ export default async function Page() {
       <FirstCaraousel bannerFirst={bannerFirst} />
       <Category category={category} allCategory={allCategory} />
       <PremiumShop />
-      <PopularaBanner popularCategories={popularCategories} allCategories={allCategory} />
+      <PopularaBanner
+        popularCategories={popularCategories}
+        allCategories={allCategory}
+      />
+      <AddvertiseBanner addvertiseBanner={addvertiseBanner}/>
+      <AddvertiseBanner2 addvertiseBanner={addvertiseBanner2} />
     </div>
   );
 }
