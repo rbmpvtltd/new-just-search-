@@ -5,6 +5,7 @@
   },
   "build": {
     "development": {
+      "bun": "1.2.20",
       "developmentClient": true,
       "distribution": "internal",
       "channel": "development",
@@ -16,6 +17,7 @@
       }
     },
     "preview": {
+      "bun": "1.2.20",
       "developmentClient": false,
       "autoIncrement": true,
       "distribution": "internal",
@@ -28,6 +30,7 @@
       }
     },
     "production": {
+      "bun": "1.2.20",
       "autoIncrement": true,
       "channel": "production",
       "android": {

@@ -12,13 +12,7 @@ export default async function Login() {
   } catch (error) {
     // handle TRPC error specifically
     if (error instanceof TRPCClientError) {
-      return (
-        <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-          <div className="w-full max-w-sm md:max-w-3xl">
-            <LoginForm />
-          </div>
-        </div>
-      );
+      return <LoadLoginForm />;
     }
 
     // let unexpected errors bubble (Next.js will show error page)
@@ -31,6 +25,10 @@ export default async function Login() {
   }
 
   // fallback UI (optional, if session is null or false)
+  return <LoadLoginForm />;
+}
+
+const LoadLoginForm = () => {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-3xl">
@@ -38,4 +36,4 @@ export default async function Login() {
       </div>
     </div>
   );
-}
+};

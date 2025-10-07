@@ -1,5 +1,4 @@
 import { db } from "@repo/db";
-import { logger } from "@repo/helper";
 import bcrypt from "bcryptjs";
 
 const getUserByUserName = async (username: string) => {

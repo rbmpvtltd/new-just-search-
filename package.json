@@ -20,6 +20,10 @@
     "apps/*",
     "packages/*"
   ],
+  "packageManager": "bun@1.2.20",
+  "engines": {
+    "bun": "1.2.20"
+  },
   "dependencies": {
     "fs": "^0.0.1-security"
   }
