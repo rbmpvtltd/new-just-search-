@@ -2,6 +2,7 @@
   "name": "@repo/backend",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
+	"version": "0.1.0",
   "types": "./dist/index.d.ts",
   "type": "module",
   "devDependencies": {
