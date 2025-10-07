@@ -19,7 +19,7 @@ function cleanup
         rm -rf *
         echo (set_color green)"[OK] Temp directory cleared."(set_color normal)
     else
-        echo (set_color blue)"[SKIP] Temp directory already empty."(set_color normal)
+        echo (set_color cyan)"[SKIP] Temp directory already empty."(set_color normal)
     end
     cd ~
 
@@ -27,7 +27,7 @@ function cleanup
         rm -rf .gradle
         echo (set_color green)"[OK] Removed .gradle."(set_color normal)
     else
-        echo (set_color blue)"[SKIP] .gradle not found."(set_color normal)
+        echo (set_color cyan)"[SKIP] .gradle not found."(set_color normal)
     end
 end
 

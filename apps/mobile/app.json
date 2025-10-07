@@ -4,13 +4,13 @@
     "slug": "justsearch",
     "version": "1.1.00",
     "orientation": "portrait",
-    "icon": "./assets/images/app-icon.png",
+    "icon": "./src/assets/images/app-icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "justsearch",
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "splash": {
-      "image": "./assets/images/app-icon.png",
+      "image": "./src/assets/images/app-icon.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
@@ -29,7 +29,7 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -47,7 +47,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
@@ -83,11 +83,7 @@
     "extra": {
       "PROD": true,
       "BUILD_TYPE": 0,
-      "BUILD_TYPE_FIELDS": [
-        "closetest",
-        "opentest",
-        "production"
-      ],
+      "BUILD_TYPE_FIELDS": ["closetest", "opentest", "production"],
       "API_URL_PROD": "https://justsearch.net.in",
       "API_URL_DEV": "http://192.168.1.59:8000",
       "router": {},
