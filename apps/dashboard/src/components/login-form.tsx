@@ -1,32 +1,35 @@
 "use client";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useId } from "react";
 import { useForm } from "react-hook-form";
+import z from "zod";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
-import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod"
-import z from "zod";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
 import { setToken } from "@/utils/session";
-import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  username: z.string(),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." }),
-})
+});
+
+type FormSchema = z.infer<typeof formSchema>;
 
 export function LoginForm({
   className,
@@ -35,31 +38,27 @@ export function LoginForm({
   const router = useRouter();
   const id = useId();
   const trpc = useTRPC();
-  const {mutate ,isSuccess , isError} = useMutation(trpc.auth.login.mutationOptions());
-  const form = useForm<z.infer <typeof formSchema>>({
+  const { mutate, isError } = useMutation(trpc.auth.login.mutationOptions());
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: ""
-    }
+      username: "",
+      password: "",
+    },
   });
 
- 
-  if(isError){
-    console.log("oo error ho gyo")
+  if (isError) {
+    console.log("oo error ho gyo");
   }
 
-  
-
-  function onSubmit(data: { email: string; password: string }) {
-     mutate(data,{
-      onSuccess: (data:string|undefined) => {
-        setToken(data?.toString() || "")
-        console.log("oo success ho gyo",data)
-        router.push("/")
-      }
-     });
-    
+  function onSubmit(data: FormSchema) {
+    mutate(data, {
+      onSuccess: (data) => {
+        setToken(data?.toString() || "");
+        console.log("oo success ho gyo", data);
+        router.push("/");
+      },
+    });
   }
 
   return (
@@ -77,15 +76,15 @@ export function LoginForm({
                 </div>
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>username</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          id={`email-${id}`}
-                          type="email"
+                          id={`username-${id}`}
+                          type="text"
                           min={8}
                           placeholder="m@example.com"
                           required
@@ -102,12 +101,12 @@ export function LoginForm({
                     <FormItem>
                       <div className="flex items-center">
                         <FormLabel>Password</FormLabel>
-                        <a
+                        <Link
                           href="#"
                           className="ml-auto text-sm underline-offset-2 hover:underline"
                         >
                           Forgot your password?
-                        </a>
+                        </Link>
                       </div>
                       <FormControl>
                         <Input
@@ -122,10 +121,7 @@ export function LoginForm({
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="w-full"
-                >
+                <Button type="submit" className="w-full">
                   Login
                 </Button>
               </div>
@@ -143,8 +139,9 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our{" "}
+        <Link href="#">Terms of Service</Link> and{" "}
+        <Link href="#">Privacy Policy</Link>.
       </div>
     </div>
   );
