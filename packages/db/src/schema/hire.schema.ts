@@ -220,7 +220,7 @@ export const hireListing = pgTable("hire_listing", {
   // expertise: text("expertise"),
   skillset: text("skillset"),
   // abilities: text("abilities"),
-  // jobType: jobTypeEnum("job_type").array().notNull(),
+  jobType: jobTypeEnum("job_type").array().notNull(),
   // locationPreferred: varchar("location_preferred", { length: 255 }),
   // certificates: text("certificates"),
   // workShift: workShiftEnum("work_shift").array().notNull(),

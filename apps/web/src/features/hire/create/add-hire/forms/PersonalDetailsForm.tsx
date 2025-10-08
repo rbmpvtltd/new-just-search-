@@ -30,7 +30,7 @@ export default function PersonalDetailsForm() {
     resolver: zodResolver(personalDetailsSchema),
     defaultValues: {
       // photo: formValue.photo ?? "",
-      // appliedFor: formValue.appliedFor ?? "",
+      categoryId: formValue.categoryId ?? 0,
       // subcategory: formValue.subcategory ?? [],
       name: formValue.name ?? "",
       // gender: formValue.gender ?? undefined,
@@ -60,21 +60,21 @@ export default function PersonalDetailsForm() {
     //   section: "profile",
     //   error: errors.photo?.message,
     // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Applied For",
-    //   name: "appliedFor",
-    //   placeholder: "Applied For",
-    //   component: "select",
-    //   section: "profile",
-    //   options: [
-    //     { value: "Job", label: "Job" },
-    //     { value: "Internship", label: "Internship" },
-    //     { value: "Other", label: "Other" },
-    //   ],
-    //   error: errors.appliedFor?.message,
-    // },
+    {
+      control,
+      type: "text",
+      label: "Applied For",
+      name: "categoryId",
+      placeholder: "Applied For",
+      component: "select",
+      section: "profile",
+      options: [
+        { value: 1, label: 1 },
+        { value: 2, label: 2 },
+        { value: 3, label: 3 },
+      ],
+      error: errors.categoryId?.message,
+    },
     // {
     //   control,
     //   type: "text",
@@ -258,7 +258,7 @@ export default function PersonalDetailsForm() {
     console.log(data, "data");
 
     // setFormValue("photo", data.photo ?? "");
-    // setFormValue("appliedFor", data.appliedFor ?? "");
+    setFormValue("appliedFor", data.appliedFor ?? "");
     // setFormValue("subcategory", data.subcategory ?? "");
     setFormValue("name", data.name ?? "");
     // setFormValue("gender", data.gender ?? "");

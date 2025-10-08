@@ -155,8 +155,9 @@ export const YES_NO_OPTIONS = [
 ];
 
 export const JOB_TYPE = [
-  { label: "Full Time", value: "Full Time" },
-  { label: "Part Time", value: "Part Time" },
+  { label: "FullTime", value: "FullTime" },
+  { label: "PartTime", value: "PartTime" },
+  { label: "Both", value: "Both" },
 ];
 
 export const JOB_DURATION = [

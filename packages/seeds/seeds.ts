@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-import { businessSeed } from "./business.seed";
+// import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
-import { businessSeed } from "./business.seed";
+// import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
 import { fakeSeed } from "./fake.seed";
 // import { feedbackseed } from "./feedback.seed";
@@ -20,9 +20,9 @@ dotenv.config();
 (async () => {
   try {
     // Postgres seeding
-    // await notRelated();
-    // await userSeed();
-    // await fakeSeed();
+    await notRelated();
+    await userSeed();
+    await fakeSeed();
     // await businessSeed();
     await hireSeed();
     // await productSeed();

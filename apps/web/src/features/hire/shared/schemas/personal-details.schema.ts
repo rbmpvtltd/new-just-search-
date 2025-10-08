@@ -1,20 +1,20 @@
 "use client";
 import { z } from "zod";
-// import {
-//   GENDER,
-//   LANGUAGES,
-//   MARITAL_STATUS,
-//   SUB_CATEGORY,
-// } from "../constants/hire";
+import {
+  //   GENDER,
+  //   LANGUAGES,
+  //   MARITAL_STATUS,
+  SUB_CATEGORY,
+} from "../constants/hire";
 
 // const genderValues = GENDER.map((gender) => gender.value);
 // const maritalStatusValues = MARITAL_STATUS.map((status) => status.value);
 // const languageValues = LANGUAGES.map((language) => language.value);
-// const subCategoryValue = SUB_CATEGORY.map((subCategory) => subCategory.value);
+const subCategoryValue = SUB_CATEGORY.map((subCategory) => subCategory.value);
 
 export const personalDetailsSchema = z.object({
   // photo: z.string().min(1, "Please upload your photo"),
-  // appliedFor: z.string().min(1, "Please select a category"),
+  categoryId: z.number().min(1, "Please select a category"),
   // subcategory: z.array(z.enum(subCategoryValue)).min(1, {
   //   message: "Please select at least one subcategory",
   // }),

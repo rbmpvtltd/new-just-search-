@@ -11,15 +11,15 @@ import {
 } from "../db/src/schema/not-related.schema";
 // import { uploadOnCloudinary } from "../db/src/index";
 import { sql } from "./mysqldb.seed";
-import { uploadOnCloudinary } from "@repo/cloudinary";
+// import { uploadOnCloudinary } from "@repo/cloudinary";
 import { clouadinaryFake } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  // await state();
-  // await citie();
-  // await bannerSeed();
-  // await seedCategories();
+  await state();
+  await citie();
+  await bannerSeed();
+  await seedCategories();
   await seedSubcategories();
 };
 
@@ -52,7 +52,7 @@ const state = async () => {
 const citie = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM cities");
   for (const row of rows) {
-    console.log(row.state_id)
+    console.log(row.state_id);
     const [state] = await db
       .select()
       .from(states)
@@ -121,7 +121,7 @@ export const seedCategories = async () => {
       categoryPhotoPublicId = result ?? null;
 
       await db.insert(categories).values({
-        id : row.id,
+        id: row.id,
         title: row.title ?? "",
         slug: row.slug ?? "",
         photo: categoryPhotoPublicId ?? "",

@@ -33,7 +33,7 @@ export default function PreferredPositionForm() {
   } = useForm<PreferredPosition>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
-      // jobType: formValue.jobType ?? [],
+      jobType: formValue.jobType ?? [],
       // locationPreferred: formValue.locationPreferred ?? "",
       // relocate: formValue.relocate ?? undefined,
       // expectedSalaryFrom: formValue.expectedSalaryFrom ?? "",
@@ -49,9 +49,9 @@ export default function PreferredPositionForm() {
   });
 
   const onSubmit = (data: PreferredPosition) => {
-    console.log("data", data);
+    console.log("jobType", data.jobType);
 
-    // setFormValue("jobType", data.jobType ?? "");
+    setFormValue("jobType", data.jobType ?? "");
     // setFormValue("locationPreferred", data.locationPreferred ?? "");
     // setFormValue("relocate", data.relocate ?? undefined);
     // setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
@@ -80,7 +80,7 @@ export default function PreferredPositionForm() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* <FormField
+              <FormField
                 type=""
                 control={control}
                 label="Job Type"
@@ -90,7 +90,7 @@ export default function PreferredPositionForm() {
                 options={[...JOB_TYPE]}
                 error={errors.jobType?.message}
               />
-              <FormField
+              {/*   <FormField
                 type=""
                 control={control}
                 label="Location Preferred"

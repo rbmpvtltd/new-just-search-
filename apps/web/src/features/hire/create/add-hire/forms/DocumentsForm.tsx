@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
 import React from "react";
 import { type FieldValues, useForm } from "react-hook-form";
 import {
@@ -29,7 +30,7 @@ export default function DocumentsForm() {
     defaultValues: {
       // idProof: formValue.idProof ?? "",
       // idProofPhoto: formValue.idProofPhoto ?? "",
-      // coverLetter: formValue.coverLetter ?? "",
+      coverLetter: formValue.coverLetter ?? "",
       // resumePdf: formValue.resumePdf ?? "",
       // aboutYourself: formValue.aboutYourself ?? "",
       // referCode: formValue.referCode ?? "RBMHORJ00000",
@@ -39,18 +40,23 @@ export default function DocumentsForm() {
   console.log("form Values before submit", formValue);
 
   const onSubmit = (data: DocumentSchema) => {
-    console.log("data", data);
+    // console.log("data", data);
 
     // setFormValue("idProof", data.idProof ?? "");
     // setFormValue("idProofPhoto", data.idProofPhoto ?? "");
-    // setFormValue("coverLetter", data.coverLetter ?? "");
+    setFormValue("coverLetter", data.coverLetter ?? "");
     // setFormValue("resumePdf", data.resumePdf ?? "");
     // setFormValue("aboutYourself", data.aboutYourself ?? "");
     // setFormValue("referCode", data.referCode ?? "");
 
     mutate(formValue, {
-      onSuccess: () => {
-        console.log("success", formValue);
+      onSuccess: (data) => {
+        console.log("success", data);
+      },
+      onError: (error) => {
+        if (isTRPCClientError(error)) {
+          console.error("error,", error.message);
+        }
       },
     });
   };

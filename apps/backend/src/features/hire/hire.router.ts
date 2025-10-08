@@ -11,10 +11,10 @@ import {
   schemas,
   WORK_SHIFT,
 } from "@repo/db";
+import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
-
 import { hireProcedure, router, visitorProcedure } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
 export const hirerouter = router({
@@ -40,7 +40,7 @@ export const hirerouter = router({
       z.object({
         name: z.string(),
         // slug: z.string(),
-        // categoryId: z.number(),
+        categoryId: z.number(),
         // subcategoryId: z.array(z.number()),
         // fatherName: z.string(),
         // dob: z.string(),
@@ -81,7 +81,8 @@ export const hirerouter = router({
         // expertise: z.string(),
         skillset: z.string(),
         // abilities: z.string(),
-        // jobType: z.array(z.enum(Object.values(JOB_TYPE))),
+        // jobType: z.array(z.string()),
+        jobType: z.array(z.enum(["PartTime", "FullTime"])),
         // locationPreferred: z.string(),
         // certificates: z.string(),
         // workShift: z.array(z.enum(Object.values(WORK_SHIFT))),
@@ -100,6 +101,9 @@ export const hirerouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      logger.info("testing that it is working or not");
+      logger.info(input.jobType);
+      return "success";
       const user = await db.query.users.findFirst({
         where: (users, { eq }) => eq(users.id, ctx.userId),
       });
@@ -198,7 +202,7 @@ export const hirerouter = router({
           // expertise: input.expertise,
           skillset: input.skillset,
           // abilities: input.abilities,
-          // jobType: input.jobType,
+          jobType: input.jobType,
           // locationPreferred: input.locationPreferred,
           // certificates: input.certificates,
           // workShift: input.workShift,
@@ -227,10 +231,10 @@ export const hirerouter = router({
 
       const hireId = createHire.id;
 
-      // await db.insert(schemas.hire.hireCategories).values({
-      //   hireId,
-      //   categoryId: input.categoryId,
-      // });
+      await db.insert(schemas.hire.hireCategories).values({
+        hireId,
+        categoryId: input.categoryId,
+      });
       // if (input.subcategoryId.length > 0) {
       //   await db.insert(schemas.hire.hireSubcategories).values(
       //     input.subcategoryId.map((subCategoryId) => ({

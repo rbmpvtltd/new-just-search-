@@ -24,7 +24,7 @@ type HireFormProps = {
 // Combined initial value
 const initialFormValue: CombinedForm = {
   // PreferredPosition
-  // jobType: [],
+  jobType: [],
   // workShift: [],
   // jobDuration: [],
   // fromHour: undefined,
@@ -57,7 +57,7 @@ const initialFormValue: CombinedForm = {
 
   // PersonalDetailsSchema
   // photo: "",
-  // appliedFor: "",
+  categoryId: 0,
   // subcategory: [],
   name: "",
   // gender: "",

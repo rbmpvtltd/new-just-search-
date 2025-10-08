@@ -36,7 +36,7 @@ export function LoginForm({
   const router = useRouter();
   const id = useId();
   const trpc = useTRPC();
-  const { mutate, isSuccess, isError } = useMutation(
+  const { mutate, isSuccess, isError , error } = useMutation(
     trpc.auth.login.mutationOptions()
   );
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,7 +48,7 @@ export function LoginForm({
   });
 
   if (isError) {
-    console.log("oo error ho gyo");
+    console.log("oo error ho gyo" , error);
   }
 
   function onSubmit(data: { username: string; password: string }) {
