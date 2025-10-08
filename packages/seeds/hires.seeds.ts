@@ -21,15 +21,17 @@ import {
   cities,
   subcategories,
 } from "../db/src/schema/not-related.schema";
+import { uploadOnCloudinary } from "@repo/cloudinary";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 
+
 export const hireSeed = async () => {
   await cleardataofhire();
-  await addHire();
+  // await addHire();
   // await seedRecentViewsHire();
-  // await seedHireSubcategories();
+  await seedHireSubcategories();
   // await seedHireCategories();
 };
 
@@ -38,28 +40,17 @@ const cleardataofhire = async () => {
   // await db.execute(
   //   `TRUNCATE  TABLE recent_view_hire RESTART IDENTITY CASCADE;`,
   // );
-  // await db.execute(
-  //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
-  // );
-  await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
+  );
+  // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
 };
 
 export const addHire = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listings");
-  let fakeUser = await fakeUserSeed();
-
-  if (!fakeUser) {
-    const seed = await fakeSeed();
-    fakeUser = seed?.user;
-  }
-
-  if (!fakeUser) {
-    throw new Error("Failed to generate a fake user!");
-  }
-
+  const fakeUser = (await fakeUserSeed()) || (await fakeSeed());
   for (const row of rows) {
-    if (row.type === 1) continue;
-    // console.log(row);
+    if (Number(row.type) === 1) continue;
 
     console.log("");
     
@@ -101,9 +92,7 @@ export const addHire = async () => {
 
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     const uploaded =
-      row.photo &&
-      (await uploadOnCloudinary(liveHireImageUrl, "Hire", clouadinaryFake));
-    console.log("-----");
+      row.photo && (await uploadOnCloudinary(liveHireImageUrl, "Hire",clouadinaryFake));
 
     const profilePhotoUrl = uploaded?.secure_url;
     console.log("=====");
@@ -302,7 +291,7 @@ export const seedHireCategories = async () => {
       .where(eq(hireListing.id, row.listing_id));
 
     if (!hire) {
-      console.log("hire not found");
+      console.log("hire not found",hire);
       continue;
     }
 

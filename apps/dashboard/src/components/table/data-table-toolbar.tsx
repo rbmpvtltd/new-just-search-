@@ -28,17 +28,19 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {table.getColumn("status") && (
+
+        {/* const allowedColumns = ["id", "route", "photo", "is_active", "type"]; */}
+        {table.getColumn("is_active") && (
           <DataTableFacetedFilter
-            column={table.getColumn("status")}
-            title="Status"
+            column={table.getColumn("is_active")}
+            title="is_active"
             options={statuses}
           />
         )}
-        {table.getColumn("priority") && (
+        {table.getColumn("route") && (
           <DataTableFacetedFilter
-            column={table.getColumn("priority")}
-            title="Priority"
+            column={table.getColumn("route")}
+            title="Route"
             options={priorities}
           />
         )}

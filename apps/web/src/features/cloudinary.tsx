@@ -4,6 +4,12 @@ import { useTRPC } from "@/trpc/client";
 import { useState } from "react";
 import Image from "next/image";
 
+declare global {
+  interface Window {
+    cloudinary: any; // You can use a more specific type if you know it
+  }
+}
+
 
 export default function Cloudinary() {
   const [resource, setResource] = useState<any>();

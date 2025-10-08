@@ -2,6 +2,8 @@ import Banner1 from "@/components/home/Banner1";
 import Banner2 from "@/components/home/Banner2";
 import Banner3 from "@/components/home/Banner3";
 import Banner4 from "@/components/home/Banner4";
+import { CategoryList } from "@/components/home/CategorySameList";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Loading } from "@/components/ui/Loading";
 import { trpc} from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
@@ -34,10 +36,10 @@ export default function TabOneScreen() {
 
         <Banner1 />
         {/* <SearchForm /> */}
-        {/* <Banner4 /> */}
-        {/* <BoundaryWrapper> */}
-        {/*   <CategoryList /> */}
-        {/* </BoundaryWrapper> */}
+        {/* <Banner4 /> */} 
+        <BoundaryWrapper>
+          <CategoryList />
+        </BoundaryWrapper>
         {/* <Banner2 /> */}
         {/* <Banner3 /> */}
       </View>

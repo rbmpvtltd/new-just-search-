@@ -1,25 +1,15 @@
 import { publicProcedure, router } from "@/utils/trpc";
-import { getFirstBannerData, getFourthBannerData, getSecondBannerData, getThirdBannerData } from "./banners.service";
+import { getBannerData, premiumShops} from "./banners.service";
+import z from "zod";
 
 export const bannerRouter = router({
-  firstBanner: publicProcedure.query(async () => {
-    const data = getFirstBannerData();
-    return data;
-  }),
-
-  secondBanner : publicProcedure.query(async ()=>{
-    const data = getSecondBannerData();
+  getBannerData: publicProcedure.input(z.object({type : z.number()})).query(async ({input})=>{
+    const data = getBannerData(input.type);
     return data
   }),
 
-  thirdBanner : publicProcedure.query(async ()=>{
-    const data = getThirdBannerData();
+  premiumShops : publicProcedure.query(async ()=>{
+    const data = premiumShops();
     return data
   }),
-
-  fourthBanner : publicProcedure.query(async ()=>{
-    const data = getFourthBannerData();
-    return data 
-  })
-
 });

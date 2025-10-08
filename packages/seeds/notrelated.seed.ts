@@ -11,14 +11,15 @@ import {
 } from "../db/src/schema/not-related.schema";
 // import { uploadOnCloudinary } from "../db/src/index";
 import { sql } from "./mysqldb.seed";
-import { clouadinaryFake, dummyImageUrl } from "./seeds";
+import { uploadOnCloudinary } from "@repo/cloudinary";
+import { clouadinaryFake } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  await state();
-  await citie();
-  await bannerSeed();
-  await seedCategories();
+  // await state();
+  // await citie();
+  // await bannerSeed();
+  // await seedCategories();
   await seedSubcategories();
 };
 
@@ -30,7 +31,7 @@ export const clearAllTablesNotRelated = async () => {
   await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
-  logger.info(" All tables cleared successfully!");
+  console.log(" All tables cleared successfully!");
 };
 
 const state = async () => {
@@ -51,6 +52,7 @@ const state = async () => {
 const citie = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM cities");
   for (const row of rows) {
+    console.log(row.state_id)
     const [state] = await db
       .select()
       .from(states)
@@ -106,24 +108,30 @@ export const seedCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM categories");
   for (const row of rows) {
     const liveProfileImageUrl = `https://justsearch.net.in/assets/images/categories/${row.photo}`;
-    const categoriesPhotoUrl =
-      (await uploadOnCloudinary(
-        liveProfileImageUrl,
-        "categories",
-        clouadinaryFake,
-      )) ?? dummyImageUrl;
+    let categoryPhotoPublicId: string | null = null;
 
-    await db.insert(categories).values({
-      id: row.id,
-      title: row.title ?? null,
-      slug: row.slug ?? null,
-      photo: categoriesPhotoUrl,
-      isPopular: Boolean(row.is_popular),
-      status: Boolean(row.status),
-      type: Number(row.type),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
+    if (row.photo) {
+      const result = await uploadOnCloudinary(
+        liveProfileImageUrl,
+        "category",
+        clouadinaryFake,
+      );
+
+      console.log("category photo public id", result);
+      categoryPhotoPublicId = result ?? null;
+
+      await db.insert(categories).values({
+        id : row.id,
+        title: row.title ?? "",
+        slug: row.slug ?? "",
+        photo: categoryPhotoPublicId ?? "",
+        isPopular: Boolean(row.id < 13),
+        status: Boolean(row.status),
+        type: Number(row.type),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    }
   }
 };
 

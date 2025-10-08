@@ -1,33 +1,64 @@
 import { db, schemas } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 const banners = schemas.not_related.banners;
-async function getFirstBannerData() {
-  const banner1 = await db
+const business = schemas.business.businessListings;
+const business_reviews = schemas.business.businessReviews;
+
+async function getBannerData(type: number) {
+  const banner = await db
     .select({ photo: banners.photo, id: banners.id })
     .from(banners)
-    .where(eq(banners.type, 1));
-  return banner1;
+    .where(eq(banners.type, type));
+  return banner;
 }
 
-async function getSecondBannerData() {
-  const banner2 = await db.select({photo : banners.photo}).from(banners).where(eq(banners.type, 2));
-  return banner2;
+async function premiumShops() {
+
+  const premiumShops = await db
+    .select({
+      photo: business.photo,
+      id: business.id,
+      name: business.name,
+      area: business.area,
+      streetName: business.streetName,
+      buildingName: business.buildingName,
+      rating: sql<string[]>`COALESCE(AVG(${business_reviews.rate}),0)`,
+      subcategories: sql<string[]>`
+      COALESCE(
+        ARRAY_AGG(DISTINCT subcategories.name) 
+        FILTER (WHERE subcategories.id IS NOT NULL),
+        '{}'
+      )
+    `,
+      category: sql<
+        string | null
+      >`MAX(${schemas.not_related.categories.title})`,
+    })
+    .from(business)
+    .leftJoin(
+      schemas.business.businessSubcategories,
+      eq(business.id, schemas.business.businessSubcategories.businessId),
+    )
+    .leftJoin(
+      schemas.not_related.subcategories,
+      eq(
+        schemas.business.businessSubcategories.subcategoryId,
+        schemas.not_related.subcategories.id,
+      ),
+    )
+    .leftJoin(
+      schemas.not_related.categories,
+      eq(
+        schemas.not_related.subcategories.categoryId,
+        schemas.not_related.categories.id,
+      ),
+    )
+    .leftJoin(business_reviews, eq(business.id, business_reviews.businessId))
+    .groupBy(business.id)
+    .limit(8);
+
+  return premiumShops;
 }
 
-async function getThirdBannerData() {
-  const banner3 = await db.select().from(banners).where(eq(banners.type, 3));
-  return banner3;
-}
-
-async function getFourthBannerData() {
-  const banner4 = await db.select().from(banners).where(eq(banners.type, 4));
-  return banner4;
-}
-
-export {
-  getFirstBannerData,
-  getSecondBannerData,
-  getThirdBannerData,
-  getFourthBannerData,
-};
+export { getBannerData, premiumShops };

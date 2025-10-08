@@ -18,33 +18,34 @@ import {
 } from "../db/src/schema/not-related.schema";
 import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
-  await clearAllTablesBusiness();
-  await addBusiness();
-  await seedFavourites();
+  // await clearAllTablesBusiness();
+  // await addBusiness();
+  // await seedFavourites();
   await businessesSubcategory();
-  await businessesCategories();
-  await BusinessReviews();
-  await seedRecentViewsBusiness();
+  // await businessesCategories();
+  // await BusinessReviews();
+  // await seedRecentViewsBusiness();
 };
 
 export const clearAllTablesBusiness = async () => {
-  await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
+  // );
   await db.execute(
     `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
   );
-  await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE TABLE recent_view_business RESTART IDENTITY CASCADE;`,
-  );
-  await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE TABLE recent_view_business RESTART IDENTITY CASCADE;`,
+  // );
+  // await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
+  // );
   console.log(" All tables cleared successfully!");
 };
 
@@ -54,9 +55,9 @@ const addBusiness = async () => {
   // const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
   for (const row of businessRows) {
     if (Number(row.type) === 1) {
-      const [user] = await (sql as any).execute(
+      const [user] =await (sql as any).execute(
         "SELECT * FROM users WHERE id = ?",
-        [row.user_id],
+        [row.user_id]
       );
 
       const mysqlUser = (user as any[])[0];
@@ -174,6 +175,8 @@ const addBusiness = async () => {
           })
           .returning();
       } catch (e) {
+        console.log("========================",user)
+
         console.error("row id is ", row.id, "user id", row.user_id);
       }
 
@@ -186,6 +189,7 @@ const addBusiness = async () => {
             const uploaded = await uploadOnCloudinary(
               liveBusinessImageUrl,
               "Business",
+              clouadinaryFake
             );
             const businessPhotoUrl = uploaded;
 

@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-// import { businessSeed } from "./business.seed";
+import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
 import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";

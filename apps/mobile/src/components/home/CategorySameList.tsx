@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useFocusEffect, usePathname } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -12,14 +12,18 @@ import {
   View,
 } from "react-native";
 import { RadioButton } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CATEGORY_URL } from "@/constants/apis";
 import Colors from "@/constants/Colors";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import { useHeadingStore } from "@/store/heading";
+import Input from "../inputs/Input";
 
 export const CategoryList = () => {
   const colorScheme = useColorScheme();
 
+  const [search, setSearch] = useState("");
+  const [filteredData, setFilteredData] = useState<any[]>([]);
   const { setHeading } = useHeadingStore();
   const { data: allCategories, refetch } = useSuspenceData(
     CATEGORY_URL.url,
@@ -35,14 +39,14 @@ export const CategoryList = () => {
     if (!allCategories?.categories) return [];
 
     return allCategories.categories
-      .filter((cat) => (value === "hire" ? cat.type === 2 : cat.type === 1))
+      .filter((cat:any) => (value === "hire" ? cat.type === 2 : cat.type === 1))
       .slice(0, 11);
   }, [value, allCategories?.categories]);
 
   const fullData = useMemo(() => {
     if (!allCategories?.categories) return [];
 
-    return allCategories.categories.filter((cat) =>
+    return allCategories.categories.filter((cat:any) =>
       value === "hire" ? cat.type === 2 : cat.type === 1,
     );
   }, [value, allCategories?.categories]);
@@ -52,6 +56,27 @@ export const CategoryList = () => {
       setValue(val as "hire" | "business");
     }
   };
+
+  const handleSearch = (text: string) => {
+    setSearch(text);
+    if (!text) {
+      setFilteredData(fullData);
+      return;
+    }
+    const filteredData = fullData.filter((item:any) =>
+      item.title.toLowerCase().includes(text.toLowerCase()),
+    );
+
+    setFilteredData(filteredData);
+
+    // if (filteredData.length > 0) {
+    //   setHeading(filteredData[0].title);
+    // }
+  };
+
+  useEffect(() => {
+    setFilteredData(fullData);
+  }, [fullData]);
 
   useFocusEffect(
     useCallback(() => {
@@ -65,6 +90,12 @@ export const CategoryList = () => {
 
   return (
     <>
+      <View className="flex my-2 mx-4 flex-row">
+        <Text className="text-xl font-black text-secondary">
+          Popular on Just {""}
+        </Text>
+        <Text className="text-xl font-black text-primary">Search</Text>
+      </View>
       {/* Radio buttons */}
       <View className="px-4 pt-4 w-[90%] flex-1">
         <RadioButton.Group onValueChange={handleValueChange} value={value}>
@@ -93,7 +124,7 @@ export const CategoryList = () => {
 
       <View className="bg-base-100 w-[100%] h-80 flex-wrap flex-row items-center justify-between">
         {visibleData?.map((item: any, i: number) => (
-          <View className="w-[25%] justify-center items-center mb-10" key={i}>
+          <View className="w-[25%] justify-center items-center mb-10" key={i.toString()}>
             <Pressable
               onPress={() => {
                 const targetPath = `/subcategory/${encodeURIComponent(item.id)}`;
@@ -103,7 +134,7 @@ export const CategoryList = () => {
                 setIsNavigating(true);
                 router.navigate({
                   pathname: "/subcategory/[subcategory]",
-                  params: { subcategory: item.id },
+                  params: { subcategory: item?.id },
                 });
                 setTimeout(() => setIsNavigating(false), 500);
               }}
@@ -111,7 +142,7 @@ export const CategoryList = () => {
               <Image
                 className="h-10 w-10 rounded-md m-auto"
                 source={{
-                  uri: `https://justsearch.net.in/assets/images/categories/${item.photo}`,
+                  uri: `https://justsearch.net.in/assets/images/categories/${item?.photo}`,
                 }}
               />
               <Text className="text-secondary text-center text-xs">
@@ -132,57 +163,74 @@ export const CategoryList = () => {
           </Pressable>
         )}
       </View>
-
+      {/* <View className="flex-1 bg-base-100 p-4"> */}
       <Modal
         visible={showModal}
         animationType="slide"
         onRequestClose={() => setShowModal(false)}
+        transparent
       >
-        <View className="flex-1 bg-base-100 p-4">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lg font-bold text-secondary">
-              All {value} Categories
-            </Text>
-            <Pressable onPress={() => setShowModal(false)}>
-              <Ionicons
-                name="close"
-                size={24}
-                style={{ color: Colors[colorScheme ?? "light"]["secondary"] }}
-              />
-            </Pressable>
-          </View>
-
-          <ScrollView>
-            <View className="flex-row flex-wrap">
-              {fullData?.map((item: any, i: number) => (
-                <Pressable
-                  key={i}
-                  className="w-[25%] mb-6 items-center"
-                  onPress={() => {
-                    setShowModal(false);
-                    const targetPath = `/subcategory/${encodeURIComponent(item.id)}`;
-                    setHeading(item.title);
-                    router.navigate({
-                      pathname: "/subcategory/[subcategory]",
-                      params: { subcategory: item.id },
-                    });
+        <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
+          <View className="flex-1 bg-base-100 p-4">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-lg font-bold text-secondary">
+                All {value} Categories
+              </Text>
+              <Pressable
+                onPress={() => {
+                  setShowModal(false);
+                  setSearch("");
+                }}
+              >
+                <Ionicons
+                  name="close"
+                  size={24}
+                  style={{
+                    color: Colors[colorScheme ?? "light"]["secondary"],
                   }}
-                >
-                  <Image
-                    className="h-12 w-12 rounded-md"
-                    source={{
-                      uri: `https://justsearch.net.in/assets/images/categories/${item.photo}`,
-                    }}
-                  />
-                  <Text className="text-xs text-center mt-1 text-secondary">
-                    {item.title}
-                  </Text>
-                </Pressable>
-              ))}
+                />
+              </Pressable>
             </View>
-          </ScrollView>
-        </View>
+
+            <Input
+              placeholder="Search..."
+              className="border border-secondary mb-4 w-[90%] mx-auto"
+              value={search}
+              onChange={(e) => handleSearch(e.nativeEvent.text)}
+            />
+            <ScrollView>
+              <View></View>
+              <View className="flex-row flex-wrap">
+                {filteredData?.map((item: any, i: number) => (
+                  <Pressable
+                    key={i.toString()}
+                    className="w-[25%] mb-6 items-center"
+                    onPress={() => {
+                      setShowModal(false);
+                      setHeading(item.title);
+                      router.navigate({
+                        pathname: "/subcategory/[subcategory]",
+                        params: { subcategory: item.id },
+                      });
+                    }}
+                  >
+                    <Image
+                      className="h-12 w-12 rounded-md"
+                      source={{
+                        uri: `https://justsearch.net.in/assets/images/categories/${item.photo}`,
+                      }}
+                    />
+                    <Text className="text-xs text-center mt-1 text-secondary">
+                      {item.title}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        </SafeAreaView>
       </Modal>
+      {/* </View> */}
     </>
   );
 };
