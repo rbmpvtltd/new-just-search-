@@ -75,8 +75,14 @@ export const FormField = <T extends FieldValues>({
               return (
                 <MultiSelect
                   options={options}
-                  defaultValues={value}
-                  onChange={onChange}
+                  defaultValues={
+                    Array.isArray(value)
+                      ? options?.filter((opt) => value.includes(opt.value))
+                      : []
+                  }
+                  onChange={(selected) =>
+                    onChange(selected.map((s) => s.value))
+                  }
                 />
               );
 
@@ -85,30 +91,45 @@ export const FormField = <T extends FieldValues>({
                 <SingleSelect
                   options={options}
                   className="h-12"
-                  value={value}
-                  onChange={onChange}
+                  value={options?.find((item) => item.value === value) || null}
+                  onChange={(selectedItem) => onChange(selectedItem?.value)}
+                  {...props}
                 />
               );
             case "checkbox":
               return (
                 <div className="flex gap-3 flex-wrap">
-                  {options?.map((i) => (
-                    <div key={i.value} className="">
-                      <div key={i.value} className="flex items-center gap-2 ">
+                  {options?.map((option) => (
+                    <div key={option.value} className="">
+                      <div
+                        key={option.value}
+                        className="flex items-center gap-2 "
+                      >
                         <div className="mt-1 flex items-center justify-center">
                           <Checkbox
                             className="border-gray-300"
-                            key={i.value}
-                            name={name}
-                            value={value}
-                            onChange={onChange}
+                            checked={
+                              Array.isArray(value) &&
+                              value.includes(option.value)
+                            }
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                onChange([...(value || []), option.value]);
+                              } else {
+                                onChange(
+                                  value?.filter(
+                                    (val: string) => val !== option.value,
+                                  ),
+                                );
+                              }
+                            }}
                           />
                         </div>
-                        <div className="">
-                          <label htmlFor="" className="text-sm text-gray-700">
-                            {i.label}
-                          </label>
-                        </div>
+                        {/* <div className=""> */}
+                        <label htmlFor="" className="text-sm text-gray-700">
+                          {option.label}
+                        </label>
+                        {/* </div> */}
                       </div>
                     </div>
                   ))}
@@ -127,7 +148,7 @@ export const FormField = <T extends FieldValues>({
       />
 
       {/* for error */}
-      {error && <div>{error}</div>}
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };
