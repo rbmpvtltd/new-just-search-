@@ -1,3 +1,4 @@
+"use client";
 import {
   Dialog,
   DialogClose,
@@ -14,8 +15,14 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/trpc/client";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function AddBanner() {
+  const trpc = useTRPC();
+
+  const { mutate } = useMutation(trpc.adminBanner.add.mutationOptions());
+
   const { control } = useForm<FieldValues>();
 
   const formFields: FormFieldProps<FieldValues>[] = [
@@ -66,7 +73,13 @@ export function AddBanner() {
     <Dialog>
       <form>
         <DialogTrigger asChild>
-          <Button>Add Banner</Button>
+          <Button
+            onClick={() => {
+              mutate();
+            }}
+          >
+            Add Banner
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
