@@ -4,7 +4,9 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
+import { Calendar } from "../ui/calendar";
 import { Checkbox } from "../ui/checkbox";
+import { DatePicker } from "../ui/date-picker";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { MultiSelect, type Option } from "../ui/multiselect";
@@ -21,7 +23,13 @@ export interface FormFieldProps<T extends FieldValues> {
   section?: string;
   error?: string;
   options?: Option[] | undefined;
-  component: "input" | "multiselect" | "select" | "checkbox" | "textarea";
+  component:
+    | "input"
+    | "multiselect"
+    | "select"
+    | "checkbox"
+    | "textarea"
+    | "calendar";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -54,7 +62,7 @@ export const FormField = <T extends FieldValues>({
                 <Input
                   type={type}
                   name={name}
-                  className={className}
+                  className={`h-[41px] ${className}`}
                   placeholder={placeholder}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -64,30 +72,64 @@ export const FormField = <T extends FieldValues>({
               );
 
             case "multiselect":
-              return <MultiSelect options={options} />;
+              return (
+                <MultiSelect
+                  options={options}
+                  defaultValues={
+                    Array.isArray(value)
+                      ? options?.filter((opt) => value.includes(opt.value))
+                      : []
+                  }
+                  onChange={(selected) =>
+                    onChange(selected.map((s) => s.value))
+                  }
+                />
+              );
 
             case "select":
-              return <SingleSelect options={options} />;
+              return (
+                <SingleSelect
+                  options={options}
+                  className="h-12"
+                  value={options?.find((item) => item.value === value) || null}
+                  onChange={(selectedItem) => onChange(selectedItem?.value)}
+                  {...props}
+                />
+              );
             case "checkbox":
               return (
                 <div className="flex gap-3 flex-wrap">
-                  {options?.map((i) => (
-                    <div key={i.value} className="">
-                      <div key={i.value} className="flex items-center gap-2 ">
+                  {options?.map((option) => (
+                    <div key={option.value} className="">
+                      <div
+                        key={option.value}
+                        className="flex items-center gap-2 "
+                      >
                         <div className="mt-1 flex items-center justify-center">
                           <Checkbox
                             className="border-gray-300"
-                            key={i.value}
-                            name={name}
-                            value={value}
-                            onChange={onChange}
+                            checked={
+                              Array.isArray(value) &&
+                              value.includes(option.value)
+                            }
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                onChange([...(value || []), option.value]);
+                              } else {
+                                onChange(
+                                  value?.filter(
+                                    (val: string) => val !== option.value,
+                                  ),
+                                );
+                              }
+                            }}
                           />
                         </div>
-                        <div className="">
-                          <label htmlFor="" className="text-sm text-gray-700">
-                            {i.label}
-                          </label>
-                        </div>
+                        {/* <div className=""> */}
+                        <label htmlFor="" className="text-sm text-gray-700">
+                          {option.label}
+                        </label>
+                        {/* </div> */}
                       </div>
                     </div>
                   ))}
@@ -95,8 +137,10 @@ export const FormField = <T extends FieldValues>({
               );
 
             case "textarea":
-              return <Textarea />;
+              return <Textarea value={value} onChange={onChange} />;
 
+            case "calendar":
+              return <DatePicker value={value} onChange={onChange} />;
             default:
               return <div>no component</div>;
           }
@@ -104,7 +148,7 @@ export const FormField = <T extends FieldValues>({
       />
 
       {/* for error */}
-      {error && <div>{error}</div>}
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };

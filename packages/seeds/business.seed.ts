@@ -21,10 +21,10 @@ import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
-  // await clearAllTablesBusiness();
-  // await addBusiness();
+  await clearAllTablesBusiness();
+  await addBusiness();
   // await seedFavourites();
-  await businessesSubcategory();
+  // await businessesSubcategory();
   // await businessesCategories();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
@@ -52,158 +52,154 @@ export const clearAllTablesBusiness = async () => {
 // business listing
 const addBusiness = async () => {
   const [businessRows] = await (sql as any).execute("SELECT * FROM listings");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed());
+  // const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
+
+  // const row = businessRows[0];
   for (const row of businessRows) {
-    if (Number(row.type) === 1) {
-      const [user] =await (sql as any).execute(
-        "SELECT * FROM users WHERE id = ?",
-        [row.user_id]
-      );
+  if (Number(row.type) === 1) {
+    const [user] = await (sql as any).execute(
+      "SELECT * FROM users WHERE id = ?",
+      [row.user_id],
+    );
+    const mysqlUser = (user as any[])[0];
 
-      let mysqlUser = user[0];
-
-      if (mysqlUser) {
-        try {
-          await db
-            .insert(users)
-            .values({
-              displayName: mysqlUser.username ?? `user_${mysqlUser.id}`,
-              phoneNumber: mysqlUser.phone,
-              email: mysqlUser.email ?? `business${mysqlUser.id}@example.com`,
-              password: mysqlUser.password,
-              role: UserRole.business,
-              googleId: mysqlUser.google_id,
-              refreshToken: null,
-              createdAt: mysqlUser.created_at || new Date(),
-              updatedAt: mysqlUser.updated_at || new Date(),
-            })
-            .returning();
-        } catch (error) {
-          await db
-            .update(users)
-            .set({ role: UserRole.business })
-            .where(eq(users.id, mysqlUser.id));
-        }
-      }
-
-      if (!mysqlUser) {
-        console.log(`User not found for business ${row.id}, using fake user`);
-        mysqlUser = fakeUser;
-      }
-      //  Slug skip logic
-      const skipSlug = [
-        "ritik",
-        "rajasthan-arts-crafts",
-        "payal-prajapat",
-        "prince-art-exporter",
-        "parikrama-advertising",
-        "manish-garment",
-        "yash-aman-hospital",
-        "hotel-ratan-vilas",
-        "bhadariya-mobile",
-        "vinayak-shopee",
-        "",
-        "dinesh-auto-repair",
-        "mayur-plastics",
-        "mahalaxmi-mobile",
-        "ambika-enterprises",
-        "creation-point",
-        "pawan-electricals",
-        "mahaveer-kirana-store",
-        "mahadev-sabji-mandi",
-        "shri-balaji-medical-store",
-        "lakki-fresh-fruit-sabji-bhandar",
-        "lakshmi-cement-jali-udyog",
-        "mobile-doctor",
-        "anmol-fashion",
-        "sunil-handicrafts-exports",
-        "sarwan-kumar",
-        "sagar",
-      ];
-      let slug = row.slug;
-      if (skipSlug.includes(row.slug)) {
-        slug = `${row.slug}${row.id}`;
-      }
-
-      let [city] = await db
-        .select()
-        .from(cities)
-        .where(eq(cities.id, row.city));
-      if (!city) {
-        console.log(` City not found for ${row.id}, using Jodhpur`);
-        [city] = await db
-          .select()
-          .from(cities)
-          .where(eq(cities.city, "Jodhpur"));
-      }
-
-      let businessListing: any;
+    if (mysqlUser) {
       try {
-        [businessListing] = await db
-          .insert(businessListings)
+        await db
+          .insert(users)
           .values({
-            id: row.id,
-            userId: mysqlUser.id,
-            name: row.name,
-            slug,
-            photo: row.photo,
-            specialities: row.specialities,
-            description: row.description,
-            homeDelivery: row.home_delivery,
-            latitude: row.latitude,
-            longitude: row.longitude,
-            buildingName: row.building_name,
-            streetName: row.street_name,
-            area: row.area,
-            landmark: row.landmark,
-            pincode: row.pincode,
-            cityId: city!.id,
-            schedules: row.schedules ? JSON.parse(row.schedules) : null,
-            status: row.status,
-            email: row.email,
-            phoneNumber: row.phone_number,
-            whatsappNo: row.whatsapp_no,
-            alternativeMobileNumber: row.alternative_mobile_number,
-            facebook: row.facebook,
-            twitter: row.twitter,
-            linkedin: row.linkedin,
-            listingVideo: row.listing_video,
-            isFeature: row.is_feature,
-            createdAt: row.created_at,
-            updatedAt: row.updated_at,
+            id: mysqlUser.id,
+            displayName: mysqlUser.display_name ?? `business${mysqlUser.id}`,
+            phoneNumber: mysqlUser.phone,
+            email: mysqlUser.email ?? `business${mysqlUser.id}@example.com`,
+            password: mysqlUser.password,
+            role: UserRole.business,
+            googleId: mysqlUser.google_id,
+            refreshToken: null,
+            createdAt: mysqlUser.created_at || new Date(),
+            updatedAt: mysqlUser.updated_at || new Date(),
           })
           .returning();
-      } catch (e) {
-        console.log("========================",user)
-
-        console.error("row id is ", row.id, "user id", row.user_id);
+      } catch (error) {
+        await db
+          .update(users)
+          .set({ role: UserRole.business })
+          .where(eq(users.id, mysqlUser.id));
       }
+    }
 
-      // images handle
-      if (businessListing) {
-        const images = ["image1", "image2", "image3", "image4", "image5"];
-        for (const image of images) {
-          if (row[image]) {
-            const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-            const uploaded = await uploadOnCloudinary(
-              liveBusinessImageUrl,
-              "Business",
-              clouadinaryFake
-            );
-            const businessPhotoUrl = uploaded;
+    // return;
 
-            if (businessPhotoUrl) {
-              await db.insert(businessPhotos).values({
-                businessId: businessListing.id,
-                photo: businessPhotoUrl,
-                createdAt: row.created_at,
-                updatedAt: row.updated_at,
-              });
-            }
+    if (!mysqlUser) {
+      console.log(`User not found for business ${row.id}, using fake user`);
+      // mysqlUser = fakeUser;
+    }
+    //  Slug skip logic
+    const skipSlug = [
+      "ritik",
+      "rajasthan-arts-crafts",
+      "payal-prajapat",
+      "prince-art-exporter",
+      "parikrama-advertising",
+      "manish-garment",
+      "yash-aman-hospital",
+      "hotel-ratan-vilas",
+      "bhadariya-mobile",
+      "vinayak-shopee",
+      "",
+      "dinesh-auto-repair",
+      "mayur-plastics",
+      "mahalaxmi-mobile",
+      "ambika-enterprises",
+      "creation-point",
+      "pawan-electricals",
+      "mahaveer-kirana-store",
+      "mahadev-sabji-mandi",
+      "shri-balaji-medical-store",
+      "lakki-fresh-fruit-sabji-bhandar",
+      "lakshmi-cement-jali-udyog",
+      "mobile-doctor",
+      "anmol-fashion",
+      "sunil-handicrafts-exports",
+      "sarwan-kumar",
+      "sagar",
+    ];
+    let slug = row.slug;
+    if (skipSlug.includes(row.slug)) {
+      slug = `${row.slug}${row.id}`;
+    }
+
+    let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
+    if (!city) {
+      console.log(` City not found for ${row.id}, using Jodhpur`);
+      [city] = await db.select().from(cities).where(eq(cities.city, "Jodhpur"));
+    }
+
+    let businessListing: any;
+
+    try {
+      [businessListing] = await db
+        .insert(businessListings)
+        .values({
+          id: row.id,
+          userId: mysqlUser.id,
+          name: row.name,
+          slug,
+          photo: row.photo,
+          specialities: row.specialities,
+          description: row.description,
+          homeDelivery: row.home_delivery,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          buildingName: row.building_name,
+          streetName: row.street_name,
+          area: row.area,
+          landmark: row.landmark,
+          pincode: row.pincode,
+          cityId: city!.id,
+          schedules: row.schedules ? JSON.parse(row.schedules) : null,
+          status: row.status,
+          email: row.email,
+          phoneNumber: row.phone_number,
+          whatsappNo: row.whatsapp_no,
+          alternativeMobileNumber: row.alternative_mobile_number,
+          facebook: row.facebook,
+          twitter: row.twitter,
+          linkedin: row.linkedin,
+          listingVideo: row.listing_video,
+          isFeature: row.is_feature,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+        })
+        .returning();
+    } catch (e) {
+      console.error("row id is ", row.id, "user id", row.user_id);
+    }
+
+    // images handle
+    if (businessListing) {
+      const images = ["image1", "image2", "image3", "image4", "image5"];
+      for (const image of images) {
+        if (row[image]) {
+          const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
+          const uploaded = await uploadOnCloudinary(
+            liveBusinessImageUrl,
+            "Business",
+          );
+          const businessPhotoUrl = uploaded;
+
+          if (businessPhotoUrl) {
+            await db.insert(businessPhotos).values({
+              businessId: businessListing.id,
+              photo: businessPhotoUrl,
+              createdAt: row.created_at,
+              updatedAt: row.updated_at,
+            });
           }
         }
       }
     }
+  }
   }
   console.log(" Business migration completed!");
 };

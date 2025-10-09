@@ -12,12 +12,12 @@ dotenv.config();
 
 export const fakeSeed = async () => {
   try {
-    // const user = await seedFakeUser();
-    // const business = await seedFakeBusiness(user!.id);
+    const user = await seedFakeUser();
+    const business = await seedFakeBusiness(user!.id);
     logger.info("adding fake admin");
     await seedAdminUser();
     logger.info("added fake admin");
-    return;
+    return{ user}
   } catch (error) {
     console.error("Error in fakeSeed:", error);
     throw error;

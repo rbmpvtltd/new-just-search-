@@ -1,6 +1,6 @@
 // import { db } from "@repo/db";
 import { db } from "@repo/db";
-import { feedbacks } from "../db/src/schema/user.schema";
+import { feedbacks } from "../db/test/user.schema";
 import { sql } from "./mysqldb.seed";
 
 export const feedbackseed = async () => {

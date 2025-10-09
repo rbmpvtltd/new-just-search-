@@ -1,0 +1,211 @@
+export const GENDER = [
+  { value: "Male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "Other", label: "Other" },
+];
+
+export const MARITAL_STATUS = [
+  { value: "Married", label: "Married" },
+  { value: "Unmarried", label: "Unmarried" },
+  { value: "Widowed", label: "Widowed" },
+  { value: "Divorced", label: "Divorced" },
+  { value: "Other", label: "Other" },
+];
+
+export const LANGUAGES = [
+  { label: "Hindi", value: "Hindi" },
+  { label: "English", value: "English" },
+  { label: "Punjabi", value: "Punjabi" },
+  { label: "Gujarati", value: "Gujarati" },
+  { label: "Bengali", value: "Bengali" },
+  { label: "Malayalam", value: "Malayalam" },
+  { label: "Kannada", value: "Kannada" },
+  { label: "Tamil", value: "Tamil" },
+  { label: "Other", value: "Other" },
+];
+
+export const QUALIFICATIONS = [
+  { label: "B.E / B.Tech", value: "b-e / b-tech" },
+  { label: "M.E / M.Tech", value: "m-e / m-tech" },
+  { label: "M.S Engineering", value: "m-s engineering" },
+  { label: "M.Eng (Hons)", value: "m-eng (hons)" },
+  { label: "B.Eng (Hons)", value: "b-eng (hons)" },
+  { label: "Engineering Diploma", value: "engineering diploma" },
+  { label: "AE", value: "ae" },
+  { label: "AET", value: "aet" },
+  { label: "B.Plan", value: "b-plan" },
+  { label: "B.Arch", value: "b-arch" },
+  { label: "B.Tech L.L.B.", value: "b-tech l-l-b" },
+  { label: "B.L.L.B.", value: "b-l-l-b" },
+  { label: "CSE", value: "cse" },
+  { label: "IT", value: "it" },
+  { label: "M.Plan", value: "m-plan" },
+  { label: "M.Arch", value: "m-arch" },
+  { label: "M.Tech L.L.B.", value: "m-tech l-l-b" },
+  { label: "M.L.L.B.", value: "m-l-l-b" },
+  { label: "B.A", value: "b-a" },
+  { label: "B.A (Hons)", value: "b-a (hons)" },
+  { label: "M.A", value: "m-a" },
+  { label: "M.A (Hons)", value: "m-a (hons)" },
+  { label: "M.Phil", value: "m-phil" },
+  { label: "B.Sc", value: "b-sc" },
+  { label: "B.Sc (Hons)", value: "b-sc (hons)" },
+  { label: "M.Sc", value: "m-sc" },
+  { label: "M.Sc (Hons)", value: "m-sc (hons)" },
+  { label: "M.Lib.I.Sc", value: "m-lib-i-sc" },
+  { label: "M.Lib.Sc", value: "m-lib-sc" },
+  { label: "B.Lib.I.Sc", value: "b-lib-i-sc" },
+  { label: "B.Lib.Sc", value: "b-lib-sc" },
+  { label: "B.Com", value: "b-com" },
+  { label: "M.Com", value: "m-com" },
+  { label: "B.Com (Hons)", value: "b-com (hons)" },
+  { label: "M.Com (Hons)", value: "m-com (hons)" },
+  { label: "CA / CPA", value: "ca / cpa" },
+  { label: "CFA", value: "cfa" },
+  { label: "CS", value: "cs" },
+  { label: "BBM", value: "bbm" },
+  { label: "BCM", value: "bcm" },
+  { label: "BBA", value: "bba" },
+  { label: "MBA", value: "mba" },
+  { label: "MBA (Finance)", value: "mba (finance)" },
+  { label: "Executive MBA", value: "executive mba" },
+  { label: "PGDM", value: "pgdm" },
+  { label: "PGDBM", value: "pgdbm" },
+  { label: "PGDCA", value: "pgdca" },
+  { label: "CPT", value: "cpt" },
+  { label: "CIA", value: "cia" },
+  { label: "ICWA", value: "icwa" },
+  { label: "MFC", value: "mfc" },
+  { label: "MFM", value: "mfm" },
+  { label: "BFIA", value: "bfia" },
+  { label: "BBS", value: "bbs" },
+  { label: "BIBF", value: "bibf" },
+  { label: "BIT", value: "bit" },
+  { label: "BCA", value: "bca" },
+  { label: "B.Sc IT", value: "b-sc it" },
+  { label: "B.Sc Computer Science", value: "b-sc computer science" },
+  { label: "PGDCA", value: "pgdca" },
+  { label: "ADCA", value: "adca" },
+  { label: "DCA", value: "dca" },
+  { label: "DOEACC", value: "doeacc" },
+  { label: "NIIT", value: "niit" },
+  { label: "J.J.T.I", value: "j-j-t-i" },
+  { label: "D. Pharma", value: "d-pharma" },
+  { label: "B. Pharma", value: "b-pharma" },
+  { label: "M. Pharma", value: "m-pharma" },
+  { label: "LL.B", value: "ll-b" },
+  { label: "LL.M", value: "ll-m" },
+  { label: "Diploma", value: "diploma" },
+  { label: "Monograph", value: "monograph" },
+  { label: "Doctorate", value: "doctorate" },
+  { label: "Associate", value: "associate" },
+  { label: "High School", value: "high school" },
+  { label: "Less than High School", value: "less than high school" },
+  { label: "Diploma in Trade School", value: "diploma in trade school" },
+  { label: "Uneducated", value: "uneducated" },
+  { label: "5th Pass", value: "5th pass" },
+  { label: "8th Pass", value: "8th pass" },
+  { label: "10th Pass", value: "10th pass" },
+  { label: "10+2 Pass", value: "10+2 pass" },
+];
+
+export const EXPERIENCE_YEARS = [
+  { label: "fresher", value: "fresher" },
+  { label: "0", value: "0" },
+  { label: "1", value: "1" },
+  { label: "2", value: "2" },
+  { label: "3", value: "3" },
+  { label: "4", value: "4" },
+  { label: "5", value: "5" },
+  { label: "6", value: "6" },
+  { label: "7", value: "7" },
+  { label: "8", value: "8" },
+  { label: "9", value: "9" },
+  { label: "10", value: "10" },
+  { label: "11", value: "11" },
+  { label: "12", value: "12" },
+  { label: "13", value: "13" },
+  { label: "14", value: "14" },
+  { label: "15", value: "15" },
+  { label: "16", value: "16" },
+  { label: "17", value: "17" },
+  { label: "18", value: "18" },
+  { label: "19", value: "19" },
+  { label: "20", value: "20" },
+];
+//experienceMonths
+export const EXPERIENCE_MONTHS = [
+  { label: "0", value: "0" },
+  { label: "1", value: "1" },
+  { label: "2", value: "2" },
+  { label: "3", value: "3" },
+  { label: "4", value: "4" },
+  { label: "5", value: "5" },
+  { label: "6", value: "6" },
+  { label: "7", value: "7" },
+  { label: "8", value: "8" },
+  { label: "9", value: "9" },
+  { label: "10", value: "10" },
+  { label: "11", value: "11" },
+];
+
+export const YES_NO_OPTIONS = [
+  { label: "Yes", value: "Yes" },
+  { label: "No", value: "No" },
+];
+
+export const JOB_TYPE = [
+  { label: "FullTime", value: "FullTime" },
+  { label: "PartTime", value: "PartTime" },
+  { label: "Both", value: "Both" },
+];
+
+export const JOB_DURATION = [
+  { label: "Day", value: "Day" },
+  { label: "Week", value: "Week" },
+  { label: "Month", value: "Month" },
+  { label: "Year", value: "Year" },
+  { label: "Few Years", value: "Few Years" },
+];
+
+export const HOURS = [
+  { label: "1", value: "1" },
+  { label: "2", value: "2" },
+  { label: "3", value: "3" },
+  { label: "4", value: "4" },
+  { label: "5", value: "5" },
+  { label: "6", value: "6" },
+  { label: "7", value: "7" },
+  { label: "8", value: "8" },
+  { label: "9", value: "9" },
+  { label: "10", value: "10" },
+  { label: "11", value: "11" },
+  { label: "12", value: "12" },
+];
+
+export const PERIOD = [
+  { label: "AM", value: "AM" },
+  { label: "PM", value: "PM" },
+];
+
+export const WORK_SHIFT = [
+  { label: "Morning Shift", value: "Morning Shift" },
+  { label: "Evening Shift", value: "Evening Shift" },
+  { label: "Night Shift", value: "Night Shift" },
+];
+
+export const SUB_CATEGORY = [
+  { label: "IT", value: "IT" },
+  { label: "Non IT", value: "Non IT" },
+  { value: "Job", label: "Job" },
+  { value: "Internship", label: "Internship" },
+  { value: "Other", label: "Other" },
+];
+
+export const ID_PROOF = [
+  { label: "Aadhar Card", value: "Aadhar Card" },
+  { label: "Pan Card", value: "Pan Card" },
+  { label: "Voter Id Card", value: "Voter Id Card" },
+  { label: "Driving License", value: "Driving License" },
+  { label: "Others", value: "Others" },
+];

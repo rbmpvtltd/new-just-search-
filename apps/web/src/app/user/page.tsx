@@ -1,14 +1,17 @@
+"use client";
 // import { log } from "@repo/helper";
 // import { trpc } from "@/trpc/server";
 // import { asyncHandler } from "@/utils/error/asyncHandler";
 // import type { errorCodeMap } from "@/utils/error/errorCode";
-"use client";
-import AddBusinessPage from "@/features/business/create/add-business/AddBusinessPage";
+// import AddBusinessPage from "@/features/business/create/add-business/AddBusinessPage";
 import AddHirePage from "@/features/hire/create/add-hire/AddHirePage";
+// import UserProfile from "@/features/user/profile/UserProfile";
 
 // logger.info("test", { test: "test" }, { newline: true }, { color: "red" });
-export default async function UserPage() {
+export default function UserPage() {
   // log();
+  console.log("test");
+
   // logger.info(
   //   "test",
   //   { test: "test", error: { code: "BAD_REQUEST" } },
@@ -33,6 +36,7 @@ export default async function UserPage() {
     <div>
       <AddHirePage />
       {/* <AddBusinessPage /> */}
+      {/* <UserProfile /> */}
     </div>
   );
 }

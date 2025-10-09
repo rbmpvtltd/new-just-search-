@@ -1,6 +1,7 @@
-// import { cloudinary } from "@repo/helper";
+import { cloudinary, uploadOnCloudinary } from "@repo/cloudinary";
+import { db } from "@repo/db";
+import { logger } from "@repo/helper";
 import { eq } from "drizzle-orm";
-import { db } from "../db/src/index";
 import {
   banners,
   categories,
@@ -10,33 +11,36 @@ import {
 } from "../db/src/schema/not-related.schema";
 // import { uploadOnCloudinary } from "../db/src/index";
 import { sql } from "./mysqldb.seed";
-import { uploadOnCloudinary } from "@repo/cloudinary";
+// import { uploadOnCloudinary } from "@repo/cloudinary";
 import { clouadinaryFake } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  // await state();
-  // await citie();
-  // await bannerSeed();
-  // await seedCategories();
+  await state();
+  await citie();
+  await bannerSeed();
+  await seedCategories();
   await seedSubcategories();
 };
 
 export const clearAllTablesNotRelated = async () => {
-  console.log("================== execution comes here ====================");
-  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  // logger.info("================== execution comes here ====================");
+  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };
 
 const state = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM states");
+  // console.log("rows", rows);
+
   for (const row of rows) {
-    console.log(row.name)
+    // console.log("row.id", row.id, "row.name", row.name);
+
     await db.insert(states).values({
       id: row.id,
       name: row.name,
@@ -48,7 +52,7 @@ const state = async () => {
 const citie = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM cities");
   for (const row of rows) {
-    console.log(row.state_id)
+    console.log(row.state_id);
     const [state] = await db
       .select()
       .from(states)
@@ -117,7 +121,7 @@ export const seedCategories = async () => {
       categoryPhotoPublicId = result ?? null;
 
       await db.insert(categories).values({
-        id : row.id,
+        id: row.id,
         title: row.title ?? "",
         slug: row.slug ?? "",
         photo: categoryPhotoPublicId ?? "",

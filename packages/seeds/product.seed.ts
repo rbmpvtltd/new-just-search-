@@ -1,14 +1,18 @@
+import { db, uploadOnCloudinary } from "@repo/db";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@repo/db";
 import { users } from "../db/src/schema/auth.schema";
-import { businessListings } from "../db/src/schema/business.schema";
 import { categories } from "../db/src/schema/category.schema";
-import { productPhotos, productReviews, products, productSubCategories } from "../db/src/schema/product.shema";
-import { uploadOnCloudinary } from "@repo/db";
-import { sql } from "./mysqldb.seed";
-import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
+import {
+  productPhotos,../db/src/test/product.shema
+  productReviews,
+  productSubCategories,
+  products,
+} from "../db/src/schema/product.shema";
 import { subcategories } from "../db/src/schema/subcategory.schema";
+import { businessListings } from "../db/test/business.schema";
+import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
+import { sql } from "./mysqldb.seed";
 
 dotenv.config();
 export const productSeed = async () => {
@@ -20,11 +24,11 @@ export const productSeed = async () => {
 };
 
 export const clearAllTablesBusiness = async () => {
-  await db.execute(`TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`);
   await db.execute(
-      `TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`,
-    );
-    await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
+    `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
 
@@ -101,17 +105,14 @@ const addProductReviews = async () => {
   const fakeBusiness = (await fakeBusinessSeed()) || (await fakeSeed()).user;
 
   for (const row of review) {
-    let [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
+    let [user] = await db.select().from(users).where(eq(users.id, row.user_id));
 
     if (!user) {
-      console.log(`user not found ${row.id} using faKe user`)
+      console.log(`user not found ${row.id} using faKe user`);
       user = fakeUser;
     }
 
-    let [business]:any = await db
+    let [business]: any = await db
       .select()
       .from(businessListings)
       .where(eq(businessListings.id, row.listing_id));
@@ -121,23 +122,26 @@ const addProductReviews = async () => {
       business = fakeBusiness as any;
     }
 
-    const [Product] = await db.select().from(products).where(eq(products.id, row.product_id));
+    const [Product] = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, row.product_id));
     if (!Product) {
       console.log("Product not found", row.id);
-      continue
+      continue;
     }
 
     await db.insert(productReviews).values({
       id: row.id,
       userId: user!.id,
       businessId: business!.id,
-      productId: Product.id ,
+      productId: Product.id,
       name: row.name,
       email: row.email,
       message: row.message,
       rate: row.rate,
-      view : row.view,
-      status : Boolean(row.status),
+      view: row.view,
+      status: Boolean(row.status),
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });
@@ -145,20 +149,25 @@ const addProductReviews = async () => {
   // console.log('successfully seed of productReviews')
 };
 
-
 // 4.ProductSubcCategroy
 const addProductSubCategroy = async () => {
   const [subCategory]: any[] = await sql.execute(
     "SELECT * FROM product_subcategory",
   );
   for (const row of subCategory) {
-    const [Product] = await db.select().from(products).where(eq(products.id ,row.product_id))
+    const [Product] = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, row.product_id));
     if (!Product) {
       console.log("Product not found", row.id);
       continue;
     }
 
-    const [subCategory] = await db.select().from(subcategories).where(eq(subcategories.id, row.subcategory_id));
+    const [subCategory] = await db
+      .select()
+      .from(subcategories)
+      .where(eq(subcategories.id, row.subcategory_id));
     if (!subCategory) {
       console.log("subCategory not found", row.id);
       continue;
@@ -166,12 +175,11 @@ const addProductSubCategroy = async () => {
 
     await db.insert(productSubCategories).values({
       productId: Product.id,
-      subCategoryId: subCategory.id
-    })
+      subCategoryId: subCategory.id,
+    });
   }
-  console.log("succcessfully seed of product_subcategory")
+  console.log("succcessfully seed of product_subcategory");
 };
-
 
 //  NOTE: recent_views_listings TABLE NOT FOUND
 // // 5. recent_views_product
@@ -185,7 +193,7 @@ const addProductSubCategroy = async () => {
 //       console.log("Product not found", row.id);
 //       continue;
 //     }
-   
+
 //     await db.insert(recentViewProducts).values({
 //       productId: Product.id,
 //       device: row.device,

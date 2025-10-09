@@ -2,8 +2,8 @@ import type React from "react";
 import Select, { type StylesConfig } from "react-select";
 
 export interface Option {
-  label: string;
-  value: string;
+  label: string | number;
+  value: string | number;
 }
 
 interface MultiSelectProps {
