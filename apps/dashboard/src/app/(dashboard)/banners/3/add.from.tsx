@@ -16,7 +16,7 @@ import {
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export function AddBanner() {
   const trpc = useTRPC();
@@ -49,11 +49,10 @@ export function AddBanner() {
     },
     {
       control,
-      type: "file",
-      label: "Resume/CV",
-      name: "resumePdf",
+      label: "Photo",
+      name: "photo",
       placeholder: "",
-      component: "input",
+      component: "image",
       required: false,
       error: "",
     },

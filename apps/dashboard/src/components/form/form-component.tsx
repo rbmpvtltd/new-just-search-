@@ -10,6 +10,7 @@ import { Label } from "../ui/label";
 import { MultiSelect, type Option } from "../ui/multiselect";
 import { SingleSelect } from "../ui/singleselect";
 import { Textarea } from "../ui/textarea";
+import Cloudinary from "./cloudinary";
 export interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
   type?: string;
@@ -21,7 +22,13 @@ export interface FormFieldProps<T extends FieldValues> {
   section?: string;
   error?: string;
   options?: Option[] | undefined;
-  component: "input" | "multiselect" | "select" | "checkbox" | "textarea";
+  component:
+    | "input"
+    | "multiselect"
+    | "select"
+    | "checkbox"
+    | "textarea"
+    | "image";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -96,6 +103,9 @@ export const FormField = <T extends FieldValues>({
 
             case "textarea":
               return <Textarea />;
+
+            case "image":
+              return <Cloudinary onChange={onChange} value={value} />;
 
             default:
               return <div>no component</div>;

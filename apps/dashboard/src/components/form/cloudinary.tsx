@@ -5,6 +5,19 @@ import Image from "next/image";
 import { useState } from "react";
 import { useTRPC } from "@/trpc/client";
 
+declare global {
+  interface Window {
+    cloudinary: {
+      createUploadWidget: (
+        options: object, // You can make this more specific if needed
+        callback: (error: any, result: any) => void,
+      ) => {
+        open: () => void;
+      };
+    };
+  }
+}
+
 interface CloudinaryProps {
   value?: string; // e.g., public_id or URL (for controlled behavior)
   onChange?: (publicId: string) => void; // or pass full result if needed

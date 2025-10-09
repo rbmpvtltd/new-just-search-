@@ -8,6 +8,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          src="https://widget.cloudinary.com/v2.0/global/all.js"
+          type="text/javascript"
+          async
+        ></script>
+      </head>
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
