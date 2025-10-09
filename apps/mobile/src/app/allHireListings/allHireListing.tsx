@@ -169,7 +169,7 @@ export default function AllHireListing() {
                       message: "Need to login to chat on your behalf",
                       onConfirm: () => {
                         clearToken();
-                        router.push("/user/bottomNav/profile");
+                        router.push("/(root)/profile/profile");
                       },
                     });
                   } else {

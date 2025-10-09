@@ -34,7 +34,7 @@ export default function Feedback() {
   } = useForm<FeedbackData>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
-      feedback_
+      feedback_type : "",
       additional_feedback: "",
     },
   });
@@ -68,7 +68,7 @@ export default function Feedback() {
           "Your feedback has been submitted successfully!",
         );
         reset();
-        router.replace("/user/bottomNav");
+        router.replace("/(root)/(home)/home");
       } else {
         Alert.alert("Something went", "Your feedback could not be submitted!");
       }
@@ -85,7 +85,7 @@ export default function Feedback() {
         </Text>
         {feedbackOptions.map((option, index) => (
           <Checkbox.Item
-            key={index}
+            key={index.toString()}
             label={option}
             status={selectedOptions.includes(option) ? "checked" : "unchecked"}
             onPress={() => toggleOption(option)}

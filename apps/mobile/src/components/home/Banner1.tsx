@@ -10,7 +10,7 @@ import { Text } from "react-native";
 function Banner1() {
   // const { data } = useSuspenceData(BANNER_URL.url, BANNER_URL.key);
   const { data, isLoading, error, isError } = useQuery(
-    trpc.banners.firstBanner.queryOptions(),
+    trpc.banners.getBannerData.queryOptions({type:1}),
   );
   console.log(data)
   if (isLoading) {

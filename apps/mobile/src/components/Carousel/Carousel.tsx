@@ -58,15 +58,24 @@ import { useFocusEffect } from "@react-navigation/native";
 // }
 // ------------------------------------------------------------------
 
-
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState,useMemo, useRef } from "react";
 import { Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
 const { width } = Dimensions.get("window");
 
 type CarouselProps = {
-  data: {id:number,photo:string|null}[];
+  data: {
+    id: number;
+    photo: string | null;
+    name?: string;
+    area?: string | null;
+    streetName?: string | null;
+    buildingName?: string | null;
+    rating?: string[];
+    subcategories?: string[];
+    category?: string | null;
+  }[] | undefined;
   renderItem: ({ item, index }: { item: any; index: number }) => JSX.Element;
   itemWidth?: number;
   height?: number;
@@ -81,11 +90,10 @@ export default function CarouselCompo({
 }: CarouselProps) {
   const [isAutoPlay, setIsAutoPlay] = useState(false);
 
-  
   useFocusEffect(
     useCallback(() => {
       setIsAutoPlay(true);
-      return () => setIsAutoPlay(false); 
+      return () => setIsAutoPlay(false);
     }, []),
   );
 
@@ -113,10 +121,10 @@ export default function CarouselCompo({
 
   return (
     <Carousel
-      loop
+      loop={true}
       width={width}
       height={height}
-      autoPlay={isAutoPlay} 
+      autoPlay={false} 
       data={data}
       scrollAnimationDuration={1000}
       style={{ flexGrow: 0 }}
@@ -124,9 +132,12 @@ export default function CarouselCompo({
       mode={mode}
       modeConfig={getModeConfig()}
       onConfigurePanGesture={(gestureChain) =>
-        gestureChain.activeOffsetX([-10, 10])
+        gestureChain.activeOffsetX([-1, 1])
       }
-      renderItem={({ item, index }) => renderItem({ item, index })}
+      renderItem={({ item, index }) => {
+        console.log("render item in Carousel.tsx file")
+        return renderItem({ item, index })
+      }}
     />
   );
 }
