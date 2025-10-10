@@ -12,6 +12,7 @@ const CropperComponent = () => {
   const [crop, setCrop] = useState<Area>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1);
   const [image, setImage] = useState<null | string>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // Clean up object URL when image changes
   useEffect(() => {
@@ -22,9 +23,19 @@ const CropperComponent = () => {
     }
   }, [image]);
 
+  // Clean up preview URL when preview changes
+  useEffect(() => {
+    if (previewUrl) {
+      return () => {
+        URL.revokeObjectURL(previewUrl);
+      };
+    }
+  }, [previewUrl]);
+
   // Handle file selection
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      setPreviewUrl(null);
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
@@ -47,13 +58,7 @@ const CropperComponent = () => {
       aspect: { value: number; text: string },
       croppedImageUrl: string,
     ) => {
-      const link = document.createElement("a");
-      link.href = croppedImageUrl;
-      link.download = "cropped-image.png";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(croppedImageUrl), 100);
+      setPreviewUrl(croppedImageUrl);
       setImage(null);
     },
     [],
@@ -80,6 +85,14 @@ const CropperComponent = () => {
           onCancel={onCancel}
           setCroppedImageFor={setCroppedImageFor}
           resetImage={resetImage}
+        />
+      )}
+
+      {previewUrl && (
+        <img
+          src={previewUrl}
+          alt="Cropped preview"
+          style={{ maxWidth: "300px", display: "block", margin: "20px 0" }}
         />
       )}
     </div>

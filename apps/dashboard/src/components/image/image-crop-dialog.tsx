@@ -1,17 +1,53 @@
 // image-crop-dialog.tsx
-import React, { useState } from "react";
+import type React from "react";
+import { useCallback, useState } from "react";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "./crop-image";
 import "./cropper.css";
 import { Button } from "../ui/button";
 
-const aspectRatios = [
+export interface Area {
+  x: number;
+  y: number;
+}
+
+export interface PixelArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface AspectRatio {
+  value: number;
+  text: string;
+}
+
+interface ImageCropDialogProps {
+  id: string;
+  imageUrl: string;
+  cropInit: Area;
+  zoomInit: number;
+  aspectInit: number | AspectRatio;
+  onCancel: () => void;
+  setCroppedImageFor: (
+    id: string,
+    crop: Area,
+    zoom: number,
+    aspect: AspectRatio,
+    croppedImageUrl: string,
+  ) => void;
+  resetImage: (id: string) => void;
+}
+
+const aspectRatios: AspectRatio[] = [
+  { value: 1, text: "1/1" },
   { value: 4 / 3, text: "4/3" },
   { value: 16 / 9, text: "16/9" },
   { value: 1 / 2, text: "1/2" },
 ];
 
-const ImageCropDialog = ({
+const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
   id,
   imageUrl,
   cropInit,
@@ -21,40 +57,80 @@ const ImageCropDialog = ({
   setCroppedImageFor,
   resetImage,
 }) => {
-  // Set default values properly
-  const [zoom, setZoom] = useState(zoomInit ?? 1);
-  const [crop, setCrop] = useState(cropInit ?? { x: 0, y: 0 });
-  const [aspect, setAspect] = useState(aspectInit ?? aspectRatios[0].value);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const initialZoom = zoomInit ?? 1;
+  const initialCrop: Area = cropInit ?? { x: 0, y: 0 };
+  let initialAspect: AspectRatio = aspectRatios[0];
+  if (typeof aspectInit === "number") {
+    const matching = aspectRatios.find(
+      (r) => Math.abs(r.value - aspectInit) < 0.01,
+    );
+    initialAspect = matching || {
+      value: aspectInit,
+      text: `${Math.round(aspectInit * 100) / 100}`,
+    };
+  } else {
+    initialAspect = aspectInit;
+  }
 
-  const onCropChange = (crop) => {
-    setCrop(crop);
-  };
+  const [zoom, setZoom] = useState(initialZoom);
+  const [crop, setCrop] = useState(initialCrop);
+  const [aspect, setAspect] = useState(initialAspect);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelArea | null>(
+    null,
+  );
 
-  const onZoomChange = (zoom) => {
-    setZoom(zoom);
-  };
+  const onCropChange = useCallback((newCrop: Area) => {
+    setCrop(newCrop);
+  }, []);
 
-  const onAspectChange = (e) => {
-    const value = parseFloat(e.target.value);
-    setAspect(value);
-  };
+  const onZoomChange = useCallback((newZoom: number) => {
+    setZoom(newZoom);
+  }, []);
 
-  const onCropComplete = (croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  };
+  const onAspectChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const value = parseFloat(e.target.value);
+      const ratio = aspectRatios.find((r) => r.value === value);
+      if (ratio) {
+        setAspect(ratio);
+      }
+    },
+    [],
+  );
 
-  const onCrop = async () => {
-    if (!croppedAreaPixels) return;
-    const croppedImageUrl = await getCroppedImg(imageUrl, croppedAreaPixels);
-    setCroppedImageFor(id, crop, zoom, aspect, croppedImageUrl);
-  };
+  const onCropComplete = useCallback(
+    (_: Area, newCroppedAreaPixels: PixelArea) => {
+      setCroppedAreaPixels(newCroppedAreaPixels);
+    },
+    [],
+  );
 
-  const onResetImage = () => {
+  const onCrop = useCallback(async () => {
+    if (!croppedAreaPixels) {
+      return;
+    }
+    const croppedImageUrl = await getCroppedImg(
+      imageUrl,
+      croppedAreaPixels,
+      0,
+      aspect.value === 1,
+    );
+    if (croppedImageUrl) {
+      setCroppedImageFor(id, crop, zoom, aspect, croppedImageUrl);
+    }
+  }, [imageUrl, croppedAreaPixels, id, crop, zoom, aspect, setCroppedImageFor]);
+
+  const onResetImage = useCallback(() => {
+    setCrop(initialCrop);
+    setZoom(initialZoom);
+    setAspect(initialAspect);
+    setCroppedAreaPixels(null);
     resetImage(id);
-    setCrop({ x: 0, y: 0 });
-    setZoom(1);
-  };
+  }, [initialCrop, initialZoom, initialAspect, resetImage, id]);
+
+  const handleCancel = useCallback(() => {
+    onCancel();
+  }, [onCancel]);
 
   return (
     <div>
@@ -64,7 +140,7 @@ const ImageCropDialog = ({
           image={imageUrl}
           zoom={zoom}
           crop={crop}
-          aspect={aspect}
+          aspect={aspect.value}
           onCropChange={onCropChange}
           onZoomChange={onZoomChange}
           onCropComplete={onCropComplete}
@@ -78,21 +154,25 @@ const ImageCropDialog = ({
             max={3}
             step={0.1}
             value={zoom}
-            onChange={(e) => {
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
               onZoomChange(parseFloat(e.target.value));
             }}
             className="slider"
           />
-          <select value={aspect} onChange={onAspectChange}>
+          <select onChange={onAspectChange}>
             {aspectRatios.map((ratio) => (
-              <option key={ratio.text} value={ratio.value}>
+              <option
+                key={ratio.text}
+                value={ratio.value.toString()}
+                selected={ratio.value === aspect.value}
+              >
                 {ratio.text}
               </option>
             ))}
           </select>
         </div>
         <div className="button-area">
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
           <Button onClick={onResetImage}>Reset</Button>
           <Button onClick={onCrop}>Crop</Button>
         </div>
