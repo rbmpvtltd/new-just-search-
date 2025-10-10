@@ -1,12 +1,7 @@
 import { z } from "zod";
-// import { ID_PROOF } from "../constants/hire";
-
-// const idProofValue = ID_PROOF.map((idProof) => idProof.value);
 
 export const documentSchema = z.object({
-  // idProof: z.enum(idProofValue, {
-  //   message: "Please select at least one option",
-  // }),
+  // idProof: z.string().min(1, "Please upload your photo"),
   // idProofPhoto: z.string().min(1, "Please upload your photo"),
   coverLetter: z.string(),
   // resumePdf: z.string().optional(),

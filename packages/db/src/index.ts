@@ -22,18 +22,15 @@ import * as product from "./schema/product.shema";
 import * as user from "./schema/user.schema";
 
 export type UserRole = (typeof auth.UserRole)[keyof typeof auth.UserRole];
-export type MaritalStatus =
-  (typeof hire.maritalStatusEnum)[keyof typeof hire.maritalStatusEnum];
 
-export const MARITAL_STATUS = hire.maritalStatusEnum;
-export const GENDER = hire.genderEnum;
-export const QUALIFICATION = hire.qualificationEnum;
-export const JOB_TYPE = hire.jobTypeEnum;
-export const WORK_SHIFT = hire.workShiftEnum;
-export const RELOCATE = hire.relocateEnum;
-export const JOB_DURATION = hire.jobDurationEnum;
-export const ID_PROOF = hire.idProofEnum;
-export const LANGUAGES = hire.languagesEnum;
+export const MARITAL_STATUS = hire.MaritalStatus;
+export const GENDER = hire.Gender;
+export const JOB_TYPE = hire.JobType;
+export const WORK_SHIFT = hire.WorkShift;
+export const RELOCATE = hire.YesNoOption;
+export const JOB_DURATION = hire.JobDuration;
+export const ID_PROOF = hire.IdProof;
+export const LANGUAGES = hire.Languages;
 
 export const schemas = {
   not_related,

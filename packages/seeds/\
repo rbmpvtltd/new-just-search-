@@ -24,7 +24,6 @@ import {
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
-import { safeArray } from "./utils";
 
 export const hireSeed = async () => {
   await cleardataofhire();
@@ -36,6 +35,9 @@ export const hireSeed = async () => {
 
 const cleardataofhire = async () => {
   await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
+  //   await db.execute(
+  //   `TRUNCATE  TABLE recent_view_hire RESTART IDENTITY CASCADE;`,
+  // );
   await db.execute(
     `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
   );
@@ -47,9 +49,6 @@ export const addHire = async () => {
   const [rows]: any[] = await sql.execute(
     "SELECT * FROM listings WHERE type = 2",
   );
-
-  // console.log("rows", rows.length);
-  // return;
 
   let fakeUser = await fakeUserSeed();
 
@@ -63,50 +62,47 @@ export const addHire = async () => {
   }
 
   // for (const row of rows) {
+  // console.log("row-------", row);
   const row = rows[0];
+  console.log("user id === ", row.user_id);
 
-  console.log("row-------", row);
-  // return;
   let [createUser] = await db
     .select()
     .from(users)
     .where(eq(users.id, Number(row.user_id)));
-
-  console.log("createUser", createUser);
   if (!createUser) {
     const [user]: any[] = await sql.execute(
       `SELECT * FROM users WHERE id = ${row.user_id}`,
     );
-
-    if (user[0]) {
-      const mySqlUser = user[0];
-      console.log("mySqlUser", mySqlUser);
-      // return
+    // return;
+    if (user) {
       try {
-        createUser = await db
-          .insert(users)
-          .values({
-            id: mySqlUser.id,
-            displayName: row.name ?? mySqlUser.name,
-            email: mySqlUser.email,
-            googleId: mySqlUser.google_id,
-            password: mySqlUser.password,
-            role: "hire",
-            phoneNumber: mySqlUser.phone,
-          })
-          .returning();
-        console.log(createUser);
+        createUser = await db.insert(users).values({
+          id: user.id,
+          displayName: row.name ?? user.name,
+          email: user.email,
+          googleId: user.google_id,
+          password: user.password,
+          role: "hire",
+          phoneNumber: user.phone,
+        });
       } catch (e) {
         console.error("error is ", e.message);
       }
+      // createUser = user[0];
+      console.log("createUser", createUser);
     } else {
+      // console.log("User not found" + row.id);
       createUser = fakeUser;
     }
   }
+  console.log("ended");
+  return;
 
-  // return
+  // }
   if (!createUser) {
     console.log("User not found" + row.id);
+    // createUser = fakeUser;
   }
 
   let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
@@ -137,92 +133,85 @@ export const addHire = async () => {
   const uploaded =
     row.photo &&
     (await uploadOnCloudinary(liveHireImageUrl, "Hire", clouadinaryFake));
+  // console.log("-----");
 
   const profilePhotoUrl = uploaded?.secure_url;
-
   // console.log("=====");
-  console.log("createUser-------------------", createUser);
   // return;
 
-  try {
-    if (!createUser) {
-      console.log("User not found" + row.id);
-    }
-    await db.insert(hireListing).values({
-      id: row.id,
-      userId: createUser.id ?? 588,
-      city: city!.id,
-      name: row.name,
-      slug: row.slug,
-      fatherName: row.father_name,
-      dob: row.dob,
-      gender:
-        row.gender === 1 ? "Male" : row.gender === 2 ? "Female" : "Others",
-      maritalStatus:
-        row.marital_status === 1
-          ? "Married"
-          : row.marital_status === 2
-            ? "Unmarried"
-            : row.marital_status === 3
-              ? "Widowed"
-              : row.marital_status === 4
-                ? "Divorced"
-                : "Others",
-      languages: safeArray(row.languages),
-      specialities: row.specialities,
-      description: row.description,
-      latitude: row.latitude,
-      longitude: row.longitude,
-      buildingName: row.building_name,
-      streetName: row.street_name,
-      area: row.area || "dadasd",
-      landmark: row.landmark,
-      pincode: row.pincode,
-      state: row.state,
-      // city: city!.id,
-      schedules: JSON.stringify(row.schedules),
-      photo: profilePhotoUrl,
-      isFeature: row.is_feature === 1,
-      status: true,
-      website: row.website,
-      email: row.email,
-      mobileNumber: row.mobile_number,
-      whatsappNo: row.whatsapp_no,
-      alternativeMobileNumber: row.alternative_mobile_number,
-      facebook: row.facebook,
-      twitter: row.twitter,
-      linkedin: row.linkedin,
-      views: 0,
-      highestQualification: row.highest_qualification,
-      employmentStatus: row.employment_status,
-      workExperienceYear: row.work_experience_year,
-      workExperienceMonth: row.work_experience_month,
-      jobRole: row.job_role,
-      previousJobRole: row.previous_job_role,
-      expertise: row.expertise,
-      skillset: row.skillset,
-      abilities: row.abilities,
-      jobType: safeArray(row.job_type),
-      locationPreferred: row.location_preferred,
-      certificates: row.certificates,
-      workShift: safeArray(row.work_shift),
-      expectedSalaryFrom: row.expected_salary_from,
-      expectedSalaryTo: row.expected_salary_to,
-      preferredWorkingHours: row.preferred_working_hours,
-      jobDuration: safeArray(row.job_duration),
-      relocate: row.relocate,
-      availability: row.availability,
-      idProof: row.id_proof,
-      idProofPhoto: profilePhotoUrl,
-      coverLetter: row.cover_letter,
-      resumePhoto: profilePhotoUrl,
-      aboutYourself: row.about_yourself,
-    });
-
-    // console.log("hire", hire);
-  } catch (error) {
-    console.log("error", error);
-  }
+  // try {
+  //   await db.insert(hireListing).values({
+  //     userId: createUser.id,
+  //     city: city!.id,
+  //     name: row.name,
+  //     slug: row.slug,
+  //     fatherName: row.father_name,
+  //     dob: row.dob,
+  //     gender:
+  //       row.gender === 1 ? "Male" : row.gender === 2 ? "Female" : "Others",
+  //     maritalStatus:
+  //       row.marital_status === 1
+  //         ? "Married"
+  //         : row.marital_status === 2
+  //           ? "Unmarried"
+  //           : row.marital_status === 3
+  //             ? "Widowed"
+  //             : row.marital_status === 4
+  //               ? "Divorced"
+  //               : "Others",
+  //     languages: row.languages,
+  //     specialities: row.specialities,
+  //     description: row.description,
+  //     latitude: row.latitude,
+  //     longitude: row.longitude,
+  //     buildingName: row.building_name,
+  //     streetName: row.street_name,
+  //     area: row.area,
+  //     landmark: row.landmark,
+  //     pincode: row.pincode,
+  //     state: row.state,
+  //     // city: city!.id,
+  //     schedules: JSON.stringify(row.schedules),
+  //     photo: profilePhotoUrl,
+  //     isFeature: row.is_feature === 1,
+  //     status: true,
+  //     website: row.website,
+  //     email: row.email,
+  //     mobileNumber: row.mobile_number,
+  //     whatsappNo: row.whatsapp_no,
+  //     alternativeMobileNumber: row.alternative_mobile_number,
+  //     facebook: row.facebook,
+  //     twitter: row.twitter,
+  //     linkedin: row.linkedin,
+  //     views: 0,
+  //     highestQualification: row.highest_qualification,
+  //     employmentStatus: row.employment_status,
+  //     workExperienceYear: row.work_experience_year,
+  //     workExperienceMonth: row.work_experience_month,
+  //     jobRole: row.job_role,
+  //     previousJobRole: row.previous_job_role,
+  //     expertise: row.expertise,
+  //     skillset: row.skillset,
+  //     abilities: row.abilities,
+  //     jobType: row.job_type,
+  //     locationPreferred: row.location_preferred,
+  //     certificates: row.certificates,
+  //     workShift: row.work_shift,
+  //     expectedSalaryFrom: row.expected_salary_from,
+  //     expectedSalaryTo: row.expected_salary_to,
+  //     preferredWorkingHours: row.preferred_working_hours,
+  //     jobDuration: row.job_duration,
+  //     relocate: row.relocate,
+  //     availability: row.availability,
+  //     idProof: row.id_proof,
+  //     idProofPhoto: profilePhotoUrl,
+  //     coverLetter: row.cover_letter,
+  //     resumePhoto: profilePhotoUrl,
+  //     aboutYourself: row.about_yourself,
+  //   });
+  // } catch (error) {
+  //   console.log("error", error);
+  // }
 
   console.log("successsfully hire listings seed");
   // }

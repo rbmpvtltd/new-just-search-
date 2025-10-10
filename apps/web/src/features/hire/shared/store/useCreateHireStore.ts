@@ -58,7 +58,7 @@ const initialFormValue: CombinedForm = {
   // PersonalDetailsSchema
   // photo: "",
   categoryId: 0,
-  // subcategory: [],
+  subcategoryId: [],
   name: "",
   // gender: "",
   // maritalStatus: "",
