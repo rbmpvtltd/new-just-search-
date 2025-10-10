@@ -1,3 +1,4 @@
+// image-crop-dialog.tsx
 import React, { useState } from "react";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "./crop-image";
@@ -20,18 +21,10 @@ const ImageCropDialog = ({
   setCroppedImageFor,
   resetImage,
 }) => {
-  if (zoomInit == null) {
-    zoomInit = 1;
-  }
-  if (cropInit == null) {
-    cropInit = { x: 0, y: 0 };
-  }
-  if (aspectInit == null) {
-    aspectInit = aspectRatios[0];
-  }
-  const [zoom, setZoom] = useState(zoomInit);
-  const [crop, setCrop] = useState(cropInit);
-  const [aspect, setAspect] = useState(aspectInit);
+  // Set default values properly
+  const [zoom, setZoom] = useState(zoomInit ?? 1);
+  const [crop, setCrop] = useState(cropInit ?? { x: 0, y: 0 });
+  const [aspect, setAspect] = useState(aspectInit ?? aspectRatios[0].value);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const onCropChange = (crop) => {
@@ -43,9 +36,8 @@ const ImageCropDialog = ({
   };
 
   const onAspectChange = (e) => {
-    const value = e.target.value;
-    const ratio = aspectRatios.find((ratio) => ratio.value == value);
-    setAspect(ratio);
+    const value = parseFloat(e.target.value);
+    setAspect(value);
   };
 
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
@@ -53,12 +45,15 @@ const ImageCropDialog = ({
   };
 
   const onCrop = async () => {
+    if (!croppedAreaPixels) return;
     const croppedImageUrl = await getCroppedImg(imageUrl, croppedAreaPixels);
     setCroppedImageFor(id, crop, zoom, aspect, croppedImageUrl);
   };
 
   const onResetImage = () => {
     resetImage(id);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
   };
 
   return (
@@ -69,7 +64,7 @@ const ImageCropDialog = ({
           image={imageUrl}
           zoom={zoom}
           crop={crop}
-          aspect={aspect.value}
+          aspect={aspect}
           onCropChange={onCropChange}
           onZoomChange={onZoomChange}
           onCropComplete={onCropComplete}
@@ -83,18 +78,14 @@ const ImageCropDialog = ({
             max={3}
             step={0.1}
             value={zoom}
-            onInput={(e) => {
-              onZoomChange(e.target.value);
+            onChange={(e) => {
+              onZoomChange(parseFloat(e.target.value));
             }}
             className="slider"
-          ></input>
-          <select onChange={onAspectChange}>
+          />
+          <select value={aspect} onChange={onAspectChange}>
             {aspectRatios.map((ratio) => (
-              <option
-                key={ratio.text}
-                value={ratio.value}
-                selected={ratio.value === aspect.value}
-              >
+              <option key={ratio.text} value={ratio.value}>
                 {ratio.text}
               </option>
             ))}
