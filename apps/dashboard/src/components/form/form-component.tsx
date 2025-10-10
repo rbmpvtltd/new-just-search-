@@ -10,7 +10,7 @@ import { Label } from "../ui/label";
 import { MultiSelect, type Option } from "../ui/multiselect";
 import { SingleSelect } from "../ui/singleselect";
 import { Textarea } from "../ui/textarea";
-import Cloudinary from "./cloudinary";
+import Cloudinary from "../image/cloudinary";
 export interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
   type?: string;
