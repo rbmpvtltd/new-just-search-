@@ -31,7 +31,7 @@ export default function PersonalDetailsForm() {
     defaultValues: {
       // photo: formValue.photo ?? "",
       categoryId: formValue.categoryId ?? 0,
-      // subcategory: formValue.subcategory ?? [],
+      subcategoryId: formValue.subcategoryId ?? [],
       name: formValue.name ?? "",
       // gender: formValue.gender ?? undefined,
       // maritalStatus: formValue.maritalStatus ?? undefined,
@@ -75,17 +75,17 @@ export default function PersonalDetailsForm() {
       ],
       error: errors.categoryId?.message,
     },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Sub Category",
-    //   name: "subcategory",
-    //   placeholder: "Select Sub Category",
-    //   component: "multiselect",
-    //   section: "profile",
-    //   options: [...SUB_CATEGORY],
-    //   error: errors.subcategory?.message,
-    // },
+    {
+      control,
+      type: "text",
+      label: "Sub Category",
+      name: "subcategoryId",
+      placeholder: "Select Sub Category",
+      component: "multiselect",
+      section: "profile",
+      options: [...SUB_CATEGORY],
+      error: errors.subcategoryId?.message,
+    },
     {
       control,
       type: "text",
@@ -258,8 +258,8 @@ export default function PersonalDetailsForm() {
     console.log(data, "data");
 
     // setFormValue("photo", data.photo ?? "");
-    setFormValue("appliedFor", data.appliedFor ?? "");
-    // setFormValue("subcategory", data.subcategory ?? "");
+    setFormValue("categoryId", data.categoryId ?? "");
+    setFormValue("subcategoryId", data.subcategoryId ?? "");
     setFormValue("name", data.name ?? "");
     // setFormValue("gender", data.gender ?? "");
     // setFormValue("maritalStatus", data.maritalStatus ?? "");
