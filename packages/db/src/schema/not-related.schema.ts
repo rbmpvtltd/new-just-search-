@@ -7,6 +7,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 const states = pgTable("states", {
   id: serial("id").primaryKey(),
@@ -49,11 +50,21 @@ const banners = pgTable("banners", {
   id: serial("id").primaryKey(),
   mysqlId: integer("mysql_id"),
   route: text("route"),
-  photo: text("photo"),
-  isActive: boolean("is_active").default(true),
-  type: integer("type").default(1),
+  photo: text("photo").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  type: integer("type").default(1).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+const bannerInsertSchema = createInsertSchema(banners);
+const bannerSelectSchema = createSelectSchema(banners);
 
-export { states, cities, categories, subcategories, banners };
+export {
+  states,
+  cities,
+  categories,
+  subcategories,
+  banners,
+  bannerInsertSchema,
+  bannerSelectSchema,
+};

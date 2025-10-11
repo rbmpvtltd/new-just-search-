@@ -20,3 +20,9 @@ export const setCountUploadImage = async (userId: number, count: number) => {
   console.log("===count is ======", count2);
   return true;
 };
+
+export const delCountUploadImage = async (userId: number) => {
+  const key = `user:${userId}:uploads`;
+  await redis.del(key);
+  return true;
+};

@@ -24,20 +24,13 @@ export interface AspectRatio {
 }
 
 interface ImageCropDialogProps {
-  id: string;
   imageUrl: string;
   cropInit: Area;
   zoomInit: number;
   aspectInit: number | AspectRatio;
   onCancel: () => void;
-  setCroppedImageFor: (
-    id: string,
-    crop: Area,
-    zoom: number,
-    aspect: AspectRatio,
-    croppedImageUrl: string,
-  ) => void;
-  resetImage: (id: string) => void;
+  setCroppedImageFor: (croppedImageUrl: string) => void;
+  resetImage: () => void;
 }
 
 const aspectRatios: AspectRatio[] = [
@@ -45,10 +38,9 @@ const aspectRatios: AspectRatio[] = [
   { value: 4 / 3, text: "4/3" },
   { value: 16 / 9, text: "16/9" },
   { value: 1 / 2, text: "1/2" },
-];
+] as const;
 
 const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
-  id,
   imageUrl,
   cropInit,
   zoomInit,
@@ -59,7 +51,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
 }) => {
   const initialZoom = zoomInit ?? 1;
   const initialCrop: Area = cropInit ?? { x: 0, y: 0 };
-  let initialAspect: AspectRatio = aspectRatios[0];
+  let initialAspect = aspectRatios[1] as AspectRatio;
   if (typeof aspectInit === "number") {
     const matching = aspectRatios.find(
       (r) => Math.abs(r.value - aspectInit) < 0.01,
@@ -116,17 +108,17 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
       aspect.value === 1,
     );
     if (croppedImageUrl) {
-      setCroppedImageFor(id, crop, zoom, aspect, croppedImageUrl);
+      setCroppedImageFor(croppedImageUrl);
     }
-  }, [imageUrl, croppedAreaPixels, id, crop, zoom, aspect, setCroppedImageFor]);
+  }, [imageUrl, croppedAreaPixels, aspect, setCroppedImageFor]);
 
   const onResetImage = useCallback(() => {
     setCrop(initialCrop);
     setZoom(initialZoom);
     setAspect(initialAspect);
     setCroppedAreaPixels(null);
-    resetImage(id);
-  }, [initialCrop, initialZoom, initialAspect, resetImage, id]);
+    resetImage();
+  }, [initialCrop, initialZoom, initialAspect, resetImage]);
 
   const handleCancel = useCallback(() => {
     onCancel();

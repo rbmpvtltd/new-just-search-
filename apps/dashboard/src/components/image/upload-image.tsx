@@ -3,18 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import ImageCropDialog from "./image-crop-dialog";
 
-interface Area {
-  x: number;
-  y: number;
+interface CropperProps {
+  value: string;
+  onChange: (imageUrl: string) => void;
 }
 
-const CropperComponent = () => {
-  const [crop, setCrop] = useState<Area>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState<number>(1);
+const CropperComponent = ({ value, onChange }: CropperProps) => {
   const [image, setImage] = useState<null | string>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Clean up object URL when image changes
   useEffect(() => {
     if (image) {
       return () => {
@@ -23,20 +19,19 @@ const CropperComponent = () => {
     }
   }, [image]);
 
-  // Clean up preview URL when preview changes
   useEffect(() => {
-    if (previewUrl) {
+    if (value) {
       return () => {
-        URL.revokeObjectURL(previewUrl);
+        URL.revokeObjectURL(value);
       };
     }
-  }, [previewUrl]);
+  }, [value]);
 
-  // Handle file selection
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setPreviewUrl(null);
+      onChange("");
       const file = e.target.files[0];
+      if (!file) return;
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
     }
@@ -46,56 +41,49 @@ const CropperComponent = () => {
     setImage(null);
   }, []);
 
-  const resetImage = useCallback((id: string) => {
+  const resetImage = useCallback(() => {
     // No-op for standalone, dialog handles local reset
   }, []);
 
   const setCroppedImageFor = useCallback(
-    (
-      id: string,
-      crop: Area,
-      zoom: number,
-      aspect: { value: number; text: string },
-      croppedImageUrl: string,
-    ) => {
-      setPreviewUrl(croppedImageUrl);
+    (croppedImageUrl: string) => {
+      onChange(croppedImageUrl);
+      // setPreviewUrl(croppedImageUrl);
       setImage(null);
     },
-    [],
+    [onChange],
   );
 
   return (
-    <div>
-      {/* File input to select image */}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={onFileChange}
-        style={{ marginBottom: "20px" }}
-      />
+    <>
+      <div className="h-50 relative w-50 border rounded overflow-hidden">
+        <input
+          className="absolute opacity-0 inset-0 cursor-pointer z-10"
+          type="file"
+          accept="image/*"
+          onChange={onFileChange}
+        />
 
-      {/* Cropper component - only show when image is selected */}
+        {value ? (
+          // biome-ignore lint/performance/noImgElement: Using <img> is intentional here
+          <img src={value} alt="Cropped preview" className="w-full h-full " />
+        ) : (
+          <span>no image</span>
+        )}
+      </div>
+
       {image && (
         <ImageCropDialog
-          id="12"
           imageUrl={image}
-          cropInit={crop}
-          zoomInit={zoom}
+          cropInit={{ x: 0, y: 0 }}
+          zoomInit={1}
           aspectInit={1}
           onCancel={onCancel}
           setCroppedImageFor={setCroppedImageFor}
           resetImage={resetImage}
         />
       )}
-
-      {previewUrl && (
-        <img
-          src={previewUrl}
-          alt="Cropped preview"
-          style={{ maxWidth: "300px", display: "block", margin: "20px 0" }}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

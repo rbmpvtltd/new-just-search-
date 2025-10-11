@@ -1,4 +1,14 @@
 "use client";
+import { useMutation } from "@tanstack/react-query";
+
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
+import {
+  FormField,
+  type FormFieldProps,
+} from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -8,24 +18,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-import { useForm, type FieldValues } from "react-hook-form";
-import {
-  FormField,
-  type FormFieldProps,
-} from "@/components/form/form-component";
-import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
+import type { schemas } from "@repo/db";
+
+export type BannerSchema = z.infer<
+  typeof schemas.not_related.bannerSelectSchema
+>;
+
+// NOTE: explain differnent between select schema and insert schema
 
 export function AddBanner() {
   const trpc = useTRPC();
 
   const { mutate } = useMutation(trpc.adminBanner.add.mutationOptions());
 
-  const { control } = useForm<FieldValues>();
+  const { control, handleSubmit } = useForm<BannerSchema>();
 
-  const formFields: FormFieldProps<FieldValues>[] = [
+  const onSubmit = async (data: BannerSchema) => {
+    const files = await uploadToCloudinary([data.photo]);
+    console.log(files);
+  };
+
+  const formFields: FormFieldProps<BannerSchema>[] = [
     {
       control,
       label: "Type",
@@ -59,7 +73,7 @@ export function AddBanner() {
     {
       control,
       label: "Active",
-      name: "is_active",
+      name: "isActive",
       placeholder: "",
       component: "select",
       options: [
@@ -93,7 +107,9 @@ export function AddBanner() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button onClick={handleSubmit(onSubmit)} type="submit">
+              Save changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

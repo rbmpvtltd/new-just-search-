@@ -4,13 +4,13 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
+import CropperComponent from "../image/upload-image";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { MultiSelect, type Option } from "../ui/multiselect";
 import { SingleSelect } from "../ui/singleselect";
 import { Textarea } from "../ui/textarea";
-import Cloudinary from "../image/cloudinary";
 export interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
   type?: string;
@@ -105,7 +105,7 @@ export const FormField = <T extends FieldValues>({
               return <Textarea />;
 
             case "image":
-              return <Cloudinary onChange={onChange} value={value} />;
+              return <CropperComponent onChange={onChange} value={value} />;
 
             default:
               return <div>no component</div>;

@@ -6,7 +6,10 @@ import {
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
-import { setCountUploadImage } from "@/utils/cloudinaryCount";
+import {
+  delCountUploadImage,
+  setCountUploadImage,
+} from "@/utils/cloudinaryCount";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
   bannerAllowedSortColumns,
@@ -59,7 +62,13 @@ export const adminBannerRouter = router({
   }),
   add: adminProcedure.mutation(async ({ ctx }) => {
     console.log("allow image");
-    await setCountUploadImage(ctx.userId, 1);
+    await setCountUploadImage(ctx.userId, 10);
     return;
   }),
+  create: adminProcedure
+    .input(schemas.not_related.bannerInsertSchema)
+    .mutation(async ({ ctx }) => {
+      await delCountUploadImage(ctx.userId);
+      return;
+    }),
 });

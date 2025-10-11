@@ -1,96 +1,75 @@
-// Cloudinary.tsx
+"use client";
 
-import { useMutation } from "@tanstack/react-query";
-import Image from "next/image";
-import { useState } from "react";
-import { useTRPC } from "@/trpc/client";
+import { trpcServer } from "@/trpc/trpc-server";
+import { asyncHandler } from "@/utils/error/asyncHandler";
 
-declare global {
-  interface Window {
-    cloudinary: {
-      createUploadWidget: (
-        options: object, // You can make this more specific if needed
-        callback: (error: any, result: any) => void,
-      ) => {
-        open: () => void;
-      };
-    };
+export const uploadToCloudinary = async (
+  files: string[],
+  folder: string = "unknown",
+  eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
+): Promise<string[] | null> => {
+  const signResponse = await asyncHandler(
+    trpcServer.cloudinarySignature.signUploadForm.query({
+      eager,
+      folder,
+    }),
+  );
+
+  if (signResponse.error || !signResponse.data) {
+    console.error(signResponse.error);
+    return null;
   }
-}
 
-interface CloudinaryProps {
-  value?: string; // e.g., public_id or URL (for controlled behavior)
-  onChange?: (publicId: string) => void; // or pass full result if needed
-  // Optional: if you want to show existing image
-}
+  const url = `https://api.cloudinary.com/v1_1/${signResponse.data.cloudname}/auto/upload`;
+  const uploadPromises: Promise<string>[] = [];
 
-export default function Cloudinary({ value, onChange }: CloudinaryProps) {
-  const [resource, setResource] = useState<any>(null);
+  for (let i = 0; i < files.length; i++) {
+    const fileUrl = files[i];
+    if (!fileUrl) continue;
 
-  // If `value` is provided (e.g., from form), try to show it
-  // Note: Cloudinary doesn't re-upload just because value exists — only on button click
+    // Fetch the blob from the blob URL
+    const blobResponse = await fetch(fileUrl);
+    const blob = await blobResponse.blob();
 
-  const trpc = useTRPC();
-  const { mutate } = useMutation(
-    trpc.cloudinarySign.uploadImage.mutationOptions(),
-  );
+    // Determine type and extension from blob
+    const type = blob.type || "image/jpeg";
+    const ext = type.split("/")[1] || "jpg";
+    const timestamp = Date.now();
+    const fileName = `${timestamp}_${Math.floor(Math.random() * 10000)}.${ext}`;
 
-  const handleUpload = () => {
-    const widget = window.cloudinary.createUploadWidget(
-      {
-        cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "dra2pandx",
-        apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY ?? "322325555249722",
-        uploadSignature: (
-          callback: (result: { signature: string }) => void,
-          paramsToSign: { timestamp: number; source: string },
-        ) => {
-          mutate(
-            { paramsToSign },
-            {
-              onSuccess: (data) => callback({ signature: data.signature }),
-              onError: (err) => console.error("Signature error:", err),
-            },
-          );
-        },
-      },
-      (error: any, result: any) => {
-        if (!error && result?.event === "success") {
-          const info = result.info;
-          setResource(info);
+    const formData = new FormData();
+    formData.append("file", blob, fileName);
+    formData.append("api_key", signResponse.data.apikey);
+    formData.append("timestamp", signResponse.data.timestamp.toString());
+    formData.append("signature", signResponse.data.signature);
+    formData.append("eager", eager);
+    formData.append("folder", folder);
 
-          // Notify parent — usually we send public_id for storage
-          if (onChange) {
-            onChange(info.public_id); // or info.secure_url if you prefer URL
-          }
+    const uploadPromise = fetch(url, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.public_id) {
+          return data.public_id;
+        } else {
+          throw new Error(`Upload failed: ${JSON.stringify(data)}`);
         }
-      },
-    );
+      })
+      .catch((error) => {
+        console.error("Upload error:", error);
+        throw error;
+      });
 
-    widget.open();
-  };
+    uploadPromises.push(uploadPromise);
+  }
 
-  // If `value` is a public_id, you can reconstruct URL (optional)
-  const imageUrl = value
-    ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${value}`
-    : resource?.secure_url;
-
-  return (
-    <div className="w-full">
-      <button type="button" onClick={handleUpload}>
-        {value ? "Change Image" : "Upload Image"}
-      </button>
-
-      {imageUrl && (
-        <div className="mt-2">
-          <Image
-            src={imageUrl}
-            alt="Preview"
-            width={200}
-            height={200}
-            unoptimized
-          />
-        </div>
-      )}
-    </div>
-  );
-}
+  try {
+    const uploadedUrls = await Promise.all(uploadPromises);
+    return uploadedUrls;
+  } catch (error) {
+    console.error("One or more uploads failed:", error);
+    return []; // Return empty array or handle as needed
+  }
+};

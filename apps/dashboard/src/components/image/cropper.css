@@ -9,6 +9,7 @@
 
 .backdrop {
   position: fixed;
+  z-index: 40;
   background-color: black;
   top: 0;
   left: 0;
@@ -18,6 +19,7 @@
 
 .crop-container {
   position: fixed;
+  z-index: 50;
   top: 0;
   left: 0;
   right: 0;
@@ -26,6 +28,7 @@
 
 .controls {
   position: fixed;
+  z-index: 50;
   bottom: 0px;
   width: 100%;
   height: 80px;
@@ -41,5 +44,8 @@
 
 .button-area {
   text-align: center;
-  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  /* padding: 100px 0; */
 }
