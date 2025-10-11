@@ -22,9 +22,6 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.1",
