@@ -34,7 +34,6 @@ export default function Feedback() {
   } = useForm<FeedbackData>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
-      feedback_
       additional_feedback: "",
     },
   });

@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { useTableStore } from "@/app/(dashboard)/banners/3/store";
+import { useTableStore } from "../store";
 
 // Define the type to match your actual backend data
 export interface Banner {

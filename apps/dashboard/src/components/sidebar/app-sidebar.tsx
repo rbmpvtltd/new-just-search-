@@ -32,30 +32,6 @@ const data = {
   },
   navMain: [
     {
-      title: "Manage Ads",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Ads block 1",
-          url: "/banners/1",
-        },
-        {
-          title: "Ads block 2",
-          url: "/banners/2",
-        },
-        {
-          title: "Ads block 3",
-          url: "/banners/3",
-        },
-        {
-          title: "Ads block 4",
-          url: "/banners/4",
-        },
-      ],
-    },
-    {
       title: "Category Master",
       url: "#",
       icon: Bot,
@@ -103,6 +79,11 @@ const data = {
   ],
 
   documents: [
+    {
+      name: "Banners",
+      url: "/banners",
+      icon: IconDatabase,
+    },
     {
       name: "Offer",
       url: "/offer",

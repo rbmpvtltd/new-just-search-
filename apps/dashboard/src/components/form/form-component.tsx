@@ -4,6 +4,7 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
+import CropperComponent from "../image/upload-image";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -21,7 +22,13 @@ export interface FormFieldProps<T extends FieldValues> {
   section?: string;
   error?: string;
   options?: Option[] | undefined;
-  component: "input" | "multiselect" | "select" | "checkbox" | "textarea";
+  component:
+    | "input"
+    | "multiselect"
+    | "select"
+    | "checkbox"
+    | "textarea"
+    | "image";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -96,6 +103,9 @@ export const FormField = <T extends FieldValues>({
 
             case "textarea":
               return <Textarea />;
+
+            case "image":
+              return <CropperComponent onChange={onChange} value={value} />;
 
             default:
               return <div>no component</div>;

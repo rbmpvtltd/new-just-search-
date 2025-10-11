@@ -1,0 +1,75 @@
+"use client";
+
+import { trpcServer } from "@/trpc/trpc-server";
+import { asyncHandler } from "@/utils/error/asyncHandler";
+
+export const uploadToCloudinary = async (
+  files: string[],
+  folder: string = "unknown",
+  eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
+): Promise<string[] | null> => {
+  const signResponse = await asyncHandler(
+    trpcServer.cloudinarySignature.signUploadForm.query({
+      eager,
+      folder,
+    }),
+  );
+
+  if (signResponse.error || !signResponse.data) {
+    console.error(signResponse.error);
+    return null;
+  }
+
+  const url = `https://api.cloudinary.com/v1_1/${signResponse.data.cloudname}/auto/upload`;
+  const uploadPromises: Promise<string>[] = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const fileUrl = files[i];
+    if (!fileUrl) continue;
+
+    // Fetch the blob from the blob URL
+    const blobResponse = await fetch(fileUrl);
+    const blob = await blobResponse.blob();
+
+    // Determine type and extension from blob
+    const type = blob.type || "image/jpeg";
+    const ext = type.split("/")[1] || "jpg";
+    const timestamp = Date.now();
+    const fileName = `${timestamp}_${Math.floor(Math.random() * 10000)}.${ext}`;
+
+    const formData = new FormData();
+    formData.append("file", blob, fileName);
+    formData.append("api_key", signResponse.data.apikey);
+    formData.append("timestamp", signResponse.data.timestamp.toString());
+    formData.append("signature", signResponse.data.signature);
+    formData.append("eager", eager);
+    formData.append("folder", folder);
+
+    const uploadPromise = fetch(url, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.public_id) {
+          return data.public_id;
+        } else {
+          throw new Error(`Upload failed: ${JSON.stringify(data)}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Upload error:", error);
+        throw error;
+      });
+
+    uploadPromises.push(uploadPromise);
+  }
+
+  try {
+    const uploadedUrls = await Promise.all(uploadPromises);
+    return uploadedUrls;
+  } catch (error) {
+    console.error("One or more uploads failed:", error);
+    return []; // Return empty array or handle as needed
+  }
+};

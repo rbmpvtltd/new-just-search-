@@ -6,7 +6,11 @@ import {
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
-import { publicProcedure, router } from "@/utils/trpc";
+import {
+  delCountUploadImage,
+  setCountUploadImage,
+} from "@/utils/cloudinaryCount";
+import { adminProcedure, router } from "@/utils/trpc";
 import {
   bannerAllowedSortColumns,
   bannerColumns,
@@ -16,8 +20,7 @@ import {
 const banners = schemas.not_related.banners;
 
 export const adminBannerRouter = router({
-  //TODO: add admin procedure
-  list: publicProcedure.input(tableInputSchema).query(async ({ input }) => {
+  list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
       input.globalFilter,
@@ -57,4 +60,15 @@ export const adminBannerRouter = router({
       pageCount: totalPages,
     };
   }),
+  add: adminProcedure.mutation(async ({ ctx }) => {
+    console.log("allow image");
+    await setCountUploadImage(ctx.userId, 10);
+    return;
+  }),
+  create: adminProcedure
+    .input(schemas.not_related.bannerInsertSchema)
+    .mutation(async ({ ctx }) => {
+      await delCountUploadImage(ctx.userId);
+      return;
+    }),
 });

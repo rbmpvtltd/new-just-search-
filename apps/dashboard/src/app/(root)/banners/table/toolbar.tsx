@@ -7,7 +7,7 @@ import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-fi
 import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 import { type, active } from "./data";
-import { AddBanner } from "./add.from";
+import { AddBanner } from "../form/add.form";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;

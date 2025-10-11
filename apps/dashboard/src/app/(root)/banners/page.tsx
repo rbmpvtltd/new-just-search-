@@ -1,8 +1,8 @@
 "use client";
 import { trpcServer } from "@/trpc/trpc-server";
 import { DataTable, type QueryFnContext } from "@/components/table/data-table";
-import { columns } from "./columns";
-import { DataTableToolbar } from "./toolbar";
+import { columns } from "./table/columns";
+import { DataTableToolbar } from "./table/toolbar";
 
 export default function Page() {
   const queryConfig = {

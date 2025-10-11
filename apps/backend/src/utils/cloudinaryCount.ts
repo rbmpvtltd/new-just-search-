@@ -14,9 +14,15 @@ export async function canUploadImage(userId: number): Promise<boolean> {
 }
 
 export const setCountUploadImage = async (userId: number, count: number) => {
-   const key = `user:${userId}:uploads`;
-   await redis.setex(key, 60 * 60 * 24, count);
-const count2 = await redis.get(key);
-   console.log("===count is ======", count2);
-   return true;
-}
+  const key = `user:${userId}:uploads`;
+  await redis.setex(key, 60 * 60 * 24, count);
+  const count2 = await redis.get(key);
+  console.log("===count is ======", count2);
+  return true;
+};
+
+export const delCountUploadImage = async (userId: number) => {
+  const key = `user:${userId}:uploads`;
+  await redis.del(key);
+  return true;
+};
