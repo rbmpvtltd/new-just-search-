@@ -1,12 +1,15 @@
 "use client";
+
 import React from "react";
+import type { OutputTrpcType } from "@/trpc/type";
 import { useHireFormStore } from "../../shared/store/useCreateHireStore";
 import DocumentsForm from "./forms/DocumentsForm";
 import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
 
-export default function AddHirePage() {
+export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
+export default function AddHirePage({ data }: { data: AddHirePageType }) {
   const { page } = useHireFormStore();
 
   const steps = [
@@ -19,7 +22,7 @@ export default function AddHirePage() {
   const renderForm = () => {
     switch (page) {
       case 0:
-        return <PersonalDetailsForm />;
+        return <PersonalDetailsForm data={data} />;
       case 1:
         return <EducationForm />;
       case 2:
@@ -27,7 +30,7 @@ export default function AddHirePage() {
       case 3:
         return <DocumentsForm />;
       default:
-        return <PersonalDetailsForm />;
+        return <h1>Form not found</h1>;
     }
   };
 

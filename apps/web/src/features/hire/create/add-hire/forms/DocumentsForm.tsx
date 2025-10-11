@@ -28,26 +28,24 @@ export default function DocumentsForm() {
   } = useForm<DocumentSchema>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
-      // idProof: formValue.idProof ?? "",
-      // idProofPhoto: formValue.idProofPhoto ?? "",
+      idProof: formValue.idProof ?? "",
+      idProofPhoto: formValue.idProofPhoto ?? "",
       coverLetter: formValue.coverLetter ?? "",
-      // resumePdf: formValue.resumePdf ?? "",
-      // aboutYourself: formValue.aboutYourself ?? "",
-      // referCode: formValue.referCode ?? "RBMHORJ00000",
+      resumePdf: formValue.resumePdf ?? "",
+      aboutYourself: formValue.aboutYourself ?? "",
+      referCode: formValue.referCode ?? "RBMHORJ00000",
     },
   });
 
   console.log("form Values before submit", formValue);
 
   const onSubmit = (data: DocumentSchema) => {
-    // console.log("data", data);
-
-    // setFormValue("idProof", data.idProof ?? "");
-    // setFormValue("idProofPhoto", data.idProofPhoto ?? "");
+    setFormValue("idProof", data.idProof ?? "");
+    setFormValue("idProofPhoto", data.idProofPhoto ?? "");
     setFormValue("coverLetter", data.coverLetter ?? "");
-    // setFormValue("resumePdf", data.resumePdf ?? "");
-    // setFormValue("aboutYourself", data.aboutYourself ?? "");
-    // setFormValue("referCode", data.referCode ?? "");
+    setFormValue("resumePdf", data.resumePdf ?? "");
+    setFormValue("aboutYourself", data.aboutYourself ?? "");
+    setFormValue("referCode", data.referCode ?? "");
 
     mutate(formValue, {
       onSuccess: (data) => {
@@ -62,24 +60,30 @@ export default function DocumentsForm() {
   };
 
   const formFields: FormFieldProps<DocumentSchema>[] = [
-    // {
-    //   control,
-    //   label: "Id Proof",
-    //   name: "idProof",
-    //   placeholder: "Id Proof",
-    //   component: "select",
-    //   options: [...ID_PROOF],
-    //   error: errors.idProof?.message,
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "idProofPhoto",
-    //   placeholder: "Upload your photo",
-    //   component: "input",
-    //   error: errors.idProofPhoto?.message,
-    // },
+    {
+      control,
+      label: "Id Proof",
+      name: "idProof",
+      placeholder: "Id Proof",
+      component: "select",
+      options: [
+        { label: "Aadhar Card", value: "Aadhar Card" },
+        { label: "Pan Card", value: "Pan Card" },
+        { label: "Voter Id Card", value: "Voter Id Card" },
+        { label: "Driving License", value: "Driving License" },
+        { label: "Others", value: "Others" },
+      ],
+      error: errors.idProof?.message,
+    },
+    {
+      control,
+      type: "",
+      label: "",
+      name: "idProofPhoto",
+      placeholder: "Upload your photo",
+      component: "input",
+      error: errors.idProofPhoto?.message,
+    },
     {
       control,
       label: "Cover Letter",
@@ -89,33 +93,33 @@ export default function DocumentsForm() {
       required: false,
       error: errors.coverLetter?.message,
     },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "Resume/CV",
-    //   name: "resumePdf",
-    //   placeholder: "",
-    //   component: "input",
-    //   required: false,
-    //   error: errors.resumePdf?.message,
-    // },
-    // {
-    //   control,
-    //   label: "Describe About Yourself",
-    //   name: "aboutYourself",
-    //   placeholder: "",
-    //   component: "textarea",
-    //   required: false,
-    //   error: errors.aboutYourself?.message,
-    // },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   placeholder: "Refer Code",
-    //   component: "input",
-    //   error: errors.referCode?.message,
-    // },
+    {
+      control,
+      type: "",
+      label: "Resume/CV",
+      name: "resumePdf",
+      placeholder: "",
+      component: "input",
+      required: false,
+      error: errors.resumePdf?.message,
+    },
+    {
+      control,
+      label: "Describe About Yourself",
+      name: "aboutYourself",
+      placeholder: "",
+      component: "textarea",
+      required: false,
+      error: errors.aboutYourself?.message,
+    },
+    {
+      control,
+      label: "Refer Code",
+      name: "referCode",
+      placeholder: "Refer Code",
+      component: "input",
+      error: errors.referCode?.message,
+    },
   ];
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

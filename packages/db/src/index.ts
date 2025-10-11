@@ -24,9 +24,7 @@ export const MARITAL_STATUS = hire.MaritalStatus;
 export const GENDER = hire.Gender;
 export const JOB_TYPE = hire.JobType;
 export const WORK_SHIFT = hire.WorkShift;
-export const RELOCATE = hire.YesNoOption;
 export const JOB_DURATION = hire.JobDuration;
-export const ID_PROOF = hire.IdProof;
 export const LANGUAGES = hire.Languages;
 
 export const schemas = {

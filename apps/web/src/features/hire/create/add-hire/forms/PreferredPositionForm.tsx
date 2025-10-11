@@ -9,12 +9,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-  HOURS,
   JOB_DURATION,
   JOB_TYPE,
-  PERIOD,
   WORK_SHIFT,
-  YES_NO_OPTIONS,
 } from "@/features/hire/shared/constants/hire";
 import {
   type PreferredPosition,
@@ -34,16 +31,16 @@ export default function PreferredPositionForm() {
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
       jobType: formValue.jobType ?? [],
-      // locationPreferred: formValue.locationPreferred ?? "",
-      // relocate: formValue.relocate ?? undefined,
-      // expectedSalaryFrom: formValue.expectedSalaryFrom ?? "",
-      // expectedSalaryTo: formValue.expectedSalaryTo ?? "",
-      // jobDuration: formValue.jobDuration ?? [],
-      // fromHour: formValue.fromHour ?? undefined,
-      // fromPeriod: formValue.fromPeriod ?? undefined,
-      // toHour: formValue.toHour ?? undefined,
-      // toPeriod: formValue.toPeriod ?? undefined,
-      // workShift: formValue.workShift ?? [],
+      locationPreferred: formValue.locationPreferred ?? "",
+      relocate: formValue.relocate ?? undefined,
+      expectedSalaryFrom: formValue.expectedSalaryFrom ?? "",
+      expectedSalaryTo: formValue.expectedSalaryTo ?? "",
+      jobDuration: formValue.jobDuration ?? [],
+      fromHour: formValue.fromHour ?? undefined,
+      fromPeriod: formValue.fromPeriod ?? undefined,
+      toHour: formValue.toHour ?? undefined,
+      toPeriod: formValue.toPeriod ?? undefined,
+      workShift: formValue.workShift ?? [],
       availability: formValue.availability ?? "",
     },
   });
@@ -52,16 +49,16 @@ export default function PreferredPositionForm() {
     console.log("jobType", data.jobType);
 
     setFormValue("jobType", data.jobType ?? "");
-    // setFormValue("locationPreferred", data.locationPreferred ?? "");
-    // setFormValue("relocate", data.relocate ?? undefined);
-    // setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
-    // setFormValue("expectedSalaryTo", data.expectedSalaryTo ?? "");
-    // setFormValue("jobDuration", data.jobDuration ?? "");
-    // setFormValue("fromHour", data.fromHour ?? undefined);
-    // setFormValue("fromPeriod", data.fromPeriod ?? undefined);
-    // setFormValue("toHour", data.toHour ?? undefined);
-    // setFormValue("toPeriod", data.toPeriod ?? undefined);
-    // setFormValue("workShift", data.workShift ?? "");
+    setFormValue("locationPreferred", data.locationPreferred ?? "");
+    setFormValue("relocate", data.relocate ?? undefined);
+    setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
+    setFormValue("expectedSalaryTo", data.expectedSalaryTo ?? "");
+    setFormValue("jobDuration", data.jobDuration ?? "");
+    setFormValue("fromHour", data.fromHour ?? undefined);
+    setFormValue("fromPeriod", data.fromPeriod ?? undefined);
+    setFormValue("toHour", data.toHour ?? undefined);
+    setFormValue("toPeriod", data.toPeriod ?? undefined);
+    setFormValue("workShift", data.workShift ?? "");
     setFormValue("availability", data.availability ?? "");
     nextPage();
     console.log("data", data);
@@ -87,10 +84,14 @@ export default function PreferredPositionForm() {
                 name="jobType"
                 placeholder="Job Type"
                 component="checkbox"
-                options={[...JOB_TYPE]}
+                options={[
+                  { label: "Full Time", value: "full-time" },
+                  { label: "Part Time", value: "part-time" },
+                  { label: "Contract", value: "contract" },
+                ]}
                 error={errors.jobType?.message}
               />
-              {/*   <FormField
+              <FormField
                 type=""
                 control={control}
                 label="Location Preferred"
@@ -106,10 +107,19 @@ export default function PreferredPositionForm() {
                 label="Relocate"
                 name="relocate"
                 component="select"
-                options={[...YES_NO_OPTIONS]}
+                options={[
+                  {
+                    label: "Yes",
+                    value: "yes",
+                  },
+                  {
+                    label: "No",
+                    value: "no",
+                  },
+                ]}
                 required={false}
                 error={errors.relocate?.message}
-              /> */}
+              />
             </div>
             <h3 className="text-base font-medium text-gray-700 mt-3">
               Expected Salary
@@ -117,7 +127,7 @@ export default function PreferredPositionForm() {
             <div className="mt-2 grid grid-cols-1 md:grid-cols-2  gap-8">
               <div className="flex flex-col space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* <FormField
+                  <FormField
                     type=""
                     control={control}
                     label="From"
@@ -136,19 +146,24 @@ export default function PreferredPositionForm() {
                     component="input"
                     required={false}
                     error={errors.expectedSalaryTo?.message}
-                  /> */}
+                  />
                 </div>
               </div>
-              {/* <FormField
+              <FormField
                 type=""
                 control={control}
                 label="Job Duration"
                 name="jobDuration"
                 component="checkbox"
-                options={[...JOB_DURATION]}
+                options={[
+                  { label: "Day", value: "day" },
+                  { label: "Week", value: "week" },
+                  { label: "Month", value: "month" },
+                  { label: "Year", value: "year" },
+                ]}
                 required={false}
                 error={errors.jobDuration?.message}
-              /> */}
+              />
             </div>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-1 gap-8">
@@ -157,13 +172,26 @@ export default function PreferredPositionForm() {
                   Perffered Working Hours
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  {/* <FormField
+                  <FormField
                     type=""
                     control={control}
                     label="From Hour"
                     name="fromHour"
                     component="select"
-                    options={[...HOURS]}
+                    options={[
+                      { label: "1", value: "1" },
+                      { label: "2", value: "2" },
+                      { label: "3", value: "3" },
+                      { label: "4", value: "4" },
+                      { label: "5", value: "5" },
+                      { label: "6", value: "6" },
+                      { label: "7", value: "7" },
+                      { label: "8", value: "8" },
+                      { label: "9", value: "9" },
+                      { label: "10", value: "10" },
+                      { label: "11", value: "11" },
+                      { label: "12", value: "12" },
+                    ]}
                     required={false}
                     error={errors.fromHour?.message}
                   />
@@ -173,7 +201,10 @@ export default function PreferredPositionForm() {
                     label="From Period"
                     name="fromPeriod"
                     component="select"
-                    options={[...PERIOD]}
+                    options={[
+                      { label: "AM", value: "AM" },
+                      { label: "PM", value: "PM" },
+                    ]}
                     required={false}
                     error={errors.fromPeriod?.message}
                   />
@@ -183,7 +214,20 @@ export default function PreferredPositionForm() {
                     label="To Hour"
                     name="toHour"
                     component="select"
-                    options={[...HOURS]}
+                    options={[
+                      { label: "1", value: "1" },
+                      { label: "2", value: "2" },
+                      { label: "3", value: "3" },
+                      { label: "4", value: "4" },
+                      { label: "5", value: "5" },
+                      { label: "6", value: "6" },
+                      { label: "7", value: "7" },
+                      { label: "8", value: "8" },
+                      { label: "9", value: "9" },
+                      { label: "10", value: "10" },
+                      { label: "11", value: "11" },
+                      { label: "12", value: "12" },
+                    ]}
                     required={false}
                     error={errors.toHour?.message}
                   />
@@ -193,24 +237,30 @@ export default function PreferredPositionForm() {
                     label="To Period"
                     name="toPeriod"
                     component="select"
-                    options={[...PERIOD]}
+                    options={[
+                      { label: "AM", value: "AM" },
+                      { label: "PM", value: "PM" },
+                    ]}
                     required={false}
                     error={errors.toPeriod?.message}
-                  /> */}
+                  />
                 </div>
               </div>
             </div>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-              {/* <FormField
+              <FormField
                 type=""
                 control={control}
                 label="Work Shift"
                 name="workShift"
                 component="checkbox"
-                options={[...WORK_SHIFT]}
+                options={[
+                  { label: "Day Shift", value: "Day Shift" },
+                  { label: "Night Shift", value: "Night Shift" },
+                ]}
                 error={errors.workShift?.message}
-              /> */}
+              />
               <FormField
                 type=""
                 control={control}

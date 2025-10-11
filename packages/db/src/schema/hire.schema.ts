@@ -35,7 +35,7 @@ export const JobType = {
   FullTime: "FullTime",
   PartTime: "PartTime",
   Both: "Both",
-};
+} as const;
 
 export const WorkShift = {
   Morning: "Morning",
@@ -51,19 +51,6 @@ export const JobDuration = {
   "Few Years": "Few Years",
 };
 
-export const YesNoOption = {
-  Yes: "Yes",
-  No: "No",
-};
-
-export const IdProof = {
-  AadharCard: "AadharCard",
-  PanCard: "PanCard",
-  VoterCard: "VoterCard",
-  DrivingLicense: "DrivingLicense",
-  Others: "Others",
-};
-
 export const Languages = {
   Hindi: "Hindi",
   English: "English",
@@ -76,14 +63,12 @@ export const Languages = {
   Other: "Other",
 };
 
-export const genderEnum = pgEnum("hire_gender", Gender);
+export const genderEnum = pgEnum("hire_gender", (Gender));
 export const maritalStatusEnum = pgEnum("hire_marital_status", MaritalStatus);
 
 export const jobTypeEnum = pgEnum("hire_job_type", JobType);
 export const workShiftEnum = pgEnum("hire_work_shift", WorkShift);
 export const jobDurationEnum = pgEnum("hire_job_duration", JobDuration);
-export const relocateEnum = pgEnum("hire_relocate", YesNoOption);
-export const idProofEnum = pgEnum("hire_id_proof", IdProof);
 export const languagesEnum = pgEnum("hire_languages", Languages);
 
 export const hireListing = pgTable("hire_listing", {
@@ -143,9 +128,9 @@ export const hireListing = pgTable("hire_listing", {
   expectedSalaryTo: varchar("expected_salary_to", { length: 100 }),
   preferredWorkingHours: varchar("preferred_working_hours", { length: 100 }),
   jobDuration: jobDurationEnum("job_duration").array().notNull(),
-  relocate: relocateEnum("relocate"),
+  relocate: varchar("relocate"),
   availability: varchar("availability", { length: 255 }),
-  idProof: idProofEnum("id_proof"),
+  idProof: varchar("id_proof").notNull(),
   idProofPhoto: varchar("id_proof_photo", { length: 500 }),
   coverLetter: varchar("resume", { length: 500 }),
   resumePhoto: varchar("resume_photo", { length: 500 }),

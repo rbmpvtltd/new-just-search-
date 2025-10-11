@@ -4,7 +4,7 @@
 // import { asyncHandler } from "@/utils/error/asyncHandler";
 // import type { errorCodeMap } from "@/utils/error/errorCode";
 // import AddBusinessPage from "@/features/business/create/add-business/AddBusinessPage";
-import AddHirePage from "@/features/hire/create/add-hire/AddHirePage";
+import AddHirePage from "@/features/hire/create/add-hire";
 // import UserProfile from "@/features/user/profile/UserProfile";
 
 // logger.info("test", { test: "test" }, { newline: true }, { color: "red" });
@@ -34,7 +34,7 @@ export default function UserPage() {
   //
   return (
     <div>
-      <AddHirePage />
+      {/* <AddHirePage /> */}
       {/* <AddBusinessPage /> */}
       {/* <UserProfile /> */}
     </div>

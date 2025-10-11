@@ -43,6 +43,7 @@ const selectStyles: StylesConfig<Option, false> = {
   }),
 };
 
+
 export function SingleSelect(props: SelectProps<Option, false>) {
   return <Select {...props} styles={selectStyles} />;
 }

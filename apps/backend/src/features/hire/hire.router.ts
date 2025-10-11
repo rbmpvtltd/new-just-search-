@@ -1,13 +1,10 @@
 import {
   db,
   GENDER,
-  ID_PROOF,
   JOB_DURATION,
   JOB_TYPE,
   LANGUAGES,
   MARITAL_STATUS,
-  QUALIFICATION,
-  RELOCATE,
   schemas,
   WORK_SHIFT,
 } from "@repo/db";
@@ -15,17 +12,24 @@ import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
-import { hireProcedure, router, visitorProcedure } from "@/utils/trpc";
+import { router, visitorProcedure } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
+
+// export const JobType = {
+//   FullTime: "FullTime",
+//   PartTime: "PartTime",
+//   Both: "Both",
+// } as const;
 export const hirerouter = router({
   add: visitorProcedure.query(async ({ ctx }) => {
-    const getHireCategories = await db.query.hireCategories.findMany();
-    const getHireSubCategories = await db.query.hireSubcategories.findMany();
+    const getHireCategories = await db.query.categories.findMany({
+      where: (categories, { eq }) => eq(categories.type, 2),
+    });
     const getCities = await db.query.cities.findMany();
     const getStates = await db.query.states.findMany();
+
     return {
       getHireCategories,
-      getHireSubCategories,
       getCities,
       getStates,
     };
@@ -35,106 +39,126 @@ export const hirerouter = router({
     // });
     // return user;
   }),
+
+  getSubCategories: visitorProcedure
+    .input(z.object({ categoryId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const hireSubCategories = await db.query.subcategories.findMany({
+        where: (subcategories, { eq }) =>
+          eq(subcategories.categoryId, input.categoryId),
+      });
+      return "hiii";
+      console.log("hireSubCategories", hireSubCategories);
+
+      return hireSubCategories;
+    }),
+
+  getCities: visitorProcedure
+    .input(z.object({ state: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const cities = await db.query.cities.findMany({
+        where: (cities, { eq }) => eq(cities.stateId, input.state),
+      });
+      return cities;
+    }),
   create: visitorProcedure
     .input(
       z.object({
+        photo: z.string(),
         name: z.string(),
-        // slug: z.string(),
+        slug: z.string().optional(),
         categoryId: z.number(),
-        subcategoryId: z.array(z.string()),
+        subcategoryId: z.array(z.number()),
         fatherName: z.string(),
         dob: z.string(),
         gender: z.enum(Object.values(GENDER)),
         maritalStatus: z.enum(Object.values(MARITAL_STATUS)),
         languages: z.array(z.enum(Object.values(LANGUAGES))),
         specialities: z.string(),
-        description: z.string(),
+        description: z.string().optional(),
         latitude: z.string(),
         longitude: z.string(),
-        buildingName: z.string(),
-        streetName: z.string(),
+        // buildingName: z.string(),
+        // streetName: z.string(),
         area: z.string(),
-        landmark: z.string(),
-        pincode: z.number(),
+        // landmark: z.string(),
+        pincode: z.string(),
         city: z.number(),
         state: z.number(),
-        schedules: z.array(
-          z.object({
-            fromHour: z.string(),
-            fromPeriod: z.string(),
-            toHour: z.string(),
-            toPeriod: z.string(),
-          }),
-        ),
-        photo: z.string(),
-        isFeature: z.boolean(),
-        email: z.string(),
+        // schedules: z.array(
+        //   z.object({
+        fromHour: z.string().optional(),
+        fromPeriod: z.string().optional(),
+        toHour: z.string().optional(),
+        toPeriod: z.string().optional(),
+        //   }),
+        // ),
+        // isFeature: z.boolean(),
+        email: z.string().optional(),
         mobileNumber: z.string(),
-        whatsappNumber: z.string(),
-        alternativeMobileNumber: z.string(),
-        highestQualification: z.enum(Object.values(QUALIFICATION)),
-        employmentStatus: z.string(),
+        // whatsappNumber: z.string(),
+        alternativeMobileNumber: z.string().optional(),
+        highestQualification: z
+          .string()
+          .min(1, "Please select a qualification"),
+        // employmentStatus: z.string(),
         workExperienceYear: z.number(),
-        workExperienceMonth: z.number(),
+        workExperienceMonth: z.number().optional(),
         jobRole: z.string(),
-        previousJobRole: z.string(),
-        expertise: z.string(),
-        skillset: z.string(),
-        abilities: z.string(),
-        jobType: z.array(z.string()),
-        // jobType: z.array(z.enum(["PartTime", "FullTime"])),
-        locationPreferred: z.string(),
-        certificates: z.string(),
+        previousJobRole: z.string().optional(),
+        // expertise: z.string(),
+        skillset: z.string().optional(),
+        // abilities: z.string(),
+        // jobType: z.array(z.string()),
+        jobType: z.array(z.enum(Object.values(JOB_TYPE))),
+        locationPreferred: z.string().optional(),
+        certificates: z.string().optional(),
         workShift: z.array(z.enum(Object.values(WORK_SHIFT))),
-        expectedSalaryFrom: z.string(),
-        expectedSalaryTo: z.string(),
-        preferredWorkingHours: z.string(),
-        jobDuration: z.array(z.enum(Object.values(JOB_DURATION))),
-        relocate: z.enum(Object.values(RELOCATE)),
-        availability: z.string(),
-        idProof: z.enum(Object.values(ID_PROOF)),
+        expectedSalaryFrom: z.string().optional(),
+        expectedSalaryTo: z.string().optional(),
+        jobDuration: z.array(z.enum(Object.values(JOB_DURATION))).optional(),
+        relocate: z.string().optional(),
+        availability: z.string().optional(),
+        idProof: z.string().min(1, "Please select a id proof"),
         idProofPhoto: z.string(),
-        coverLetter: z.string(),
-        resumePhoto: z.string(),
-        aboutYourself: z.string(),
-        referCode: z.string(),
+        coverLetter: z.string().optional(),
+        resumePdf: z.string().optional(),
+        aboutYourself: z.string().optional(),
+        referCode: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      logger.info("testing that it is working or not");
-      logger.info(input.jobType);
-      console.log("input", input);
-      return input;
-      // const user = await db.query.users.findFirst({
-      //   where: (users, { eq }) => eq(users.id, ctx.userId),
-      // });
-      // if (!user) {
-      //   throw new TRPCError({
-      //     code: "UNAUTHORIZED",
-      //     message: "User not found",
-      //   });
-      // }
+      // return input;
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, ctx.userId),
+      });
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not found",
+        });
+      }
 
-      // const existingBusiness = await db.query.businessListings.findFirst({
-      //   where: (businessListings, { eq }) =>
-      //     eq(businessListings.userId, ctx.userId),
-      // });
-      // if (existingBusiness) {
-      //   throw new TRPCError({
-      //     code: "CONFLICT",
-      //     message: "User already have business listing",
-      //   });
-      // }
+      const existingBusiness = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+      if (existingBusiness) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "User already have business listing",
+        });
+      }
 
-      // const existingHire = await db.query.hireListing.findFirst({
-      //   where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
-      // });
-      // if (existingHire) {
-      //   throw new TRPCError({
-      //     code: "CONFLICT",
-      //     message: "User already have hire listing",
-      //   });
-      // }
+      const existingHire = await db.query.hireListing.findFirst({
+        where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
+      });
+      if (existingHire) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "User already have hire listing",
+        });
+      }
 
       // const existingEmail = await db.query.hireListing.findFirst({
       //   where: (hireListing, { eq }) => eq(hireListing.email, input.email),
@@ -146,130 +170,147 @@ export const hirerouter = router({
       //   });
       // }
 
-      // const isStateExists = await db.query.states.findFirst({
-      //   where: (states, { eq }) => eq(states.id, input.state),
-      // });
-      // if (!isStateExists) {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: "State not found",
-      //   });
-      // }
+      const isStateExists = await db.query.states.findFirst({
+        where: (states, { eq }) => eq(states.id, input.state),
+      });
+      if (!isStateExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "State not found",
+        });
+      }
 
-      // const isCityExists = await db.query.cities.findFirst({
-      //   where: (cities, { eq }) => eq(cities.id, input.city),
-      // });
-      // if (!isCityExists) {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: "City not found",
-      //   });
-      // }
+      const isCityExists = await db.query.cities.findFirst({
+        where: (cities, { eq }) => eq(cities.id, input.city),
+      });
+      if (!isCityExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "City not found",
+        });
+      }
 
-      // const [createHire] = await db
-      //   .insert(schemas.hire.hireListing)
-      //   .values({
-      //     userId: ctx.userId,
-      //     name: input.name,
-      // photo: input.photo,
-      // fatherName: input.fatherName,
-      // dob: input.dob,
-      // gender: input.gender,
-      // maritalStatus: input.maritalStatus,
-      // languages: input.languages,
-      // slug: input.slug,
-      // specialities: input.specialities,
-      // description: input.description,
-      // latitude: input.latitude,
-      // longitude: input.longitude,
-      // buildingName: input.buildingName,
-      // streetName: input.streetName,
-      // area: input.area,
-      // landmark: input.landmark,
-      // pincode: input.pincode,
-      // state: input.state,
-      // city: input.city,
-      // schedules: JSON.stringify(input.schedules),
-      // email: input.email,
-      // mobileNumber: input.mobileNumber,
-      // whatsappNo: input.whatsappNumber,
-      // alternativeMobileNumber: input.alternativeMobileNumber,
-      // highestQualification: input.highestQualification,
-      // employmentStatus: input.employmentStatus,
-      // workExperienceYear: input.workExperienceYear,
-      // workExperienceMonth: input.workExperienceMonth,
-      // jobRole: input.jobRole,
-      // previousJobRole: input.previousJobRole,
-      // expertise: input.expertise,
-      // skillset: input.skillset,
-      // abilities: input.abilities,
-      // jobType: input.jobType,
-      // locationPreferred: input.locationPreferred,
-      // certificates: input.certificates,
-      // workShift: input.workShift,
-      // expectedSalaryFrom: input.expectedSalaryFrom,
-      // expectedSalaryTo: input.expectedSalaryTo,
-      // preferredWorkingHours: input.preferredWorkingHours,
-      // jobDuration: input.jobDuration,
-      // relocate: input.relocate,
-      // availability: input.availability,
-      // idProof: input.idProof,
-      // idProofPhoto: input.idProofPhoto,
-      // coverLetter: input.coverLetter,
-      // resumePhoto: input.resumePhoto,
-      // aboutYourself: input.aboutYourself,
-      // })
-      // .returning({
-      //   id: schemas.hire.hireListing.id,
-      // });
+      const [createHire] = await db
+        .insert(schemas.hire.hireListing)
+        .values({
+          userId: ctx.userId,
+          name: input.name,
+          photo: input.photo,
+          fatherName: input.fatherName,
+          dob: input.dob,
+          // gender: input.gender,
+          // maritalStatus: input.maritalStatus,
+          languages: Array.isArray(input.languages)
+            ? input.languages
+            : JSON.parse(input.languages || "[]"),
+          // slug: input.name,
+          // specialities: input.specialities,
+          // description: input.description,
+          // latitude: input.latitude,
+          // longitude: input.longitude,
+          // pincode: 123456,
+          // state: input.state,
+          // city: input.city,
+          // email: input.email,
+          // mobileNumber: input.mobileNumber,
+          // alternativeMobileNumber: input.alternativeMobileNumber,
+          // highestQualification: input.highestQualification,
+          // workExperienceYear: input.workExperienceYear,
+          // workExperienceMonth: input.workExperienceMonth,
+          // jobRole: input.jobRole,
+          // previousJobRole: input.previousJobRole,
+          // skillset: input.skillset,
+          // jobType: Array.isArray(input.jobType)
+          //   ? input.jobType
+          //   : JSON.parse(input.jobType || "[]"),
+          // workShift: Array.isArray(input.workShift)
+          //   ? input.workShift
+          //   : JSON.parse(input.workShift || "[]"),
+          // jobDuration: Array.isArray(input.jobDuration)
+          //   ? input.jobDuration
+          //   : JSON.parse(input.jobDuration || "[]"),
+          // locationPreferred: input.locationPreferred,
+          // certificates: input.certificates,
+          // expectedSalaryFrom: input.expectedSalaryFrom,
+          // expectedSalaryTo: input.expectedSalaryTo,
+          // relocate: input.relocate,
+          // availability: input.availability,
+          // idProof: input.idProof,
+          // idProofPhoto: input.idProofPhoto,
+          // coverLetter: input.coverLetter,
+          // resumePhoto: input.resumePdf,
+          // aboutYourself: input.aboutYourself,
+          // abilities: "",
+          // area: "",
+          // buildingName: "",
+          // streetName: "",
+          // landmark: "",
+          // whatsappNo: "",
+          // schedules: "",
+          // employmentStatus: "",
+          // expertise: "",
+          // facebook: "",
+          // twitter: "",
+          // linkedin: "",
+          // views: 0,
+          // isFeature: false,
+          // preferredWorkingHours: "",
+          // resumePhoto: input.resumePdf,
+          // status: true,
+          // website: "",
+          // createdAt: new Date(),
+          // updatedAt: new Date(),
+          // referCode: input.referCode,
+        })
+        .returning({
+          id: schemas.hire.hireListing.id,
+        });
 
-      // if (!createHire) {
-      //   throw new TRPCError({
-      //     code: "INTERNAL_SERVER_ERROR",
-      //     message: "Something went wrong",
-      //   });
-      // }
+      if (!createHire) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
 
-      // const hireId = createHire.id;
+      const hireId = createHire.id;
 
-      // await db.insert(schemas.hire.hireCategories).values({
-      //   hireId,
-      //   categoryId: input.categoryId,
-      // });
-      // if (input.subcategoryId.length > 0) {
-      //   await db.insert(schemas.hire.hireSubcategories).values(
-      //     input.subcategoryId.map((subCategoryId) => ({
-      //       hireId,
-      //       subcategoryId: subCategoryId,
-      //     })),
-      //   );
-      // }
+      await db.insert(schemas.hire.hireCategories).values({
+        hireId,
+        categoryId: input.categoryId,
+      });
+      await db.insert(schemas.hire.hireSubcategories).values(
+        input.subcategoryId.map((subCategoryId) => ({
+          subcategoryId: Number(subCategoryId),
+          hireId,
+        })),
+      );
 
-      //   await db
-      //     .update(schemas.auth.users)
-      //     .set({
-      //       role: "hire",
-      //     })
-      //     .where(eq(schemas.auth.users.id, ctx.userId));
+      await db
+        .update(schemas.auth.users)
+        .set({
+          role: "hire",
+        })
+        .where(eq(schemas.auth.users.id, ctx.userId));
 
-      //   changeRoleInSession(ctx.sessionId, "hire");
-      //   return {
-      //     success: true,
-      //     message: "Hire listing created successfully",
-      //   };
-      // }),
-
-      // show: hireProcedure.query(async ({ ctx }) => {
-      //   const hire = await db.query.hireListing.findFirst({
-      //     where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
-      //   });
-
-      //   if (!hire) {
-      //     throw new TRPCError({
-      //       code: "NOT_FOUND",
-      //       message: "Hire listing not found",
-      //     });
-      //   }
-      //   return hire;
+      changeRoleInSession(ctx.sessionId, "hire");
+      return {
+        success: true,
+        message: "Hire listing created successfully",
+      };
     }),
+
+  // show: hireProcedure.query(async ({ ctx }) => {
+  //   const hire = await db.query.hireListing.findFirst({
+  //     where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
+  //   });
+
+  //   if (!hire) {
+  //     throw new TRPCError({
+  //       code: "NOT_FOUND",
+  //       message: "Hire listing not found",
+  //     });
+  //   }
+  //   return hire;
+  // }),
 });

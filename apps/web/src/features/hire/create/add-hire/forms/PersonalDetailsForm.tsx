@@ -1,6 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
+import { is } from "date-fns/locale";
+import { useForm, useWatch } from "react-hook-form";
 import {
   FormField,
   type FormFieldProps,
@@ -9,18 +11,27 @@ import { Button } from "@/components/ui/button";
 import {
   GENDER,
   LANGUAGES,
-  MARITAL_STATUS,
-  SUB_CATEGORY,
+  MaritalStatus,
 } from "@/features/hire/shared/constants/hire";
+import { Gender } from "@/features/hire/shared/constants/test";
 import {
   type PersonalDetailsSchema,
   personalDetailsSchema,
 } from "@/features/hire/shared/schemas/personal-details.schema";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
+import { useTRPC } from "@/trpc/client";
+import type { AddHirePageType } from "..";
 
-export default function PersonalDetailsForm() {
+export default function PersonalDetailsForm({
+  data,
+}: {
+  data: AddHirePageType;
+}) {
+  const trpc = useTRPC();
   const { page, prevPage, nextPage, setFormValue, formValue } =
     useHireFormStore();
+
+  console.log("ranjeet is maried", MaritalStatus());
 
   const {
     control,
@@ -30,25 +41,80 @@ export default function PersonalDetailsForm() {
     resolver: zodResolver(personalDetailsSchema),
     defaultValues: {
       // photo: formValue.photo ?? "",
-      categoryId: formValue.categoryId ?? 0,
-      subcategoryId: formValue.subcategoryId ?? [],
-      name: formValue.name ?? "",
-      // gender: formValue.gender ?? undefined,
+      // categoryId: formValue.categoryId ?? "",
+      // subcategoryId: formValue.subcategoryId ?? [],
+      // name: formValue.name ?? "",
+      gender: formValue.gender ?? [],
       // maritalStatus: formValue.maritalStatus ?? undefined,
-      // fathersName: formValue.fathersName ?? "",
-      // dateOfBirth: formValue.dateOfBirth ?? "",
+      // fatherName: formValue.fatherName ?? "",
+      // dob: formValue.dob ?? "",
       // languages: formValue.languages ?? [],
       // mobileNumber: formValue.mobileNumber ?? "",
       // alternateMobileNumber: formValue.alternateMobileNumber ?? "",
       // email: formValue.email ?? "",
       // latitude: formValue.latitude ?? "",
       // longitude: formValue.longitude ?? "",
-      // address: formValue.address ?? "",
+      // area: formValue.area ?? "",
       // pincode: formValue.pincode ?? "",
       // state: formValue.state ?? "",
       // city: formValue.city ?? "",
     },
   });
+
+  // const categories = data?.getHireCategories.map((item: any) => {
+  //   return {
+  //     label: item.title,
+  //     value: item.id,
+  //   };
+  // });
+  // const selectedCategoryId = useWatch({ control, name: "categoryId" });
+
+  // console.log("selectedCategoryId", selectedCategoryId);
+
+  // const { data: subCategories, isLoading } = useQuery(
+  //   trpc.hirerouter.getSubCategories.queryOptions({
+  //     categoryId: selectedCategoryId,
+  //   }),
+  // );
+  // console.log("subCategories", subCategories);
+
+  // const states = data?.getStates.map((item: any) => {
+  //   return {
+  //     label: item.name,
+  //     value: item.id,
+  //   };
+  // });
+  // const selectedStateId = useWatch({ control, name: "state" });
+  // console.log("selectedStateId", selectedStateId);
+
+  // const { data: cities, isLoading: cityLoading } = useQuery(
+  //   trpc.hirerouter.getCities.queryOptions({
+  //     state: selectedStateId,
+  //   }),
+  // );
+
+  // console.log("cities", cities);
+
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
+  // if (cityLoading) {
+  //   return <div>Loading...</div>;
+  // }
+
+  // const citiesList = cities?.map((item) => {
+  //   return {
+  //     label: item.city,
+  //     value: item.id,
+  //   };
+  // });
+  // const subCategoriesList = subCategories?.map((item) => {
+  //   return {
+  //     label: item.name,
+  //     value: item.id,
+  //   };
+  // });
+
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
     // {
     //   control,
@@ -60,84 +126,92 @@ export default function PersonalDetailsForm() {
     //   section: "profile",
     //   error: errors.photo?.message,
     // },
+    // {
+    //   control,
+    //   type: "text",
+    //   label: "Applied For",
+    //   name: "categoryId",
+    //   placeholder: "Applied For",
+    //   component: "select",
+    //   section: "profile",
+    //   options: [
+    //     { label: "Teacher", value: 1 },
+    //     { label: "All Subjects", value: 2 },
+    //   ],
+    //   error: errors.categoryId?.message,
+    // },
+    // {
+    //   control,
+    //   type: "text",
+    //   label: "Sub Category",
+    //   name: "subcategoryId",
+    //   placeholder: "Select Sub Category",
+    //   component: "multiselect",
+    //   section: "profile",
+    //   options: [
+    //     { label: "Teacher", value: 1 },
+    //     { label: "All Subjects", value: 2 },
+    //   ],
+    //   error: errors.subcategoryId?.message,
+    // },
+    // {
+    //   control,
+    //   type: "text",
+    //   label: "Full Name",
+    //   name: "name",
+    //   placeholder: "Full Name",
+    //   component: "input",
+    //   className: "",
+    //   section: "profile",
+    //   error: errors.name?.message,
+    // },
     {
       control,
       type: "text",
-      label: "Applied For",
-      name: "categoryId",
-      placeholder: "Applied For",
+      label: "Gender",
+      name: "gender",
+      placeholder: "Select Gender",
       component: "select",
       section: "profile",
-      options: [
-        { value: 1, label: 1 },
-        { value: 2, label: 2 },
-        { value: 3, label: 3 },
-      ],
-      error: errors.categoryId?.message,
+      options: [...Gender],
+      error: errors.gender?.message,
     },
     {
       control,
       type: "text",
-      label: "Sub Category",
-      name: "subcategoryId",
-      placeholder: "Select Sub Category",
-      component: "multiselect",
+      label: "Marital Status",
+      name: "maritalStatus",
+      placeholder: "Select Marital Status",
+      component: "select",
       section: "profile",
-      options: [...SUB_CATEGORY],
-      error: errors.subcategoryId?.message,
+      options: Object.values(MaritalStatus).map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      }),
+
+      error: errors.maritalStatus?.message,
     },
-    {
-      control,
-      type: "text",
-      label: "Full Name",
-      name: "name",
-      placeholder: "Full Name",
-      component: "input",
-      className: "",
-      section: "profile",
-      error: errors.name?.message,
-    },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Gender",
-    //   name: "gender",
-    //   placeholder: "Select Gender",
-    //   component: "select",
-    //   section: "profile",
-    //   options: [...GENDER],
-    //   error: errors.gender?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Marital Status",
-    //   name: "maritalStatus",
-    //   placeholder: "Select Marital Status",
-    //   component: "select",
-    //   section: "profile",
-    //   options: [...MARITAL_STATUS],
-    //   error: errors.maritalStatus?.message,
-    // },
     // {
     //   control,
     //   type: "text",
     //   label: "Father's Name",
-    //   name: "fathersName",
+    //   name: "fatherName",
     //   placeholder: "Father's Name",
     //   component: "input",
     //   section: "profile",
-    //   error: errors.fathersName?.message,
+    //   error: errors.fatherName?.message,
     // },
     // {
     //   control,
     //   type: "date",
     //   label: "Date of Birth",
-    //   name: "dateOfBirth",
+    //   name: "dob",
     //   placeholder: "Date of Birth",
     //   component: "input",
     //   section: "profile",
-    //   error: errors.dateOfBirth?.message,
+    //   error: errors.dob?.message,
     // },
     // {
     //   control,
@@ -147,7 +221,12 @@ export default function PersonalDetailsForm() {
     //   placeholder: "Select Languages",
     //   component: "multiselect",
     //   section: "profile",
-    //   options: [...LANGUAGES],
+    //   options: [
+    //     {
+    //       label: "Hindi",
+    //       value: "Hindi",
+    //     },
+    //   ],
     //   error: errors.languages?.message,
     // },
     // {
@@ -176,7 +255,7 @@ export default function PersonalDetailsForm() {
     //   type: "email",
     //   label: "Email",
     //   name: "email",
-    //   placeholder: "Email Address",
+    //   placeholder: "Email area",
     //   component: "input",
     //   required: false,
     //   section: "profile",
@@ -205,12 +284,12 @@ export default function PersonalDetailsForm() {
     // {
     //   control,
     //   type: "text",
-    //   label: "Address",
-    //   name: "address",
-    //   placeholder: "Address",
+    //   label: "area",
+    //   name: "area",
+    //   placeholder: "area",
     //   component: "input",
     //   section: "loction",
-    //   error: errors.address?.message,
+    //   error: errors.area?.message,
     // },
     // {
     //   control,
@@ -231,9 +310,8 @@ export default function PersonalDetailsForm() {
     //   component: "select",
     //   section: "loction",
     //   options: [
-    //     { value: "Job", label: "Job" },
-    //     { value: "Internship", label: "Internship" },
-    //     { value: "Other", label: "Other" },
+    //     { label: "Rajasthan", value: 1 },
+    //     { label: "Uttar Pradesh", value: 2 },
     //   ],
     //   error: errors.state?.message,
     // },
@@ -246,37 +324,34 @@ export default function PersonalDetailsForm() {
     //   component: "select",
     //   section: "loction",
     //   options: [
-    //     { value: "Job", label: "Job" },
-    //     { value: "Internship", label: "Internship" },
-    //     { value: "Other", label: "Other" },
+    //     { label: "Jaipur", value: 2 },
+    //     { label: "Jodhpur", value: 1 },
     //   ],
     //   error: errors.city?.message,
     // },
   ];
 
   const onSubmit = (data: PersonalDetailsSchema) => {
-    console.log(data, "data");
+    console.log("data", data);
 
     // setFormValue("photo", data.photo ?? "");
-    setFormValue("categoryId", data.categoryId ?? "");
-    setFormValue("subcategoryId", data.subcategoryId ?? "");
-    setFormValue("name", data.name ?? "");
-    // setFormValue("gender", data.gender ?? "");
-    // setFormValue("maritalStatus", data.maritalStatus ?? "");
-    // setFormValue("fatherName", data.fathersName ?? "");
-    // setFormValue("dateOfBirth", data.dateOfBirth ?? "");
-    // setFormValue("languages", data.languages ?? "");
+    // setFormValue("categoryId", data.categoryId ?? "");
+    // setFormValue("subcategoryId", data.subcategoryId?.map(String) ?? []);
+    // setFormValue("name", data.name ?? "");
+    setFormValue("gender", data.gender ?? []);
+    setFormValue("maritalStatus", data.maritalStatus ?? "");
+    // setFormValue("fatherName", data.fatherName ?? "");
+    // setFormValue("dob", data.dob ?? "");
+    // setFormValue("languages", data.languages ?? []);
     // setFormValue("mobileNumber", data.mobileNumber ?? "");
     // setFormValue("alternateMobileNumber", data.alternateMobileNumber ?? "");
     // setFormValue("email", data.email ?? "");
     // setFormValue("latitude", data.latitude ?? "");
     // setFormValue("longitude", data.longitude ?? "");
-    // setFormValue("address", data.address ?? "");
+    // setFormValue("area", data.area ?? "");
     // setFormValue("pincode", data.pincode ?? "");
     // setFormValue("state", data.state ?? "");
     // setFormValue("city", data.city ?? "");
-    console.log(data, "data");
-    console.log("form value", formValue);
     nextPage();
   };
 
@@ -318,14 +393,14 @@ export default function PersonalDetailsForm() {
                 </Button>
               </div>
 
-              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {formFields
                   .filter((fields) => fields.section === "loction")
                   .map((field, index) => (
                     <div
                       key={field.name}
                       className={
-                        field.name === "address"
+                        field.name === "area"
                           ? "md:col-span-2 lg:col-span-3"
                           : ""
                       }
@@ -333,13 +408,16 @@ export default function PersonalDetailsForm() {
                       <FormField {...field} />
                     </div>
                   ))}
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="flex justify-end p-6 border-t border-gray-200">
-          <Button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-md">
+          <Button
+            type="submit"
+            className="bg-orange-500 hover:bg-orange-700 font-bold "
+          >
             CONTINUE
           </Button>
         </div>

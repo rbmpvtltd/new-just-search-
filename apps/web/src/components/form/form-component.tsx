@@ -22,6 +22,7 @@ export interface FormFieldProps<T extends FieldValues> {
   required?: boolean;
   section?: string;
   error?: string;
+  onChangeValue?: (value: string | undefined | null) => void;
   options?: Option[] | undefined;
   component:
     | "input"
@@ -44,6 +45,7 @@ export const FormField = <T extends FieldValues>({
   error,
   options,
   component,
+  onChangeValue,
   ...props
 }: FormFieldProps<T>) => {
   return (
@@ -92,6 +94,7 @@ export const FormField = <T extends FieldValues>({
                   options={options}
                   className="h-12"
                   value={options?.find((item) => item.value === value) || null}
+                
                   onChange={(selectedItem) => onChange(selectedItem?.value)}
                   {...props}
                 />

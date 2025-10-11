@@ -1,28 +1,12 @@
-export const GENDER = [
-  { value: "Male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "Other", label: "Other" },
-];
+"use server";
 
-export const MARITAL_STATUS = [
-  { value: "Married", label: "Married" },
-  { value: "Unmarried", label: "Unmarried" },
-  { value: "Widowed", label: "Widowed" },
-  { value: "Divorced", label: "Divorced" },
-  { value: "Other", label: "Other" },
-];
+import { schemas } from "@repo/db";
 
-export const LANGUAGES = [
-  { label: "Hindi", value: "Hindi" },
-  { label: "English", value: "English" },
-  { label: "Punjabi", value: "Punjabi" },
-  { label: "Gujarati", value: "Gujarati" },
-  { label: "Bengali", value: "Bengali" },
-  { label: "Malayalam", value: "Malayalam" },
-  { label: "Kannada", value: "Kannada" },
-  { label: "Tamil", value: "Tamil" },
-  { label: "Other", value: "Other" },
-];
+export const GENDER = schemas.hire.Gender;
+
+export const MaritalStatus = schemas.hire.MaritalStatus
+
+export const LANGUAGES = schemas.hire.Languages;
 
 export const QUALIFICATIONS = [
   { label: "B.E / B.Tech", value: "b-e / b-tech" },
@@ -154,19 +138,9 @@ export const YES_NO_OPTIONS = [
   { label: "No", value: "No" },
 ];
 
-export const JOB_TYPE = [
-  { label: "FullTime", value: "FullTime" },
-  { label: "PartTime", value: "PartTime" },
-  { label: "Both", value: "Both" },
-];
+export const JOB_TYPE = schemas.hire.JobType
 
-export const JOB_DURATION = [
-  { label: "Day", value: "Day" },
-  { label: "Week", value: "Week" },
-  { label: "Month", value: "Month" },
-  { label: "Year", value: "Year" },
-  { label: "Few Years", value: "Few Years" },
-];
+export const JOB_DURATION = schemas.hire.JobDuration
 
 export const HOURS = [
   { label: "1", value: "1" },
@@ -188,11 +162,7 @@ export const PERIOD = [
   { label: "PM", value: "PM" },
 ];
 
-export const WORK_SHIFT = [
-  { label: "Morning Shift", value: "Morning Shift" },
-  { label: "Evening Shift", value: "Evening Shift" },
-  { label: "Night Shift", value: "Night Shift" },
-];
+export const WORK_SHIFT = schemas.hire.WorkShift
 
 export const SUB_CATEGORY = [
   { label: "IT", value: "IT" },

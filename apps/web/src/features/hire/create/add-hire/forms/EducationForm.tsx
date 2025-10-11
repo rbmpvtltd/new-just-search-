@@ -29,40 +29,48 @@ export default function EducationForm() {
   } = useForm<EducationSchema>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      // highestQualification: formValue.highestQualification ?? "",
+      highestQualification: formValue.highestQualification ?? "",
       skillset: formValue.skillset ?? "",
-      // currentlyEmployed: formValue.currentlyEmployed ?? "",
-      // workExperienceYears: formValue.workExperienceYears ?? "",
-      // workExperienceMonths: formValue.workExperienceMonths ?? undefined,
-      // previousJobRole: formValue.previousJobRole ?? "",
-      // jobRole: formValue.jobRole ?? "",
-      // certificate: formValue.certificate ?? "",
+      currentlyEmployed: formValue.currentlyEmployed ?? "",
+      workExperienceYear: formValue.workExperienceYear ?? "",
+      workExperienceMonth: formValue.workExperienceMonth ?? undefined,
+      previousJobRole: formValue.previousJobRole ?? "",
+      jobRole: formValue.jobRole ?? "",
+      certificate: formValue.certificate ?? "",
     },
   });
   const onSubmit = (data: EducationSchema) => {
-    // setFormValue("highestQualification", data.highestQualification ?? "");
+    setFormValue("highestQualification", data.highestQualification ?? "");
     setFormValue("skillset", data.skillset ?? "");
-    // setFormValue("currentlyEmployed", data.currentlyEmployed ?? "");
-    // setFormValue("workExperienceYears", data.workExperienceYears ?? "");
-    // setFormValue("workExperienceMonths", data.workExperienceMonths ?? "");
-    // setFormValue("previousJobRole", data.previousJobRole ?? "");
-    // setFormValue("jobRole", data.jobRole ?? "");
-    // setFormValue("certificate", data.certificate ?? "");
+    setFormValue("currentlyEmployed", data.currentlyEmployed ?? "");
+    setFormValue("workExperienceYear", data.workExperienceYear ?? "");
+    setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
+    setFormValue("previousJobRole", data.previousJobRole ?? "");
+    setFormValue("jobRole", data.jobRole ?? "");
+    setFormValue("certificate", data.certificate ?? "");
     // console.log("form value", formValue ?? "");
     console.log("data", data);
 
     nextPage();
   };
   const formFields: FormFieldProps<EducationSchema>[] = [
-    // {
-    //   control,
-    //   label: "Highest Qualification",
-    //   name: "highestQualification",
-    //   placeholder: "Highest Qualification",
-    //   component: "select",
-    //   options: [...QUALIFICATIONS],
-    //   error: errors.highestQualification?.message,
-    // },
+    {
+      control,
+      label: "Highest Qualification",
+      name: "highestQualification",
+      placeholder: "Highest Qualification",
+      component: "select",
+      options: [
+        { label: "B.E / B.Tech", value: "b-e / b-tech" },
+        { label: "M.E / M.Tech", value: "m-e / m-tech" },
+        { label: "M.S Engineering", value: "m-s engineering" },
+        { label: "M.Eng (Hons)", value: "m-eng (hons)" },
+        { label: "B.Eng (Hons)", value: "b-eng (hons)" },
+        { label: "Engineering Diploma", value: "engineering diploma" },
+        { label: "AE", value: "ae" },
+      ],
+      error: errors.highestQualification?.message,
+    },
     {
       control,
       label: "Skill Set",
@@ -72,61 +80,86 @@ export default function EducationForm() {
       required: false,
       error: errors.skillset?.message,
     },
-    // {
-    //   control,
-    //   label: "Currently Employed",
-    //   name: "currentlyEmployed",
-    //   placeholder: "Currently Employed",
-    //   component: "select",
-    //   options: [...YES_NO_OPTIONS],
-    //   error: errors.currentlyEmployed?.message,
-    // },
-    // {
-    //   control,
-    //   label: "Work Experience (Years)",
-    //   name: "workExperienceYears",
-    //   placeholder: "Years",
-    //   component: "select",
-    //   options: [...EXPERIENCE_YEARS],
-    //   error: errors.workExperienceYears?.message,
-    // },
-    // {
-    //   control,
-    //   label: "Months",
-    //   name: "workExperienceMonths",
-    //   placeholder: "Months",
-    //   component: "select",
-    //   required: false,
-    //   options: [...EXPERIENCE_MONTHS],
-    //   error: errors.workExperienceMonths?.message,
-    // },
-    // {
-    //   control,
-    //   label: "Job Role",
-    //   name: "jobRole",
-    //   placeholder: "Job Role",
-    //   component: "input",
-    //   error: errors.jobRole?.message,
-    // },
-    // {
-    //   control,
-    //   label: "Previous Job Role",
-    //   name: "previousJobRole",
-    //   placeholder: "Previous Job Role",
-    //   component: "input",
-    //   required: false,
-    //   error: errors.previousJobRole?.message,
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "Certificate",
-    //   name: "certificate",
-    //   placeholder: "Certificate",
-    //   component: "input",
-    //   required: false,
-    //   error: errors.certificate?.message,
-    // },
+    {
+      control,
+      label: "Currently Employed",
+      name: "currentlyEmployed",
+      placeholder: "Currently Employed",
+      component: "select",
+      options: [
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+      error: errors.currentlyEmployed?.message,
+    },
+    {
+      control,
+      label: "Work Experience (Years)",
+      name: "workExperienceYear",
+      placeholder: "Years",
+      component: "select",
+      options: [
+        { label: "fresher", value: "fresher" },
+        { label: "0", value: "0" },
+        { label: "1", value: "1" },
+        { label: "2", value: "2" },
+        { label: "3", value: "3" },
+        { label: "4", value: "4" },
+        { label: "5", value: "5" },
+      ],
+      error: errors.workExperienceYear?.message,
+    },
+    {
+      control,
+      label: "Months",
+      name: "workExperienceMonth",
+      placeholder: "Months",
+      component: "select",
+      required: false,
+      options: [
+        { label: "fresher", value: "fresher" },
+        { label: "0", value: "0" },
+        { label: "1", value: "1" },
+        { label: "2", value: "2" },
+        { label: "3", value: "3" },
+        { label: "4", value: "4" },
+        { label: "5", value: "5" },
+      ],
+      error: errors.workExperienceMonth?.message,
+    },
+    {
+      control,
+      label: "Job Role",
+      name: "jobRole",
+      placeholder: "Job Role",
+      component: "input",
+      error: errors.jobRole?.message,
+    },
+    {
+      control,
+      label: "Previous Job Role",
+      name: "previousJobRole",
+      placeholder: "Previous Job Role",
+      component: "input",
+      required: false,
+      error: errors.previousJobRole?.message,
+    },
+    {
+      control,
+      type: "",
+      label: "Certificate",
+      name: "certificate",
+      placeholder: "Certificate",
+      component: "input",
+      required: false,
+      error: errors.certificate?.message,
+    },
   ];
 
   return (
@@ -150,9 +183,9 @@ export default function EducationForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {formFields.map((field) => {
-                if (field.name === "workExperienceYears") {
+                if (field.name === "workExperienceYear") {
                   const monthsField = formFields.find(
-                    (f) => f.name === "workExperienceMonths",
+                    (f) => f.name === "workExperienceMonth",
                   );
 
                   return (
@@ -168,7 +201,7 @@ export default function EducationForm() {
                   );
                 }
 
-                if (field.name === "workExperienceMonths") return null;
+                if (field.name === "workExperienceMonth") return null;
 
                 return <FormField key={field.name} {...field} />;
               })}
