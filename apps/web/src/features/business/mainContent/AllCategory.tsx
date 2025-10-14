@@ -1,12 +1,20 @@
 "use client";
 
 import { CldImage } from "next-cloudinary";
+import Link from "next/link";
 import { IoCloseCircleOutline } from "react-icons/io5";
 
 interface AllCategoryProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  data: { photo: string; title: string; type: number | null }[] | null;
+  data:
+    | {
+        photo: string;
+        title: string;
+        type: number | null;
+        id: string | number;
+      }[]
+    | null;
   type?: 1 | 2 | 0;
 }
 
@@ -32,26 +40,36 @@ function AllCategory({ isOpen, setIsOpen, data, type = 0 }: AllCategoryProps) {
       <div className="px-8 pb-8 h-[calc(100%-80px)] overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {data
           ?.filter((item) => {
-            if(item.type === 0) return true
-            return Number(item.type) === type
+            if (type === 0) return true;
+            return Number(item.type) === type;
           })
-          .map((item: { photo: string; title: string }, index: number) => {
-            return (
-              <div
-                key={index.toString()}
-                className="flex items-center gap-4 mb-4 cursor-pointer"
-              >
-                <CldImage
-                  height={30}
-                  width={30}
-                  src={item.photo}
-                  alt={`${item.title} category image`}
-                  className="object-cover"
-                />
-                <p className="text-sm">{item.title}</p>
-              </div>
-            );
-          })}
+          .map(
+            (
+              item: { photo: string; title: string; id: number | string },
+              index: number,
+            ) => {
+              return (
+                <Link
+                  key={index.toString()}
+                  href={{
+                    pathname: `/business/listings/${item.id}`,
+                    query: { page: 1 },
+                  }}
+                >
+                  <div className="flex items-center gap-4 mb-4 cursor-pointer">
+                    <CldImage
+                      height={30}
+                      width={30}
+                      src={item.photo}
+                      alt={`${item.title} category image`}
+                      className="object-cover"
+                    />
+                    <p className="text-sm">{item.title}</p>
+                  </div>
+                </Link>
+              );
+            },
+          )}
       </div>
     </div>
   );

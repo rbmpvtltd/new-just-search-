@@ -22,9 +22,9 @@ function PopularaBanner({
 
   return (
     <div className="">
-      <div className="flex justify-between w-[60%] gap-4 m-5 px-12">
-        <h1 className="text-2xl font-semibold">Popular On Just <span className="text-primary"> Search</span></h1>
-        <div className="flex gap-4">
+      <div className="flex flex-col mx-auto sm:mx-0 sm:flex-row justify-between lg:w-[60%] w-[90%]  gap-4 m-5 px-12">
+        <h1 className="text-2xl font-semibold text-center">Popular On Just <span className="text-primary"> Search</span></h1>
+        <div className="flex gap-4 mx-auto sm:mx-0">
           <button
             onClick={() => setCategoryType(2)}
             type="button"

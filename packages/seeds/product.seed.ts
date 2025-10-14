@@ -1,34 +1,41 @@
-import { db, uploadOnCloudinary } from "@repo/db";
+import { db } from "@repo/db";
+import { uploadOnCloudinary } from "@repo/cloudinary";
+
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
-import { categories } from "../db/src/schema/category.schema";
+
 import {
-  productPhotos,../db/src/test/product.shema
+  productPhotos,
   productReviews,
   productSubCategories,
   products,
-} from "../db/src/schema/product.shema";
-import { subcategories } from "../db/src/schema/subcategory.schema";
-import { businessListings } from "../db/test/business.schema";
+} from "../db/src/schema/product.schema";
+import {
+  categories,
+  cities,
+  subcategories,
+} from "../db/src/schema/not-related.schema";
+import { businessListings } from "../db/src/schema/business.schema";
 import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake } from "./seeds";
 
 dotenv.config();
 export const productSeed = async () => {
   await clearAllTablesBusiness();
-  await addProduct();
+  // await addProduct();
   await addProductReviews();
   // await addRecentViewProduct();
-  await addProductSubCategroy();
+  // await addProductSubCategroy();
 };
 
 export const clearAllTablesBusiness = async () => {
-  await db.execute(
-    `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(
+  //   `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
+  // );
   await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
 
@@ -81,8 +88,9 @@ export const addProduct = async () => {
         const uploaded = await uploadOnCloudinary(
           liveProductsImageUrl,
           "Products",
+          clouadinaryFake
         );
-        const photoUrl = uploaded?.secure_url ?? null;
+        const photoUrl = uploaded;
 
         if (photoUrl) {
           await db.insert(productPhotos).values({

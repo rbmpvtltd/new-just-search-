@@ -6,9 +6,9 @@ dotenv.config({ path: "../../.env" });
 
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
-  user: process.env.PGUSER ?? "myuser",
-  password: process.env.PGPASSWORD ?? "mypassword",
-  database: process.env.PGDATABASE ?? "mydb",
+  user: process.env.PGUSER ?? "root",
+  password: process.env.PGPASSWORD ?? "12345678",
+  database: process.env.PGDATABASE ?? "justsearch",
   port: Number(process.env.PGPORT) ?? 5432,
 });
 
@@ -18,7 +18,7 @@ import * as hire from "./schema/hire.schema";
 import * as not_related from "./schema/not-related.schema";
 import * as offer from "./schema/offer.schema";
 import * as plan from "./schema/plan.schema";
-import * as product from "./schema/product.shema";
+import * as product from "./schema/product.schema";
 import * as user from "./schema/user.schema";
 
 export type UserRole = (typeof auth.UserRole)[keyof typeof auth.UserRole];
