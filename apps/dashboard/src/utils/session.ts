@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import "server-only";
 import { cookies } from "next/headers";
 
@@ -19,4 +19,9 @@ export async function setToken(token: string) {
 export async function getToken() {
   const cookieStore = await cookies();
   return cookieStore.get("token");
+}
+
+export async function delToken() {
+  const cookieStore = await cookies();
+  return cookieStore.delete("token");
 }

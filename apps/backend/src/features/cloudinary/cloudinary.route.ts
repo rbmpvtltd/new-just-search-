@@ -1,8 +1,6 @@
 import { cloudinary } from "@repo/cloudinary";
 import { env } from "@repo/helper";
-import { TRPCError } from "@trpc/server";
 import z from "zod";
-import { canUploadImage } from "@/utils/cloudinaryCount";
 import { protectedProcedure, router } from "@/utils/trpc";
 
 export const cloudinarySignature = router({
@@ -15,17 +13,8 @@ export const cloudinarySignature = router({
         }),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
-      const userId = ctx.userId;
+    .mutation(async ({ input }) => {
       const { paramsToSign } = input;
-      const isAllowed = await canUploadImage(userId);
-
-      if (!isAllowed) {
-        throw new TRPCError({
-          code: "CLIENT_CLOSED_REQUEST",
-          message: "You Just Allowed To Uploads Images",
-        });
-      }
 
       const signature = cloudinary.utils.api_sign_request(
         paramsToSign,
@@ -43,15 +32,7 @@ export const cloudinarySignature = router({
         folder: z.string(),
       }),
     )
-    .query(async ({ ctx, input }) => {
-      const isAllowed = await canUploadImage(ctx.userId);
-
-      if (!isAllowed) {
-        throw new TRPCError({
-          code: "CLIENT_CLOSED_REQUEST",
-          message: "You Just Allowed To Uploads Images",
-        });
-      }
+    .query(async ({ input }) => {
       const timestamp = Math.round(Date.now() / 1000);
 
       const signature = cloudinary.utils.api_sign_request(

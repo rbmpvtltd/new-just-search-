@@ -1,30 +1,18 @@
 // import { FormField } from "@/components/form-component";
 
-import { TRPCClientError } from "@trpc/client";
 import { redirect } from "next/navigation";
 import { trpcServer } from "@/trpc/trpc-server";
+import { asyncHandler } from "@/utils/error/asyncHandler";
 import { LoginForm } from "./login-form";
 export default async function Login() {
-  let session = null;
+  const dashboardverify = await asyncHandler(
+    trpcServer.auth.dashboardverify.query(),
+  );
 
-  try {
-    session = await trpcServer.auth.verifyauth.query();
-  } catch (error) {
-    // handle TRPC error specifically
-    if (error instanceof TRPCClientError) {
-      return <LoadLoginForm />;
-    }
-
-    // let unexpected errors bubble (Next.js will show error page)
-    throw error;
+  if (dashboardverify?.data?.success) {
+    redirect("/");
   }
 
-  // only redirect after successful TRPC call
-  if (session?.success) {
-    redirect("/"); // never wrap this in try/catch
-  }
-
-  // fallback UI (optional, if session is null or false)
   return <LoadLoginForm />;
 }
 

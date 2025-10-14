@@ -1,8 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
-
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
+import { z } from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -19,27 +18,32 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
-import type { schemas } from "@repo/db";
+import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+// import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
 
-export type BannerSchema = z.infer<
-  typeof schemas.not_related.bannerSelectSchema
->;
+const extendedBannerSelectSchema = bannerInsertSchema.extend({
+  photo1: z.any(),
+  photo: z.any(),
+});
 
-// NOTE: explain differnent between select schema and insert schema
+type ExtendedBannerSelectSchema = z.infer<typeof extendedBannerSelectSchema>;
 
 export function AddBanner() {
   const trpc = useTRPC();
 
   const { mutate } = useMutation(trpc.adminBanner.add.mutationOptions());
 
-  const { control, handleSubmit } = useForm<BannerSchema>();
+  const { control, handleSubmit } = useForm<ExtendedBannerSelectSchema>({
+    resolver: zodResolver(extendedBannerSelectSchema),
+  });
 
-  const onSubmit = async (data: BannerSchema) => {
-    const files = await uploadToCloudinary([data.photo]);
+  const onSubmit = async (data: ExtendedBannerSelectSchema) => {
+    const files = await uploadToCloudinary([data.photo, data.photo1]);
     console.log(files);
   };
 
-  const formFields: FormFieldProps<BannerSchema>[] = [
+  const formFields: FormFieldProps<ExtendedBannerSelectSchema>[] = [
     {
       control,
       label: "Type",
@@ -65,6 +69,15 @@ export function AddBanner() {
       control,
       label: "Photo",
       name: "photo",
+      placeholder: "",
+      component: "image",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      label: "Photo",
+      name: "photo1",
       placeholder: "",
       component: "image",
       required: false,

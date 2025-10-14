@@ -7,7 +7,7 @@ import {
   IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react";
-
+import { useMutation } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -24,6 +24,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useTRPC } from "@/trpc/client";
+import { delToken } from "@/utils/session";
 
 export function NavUser({
   user,
@@ -35,6 +37,20 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const trpc = useTRPC();
+  const { mutate } = useMutation({
+    ...trpc.auth.logout.mutationOptions(),
+    onSuccess: async () => {
+      await delToken();
+    },
+    onError: async () => {
+      await delToken();
+    },
+  });
+
+  const handleLogout = () => {
+    mutate();
+  };
 
   return (
     <SidebarMenu>
@@ -94,7 +110,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <IconLogout />
               Log out
             </DropdownMenuItem>

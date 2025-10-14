@@ -1,23 +1,21 @@
 // features/banners/banners.admin.routes.ts
-import { db, schemas } from "@repo/db";
+import { db } from "@repo/db";
+import {
+  bannerInsertSchema,
+  banners,
+} from "@repo/db/src/schema/not-related.schema";
 import { sql } from "drizzle-orm";
 import {
   buildOrderByClause,
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
-import {
-  delCountUploadImage,
-  setCountUploadImage,
-} from "@/utils/cloudinaryCount";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
   bannerAllowedSortColumns,
   bannerColumns,
   bannerGlobalFilterColumns,
 } from "./banners.admin.service";
-
-const banners = schemas.not_related.banners;
 
 export const adminBannerRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
@@ -60,15 +58,10 @@ export const adminBannerRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: adminProcedure.mutation(async ({ ctx }) => {
-    console.log("allow image");
-    await setCountUploadImage(ctx.userId, 10);
+  add: adminProcedure.mutation(async () => {
     return;
   }),
-  create: adminProcedure
-    .input(schemas.not_related.bannerInsertSchema)
-    .mutation(async ({ ctx }) => {
-      await delCountUploadImage(ctx.userId);
-      return;
-    }),
+  create: adminProcedure.input(bannerInsertSchema).mutation(async () => {
+    return;
+  }),
 });
