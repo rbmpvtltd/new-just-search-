@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
 
 function Banner3() {
-  const {data,isLoading,isError} = useQuery(trpc.banners.thirdBanner.queryOptions())
+  const {data,isLoading,isError} = useQuery(trpc.banners.getBannerData.queryOptions({type:3}))
 
   return (
     <CarouselCompo
