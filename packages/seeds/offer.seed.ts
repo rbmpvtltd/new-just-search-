@@ -1,33 +1,39 @@
-import { db, uploadOnCloudinary } from "@repo/db";
+import { db } from "@repo/db";
+import { uploadOnCloudinary } from "@repo/cloudinary";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
-import { categories } from "../db/src/schema/category.schema";
-import { subcategories } from "../db/src/schema/subcategory.schema";
-import { businessListings } from "../db/test/business.schema";
+import {
+  categories,
+  subcategories,
+} from "../db/src/schema/not-related.schema";
+import { businessListings } from "../db/src/schema/business.schema";
+
 import {
   offerPhotos,
   offerReviews,
   offerSubcategory,
   offers,
-} from "../db/test/offer.schema";
+} from "../db/src/schema/offer.schema";
 import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
+import { clouadinaryFake } from "./seeds";
 
 dotenv.config();
 
 export const offerSeed = async () => {
   await clearOfferSeed();
-  await addOffer();
-  // await addOfferReviews();
+  // await addOffer();
+  await addOfferReviews();
   // await addOfferSubcategories();
 };
 
 const clearOfferSeed = async () => {
   // await db.execute(`TRUNCATE TABLE offer_subcagtegorys RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE offer_reviews RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE offer_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE offer_photos RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE offers RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE offers RESTART IDENTITY CASCADE;`);
+  console.log("all tables cleared successfully")
 };
 
 // 1. offer
@@ -81,8 +87,8 @@ export const addOffer = async () => {
     for (const image of images) {
       if (row[image]) {
         const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-        const uploaded = await uploadOnCloudinary(liveOfferImageUrl, "offer");
-        const offerPhotoUrl = uploaded?.secure_url ?? null;
+        const uploaded = await uploadOnCloudinary(liveOfferImageUrl, "offer",clouadinaryFake);
+        const offerPhotoUrl = uploaded;
 
         await db.insert(offerPhotos).values({
           offerId: offerCreate!.id,

@@ -6,7 +6,7 @@ import {
   LANGUAGES,
   MARITAL_STATUS,
   schemas,
-  WORK_SHIFT,
+  // WORK_SHIFT,
 } from "@repo/db";
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
@@ -160,15 +160,15 @@ export const hirerouter = router({
         });
       }
 
-      // const existingEmail = await db.query.hireListing.findFirst({
-      //   where: (hireListing, { eq }) => eq(hireListing.email, input.email),
-      // });
-      // if (existingEmail) {
-      //   throw new TRPCError({
-      //     code: "CONFLICT",
-      //     message: "Email address already exist",
-      //   });
-      // }
+  //     // const existingEmail = await db.query.hireListing.findFirst({
+  //     //   where: (hireListing, { eq }) => eq(hireListing.email, input.email),
+  //     // });
+  //     // if (existingEmail) {
+  //     //   throw new TRPCError({
+  //     //     code: "CONFLICT",
+  //     //     message: "Email address already exist",
+  //     //   });
+  //     // }
 
       const isStateExists = await db.query.states.findFirst({
         where: (states, { eq }) => eq(states.id, input.state),

@@ -21,7 +21,7 @@ export default function BussinessList({ business, page, totalPages, id }: any) {
           <BussinessListingCard key={item.id} item={item} />
         ))}
       </div>
-      <div className="mt-4">
+      <div className="mt-4 mb-5">
         <Pagination>
           <PaginationContent>
             {page > 1 && (

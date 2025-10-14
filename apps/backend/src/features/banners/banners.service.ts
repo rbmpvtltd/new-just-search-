@@ -1,4 +1,5 @@
 import { db, schemas } from "@repo/db";
+import { logger } from "@repo/helper";
 import { eq, sql } from "drizzle-orm";
 
 const banners = schemas.not_related.banners;
@@ -6,10 +7,13 @@ const business = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
 
 async function getBannerData(type: number) {
+  logger.info("hire2")
   const banner = await db
-    .select({ photo: banners.photo, id: banners.id })
-    .from(banners)
-    .where(eq(banners.type, type));
+  .select({ photo: banners.photo, id: banners.id })
+  .from(banners)
+  .where(eq(banners.type, type));
+  
+  logger.info("banner is",banner)
   return banner;
 }
 

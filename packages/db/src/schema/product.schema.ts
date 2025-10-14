@@ -9,8 +9,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth.schema";
-import { businessListings } from "../schema/business.schema";
-import { categories, subcategories } from "../schema/not-related.schema";
+import { businessListings } from "./business.schema";
+import { categories, subcategories } from "./not-related.schema";
 
 // 1.products
 export const products = pgTable("products", {

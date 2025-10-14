@@ -1,9 +1,25 @@
 import { db, schemas } from "@repo/db";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import z from "zod";
-import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
+import {
+  businessProcedure,
+  publicProcedure,
+  router,
+  visitorProcedure,
+} from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
+import { users } from "../../../../../packages/db/src/schema/auth.schema";
+import {
+  productPhotos,
+  productReviews,
+  products,
+} from "../../../../../packages/db/src/schema/product.schema";
+import { offerPhotos, offers } from "../../../../../packages/db/src/schema/offer.schema";
+
+const businessListing = schemas.business.businessListings;
+const business_reviews = schemas.business.businessReviews;
+
 export const businessrouter = router({
   add: businessProcedure.query(async ({ ctx }) => {
     const getBusinessCategories = await db.query.businessCategories.findMany();
@@ -218,4 +234,218 @@ export const businessrouter = router({
 
     return business;
   }),
+
+  singleShop: publicProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ input }) => {
+      console.log("execution comes here line number 234");
+      const shop = await db
+        .select({
+          id: businessListing.id,
+          userId: businessListing.userId,
+          name: businessListing.name,
+          email: businessListing.email,
+          photo: businessListing.photo,
+          phoneNumber: businessListing.phoneNumber,
+          pincode: businessListing.pincode,
+          homeDelivery: businessListing.homeDelivery,
+          schedule: businessListing.schedules,
+          status: businessListing.status,
+          area: businessListing.area,
+          streetName: businessListing.streetName,
+          buildingName: businessListing.buildingName,
+          createdAt: businessListing.createdAt,
+          latitude: businessListing.latitude,
+          longitude: businessListing.longitude,
+          landMark: businessListing.landmark,
+          whatsappNo: businessListing.whatsappNo,
+          description: businessListing.description,
+          updatedAt: businessListing.updatedAt,
+          specialities: businessListing.specialities,
+          rating: sql<string[]>`COALESCE(
+            JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'id', business_reviews.id,
+              'created_at', business_reviews.created_at,
+              'rating', business_reviews.rate,
+              'message', business_reviews.message,
+              'user', users.display_name
+            ))
+              FILTER (WHERE business_reviews.id IS NOT NULL),
+            '[]'
+          )`,
+
+          offers: sql<any[]>`
+          COALESCE(
+            JSON_AGG(
+              DISTINCT JSONB_BUILD_OBJECT(
+                'id', offers.id,
+                'price', offers.rate,
+                'discountPercent' , offers.discount_percent,
+                'final_price', offers.final_price,
+                'name', offers.product_name,
+                'photos', COALESCE((
+                  SELECT ARRAY_AGG(DISTINCT offer_photos.photo)
+                  FROM offer_photos
+                  WHERE offer_photos."offer_id" = offers.id
+                ), '{}')
+              )
+            ) FILTER (WHERE offers.id IS NOT NULL),
+            '[]'
+          )
+        `,
+          products: sql<any[]>`
+            COALESCE(
+              JSON_AGG(
+                DISTINCT JSONB_BUILD_OBJECT(
+                  'id', products.id,
+                  'price', products.rate,
+                  'name', products.product_name,
+                  'photos', COALESCE((
+                    SELECT ARRAY_AGG(DISTINCT product_photos.photo)
+                    FROM product_photos
+                    WHERE product_photos."product_id" = products.id
+                  ), '{}')
+                )
+              ) FILTER (WHERE products.id IS NOT NULL),
+              '[]'
+            )
+          `,
+          subcategories: sql<string[]>`
+            COALESCE(
+              ARRAY_AGG(DISTINCT subcategories.name) 
+              FILTER (WHERE subcategories.id IS NOT NULL),
+              '{}'
+            )
+          `,
+          category: sql<
+            string | null
+          >`MAX(${schemas.not_related.categories.title})`,
+          businessPhotos: sql<string[]>`
+          COALESCE(
+            ARRAY_AGG(DISTINCT business_photos.photo)
+            FILTER (WHERE business_photos.id IS NOT NULL),
+            '{}'
+          )
+        `,
+        })
+        .from(businessListing)
+        .leftJoin(
+          schemas.business.businessSubcategories,
+          eq(
+            businessListing.id,
+            schemas.business.businessSubcategories.businessId,
+          ),
+        )
+        .leftJoin(
+          schemas.product.products,
+          eq(businessListing.id, schemas.product.products.businessId),
+        )
+        .leftJoin(
+          schemas.offer.offers,
+          eq(businessListing.id, schemas.offer.offers.businessId),
+        )
+        .leftJoin(
+          schemas.not_related.subcategories,
+          eq(
+            schemas.business.businessSubcategories.subcategoryId,
+            schemas.not_related.subcategories.id,
+          ),
+        )
+        .leftJoin(
+          schemas.not_related.categories,
+          eq(
+            schemas.not_related.subcategories.categoryId,
+            schemas.not_related.categories.id,
+          ),
+        )
+        .leftJoin(
+          schemas.business.businessPhotos,
+          eq(businessListing.id, schemas.business.businessPhotos.businessId),
+        )
+        .leftJoin(
+          business_reviews,
+          eq(businessListing.id, business_reviews.businessId),
+        )
+        .leftJoin(users, eq(business_reviews.userId, users.id))
+        .groupBy(businessListing.id)
+        .where(eq(businessListing.id, input.businessId));
+
+      console.log("execution comes here line number 317");
+
+      return shop[0];
+    }),
+
+  singleProduct: publicProcedure
+    .input(z.object({ productId: z.number() }))
+    .query(async ({ input }) => {
+      const product = await db
+        .select({
+          id: products.id,
+          name: products.productName,
+          rate: products.rate,
+          businessId: products.businessId,
+          description: products.productDescription,
+          photos: sql<string[]>`COALESCE(
+            ARRAY_AGG(DISTINCT product_photos.photo)
+            FILTER (WHERE product_photos.id IS NOT NULL),
+            '{}'
+          )`,
+          shopName: sql<string | null>`COALESCE((
+              SELECT name FROM business_listings LIMIT 1
+          ), '')`,
+          rating: sql<string[]>`COALESCE(
+            JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'id', product_reviews.id,
+              'created_at', product_reviews.created_at,
+              'rating', product_reviews.rate,
+              'message', product_reviews.message,
+              'user', users.display_name
+            ))
+              FILTER (WHERE product_reviews.id IS NOT NULL),
+            '[]'
+          )`,
+        })
+        .from(products)
+        .leftJoin(businessListing, eq(businessListing.id, products.businessId))
+        .leftJoin(productReviews, eq(products.id, productReviews.productId))
+        .leftJoin(productPhotos, eq(products.id, productPhotos.productId))
+        .leftJoin(users, eq(productReviews.userId, users.id))
+        .groupBy(products.id)
+        .where(eq(products.id, input.productId));
+      return product[0];
+    }),
+
+  singleOffer: publicProcedure
+    .input(z.object({ offerId: z.number() }))
+    .query(async ({ input }) => {
+      const offer = await db
+        .select({
+          id: offers.id,
+          name: offers.productName,
+          rate: offers.rate,
+          discountPercent : offers.discountPercent,
+          finalPrice : offers.finalPrice,
+          startDate : offers.offerStartDate,
+          endDate : offers.offerEndDate,
+          description : offers.productDescription,
+          createdAt : offers.createdAt,
+          businessId: offers.businessId,
+          shopName : sql<string | null>`COALESCE((
+            SELECT name FROM business_listings LIMIT 1
+          ), '')`,
+          photos : sql<string[]>`COALESCE(
+            ARRAY_AGG(DISTINCT offer_photos.photo)
+            FILTER (WHERE offer_photos.id IS NOT NULL),
+            '{}'
+          )`
+        })
+        .from(offers)
+        .leftJoin(offerPhotos,eq(offerPhotos.offerId,offers.id))
+        .leftJoin(businessListing,eq(businessListing.id,offers.businessId))
+        .groupBy(offers.id)
+        .where(eq(offers.id, input.offerId));
+
+
+      return offer[0];
+    }),
 });
