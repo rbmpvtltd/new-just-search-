@@ -28,7 +28,7 @@ export const GENDER = hire.Gender;
 export const JOB_TYPE = hire.JobType;
 export const WORK_SHIFT = hire.WorkShift;
 export const JOB_DURATION = hire.JobDuration;
-export const LANGUAGES = hire.Languages;
+// export const LANGUAGES = hire.Languages;
 
 export const schemas = {
   not_related,

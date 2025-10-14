@@ -1,26 +1,26 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
-import { is } from "date-fns/locale";
-import { useForm, useWatch } from "react-hook-form";
+import {
+  Gender,
+  JobType,
+  MaritalStatus,
+  personalDetailsHireSchema,
+} from "@repo/db/src/schema/hire.schema";
+import { useForm } from "react-hook-form";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
-import {
-  GENDER,
-  LANGUAGES,
-  MaritalStatus,
-} from "@/features/hire/shared/constants/hire";
-import { Gender } from "@/features/hire/shared/constants/test";
-import {
-  type PersonalDetailsSchema,
-  personalDetailsSchema,
-} from "@/features/hire/shared/schemas/personal-details.schema";
+// import {
+//   personalDetailsSchema,
+// } from "@/features/hire/shared/schemas/personal-details.schema";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
 import type { AddHirePageType } from "..";
+
+type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 
 export default function PersonalDetailsForm({
   data,
@@ -31,21 +31,21 @@ export default function PersonalDetailsForm({
   const { page, prevPage, nextPage, setFormValue, formValue } =
     useHireFormStore();
 
-  console.log("ranjeet is maried", MaritalStatus());
-
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<PersonalDetailsSchema>({
-    resolver: zodResolver(personalDetailsSchema),
+    resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
+      name: "hi",
+      jobType: [],
       // photo: formValue.photo ?? "",
       // categoryId: formValue.categoryId ?? "",
       // subcategoryId: formValue.subcategoryId ?? [],
       // name: formValue.name ?? "",
-      gender: formValue.gender ?? [],
-      // maritalStatus: formValue.maritalStatus ?? undefined,
+      gender: formValue.gender ?? "Male",
+      maritalStatus: formValue.maritalStatus ?? "Others",
       // fatherName: formValue.fatherName ?? "",
       // dob: formValue.dob ?? "",
       // languages: formValue.languages ?? [],
@@ -154,17 +154,17 @@ export default function PersonalDetailsForm({
     //   ],
     //   error: errors.subcategoryId?.message,
     // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Full Name",
-    //   name: "name",
-    //   placeholder: "Full Name",
-    //   component: "input",
-    //   className: "",
-    //   section: "profile",
-    //   error: errors.name?.message,
-    // },
+    {
+      control,
+      type: "text",
+      label: "Full Name",
+      name: "name",
+      placeholder: "Full Name",
+      component: "input",
+      className: "",
+      section: "profile",
+      error: errors.name?.message,
+    },
     {
       control,
       type: "text",
@@ -173,7 +173,10 @@ export default function PersonalDetailsForm({
       placeholder: "Select Gender",
       component: "select",
       section: "profile",
-      options: [...Gender],
+      options: Object.values(Gender).map((item) => ({
+        label: item,
+        value: item,
+      })),
       error: errors.gender?.message,
     },
     {
@@ -190,7 +193,21 @@ export default function PersonalDetailsForm({
           value: item,
         };
       }),
-
+      error: errors.maritalStatus?.message,
+    },
+    {
+      control,
+      label: "job type",
+      name: "jobType",
+      placeholder: "Select Marital Status",
+      component: "checkbox",
+      section: "profile",
+      options: Object.values(JobType).map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      }),
       error: errors.maritalStatus?.message,
     },
     // {
@@ -338,8 +355,8 @@ export default function PersonalDetailsForm({
     // setFormValue("categoryId", data.categoryId ?? "");
     // setFormValue("subcategoryId", data.subcategoryId?.map(String) ?? []);
     // setFormValue("name", data.name ?? "");
-    setFormValue("gender", data.gender ?? []);
-    setFormValue("maritalStatus", data.maritalStatus ?? "");
+    // setFormValue("gender", data.gender ?? []);
+    // setFormValue("maritalStatus", data.maritalStatus ?? "");
     // setFormValue("fatherName", data.fatherName ?? "");
     // setFormValue("dob", data.dob ?? "");
     // setFormValue("languages", data.languages ?? []);
@@ -393,22 +410,22 @@ export default function PersonalDetailsForm({
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {formFields
-                  .filter((fields) => fields.section === "loction")
-                  .map((field, index) => (
-                    <div
-                      key={field.name}
-                      className={
-                        field.name === "area"
-                          ? "md:col-span-2 lg:col-span-3"
-                          : ""
-                      }
-                    >
-                      <FormField {...field} />
-                    </div>
-                  ))}
-              </div>
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
+              {/*   {formFields */}
+              {/*     .filter((fields) => fields.section === "loction") */}
+              {/*     .map((field, index) => ( */}
+              {/*       <div */}
+              {/*         key={field.name} */}
+              {/*         className={ */}
+              {/*           field.name === "area" */}
+              {/*             ? "md:col-span-2 lg:col-span-3" */}
+              {/*             : "" */}
+              {/*         } */}
+              {/*       > */}
+              {/*         <FormField {...field} /> */}
+              {/*       </div> */}
+              {/*     ))} */}
+              {/* </div> */}
             </div>
           </div>
         </div>

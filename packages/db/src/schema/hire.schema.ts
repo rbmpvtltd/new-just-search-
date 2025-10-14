@@ -9,6 +9,8 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import z from "zod";
 import {
   categories,
   cities,
@@ -51,25 +53,25 @@ export const JobDuration = {
   "Few Years": "Few Years",
 };
 
-export const Languages = {
-  Hindi: "Hindi",
-  English: "English",
-  Punjabi: "Punjabi",
-  Gujarati: "Gujarati",
-  Bengali: "Bengali",
-  Malayalam: "Malayalam",
-  Kannada: "Kannada",
-  Tamil: "Tamil",
-  Other: "Other",
-};
+// export const Languages = {
+//   Hindi: "Hindi",
+//   English: "English",
+//   Punjabi: "Punjabi",
+//   Gujarati: "Gujarati",
+//   Bengali: "Bengali",
+//   Malayalam: "Malayalam",
+//   Kannada: "Kannada",
+//   Tamil: "Tamil",
+//   Other: "Other",
+// } as const;
 
-export const genderEnum = pgEnum("hire_gender", (Gender));
+export const genderEnum = pgEnum("hire_gender", Gender);
 export const maritalStatusEnum = pgEnum("hire_marital_status", MaritalStatus);
 
 export const jobTypeEnum = pgEnum("hire_job_type", JobType);
 export const workShiftEnum = pgEnum("hire_work_shift", WorkShift);
 export const jobDurationEnum = pgEnum("hire_job_duration", JobDuration);
-export const languagesEnum = pgEnum("hire_languages", Languages);
+// export const languagesEnum = pgEnum("hire_languages", Languages);
 
 export const hireListing = pgTable("hire_listing", {
   id: serial("id").primaryKey(),
@@ -81,7 +83,7 @@ export const hireListing = pgTable("hire_listing", {
   dob: date("dob"),
   gender: genderEnum("gender").notNull(),
   maritalStatus: maritalStatusEnum("marital_status").notNull(),
-  languages: languagesEnum("languages").array().notNull(),
+  languages: varchar("language", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }),
   specialities: text("specialities"),
   description: text("description"),
@@ -137,6 +139,30 @@ export const hireListing = pgTable("hire_listing", {
   aboutYourself: text("about_yourself"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const hireInsertSchema = createInsertSchema(hireListing);
+export const hireSelectSchema = createSelectSchema(hireListing).extend({
+  category: z.number(),
+  subcategory: z.array(z.number()),
+  gender: z.enum(Gender),
+  maritalStatus: z.enum(MaritalStatus),
+});
+
+export const personalDetailsHireSchema = hireSelectSchema.pick({
+  // photo: true,
+  name: true,
+  // category: true,
+  // subcategory: true,
+  // description: true,
+  // specialities: true,
+  maritalStatus: true,
+  gender: true,
+  jobType: true,
+  // area: true,
+  // pincode: true,
+  // state: true,
+  // city: true,
 });
 
 // // 2. recent_views_hire

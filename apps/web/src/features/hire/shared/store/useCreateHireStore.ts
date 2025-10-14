@@ -1,9 +1,11 @@
+import type { personalDetailsHireSchema } from "@repo/db/src/schema/hire.schema";
+import type z from "zod";
 import { create } from "zustand";
 import type { DocumentSchema } from "../schemas/documents.schema";
 import type { EducationSchema } from "../schemas/education.schema";
-import type { PersonalDetailsSchema } from "../schemas/personal-details.schema";
 import type { PreferredPosition } from "../schemas/preferred-position.schema";
 
+type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 export type CombinedForm = PreferredPosition &
   EducationSchema &
   DocumentSchema &
@@ -24,7 +26,7 @@ type HireFormProps = {
 // Combined initial value
 const initialFormValue: CombinedForm = {
   // PreferredPosition
-  jobType: [],
+  jobType: ["FullTime"],
   workShift: [],
   jobDuration: [],
   fromHour: "",
@@ -59,9 +61,9 @@ const initialFormValue: CombinedForm = {
   // photo: "",
   // categoryId: 0,
   // subcategoryId: [],
-  // name: "",
+  name: "",
   gender: "Male",
-  maritalStatus: [],
+  maritalStatus: "Others",
   // specialities: "",
   // description: "",
   // fatherName: "",
@@ -74,9 +76,9 @@ const initialFormValue: CombinedForm = {
   // pincode: "",
   // state: 0,
   // city: 0,
-  
-  alternateMobileNumber: "",
-  email: "",
+
+  // alternateMobileNumber: "",
+  // email: "",
 };
 
 export const useHireFormStore = create<HireFormProps>((set) => ({
