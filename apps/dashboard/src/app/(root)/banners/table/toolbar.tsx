@@ -3,11 +3,12 @@
 import type { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-filter";
-import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
-import { type, active } from "./data";
-import { AddBanner } from "../form/add.form";
+import { Button } from "@/components/ui/button";
 import { DebouncedInput } from "@/components/ui/input-debounced";
+import { AddBanner } from "../form/add.form";
+import { active, type } from "./data";
+import { MuiltDeleteButton } from "../form/delete";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -55,6 +56,7 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex items-center gap-2">
+        <MuiltDeleteButton />
         <DataTableViewOptions table={table} />
         <AddBanner />
       </div>

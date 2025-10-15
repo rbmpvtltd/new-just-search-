@@ -3,8 +3,11 @@ import { db } from "@repo/db";
 import {
   bannerInsertSchema,
   banners,
+  bannerUpdateSchema,
 } from "@repo/db/src/schema/not-related.schema";
-import { sql } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { eq, inArray, sql } from "drizzle-orm";
+import z from "zod";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -61,7 +64,55 @@ export const adminBannerRouter = router({
   add: adminProcedure.mutation(async () => {
     return;
   }),
-  create: adminProcedure.input(bannerInsertSchema).mutation(async () => {
-    return;
-  }),
+  create: adminProcedure
+    .input(bannerInsertSchema)
+    .mutation(async ({ input }) => {
+      await db.insert(banners).values(input);
+      return { success: true };
+    }),
+  edit: adminProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const data = await db
+        .select()
+        .from(banners)
+        .where(eq(banners.id, input.id));
+      return data[0];
+    }),
+  update: adminProcedure
+    .input(
+      bannerUpdateSchema.extend(
+        z.object({
+          id: z.number(),
+        }),
+      ),
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...updateData } = input;
+      if (!id)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Please pass id field",
+        });
+      const validatedUpdateData = bannerUpdateSchema.parse(updateData);
+      await db
+        .update(banners)
+        .set(validatedUpdateData)
+        .where(eq(banners.id, id));
+      return { success: true };
+    }),
+  multidelete: adminProcedure
+    .input(
+      z.object({
+        ids: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      await db.delete(banners).where(inArray(banners.id, input.ids));
+      return { success: true };
+    }),
 });

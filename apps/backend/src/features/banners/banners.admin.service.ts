@@ -10,11 +10,5 @@ export const bannerColumns = {
   type: banners.type,
 };
 
-export const bannerGlobalFilterColumns = [banners.photo, banners.route];
-export const bannerAllowedSortColumns = [
-  "id",
-  "route",
-  "photo",
-  "is_active",
-  "type",
-];
+export const bannerGlobalFilterColumns = [banners.route];
+export const bannerAllowedSortColumns = ["id", "route", "is_active", "type"];

@@ -3,11 +3,19 @@
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 
+function isBlobUrl(url: string) {
+  try {
+    return new URL(url).protocol === "blob:";
+  } catch (_) {
+    return false;
+  }
+}
+
 export const uploadToCloudinary = async (
   files: string[],
   folder: string = "unknown",
   eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
-): Promise<string[] | null> => {
+): Promise<(string | null)[]> => {
   const signResponse = await asyncHandler(
     trpcServer.cloudinarySignature.signUploadForm.query({
       eager,
@@ -15,18 +23,25 @@ export const uploadToCloudinary = async (
     }),
   );
 
-  if (signResponse.error || !signResponse.data) {
-    console.error(signResponse.error);
-    return null;
-  }
-
-  const url = `https://api.cloudinary.com/v1_1/${signResponse.data.cloudname}/auto/upload`;
-  const uploadPromises: Promise<string>[] = [];
+  const uploadPromises: Promise<string | null>[] = [];
 
   for (let i = 0; i < files.length; i++) {
     const fileUrl = files[i];
-    if (!fileUrl) continue;
+    if (!fileUrl) {
+      uploadPromises.push(Promise.resolve(null));
+      continue;
+    }
 
+    if (!isBlobUrl(fileUrl)) {
+      uploadPromises.push(Promise.resolve(fileUrl));
+      continue;
+    }
+
+    if (signResponse.error || !signResponse.data) {
+      uploadPromises.push(Promise.resolve(fileUrl));
+      continue;
+    }
+    const url = `https://api.cloudinary.com/v1_1/${signResponse.data.cloudname}/auto/upload`;
     // Fetch the blob from the blob URL
     const blobResponse = await fetch(fileUrl);
     const blob = await blobResponse.blob();

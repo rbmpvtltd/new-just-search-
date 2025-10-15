@@ -1,9 +1,11 @@
 "use client";
 
+import { CldImage } from "next-cloudinary";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { useTableStore } from "../store";
+import { EditBanner } from "../form/edit.form";
 
 // Define the type to match your actual backend data
 export interface Banner {
@@ -29,6 +31,10 @@ function SelectCell({ id }: { id: number }) {
       className="translate-y-[2px]"
     />
   );
+}
+
+function ActionCell({ id }: { id: number }) {
+  return <EditBanner id={id} />;
 }
 
 // SelectHeader.tsx (or inline)
@@ -91,11 +97,18 @@ export const columns: ColumnDef<Banner>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Photo" />
     ),
-    cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">
-        {row.original.photo || "No photo"}
-      </div>
-    ),
+    cell: ({ row }) =>
+      row.original.photo ? (
+        <CldImage
+          width="100"
+          height="100"
+          className="border rounded p-4"
+          src={row.original.photo}
+          alt="cloudinary image not loaded"
+        />
+      ) : (
+        "no photo"
+      ),
   },
   {
     accessorKey: "route",
@@ -128,5 +141,12 @@ export const columns: ColumnDef<Banner>[] = [
       <DataTableColumnHeader column={column} title="Created" />
     ),
     cell: ({ row }) => <div>{row.original.createdAt.toLocaleDateString()}</div>,
+  },
+  {
+    id: "action",
+    header: () => <div className="text-center">Action</div>,
+    cell: ({ row }) => <ActionCell id={row.original.id} />,
+    enableSorting: false,
+    enableHiding: false,
   },
 ];

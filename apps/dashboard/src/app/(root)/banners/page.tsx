@@ -1,12 +1,14 @@
 "use client";
-import { trpcServer } from "@/trpc/trpc-server";
 import { DataTable, type QueryFnContext } from "@/components/table/data-table";
+import { useTRPC } from "@/trpc/client";
+import { trpcServer } from "@/trpc/trpc-server";
 import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/toolbar";
 
 export default function Page() {
+  const trpc = useTRPC();
   const queryConfig = {
-    queryKey: ["tasks"],
+    queryKey: trpc.adminBanner.list.queryKey(),
     queryFn: async ({
       pagination,
       sorting,
