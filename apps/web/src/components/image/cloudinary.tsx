@@ -12,7 +12,7 @@ function isBlobUrl(url: string) {
 }
 
 export const uploadToCloudinary = async (
-  files: string[],
+  files: (string | null)[],
   folder: string = "unknown",
   tags: string = "",
   eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
