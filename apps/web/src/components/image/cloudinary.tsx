@@ -14,7 +14,7 @@ function isBlobUrl(url: string) {
 export const uploadToCloudinary = async (
   files: string[],
   folder: string = "unknown",
-  tags: string = "editbanner",
+  tags: string = "",
   eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
 ): Promise<(string | null)[]> => {
   const signResponse = await asyncHandler(
@@ -61,6 +61,7 @@ export const uploadToCloudinary = async (
     formData.append("signature", signResponse.data.signature);
     formData.append("eager", eager);
     formData.append("folder", folder);
+    formData.append("tags", signResponse.data.tags);
 
     const uploadPromise = fetch(url, {
       method: "POST",
