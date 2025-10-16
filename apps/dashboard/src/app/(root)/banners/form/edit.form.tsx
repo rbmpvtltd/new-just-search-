@@ -89,7 +89,7 @@ function BannerEditForm({ id, setOpen }: EditForm) {
 
   const onSubmit = async (data: BannerSelectSchema) => {
     console.log("submiting started");
-    const files = await uploadToCloudinary([data.photo],"banner","");
+    const files = await uploadToCloudinary([data.photo], "banner");
     if (!files || !files[0]) {
       console.log("files", files);
       console.error("file uploading to cloudinary failed");

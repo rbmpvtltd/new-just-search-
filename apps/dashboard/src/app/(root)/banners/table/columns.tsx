@@ -38,6 +38,40 @@ function ActionCell({ id }: { id: number }) {
 }
 
 // SelectHeader.tsx (or inline)
+//
+
+function ActiveHeader({ ids }: { ids: number[] }) {
+  const active = useTableStore((state) => state.active);
+  const addActive = useTableStore((state) => state.addActive);
+  const deleteManyActive = useTableStore((state) => state.deleteManyActive);
+
+  // Derived state
+  const allActived = ids.every((id) => active.includes(id));
+  const someActived = ids.some((id) => active.includes(id));
+
+  const handleToggleAll = () => {
+    if (allActived) {
+      // Deselect all
+      deleteManyActive(ids);
+    } else {
+      // Select all (only those not already selected)
+      ids.forEach((id) => {
+        if (!active.includes(id)) {
+          addActive(id);
+        }
+      });
+    }
+  };
+
+  return (
+    <Checkbox
+      checked={allActived || (someActived && "indeterminate")}
+      onCheckedChange={handleToggleAll}
+      aria-label="Select all"
+      className="translate-y-[2px]"
+    />
+  );
+}
 function SelectHeader({ ids }: { ids: number[] }) {
   const select = useTableStore((state) => state.select);
   const addSelect = useTableStore((state) => state.addSelect);
@@ -123,9 +157,12 @@ export const columns: ColumnDef<Banner>[] = [
   },
   {
     accessorKey: "isActive",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Active" />
-    ),
+    header: ({ table }) => {
+      const currentPageIds = table
+        .getRowModel()
+        .rows.map((row) => row.original.id);
+      return <ActiveHeader ids={currentPageIds} />;
+    },
     cell: ({ row }) => <div>{row.original.isActive ? "Yes" : "No"}</div>,
   },
   {

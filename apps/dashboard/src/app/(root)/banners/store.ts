@@ -3,31 +3,49 @@
 import { create } from "zustand";
 
 interface TableState {
+  active: number[];
+  addActive: (id: number) => void;
+  addManyActive: (ids: number[]) => void;
+  toggleActive: (id: number) => void;
+  deleteManyActive: (ids: number[]) => void;
   select: number[];
-  // isIdExist: (id: number) => boolean;
-  // isExistAll: (ids: number[]) => boolean;
   addSelect: (id: number) => void;
-  // deleteSelect: (id: number) => void;
   toggleSelect: (id: number) => void;
   deleteManySelect: (ids: number[]) => void;
 }
 
 export const useTableStore = create<TableState>()((set) => ({
+  active: [],
+  addActive: (id) =>
+    set((state) => ({
+      active: [...state.active, id],
+    })),
+  addManyActive: (ids) =>
+    set(() => ({
+      active: ids,
+    })),
+  toggleActive: (id) =>
+    set((state) => {
+      const isSelected = state.active.includes(id);
+      if (isSelected) {
+        return {
+          active: state.active.filter((selectedId) => selectedId !== id),
+        };
+      } else {
+        return {
+          active: [...state.active, id],
+        };
+      }
+    }),
+  deleteManyActive: (ids) =>
+    set((state) => ({
+      active: state.active.filter((id) => !ids.includes(id)),
+    })),
   select: [],
-  // isIdExist: (id: number) => get().select.includes(id),
-  // isExistAll: (ids: number[]) => {
-  //   if (ids.length === 0) return true;
-  //   const currentSelect = get().select;
-  //   return ids.every((id) => currentSelect.includes(id));
-  // },
   addSelect: (id) =>
     set((state) => ({
       select: [...state.select, id],
     })),
-  // deleteSelect: (id) =>
-  //   set((state) => ({
-  //     select: state.select.filter((selectedId) => selectedId !== id),
-  //   })),
   toggleSelect: (id) =>
     set((state) => {
       const isSelected = state.select.includes(id);

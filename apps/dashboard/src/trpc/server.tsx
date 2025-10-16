@@ -10,9 +10,11 @@ import type { AppRouter } from "types/index";
 import { getToken } from "@/utils/session";
 import { getTrpcUrl } from "./helper";
 import { getQueryClient } from "./query-client";
+
 // IMPORTANT: Create a stable getter for the query client that
 //            will return the same client during the same request.
 
+console.log("trpc url is", getTrpcUrl());
 export const trpc = createTRPCOptionsProxy<AppRouter>({
   client: createTRPCClient({
     links: [

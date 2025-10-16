@@ -1,12 +1,13 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "types/index";
-import { getToken } from "./session";
 import superjson from "superjson";
+import type { AppRouter } from "types/index";
+import { getTrpcUrl } from "@/trpc/helper";
+import { getToken } from "./session";
 
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:4000/trpc",
+      url: getTrpcUrl(),
       transformer: superjson,
       async headers() {
         const token = await getToken();

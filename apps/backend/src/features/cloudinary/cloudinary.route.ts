@@ -35,13 +35,14 @@ export const cloudinarySignature = router({
     )
     .query(async ({ input, ctx }) => {
       const timestamp = Math.round(Date.now() / 1000);
+      const newTag = `${ctx.userId},${input.tags}`;
 
       const signature = cloudinary.utils.api_sign_request(
         {
           timestamp: timestamp,
           eager: input.eager,
           folder: input.folder,
-          tags: `${ctx.userId},${input.tags}`,
+          tags: newTag,
         },
         env.CLOUDINARY_API_SECRET,
       );
@@ -51,6 +52,7 @@ export const cloudinarySignature = router({
         signature,
         cloudname: env.CLOUDINARY_CLOUD_NAME,
         apikey: env.CLOUDINARY_API_KEY,
+        tags: newTag,
       };
     }),
 });
