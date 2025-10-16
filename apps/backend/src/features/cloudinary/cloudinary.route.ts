@@ -30,9 +30,10 @@ export const cloudinarySignature = router({
       z.object({
         eager: z.string(),
         folder: z.string(),
+        tags: z.string(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const timestamp = Math.round(Date.now() / 1000);
 
       const signature = cloudinary.utils.api_sign_request(
@@ -40,6 +41,7 @@ export const cloudinarySignature = router({
           timestamp: timestamp,
           eager: input.eager,
           folder: input.folder,
+          tags: `${ctx.userId},${input.tags}`,
         },
         env.CLOUDINARY_API_SECRET,
       );

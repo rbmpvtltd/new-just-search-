@@ -102,7 +102,7 @@ export const columns: ColumnDef<Banner>[] = [
         <CldImage
           width="100"
           height="100"
-          className="border rounded p-4"
+          className="border rounded "
           src={row.original.photo}
           alt="cloudinary image not loaded"
         />

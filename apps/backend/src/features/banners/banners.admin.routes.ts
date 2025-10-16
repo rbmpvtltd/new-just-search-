@@ -84,13 +84,7 @@ export const adminBannerRouter = router({
       return data[0];
     }),
   update: adminProcedure
-    .input(
-      bannerUpdateSchema.extend(
-        z.object({
-          id: z.number(),
-        }),
-      ),
-    )
+    .input(bannerUpdateSchema)
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
       if (!id)
@@ -98,11 +92,7 @@ export const adminBannerRouter = router({
           code: "BAD_REQUEST",
           message: "Please pass id field",
         });
-      const validatedUpdateData = bannerUpdateSchema.parse(updateData);
-      await db
-        .update(banners)
-        .set(validatedUpdateData)
-        .where(eq(banners.id, id));
+      await db.update(banners).set(updateData).where(eq(banners.id, id));
       return { success: true };
     }),
   multidelete: adminProcedure

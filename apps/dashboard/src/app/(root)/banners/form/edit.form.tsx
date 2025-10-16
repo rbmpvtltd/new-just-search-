@@ -27,6 +27,7 @@ import { getQueryClient } from "@/trpc/query-client";
 
 const extendedBannerSelectSchema = bannerInsertSchema
   .pick({
+    id: true,
     isActive: true,
     photo: true,
     route: true,
@@ -63,10 +64,12 @@ interface EditForm {
 function BannerEditForm({ id, setOpen }: EditForm) {
   const trpc = useTRPC();
 
-  const { data } = useSuspenseQuery(trpc.adminBanner.edit.queryOptions({ id }));
+  const { data, refetch } = useSuspenseQuery(
+    trpc.adminBanner.edit.queryOptions({ id }),
+  );
 
   const { mutate: updateBanner } = useMutation(
-    trpc.adminBanner.create.mutationOptions(),
+    trpc.adminBanner.update.mutationOptions(),
   );
 
   const {
@@ -76,6 +79,7 @@ function BannerEditForm({ id, setOpen }: EditForm) {
   } = useForm<BannerSelectSchema>({
     resolver: zodResolver(extendedBannerSelectSchema),
     defaultValues: {
+      id: data?.id,
       photo: data?.photo,
       type: data?.type,
       isActive: data?.isActive ? 1 : 0,
@@ -85,13 +89,13 @@ function BannerEditForm({ id, setOpen }: EditForm) {
 
   const onSubmit = async (data: BannerSelectSchema) => {
     console.log("submiting started");
-    const files = await uploadToCloudinary([data.photo]);
+    const files = await uploadToCloudinary([data.photo],"banner","");
     if (!files || !files[0]) {
       console.log("files", files);
       console.error("file uploading to cloudinary failed");
       return;
     }
-    console.log("uploading to db");
+    console.log("data is", data);
     updateBanner(
       {
         ...data,
@@ -104,13 +108,26 @@ function BannerEditForm({ id, setOpen }: EditForm) {
           queryClient.invalidateQueries({
             queryKey: trpc.adminBanner.list.queryKey(),
           });
+          refetch();
           setOpen(false);
+        },
+        onError: (e) => {
+          console.error(e);
         },
       },
     );
   };
 
   const formFields: FormFieldProps<BannerSelectSchema>[] = [
+    {
+      control,
+      label: "",
+      name: "id",
+      placeholder: "idis",
+      type: "hidden",
+      component: "input",
+      required: false,
+    },
     {
       control,
       label: "Type",
