@@ -332,15 +332,23 @@ export const hirerouter = router({
     }),
 
   show: hireProcedure.query(async ({ ctx }) => {
+    if (!ctx.userId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not logged in",
+      });
+    }
+    const isVisible = true;
     const hireListing = await db.query.hireListing.findFirst({
       where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
     });
 
     if (!hireListing) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
+      return {
+        success: false,
         message: "Hire listing not found",
-      });
+        isVisible,
+      };
     }
     const cityRecord = await db.query.cities.findFirst({
       where: (cities, { eq }) => eq(cities.id, Number(hireListing?.city)),

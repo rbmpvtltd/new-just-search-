@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { object } from "zod";
 
 const menuItems = [
   { name: "Home", href: "#link" },
@@ -31,8 +32,9 @@ export const HeroHeader = () => {
                 <Image
                   src="/images/logo-v2.png"
                   alt="logo image"
-                  width={200}
-                  height={200}
+                  width={100}
+                  height={100}
+                  style={{objectFit: "contain"}}
                 />
               </Link>
 

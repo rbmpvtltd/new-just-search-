@@ -32,20 +32,7 @@ export default function EducationForm() {
       certificates: formValue.certificates ?? "",
     },
   });
-  const onSubmit = (data: EducationSchema) => {
-    setFormValue("highestQualification", data.highestQualification ?? "");
-    setFormValue("skillset", data.skillset ?? "");
-    setFormValue("employmentStatus", data.employmentStatus ?? "");
-    setFormValue("workExperienceYear", data.workExperienceYear ?? "");
-    setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
-    setFormValue("previousJobRole", data.previousJobRole ?? "");
-    setFormValue("jobRole", data.jobRole ?? "");
-    setFormValue("certificates", data.certificates ?? "");
-    console.log("form value", formValue ?? "");
-    console.log("data", data);
 
-    nextPage();
-  };
   const formFields: FormFieldProps<EducationSchema>[] = [
     {
       control,
@@ -133,6 +120,7 @@ export default function EducationForm() {
       component: "input",
       error: errors.jobRole?.message,
     },
+
     {
       control,
       label: "Previous Job Role",
@@ -148,14 +136,26 @@ export default function EducationForm() {
       label: "Certificates",
       name: "certificates",
       placeholder: "Certificates",
-      component: "input",
+      component: "image",
       required: false,
       error: errors.certificates?.message,
     },
   ];
-
+  const onSubmit = (data: EducationSchema) => {
+    setFormValue("highestQualification", data.highestQualification ?? "");
+    setFormValue("skillset", data.skillset ?? "");
+    setFormValue("employmentStatus", data.employmentStatus ?? "");
+    setFormValue("workExperienceYear", data.workExperienceYear ?? "");
+    setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
+    setFormValue("previousJobRole", data.previousJobRole ?? "");
+    setFormValue("jobRole", data.jobRole ?? "");
+    setFormValue("certificates", data.certificates ?? "");
+    console.log("form value", formValue ?? "");
+    console.log("data", data);
+    nextPage();
+  };
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
+    <div className="min-h-screen p-4 relative" >
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl"
@@ -165,15 +165,15 @@ export default function EducationForm() {
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Qualifications and Experience
             </h2>
-            {
+            {/* {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {formFields.map((field) => (
                   <FormField key={field.name} {...field} />
                 ))}
               </div>
-            }
+            } */}
 
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {formFields.map((field) => {
                 if (field.name === "workExperienceYear") {
                   const monthsField = formFields.find(
@@ -197,7 +197,7 @@ export default function EducationForm() {
 
                 return <FormField key={field.name} {...field} />;
               })}
-            </div> */}
+            </div>
           </div>
         </div>
 

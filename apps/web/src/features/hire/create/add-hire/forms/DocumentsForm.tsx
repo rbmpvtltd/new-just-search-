@@ -9,6 +9,7 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
@@ -35,9 +36,12 @@ export default function DocumentsForm() {
     },
   });
 
-  console.log("form Values before submit", formValue);
-
-  const onSubmit = (data: DocumentSchema) => {
+  const onSubmit = async (data: DocumentSchema) => {
+    const files = await uploadToCloudinary([
+      formValue?.photo,
+    ]);
+    console.log("files", files);
+    // return;
     setFormValue("idProof", data.idProof ?? "");
     setFormValue("idProofPhoto", data.idProofPhoto ?? "");
     setFormValue("coverLetter", data.coverLetter ?? "");
@@ -47,16 +51,25 @@ export default function DocumentsForm() {
 
     console.log("form Values after submit", formValue);
 
-    mutate(formValue, {
-      onSuccess: (data) => {
-        console.log("success", data);
+    mutate(
+      {
+        ...formValue,
+        // photo: files[0],
+        // certificates: files[1],
+        // idProofPhoto: files[2],
+        // resumePhoto: files[3],
       },
-      onError: (error) => {
-        if (isTRPCClientError(error)) {
-          console.error("error,", error.message);
-        }
+      {
+        onSuccess: (data) => {
+          console.log("success", data);
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            console.error("error,", error.message);
+          }
+        },
       },
-    });
+    );
   };
 
   const formFields: FormFieldProps<DocumentSchema>[] = [
@@ -81,7 +94,7 @@ export default function DocumentsForm() {
       label: "",
       name: "idProofPhoto",
       placeholder: "Upload your photo",
-      component: "input",
+      component: "image",
       error: errors.idProofPhoto?.message,
     },
     {
@@ -99,7 +112,7 @@ export default function DocumentsForm() {
       label: "Resume/CV",
       name: "resumePhoto",
       placeholder: "",
-      component: "input",
+      component: "image",
       required: false,
       error: errors.resumePhoto?.message,
     },
@@ -122,17 +135,17 @@ export default function DocumentsForm() {
     // },
   ];
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="min-h-screen p-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
+        className="max-w-6xl mx-auto bg-gray-100 rounded-lg shadow-xl"
       >
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Documents
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {formFields.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}

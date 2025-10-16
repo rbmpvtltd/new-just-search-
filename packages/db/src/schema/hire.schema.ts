@@ -183,6 +183,8 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
   highestQualification: () =>
     z.string().min(1, "Highest qualification is required"),
   employmentStatus: () => z.string().min(1, "Employment status is required"),
+  certificates: () => z.string().optional(),
+
   workExperienceYear: () =>
     z.number().min(1, "Work experience year is required"),
   jobRole: () => z.string().min(1, "Job role is required"),
@@ -200,6 +202,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
   }),
   // jobType: z.array(z.enum(JobType), { message: "Job type is required" }),
   jobDuration: z.array(z.enum(JobDuration)),
+
   // workShift: z.array(z.enum(WorkShift), { message: "Work shift is required" }),
 });
 
@@ -216,23 +219,23 @@ export const hireUpdateSchema = createUpdateSchema(hireListing).extend({
 
 export const personalDetailsHireSchema = hireInsertSchema.pick({
   photo: true,
-  name: true,
-  categoryId: true,
-  subcategoryId: true,
-  maritalStatus: true,
-  gender: true,
-  fatherName: true,
-  dob: true,
-  languages: true,
-  mobileNumber: true,
-  alternativeMobileNumber: true,
-  email: true,
-  latitude: true,
-  longitude: true,
-  area: true,
-  pincode: true,
-  state: true,
-  city: true,
+  // name: true,
+  // categoryId: true,
+  // subcategoryId: true,
+  // maritalStatus: true,
+  // gender: true,
+  // fatherName: true,
+  // dob: true,
+  // languages: true,
+  // mobileNumber: true,
+  // alternativeMobileNumber: true,
+  // email: true,
+  // latitude: true,
+  // longitude: true,
+  // area: true,
+  // pincode: true,
+  // state: true,
+  // city: true,
 });
 export const educationSchema = hireInsertSchema.pick({
   highestQualification: true,

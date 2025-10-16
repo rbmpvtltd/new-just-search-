@@ -11,20 +11,20 @@ export default async function page() {
   const { data: myHire, error: myHireError } = await asyncHandler(
     trpcServer.hirerouter.show.query(),
   );
-  console.log("myHire", myHire);
 
-  if (error || !myHire) {
+  if (error === "") {
     console.log("error", error);
     logger.error(error);
     return <ErrorComponent error={error} />;
   }
-  if (myHireError) {
-    console.log("myHireError", myHireError);
-    logger.error(myHireError);
-    return <ErrorComponent error={myHireError} />;
-  }
 
   return (
-    <div>{myHire ? <MyHire data={myHire} /> : <AddHirePage data={data} />}</div>
+    <div>
+      {myHire?.isVisible ? (
+        <MyHire data={myHire} />
+      ) : (
+        <AddHirePage data={data} />
+      )}
+    </div>
   );
 }

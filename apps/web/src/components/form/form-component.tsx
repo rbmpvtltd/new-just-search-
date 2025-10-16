@@ -4,7 +4,7 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
-import { Calendar } from "../ui/calendar";
+import CropperComponent from "../image/upload-image";
 import { Checkbox } from "../ui/checkbox";
 import { DatePicker } from "../ui/date-picker";
 import { Input } from "../ui/input";
@@ -30,7 +30,8 @@ export interface FormFieldProps<T extends FieldValues> {
     | "select"
     | "checkbox"
     | "textarea"
-    | "calendar";
+    | "calendar"
+    | "image";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -144,6 +145,8 @@ export const FormField = <T extends FieldValues>({
 
             case "calendar":
               return <DatePicker value={value} onChange={onChange} />;
+            case "image":
+              return <CropperComponent onChange={onChange} value={value} />;
             default:
               return <div>no component</div>;
           }
