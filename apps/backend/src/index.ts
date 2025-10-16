@@ -1,22 +1,28 @@
 // import { logger } from "@repo/helper";
+
+import { logger } from "@repo/helper";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { applyWSSHandler } from "@trpc/server/adapters/ws";
+// import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
-import * as ws from "ws";
-import { cloudinarySignature } from "./lib/cloudinary";
-import { ORPChandler, ORPCspec } from "./lib/orpc";
+// import * as ws from "ws";
+// import { cloudinarySignature } from "./lib/cloudinary";
+// import { ORPChandler } from "./lib/orpc";
 import { appRouter } from "./route";
-import { createContext, createWSContext } from "./utils/context";
+import { createContext } from "./utils/context";
 
 const app = express();
 // console.log("rerun");
 
-app.use(cors({ origin: "*" }));
-app.use(cookieParser());
+// app.use(cors({ origin: "*" }));
+// app.use(cookieParser());
 
 // adding trpc
+
+app.get("/", (req, res) => {
+  res.send("hello");
+});
 app.use(
   "/trpc",
   createExpressMiddleware({
@@ -24,7 +30,7 @@ app.use(
     createContext,
     middleware: cors({ origin: "*" }),
     onError: (opts) => {
-      // logger.error(opts.error.code);
+      logger.error(opts.error.code);
     },
   }),
 );
@@ -55,31 +61,27 @@ app.use(
 // });
 //
 // adding Orpc
-//
-// get data on localhost:4000/api
-app.use(async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  const result = await ORPChandler.handle(req, res, {
-    context: {
-      token,
-    },
-  });
 
-  if (!result.matched) {
-    return next();
-  }
-});
+// get data on localhost:4000/api
+// app.use(async (req, res, next) => {
+//   const token = req.headers.authorization?.split(" ")[1];
+//   const result = await ORPChandler.handle(req, res, {
+//    context: {
+//       token,
+//     },
+//   });
+
+//   if (!result.matched) {
+//     return next();
+//   }
+// });
 
 // get data on localhost:4000/spec
-app.get("/spec", (_, res) => {
-  const result = ORPCspec;
+// app.get("/spec", (_, res) => {
+//   const result = ORPCspec;
 
-  res.send(result);
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.post("/v1/api/sign-image", cloudinarySignature);
+//   res.send(result);
+// });
 app.listen(4000);
 
 // exporting ---

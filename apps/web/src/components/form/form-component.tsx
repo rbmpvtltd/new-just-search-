@@ -115,6 +115,7 @@ export const FormField = <T extends FieldValues>({
                               value.includes(option.value)
                             }
                             onCheckedChange={(checked) => {
+                              console.log({ value });
                               if (checked) {
                                 onChange([...(value || []), option.value]);
                               } else {

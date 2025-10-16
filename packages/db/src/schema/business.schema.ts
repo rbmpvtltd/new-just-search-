@@ -8,10 +8,11 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import z from "zod";
 import {
   categories,
   cities,
-  states,
   subcategories,
 } from "../schema/not-related.schema";
 import { users } from "./auth.schema";
@@ -53,6 +54,88 @@ export const businessListings = pgTable("business_listings", {
   isFeature: boolean("is_feature").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const businessSelectSchema = createSelectSchema(businessListings).extend(
+  {
+    categoryId: z.number(),
+    subcategoryId: z.array(z.number()),
+  },
+);
+
+export const businessInsertSchema = createInsertSchema(businessListings, {
+  photo: () => z.string().min(1, "Photo is required"),
+  name: () => z.string().min(3, "Name should be minimum 3 characters long"),
+  buildingName: () =>
+    z.string().min(3, "Building name should be minimum 3 characters long"),
+  streetName: () =>
+    z.string().min(3, "Street name should be minimum 3 characters long"),
+  area: () => z.string().min(3, "Area should be minimum 3 characters long"),
+  latitude: () =>
+    z.string().refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= -90 && num <= 90;
+      },
+      { message: "Latitude must be a number between -90 and 90" },
+    ),
+  longitude: () =>
+    z.string().refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= -180 && num <= 180;
+      },
+      { message: "Longitude must be a number between -180 and 180" },
+    ),
+  pincode: () =>
+    z.string().min(6, "Pincode should be minimum 6 characters long"),
+  cityId: () => z.number().min(1, "City is required"),
+
+  contactPerson: () =>
+    z.string().min(3, "Contact person should be minimum 3 characters long"),
+  phoneNumber: () =>
+    z.string().min(10, "Phone number should be minimum 10 characters long"),
+  ownerNumber: () =>
+    z.string().min(10, "Owner number should be minimum 10 characters long"),
+}).extend({
+  categoryId: z.number().min(1, "Category is required"),
+  subcategoryId: z.array(z.number()).min(1, "Select at least one subcategory"),
+  state: z.number().min(1, "State is required"),
+});
+
+export const businessDetailSchema = businessInsertSchema.pick({
+  photo: true,
+  name: true,
+  categoryId: true,
+  subcategoryId: true,
+  // slug: true,
+  specialities: true,
+  description: true,
+  homeDelivery: true,
+});
+
+export const addressDetailSchema = businessInsertSchema.pick({
+  buildingName: true,
+  streetName: true,
+  area: true,
+  landmark: true,
+  latitude: true,
+  longitude: true,
+  pincode: true,
+  state: true,
+  cityId: true,
+});
+
+export const businessTimingSchema = businessInsertSchema.pick({
+  alternativeMobileNumber: true,
+});
+
+export const contactDetailSchema = businessInsertSchema.pick({
+  contactPerson: true,
+  phoneNumber: true,
+  ownerNumber: true,
+  whatsappNo: true,
+  email: true,
 });
 
 // 2. Business Photo Interface

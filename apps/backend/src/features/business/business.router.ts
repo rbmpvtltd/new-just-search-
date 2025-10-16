@@ -1,4 +1,5 @@
 import { db, schemas } from "@repo/db";
+import { businessInsertSchema } from "@repo/db/src/schema/business.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import z from "zod";
@@ -21,18 +22,15 @@ const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
 
 export const businessrouter = router({
-  add: businessProcedure.query(async ({ ctx }) => {
-    const getBusinessCategories = await db.query.businessCategories.findMany();
-    const getBusinessSubCategories =
-      await db.query.businessSubcategories.findMany();
+  add: visitorProcedure.query(async ({ ctx }) => {
+    const getBusinessCategories = await db.query.categories.findMany({
+      where: (categories, { eq }) => eq(categories.type, 1),
+    });
     const getStates = await db.query.states.findMany();
-    const getCities = await db.query.cities.findMany();
 
     return {
       getBusinessCategories,
-      getBusinessSubCategories,
       getStates,
-      getCities,
     };
     // const user = await db.query.users.findFirst({
     //   where: (user, { eq }) => eq(user.id, ctx.userId),
@@ -40,47 +38,30 @@ export const businessrouter = router({
     // return user;
   }),
 
+  getSubCategories: visitorProcedure
+    .input(z.object({ categoryId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const businessSubCategories = await db.query.subcategories.findMany({
+        where: (subcategories, { eq }) =>
+          eq(subcategories.categoryId, input.categoryId),
+      });
+      return businessSubCategories;
+    }),
+
+  getCities: visitorProcedure
+    .input(z.object({ state: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const cities = await db.query.cities.findMany({
+        where: (cities, { eq }) => eq(cities.stateId, input.state),
+      });
+      return cities;
+    }),
+
   create: visitorProcedure
     .input(
-      z.object({
-        name: z.string(),
-        slug: z.string(),
-        photo: z.string(),
-        categoryId: z.number(),
-        subcategoryId: z.array(z.number()),
-        specialities: z.string(),
-        description: z.string(),
-        homeDelivery: z.boolean(),
-        shopImages: z.array(z.string()),
-        latitude: z.string(),
-        longitude: z.string(),
-        buildingName: z.string(),
-        streetName: z.string(),
-        area: z.string(),
-        landmark: z.string(),
-        pincode: z.number(),
-        cityId: z.number(),
-        stateId: z.number(),
-        schedules: z.array(
-          z.object({
-            days: z.array(z.string()),
-            openingTime: z.string(),
-            openingTimePeriod: z.string(),
-            closingTime: z.string(),
-            closingTimePeriod: z.string(),
-          }),
-        ),
-        phoneNumber: z.string(),
-        email: z.string(),
-        contactPerson: z.string(),
-        ownerNumber: z.string(),
-        whatsappNo: z.string(),
-        alternativeMobileNumber: z.string(),
-        facebook: z.string(),
-        twitter: z.string(),
-        linkedin: z.string(),
-        listingVideo: z.string(),
-        isFeature: z.string(),
+      businessInsertSchema.omit({
+        userId: true,
+        slug: true,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -112,7 +93,7 @@ export const businessrouter = router({
 
       const existingEmail = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
-          eq(businessListings.email, input.email),
+          eq(businessListings.email, String(input.email)),
       });
 
       if (existingEmail) {
@@ -122,34 +103,34 @@ export const businessrouter = router({
         });
       }
 
-      const isStateExists = await db.query.states.findFirst({
-        where: (states, { eq }) => eq(states.id, input.stateId),
-      });
+      // const isStateExists = await db.query.states.findFirst({
+      //   where: (states, { eq }) => eq(states.id, input.s),
+      // });
       // return isStateExists;
 
-      if (!isStateExists) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "State not found",
-        });
-      }
+      // if (!isStateExists) {
+      //   throw new TRPCError({
+      //     code: "NOT_FOUND",
+      //     message: "State not found",
+      //   });
+      // }
 
-      const isCityExists = await db.query.cities.findFirst({
-        where: (cities, { eq }) => eq(cities.id, input.cityId),
-      });
-      if (!isCityExists) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "City not found",
-        });
-      }
+      // const isCityExists = await db.query.cities.findFirst({
+      //   where: (cities, { eq }) => eq(cities.id, input.cityId),
+      // });
+      // if (!isCityExists) {
+      //   throw new TRPCError({
+      //     code: "NOT_FOUND",
+      //     message: "City not found",
+      //   });
+      // }
 
       const [createBusiness] = await db
         .insert(schemas.business.businessListings)
         .values({
           userId: ctx.userId,
           name: input.name,
-          slug: input.slug,
+          slug: input.name,
           photo: input.photo,
           specialities: input.specialities,
           description: input.description,
@@ -173,7 +154,6 @@ export const businessrouter = router({
           twitter: input.twitter,
           linkedin: input.linkedin,
           listingVideo: input.listingVideo,
-          isFeature: input.isFeature === "true",
         })
         .returning({
           id: schemas.business.businessListings.id,
@@ -194,20 +174,20 @@ export const businessrouter = router({
         await db.insert(schemas.business.businessSubcategories).values(
           input.subcategoryId.map((subCategoryId) => ({
             businessId,
-            subcategoryId: subCategoryId,
+            subcategoryId: Number(subCategoryId),
           })),
         );
       }
-      await db.insert(schemas.business.businessPhotos).values({
-        businessId,
-        photo: input.photo,
-      });
-      await db.insert(schemas.business.businessPhotos).values(
-        input.shopImages.map((image) => ({
-          businessId,
-          photo: image,
-        })),
-      );
+      // await db.insert(schemas.business.businessPhotos).values({
+      //   businessId,
+      //   photo: input.photo,
+      // });
+      // await db.insert(schemas.business.businessPhotos).values(
+      //   input.shopImages.map((image) => ({
+      //     businessId,
+      //     photo: image,
+      //   })),
+      // );
       await db
         .update(schemas.auth.users)
         .set({

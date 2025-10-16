@@ -9,7 +9,11 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 import z from "zod";
 import {
   categories,
@@ -30,7 +34,7 @@ export const MaritalStatus = {
   Unmarried: "Unmarried",
   Widowed: "Widowed",
   Divorced: "Divorced",
-  Others: "Others", // TODO : add unknown field
+  Others: "Others",
 } as const;
 
 export const JobType = {
@@ -43,15 +47,14 @@ export const WorkShift = {
   Morning: "Morning",
   Evening: "Evening",
   Night: "Night",
-};
+} as const;
 
 export const JobDuration = {
   Day: "Day",
   Week: "Week",
   Month: "Month",
   Year: "Year",
-  "Few Years": "Few Years",
-};
+} as const;
 
 // export const Languages = {
 //   Hindi: "Hindi",
@@ -83,7 +86,7 @@ export const hireListing = pgTable("hire_listing", {
   dob: date("dob"),
   gender: genderEnum("gender").notNull(),
   maritalStatus: maritalStatusEnum("marital_status").notNull(),
-  languages: varchar("language", { length: 255 }).notNull(),
+  languages: varchar("language", { length: 255 }).array().notNull(),
   slug: varchar("slug", { length: 255 }),
   specialities: text("specialities"),
   description: text("description"),
@@ -93,7 +96,7 @@ export const hireListing = pgTable("hire_listing", {
   streetName: varchar("street_name", { length: 255 }),
   area: varchar("area", { length: 255 }),
   landmark: varchar("landmark", { length: 255 }),
-  pincode: integer("pincode"),
+  pincode: varchar("pincode"),
   state: integer("state"),
   city: integer("city")
     .notNull()
@@ -123,13 +126,13 @@ export const hireListing = pgTable("hire_listing", {
   skillset: text("skillset"),
   abilities: text("abilities"),
   jobType: jobTypeEnum("job_type").array().notNull(),
+  jobDuration: jobDurationEnum("job_duration").array().notNull(),
   locationPreferred: varchar("location_preferred", { length: 255 }),
   certificates: text("certificates"),
   workShift: workShiftEnum("work_shift").array().notNull(),
   expectedSalaryFrom: varchar("expected_salary_from", { length: 100 }),
   expectedSalaryTo: varchar("expected_salary_to", { length: 100 }),
   preferredWorkingHours: varchar("preferred_working_hours", { length: 100 }),
-  jobDuration: jobDurationEnum("job_duration").array().notNull(),
   relocate: varchar("relocate"),
   availability: varchar("availability", { length: 255 }),
   idProof: varchar("id_proof").notNull(),
@@ -141,31 +144,127 @@ export const hireListing = pgTable("hire_listing", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const hireInsertSchema = createInsertSchema(hireListing);
-export const hireSelectSchema = createSelectSchema(hireListing).extend({
-  category: z.number(),
-  subcategory: z.array(z.number()),
+// export const hireInsertSchema = createInsertSchema(hireListing).extend({
+//   gender: z.enum(Gender),
+//   maritalStatus: z.enum(MaritalStatus),
+//   categoryId: z.number(),
+//   subcategoryId: z.array(z.number()),
+// });
+export const hireInsertSchema = createInsertSchema(hireListing, {
+  photo: () => z.string().min(1, "Photo is required"),
+  name: () => z.string().min(3, "Name should be minimum 3 characters long"),
+  fatherName: () =>
+    z.string().min(3, "Name should be minimum 3 characters long"),
+  dob: () => z.string().min(1, "Date of birth is required"),
+  mobileNumber: () =>
+    z.string().min(10, "Mobile number should be minimum 10 characters long"),
+  languages: () => z.array(z.string()).min(1, "Select at least one language"),
+  latitude: () =>
+    z.string().refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= -90 && num <= 90;
+      },
+      { message: "Latitude must be a number between -90 and 90" },
+    ),
+  longitude: () =>
+    z.string().refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= -180 && num <= 180;
+      },
+      { message: "Longitude must be a number between -180 and 180" },
+    ),
+  area: () => z.string().min(3, "Area should be minimum 3 characters long"),
+  pincode: () =>
+    z.string().min(6, "Pincode should be minimum 6 characters long"),
+  state: () => z.number().min(1, "State is required"),
+
+  highestQualification: () =>
+    z.string().min(1, "Highest qualification is required"),
+  employmentStatus: () => z.string().min(1, "Employment status is required"),
+  workExperienceYear: () =>
+    z.number().min(1, "Work experience year is required"),
+  jobRole: () => z.string().min(1, "Job role is required"),
+
+  idProof: () => z.string().min(1, "ID proof is required"),
+  city: () => z.number().min(1, "City is required"),
+  jobType: () => z.array(z.enum(JobType)).min(1, "Job type is required"),
+  workShift: () => z.array(z.enum(WorkShift)).min(1, "Work shift is required"),
+}).extend({
+  categoryId: z.number().min(1, "Category is required"),
+  subcategoryId: z.array(z.number()).min(1, "Select at least one subcategory"),
+  gender: z.enum(Gender, { message: "Gender is required" }),
+  maritalStatus: z.enum(MaritalStatus, {
+    message: "Marital status is required",
+  }),
+  // jobType: z.array(z.enum(JobType), { message: "Job type is required" }),
+  jobDuration: z.array(z.enum(JobDuration)),
+  // workShift: z.array(z.enum(WorkShift), { message: "Work shift is required" }),
+});
+
+export const hireUpdateSchema = createUpdateSchema(hireListing).extend({
+  categoryId: z.number(),
+  subcategoryId: z.array(z.number()),
   gender: z.enum(Gender),
   maritalStatus: z.enum(MaritalStatus),
+  languages: z.array(z.string()),
+  jobType: z.array(z.enum(JobType)),
+  jobDuration: z.array(z.enum(JobDuration)),
+  workShift: z.array(z.enum(WorkShift)),
 });
 
-export const personalDetailsHireSchema = hireSelectSchema.pick({
-  // photo: true,
+export const personalDetailsHireSchema = hireInsertSchema.pick({
+  photo: true,
   name: true,
-  // category: true,
-  // subcategory: true,
-  // description: true,
-  // specialities: true,
+  categoryId: true,
+  subcategoryId: true,
   maritalStatus: true,
   gender: true,
-  jobType: true,
-  // area: true,
-  // pincode: true,
-  // state: true,
-  // city: true,
+  fatherName: true,
+  dob: true,
+  languages: true,
+  mobileNumber: true,
+  alternativeMobileNumber: true,
+  email: true,
+  latitude: true,
+  longitude: true,
+  area: true,
+  pincode: true,
+  state: true,
+  city: true,
+});
+export const educationSchema = hireInsertSchema.pick({
+  highestQualification: true,
+  skillset: true,
+  employmentStatus: true,
+  workExperienceYear: true,
+  workExperienceMonth: true,
+  jobRole: true,
+  previousJobRole: true,
+  certificates: true,
 });
 
-// // 2. recent_views_hire
+export const preferredPositionSchema = hireInsertSchema.pick({
+  jobType: true,
+  locationPreferred: true,
+  workShift: true,
+  expectedSalaryFrom: true,
+  expectedSalaryTo: true,
+  preferredWorkingHours: true,
+  jobDuration: true,
+  relocate: true,
+  availability: true,
+});
+
+export const documentSchema = hireInsertSchema.pick({
+  idProof: true,
+  idProofPhoto: true,
+  coverLetter: true,
+  resumePhoto: true,
+  aboutYourself: true,
+});
+
 export const recentViewHire = pgTable("recent_view_hire", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
@@ -184,7 +283,7 @@ export const hireSubcategories = pgTable("hire_subcategories", {
   id: serial("id").primaryKey(),
   hireId: integer("hire_id")
     .notNull()
-    .references(() => hireListing.id),
+    .references(() => hireListing.id, { onDelete: "cascade" }),
 
   subcategoryId: integer("subcategory_id")
     .notNull()
@@ -197,7 +296,7 @@ export const hireCategories = pgTable("hire_categories", {
 
   hireId: integer("hire_id")
     .notNull()
-    .references(() => hireListing.id),
+    .references(() => hireListing.id, { onDelete: "cascade" }),
 
   categoryId: integer("category_id")
     .notNull()

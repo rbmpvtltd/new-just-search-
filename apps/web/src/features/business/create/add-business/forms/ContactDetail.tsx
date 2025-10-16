@@ -1,63 +1,118 @@
+"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { contactDetailSchema } from "@repo/db/src/schema/business.schema";
+import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
 import React from "react";
 import { type FieldValues, useForm } from "react-hook-form";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
+import { useTRPC } from "@/trpc/client";
 
+type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail() {
-  const { control } = useForm<FieldValues>();
+  const trpc = useTRPC();
+  const { mutate } = useMutation(trpc.businessrouter.create.mutationOptions());
+  const formValue = useBusinessFormStore((state) => state.formValue);
+  const setFormValue = useBusinessFormStore((state) => state.setFormValue);
+  const prevPage = useBusinessFormStore((state) => state.prevPage);
 
-  const formFields: FormFieldProps<FieldValues>[] = [
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ContactDetailSchema>({
+    resolver: zodResolver(contactDetailSchema),
+    defaultValues: {
+      contactPerson: formValue.contactPerson ?? "",
+      phoneNumber: formValue.phoneNumber ?? "",
+      ownerNumber: formValue.ownerNumber ?? "",
+      whatsappNo: formValue.whatsappNo ?? "",
+      email: formValue.email ?? "",
+    },
+  });
+
+  const formFields: FormFieldProps<ContactDetailSchema>[] = [
     {
       control,
       label: "Contact Person Name",
-      name: "contactPersonName",
+      name: "contactPerson",
       component: "input",
-      error: "",
+      error: errors.contactPerson?.message,
     },
     {
       control,
       label: "Contact Person Number",
-      name: "contactPersonNumber",
+      name: "phoneNumber",
       component: "input",
-      error: "",
+      error: errors.phoneNumber?.message,
     },
     {
       control,
       label: "Owner Number",
       name: "ownerNumber",
       component: "input",
-      error: "",
+      error: errors.ownerNumber?.message,
     },
     {
       control,
       label: "Whatsapp Number",
-      name: "whatsappNumber",
+      name: "whatsappNo",
       component: "input",
       required: false,
-      error: "",
+      error: errors.whatsappNo?.message,
     },
     {
       control,
       label: "Email Id",
-      name: "emailId",
+      name: "email",
       component: "input",
       required: false,
-      error: "",
+      error: errors.email?.message,
     },
-    {
-      control,
-      label: "Refer Code",
-      name: "referCode",
-      component: "input",
-      error: "",
-    },
+    // {
+    //   control,
+    //   label: "Refer Code",
+    //   name: "referCode",
+    //   component: "input",
+    //   error: "",
+    // },
   ];
+
+  const onSubmit = (data: ContactDetailSchema) => {
+    console.log("Contact data", data);
+    setFormValue("contactPerson", data.contactPerson ?? "");
+    setFormValue("phoneNumber", data.phoneNumber ?? "");
+    setFormValue("ownerNumber", data.ownerNumber ?? "");
+    setFormValue("whatsappNo", data.whatsappNo ?? "");
+    setFormValue("email", data.email ?? "");
+    console.log("formValue", formValue);
+
+    mutate(
+      { ...formValue, pincode: formValue.pincode },
+      {
+        onSuccess: (data) => {
+          console.log("Success", data);
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            console.error("Error", error.message);
+          }
+        },
+      },
+    );
+  };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <form className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
+      >
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -73,6 +128,7 @@ export default function ContactDetail() {
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
             type="submit"
+            onClick={prevPage}
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             PREVIOUS

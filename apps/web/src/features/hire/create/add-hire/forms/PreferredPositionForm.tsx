@@ -1,24 +1,20 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
-import { type Control, type FieldValues, useForm } from "react-hook-form";
 import {
-  FormField,
-  type FormFieldProps,
-} from "@/components/form/form-component";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  JOB_DURATION,
-  JOB_TYPE,
-  WORK_SHIFT,
-} from "@/features/hire/shared/constants/hire";
-import {
-  type PreferredPosition,
+  JobDuration,
+  JobType,
   preferredPositionSchema,
-} from "@/features/hire/shared/schemas/preferred-position.schema";
+  WorkShift,
+} from "@repo/db/src/schema/hire.schema";
+import React from "react";
+import { useForm } from "react-hook-form";
+import type z from "zod";
+import { FormField } from "@/components/form/form-component";
+import { Button } from "@/components/ui/button";
+
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 
+type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
 export default function PreferredPositionForm() {
   const { page, prevPage, nextPage, setFormValue, formValue } =
     useHireFormStore();
@@ -27,7 +23,7 @@ export default function PreferredPositionForm() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<PreferredPosition>({
+  } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
       jobType: formValue.jobType ?? [],
@@ -36,16 +32,17 @@ export default function PreferredPositionForm() {
       expectedSalaryFrom: formValue.expectedSalaryFrom ?? "",
       expectedSalaryTo: formValue.expectedSalaryTo ?? "",
       jobDuration: formValue.jobDuration ?? [],
-      fromHour: formValue.fromHour ?? undefined,
-      fromPeriod: formValue.fromPeriod ?? undefined,
-      toHour: formValue.toHour ?? undefined,
-      toPeriod: formValue.toPeriod ?? undefined,
+      // fromHour: formValue.fromHour ?? undefined,
+      // fromPeriod: formValue.fromPeriod ?? undefined,
+      // toHour: formValue.toHour ?? undefined,
+      // toPeriod: formValue.toPeriod ?? undefined,
+      preferredWorkingHours: formValue.preferredWorkingHours ?? "",
       workShift: formValue.workShift ?? [],
       availability: formValue.availability ?? "",
     },
   });
 
-  const onSubmit = (data: PreferredPosition) => {
+  const onSubmit = (data: PreferredPositionSchema) => {
     console.log("jobType", data.jobType);
 
     setFormValue("jobType", data.jobType ?? "");
@@ -54,10 +51,11 @@ export default function PreferredPositionForm() {
     setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
     setFormValue("expectedSalaryTo", data.expectedSalaryTo ?? "");
     setFormValue("jobDuration", data.jobDuration ?? "");
-    setFormValue("fromHour", data.fromHour ?? undefined);
-    setFormValue("fromPeriod", data.fromPeriod ?? undefined);
-    setFormValue("toHour", data.toHour ?? undefined);
-    setFormValue("toPeriod", data.toPeriod ?? undefined);
+    // setFormValue("fromHour", data.fromHour ?? undefined);
+    // setFormValue("fromPeriod", data.fromPeriod ?? undefined);
+    // setFormValue("toHour", data.toHour ?? undefined);
+    // setFormValue("toPeriod", data.toPeriod ?? undefined);
+    setFormValue("preferredWorkingHours", data.preferredWorkingHours ?? "");
     setFormValue("workShift", data.workShift ?? "");
     setFormValue("availability", data.availability ?? "");
     nextPage();
@@ -84,11 +82,10 @@ export default function PreferredPositionForm() {
                 name="jobType"
                 placeholder="Job Type"
                 component="checkbox"
-                options={[
-                  { label: "Full Time", value: "full-time" },
-                  { label: "Part Time", value: "part-time" },
-                  { label: "Contract", value: "contract" },
-                ]}
+                options={Object.values(JobType).map((jobType) => ({
+                  label: jobType,
+                  value: jobType,
+                }))}
                 error={errors.jobType?.message}
               />
               <FormField
@@ -155,12 +152,10 @@ export default function PreferredPositionForm() {
                 label="Job Duration"
                 name="jobDuration"
                 component="checkbox"
-                options={[
-                  { label: "Day", value: "day" },
-                  { label: "Week", value: "week" },
-                  { label: "Month", value: "month" },
-                  { label: "Year", value: "year" },
-                ]}
+                options={Object.values(JobDuration).map((duration) => ({
+                  label: duration,
+                  value: duration,
+                }))}
                 required={false}
                 error={errors.jobDuration?.message}
               />
@@ -172,7 +167,7 @@ export default function PreferredPositionForm() {
                   Perffered Working Hours
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  <FormField
+                  {/* <FormField
                     type=""
                     control={control}
                     label="From Hour"
@@ -243,7 +238,7 @@ export default function PreferredPositionForm() {
                     ]}
                     required={false}
                     error={errors.toPeriod?.message}
-                  />
+                  /> */}
                 </div>
               </div>
             </div>
@@ -255,10 +250,10 @@ export default function PreferredPositionForm() {
                 label="Work Shift"
                 name="workShift"
                 component="checkbox"
-                options={[
-                  { label: "Day Shift", value: "Day Shift" },
-                  { label: "Night Shift", value: "Night Shift" },
-                ]}
+                options={Object.values(WorkShift).map((shift) => ({
+                  label: shift,
+                  value: shift,
+                }))}
                 error={errors.workShift?.message}
               />
               <FormField

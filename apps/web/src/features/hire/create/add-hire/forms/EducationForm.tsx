@@ -1,23 +1,16 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { educationSchema } from "@repo/db/src/schema/hire.schema";
 import { useForm } from "react-hook-form";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
-import {
-  EXPERIENCE_MONTHS,
-  EXPERIENCE_YEARS,
-  QUALIFICATIONS,
-  YES_NO_OPTIONS,
-} from "@/features/hire/shared/constants/hire";
-import {
-  type EducationSchema,
-  educationSchema,
-} from "@/features/hire/shared/schemas/education.schema";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 
+type EducationSchema = z.infer<typeof educationSchema>;
 export default function EducationForm() {
   const { page, prevPage, nextPage, setFormValue, formValue } =
     useHireFormStore();
@@ -31,24 +24,24 @@ export default function EducationForm() {
     defaultValues: {
       highestQualification: formValue.highestQualification ?? "",
       skillset: formValue.skillset ?? "",
-      currentlyEmployed: formValue.currentlyEmployed ?? "",
-      workExperienceYear: formValue.workExperienceYear ?? "",
+      employmentStatus: formValue.employmentStatus ?? "",
+      workExperienceYear: formValue.workExperienceYear ?? 0,
       workExperienceMonth: formValue.workExperienceMonth ?? undefined,
       previousJobRole: formValue.previousJobRole ?? "",
       jobRole: formValue.jobRole ?? "",
-      certificate: formValue.certificate ?? "",
+      certificates: formValue.certificates ?? "",
     },
   });
   const onSubmit = (data: EducationSchema) => {
     setFormValue("highestQualification", data.highestQualification ?? "");
     setFormValue("skillset", data.skillset ?? "");
-    setFormValue("currentlyEmployed", data.currentlyEmployed ?? "");
+    setFormValue("employmentStatus", data.employmentStatus ?? "");
     setFormValue("workExperienceYear", data.workExperienceYear ?? "");
     setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
     setFormValue("previousJobRole", data.previousJobRole ?? "");
     setFormValue("jobRole", data.jobRole ?? "");
-    setFormValue("certificate", data.certificate ?? "");
-    // console.log("form value", formValue ?? "");
+    setFormValue("certificates", data.certificates ?? "");
+    console.log("form value", formValue ?? "");
     console.log("data", data);
 
     nextPage();
@@ -83,7 +76,7 @@ export default function EducationForm() {
     {
       control,
       label: "Currently Employed",
-      name: "currentlyEmployed",
+      name: "employmentStatus",
       placeholder: "Currently Employed",
       component: "select",
       options: [
@@ -96,7 +89,7 @@ export default function EducationForm() {
           value: "no",
         },
       ],
-      error: errors.currentlyEmployed?.message,
+      error: errors.employmentStatus?.message,
     },
     {
       control,
@@ -105,13 +98,12 @@ export default function EducationForm() {
       placeholder: "Years",
       component: "select",
       options: [
-        { label: "fresher", value: "fresher" },
-        { label: "0", value: "0" },
-        { label: "1", value: "1" },
-        { label: "2", value: "2" },
-        { label: "3", value: "3" },
-        { label: "4", value: "4" },
-        { label: "5", value: "5" },
+        { label: "0", value: 0 },
+        { label: "1", value: 1 },
+        { label: "2", value: 2 },
+        { label: "3", value: 3 },
+        { label: "4", value: 4 },
+        { label: "5", value: 5 },
       ],
       error: errors.workExperienceYear?.message,
     },
@@ -124,12 +116,12 @@ export default function EducationForm() {
       required: false,
       options: [
         { label: "fresher", value: "fresher" },
-        { label: "0", value: "0" },
-        { label: "1", value: "1" },
-        { label: "2", value: "2" },
-        { label: "3", value: "3" },
-        { label: "4", value: "4" },
-        { label: "5", value: "5" },
+        { label: "0", value: 0 },
+        { label: "1", value: 1 },
+        { label: "2", value: 2 },
+        { label: "3", value: 3 },
+        { label: "4", value: 4 },
+        { label: "5", value: 5 },
       ],
       error: errors.workExperienceMonth?.message,
     },
@@ -153,12 +145,12 @@ export default function EducationForm() {
     {
       control,
       type: "",
-      label: "Certificate",
-      name: "certificate",
-      placeholder: "Certificate",
+      label: "Certificates",
+      name: "certificates",
+      placeholder: "Certificates",
       component: "input",
       required: false,
-      error: errors.certificate?.message,
+      error: errors.certificates?.message,
     },
   ];
 
@@ -173,15 +165,15 @@ export default function EducationForm() {
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Qualifications and Experience
             </h2>
-            {/* {
+            {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {formFields.map((field) => (
                   <FormField key={field.name} {...field} />
                 ))}
               </div>
-            } */}
+            }
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {formFields.map((field) => {
                 if (field.name === "workExperienceYear") {
                   const monthsField = formFields.find(
@@ -205,7 +197,7 @@ export default function EducationForm() {
 
                 return <FormField key={field.name} {...field} />;
               })}
-            </div>
+            </div> */}
           </div>
         </div>
 

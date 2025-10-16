@@ -1,21 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { documentSchema } from "@repo/db/src/schema/hire.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import React from "react";
-import { type FieldValues, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
-import { ID_PROOF } from "@/features/hire/shared/constants/hire";
-import {
-  type DocumentSchema,
-  documentSchema,
-} from "@/features/hire/shared/schemas/documents.schema";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
 
+type DocumentSchema = z.infer<typeof documentSchema>;
 export default function DocumentsForm() {
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
@@ -31,9 +29,9 @@ export default function DocumentsForm() {
       idProof: formValue.idProof ?? "",
       idProofPhoto: formValue.idProofPhoto ?? "",
       coverLetter: formValue.coverLetter ?? "",
-      resumePdf: formValue.resumePdf ?? "",
+      resumePhoto: formValue.resumePhoto ?? "",
       aboutYourself: formValue.aboutYourself ?? "",
-      referCode: formValue.referCode ?? "RBMHORJ00000",
+      // referCode: formValue.referCode ?? "RBMHORJ00000",
     },
   });
 
@@ -43,9 +41,11 @@ export default function DocumentsForm() {
     setFormValue("idProof", data.idProof ?? "");
     setFormValue("idProofPhoto", data.idProofPhoto ?? "");
     setFormValue("coverLetter", data.coverLetter ?? "");
-    setFormValue("resumePdf", data.resumePdf ?? "");
+    setFormValue("resumePhoto", data.resumePhoto ?? "");
     setFormValue("aboutYourself", data.aboutYourself ?? "");
-    setFormValue("referCode", data.referCode ?? "");
+    // setFormValue("referCode", data.referCode ?? "");
+
+    console.log("form Values after submit", formValue);
 
     mutate(formValue, {
       onSuccess: (data) => {
@@ -97,11 +97,11 @@ export default function DocumentsForm() {
       control,
       type: "",
       label: "Resume/CV",
-      name: "resumePdf",
+      name: "resumePhoto",
       placeholder: "",
       component: "input",
       required: false,
-      error: errors.resumePdf?.message,
+      error: errors.resumePhoto?.message,
     },
     {
       control,
@@ -112,14 +112,14 @@ export default function DocumentsForm() {
       required: false,
       error: errors.aboutYourself?.message,
     },
-    {
-      control,
-      label: "Refer Code",
-      name: "referCode",
-      placeholder: "Refer Code",
-      component: "input",
-      error: errors.referCode?.message,
-    },
+    // {
+    //   control,
+    //   label: "Refer Code",
+    //   name: "referCode",
+    //   placeholder: "Refer Code",
+    //   component: "input",
+    //   error: errors.referCode?.message,
+    // },
   ];
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

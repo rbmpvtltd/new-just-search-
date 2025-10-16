@@ -1,12 +1,17 @@
-import type { personalDetailsHireSchema } from "@repo/db/src/schema/hire.schema";
+import type {
+  documentSchema,
+  educationSchema,
+  personalDetailsHireSchema,
+  preferredPositionSchema,
+} from "@repo/db/src/schema/hire.schema";
 import type z from "zod";
 import { create } from "zustand";
-import type { DocumentSchema } from "../schemas/documents.schema";
-import type { EducationSchema } from "../schemas/education.schema";
-import type { PreferredPosition } from "../schemas/preferred-position.schema";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
-export type CombinedForm = PreferredPosition &
+type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
+type EducationSchema = z.infer<typeof educationSchema>;
+type DocumentSchema = z.infer<typeof documentSchema>;
+export type CombinedForm = PreferredPositionSchema &
   EducationSchema &
   DocumentSchema &
   PersonalDetailsSchema;
@@ -19,20 +24,21 @@ type HireFormProps = {
   formValue: CombinedForm;
   setFormValue: (
     key: keyof CombinedForm,
-    value: string[] | string | number | undefined,
+    value: string[] | number[] | string | number | boolean | undefined,
   ) => void;
 };
 
 // Combined initial value
 const initialFormValue: CombinedForm = {
   // PreferredPosition
-  jobType: ["FullTime"],
+  jobType: [],
   workShift: [],
   jobDuration: [],
-  fromHour: "",
-  fromPeriod: "",
-  toHour: "",
-  toPeriod: "",
+  // fromHour: "",
+  // fromPeriod: "",
+  // toHour: "",
+  // toPeriod: "",
+  preferredWorkingHours: "",
   availability: "",
   locationPreferred: "",
   expectedSalaryFrom: "",
@@ -41,44 +47,41 @@ const initialFormValue: CombinedForm = {
 
   // EducationSchema
   highestQualification: "",
-  currentlyEmployed: "",
+  employmentStatus: "",
   workExperienceYear: 0,
-  workExperienceMonth: undefined,
+  workExperienceMonth: 0,
   jobRole: "",
   skillset: "",
   previousJobRole: "",
-  certificate: "",
+  certificates: "",
 
   // DocumentSchema
   idProof: "",
   idProofPhoto: "",
   coverLetter: "",
-  resumePdf: "",
+  resumePhoto: "",
   aboutYourself: "",
-  referCode: "RBMHORJ00000",
+  // referCode: "RBMHORJ00000",
 
   // PersonalDetailsSchema
-  // photo: "",
-  // categoryId: 0,
-  // subcategoryId: [],
+  photo: "",
+  categoryId: 0,
+  subcategoryId: [],
   name: "",
   gender: "Male",
-  maritalStatus: "Others",
-  // specialities: "",
-  // description: "",
-  // fatherName: "",
-  // dob: "",
-  // languages: [],
-  // mobileNumber: "",
-  // latitude: "",
-  // longitude: "",
-  // area: "",
-  // pincode: "",
-  // state: 0,
-  // city: 0,
-
-  // alternateMobileNumber: "",
-  // email: "",
+  maritalStatus: "Married",
+  fatherName: "",
+  dob: "",
+  languages: [],
+  mobileNumber: "",
+  latitude: "",
+  longitude: "",
+  area: "",
+  pincode: "",
+  state: 0,
+  city: 0,
+  alternativeMobileNumber: "",
+  email: "",
 };
 
 export const useHireFormStore = create<HireFormProps>((set) => ({

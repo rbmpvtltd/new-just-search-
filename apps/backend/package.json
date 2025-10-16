@@ -2,7 +2,7 @@
   "name": "@repo/backend",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-	"version": "0.1.0",
+  "version": "0.1.0",
   "types": "./dist/index.d.ts",
   "type": "module",
   "devDependencies": {
@@ -21,7 +21,7 @@
   "dependencies": {
     "@orpc/openapi": "^1.8.7",
     "@orpc/trpc": "^1.8.7",
-    "@orpc/zod": "^1.8.7",
+    "@orpc/zod": "^1.9.4",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@repo/db": "*",
@@ -42,6 +42,6 @@
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "superjson": "^2.2.2",
-    "zod": "^4.0.17"
+    "zod": "^4.1.12"
   }
 }

@@ -3,6 +3,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { validateSessionToken } from "@/features/auth/lib/session";
 import type { Context } from "./context";
+import { logger } from "@repo/helper";
 
 export const t = initTRPC.context<Context>().meta<ORPCMeta>().create({
   transformer: superjson,

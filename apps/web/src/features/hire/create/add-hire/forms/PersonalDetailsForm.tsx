@@ -2,20 +2,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Gender,
-  JobType,
   MaritalStatus,
   personalDetailsHireSchema,
 } from "@repo/db/src/schema/hire.schema";
-import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
+import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
-// import {
-//   personalDetailsSchema,
-// } from "@/features/hire/shared/schemas/personal-details.schema";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
 import type { AddHirePageType } from "..";
@@ -38,122 +35,104 @@ export default function PersonalDetailsForm({
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
-      name: "hi",
-      jobType: [],
-      // photo: formValue.photo ?? "",
-      // categoryId: formValue.categoryId ?? "",
-      // subcategoryId: formValue.subcategoryId ?? [],
-      // name: formValue.name ?? "",
-      gender: formValue.gender ?? "Male",
+      name: formValue.name ?? "",
+      photo: formValue.photo ?? "",
+      categoryId: formValue.categoryId ?? "",
+      subcategoryId: formValue.subcategoryId ?? [],
+      gender: formValue.gender ?? "",
       maritalStatus: formValue.maritalStatus ?? "Others",
-      // fatherName: formValue.fatherName ?? "",
-      // dob: formValue.dob ?? "",
-      // languages: formValue.languages ?? [],
-      // mobileNumber: formValue.mobileNumber ?? "",
-      // alternateMobileNumber: formValue.alternateMobileNumber ?? "",
-      // email: formValue.email ?? "",
-      // latitude: formValue.latitude ?? "",
-      // longitude: formValue.longitude ?? "",
-      // area: formValue.area ?? "",
-      // pincode: formValue.pincode ?? "",
-      // state: formValue.state ?? "",
-      // city: formValue.city ?? "",
+      fatherName: formValue.fatherName ?? "",
+      dob: formValue.dob ?? "",
+      languages: formValue.languages ?? [],
+      mobileNumber: formValue.mobileNumber ?? "",
+      alternativeMobileNumber: formValue.alternativeMobileNumber ?? "",
+      email: formValue.email ?? "",
+      latitude: formValue.latitude ?? "",
+      longitude: formValue.longitude ?? "",
+      area: formValue.area ?? "",
+      pincode: formValue.pincode ?? "",
+      state: formValue.state ?? 0,
+      city: formValue.city ?? 0,
     },
   });
 
-  // const categories = data?.getHireCategories.map((item: any) => {
-  //   return {
-  //     label: item.title,
-  //     value: item.id,
-  //   };
-  // });
-  // const selectedCategoryId = useWatch({ control, name: "categoryId" });
+  const categories = data?.getHireCategories.map((item: any) => {
+    return {
+      label: item.title,
+      value: item.id,
+    };
+  });
 
-  // console.log("selectedCategoryId", selectedCategoryId);
+  const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
-  // const { data: subCategories, isLoading } = useQuery(
-  //   trpc.hirerouter.getSubCategories.queryOptions({
-  //     categoryId: selectedCategoryId,
-  //   }),
-  // );
-  // console.log("subCategories", subCategories);
+  const { data: subCategories, isLoading } = useQuery(
+    trpc.hirerouter.getSubCategories.queryOptions({
+      categoryId: selectedCategoryId,
+    }),
+  );
 
-  // const states = data?.getStates.map((item: any) => {
-  //   return {
-  //     label: item.name,
-  //     value: item.id,
-  //   };
-  // });
-  // const selectedStateId = useWatch({ control, name: "state" });
-  // console.log("selectedStateId", selectedStateId);
+  const states = data?.getStates.map((item: any) => {
+    return {
+      label: item.name,
+      value: item.id,
+    };
+  });
 
-  // const { data: cities, isLoading: cityLoading } = useQuery(
-  //   trpc.hirerouter.getCities.queryOptions({
-  //     state: selectedStateId,
-  //   }),
-  // );
+  const selectedStateId = useWatch({ control, name: "state" });
 
-  // console.log("cities", cities);
+  const { data: cities, isLoading: cityLoading } = useQuery(
+    trpc.hirerouter.getCities.queryOptions({
+      state: Number(selectedStateId),
+    }),
+  );
 
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
-  // if (cityLoading) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // const citiesList = cities?.map((item) => {
-  //   return {
-  //     label: item.city,
-  //     value: item.id,
-  //   };
-  // });
-  // const subCategoriesList = subCategories?.map((item) => {
-  //   return {
-  //     label: item.name,
-  //     value: item.id,
-  //   };
-  // });
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (cityLoading) {
+    return <div>Loading...</div>;
+  }
 
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
-    // {
-    //   control,
-    //   type: "",
-    //   label: "Profile Image",
-    //   name: "photo",
-    //   placeholder: "Upload your photo",
-    //   component: "input",
-    //   section: "profile",
-    //   error: errors.photo?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Applied For",
-    //   name: "categoryId",
-    //   placeholder: "Applied For",
-    //   component: "select",
-    //   section: "profile",
-    //   options: [
-    //     { label: "Teacher", value: 1 },
-    //     { label: "All Subjects", value: 2 },
-    //   ],
-    //   error: errors.categoryId?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Sub Category",
-    //   name: "subcategoryId",
-    //   placeholder: "Select Sub Category",
-    //   component: "multiselect",
-    //   section: "profile",
-    //   options: [
-    //     { label: "Teacher", value: 1 },
-    //     { label: "All Subjects", value: 2 },
-    //   ],
-    //   error: errors.subcategoryId?.message,
-    // },
+    {
+      control,
+      type: "",
+      label: "Profile Image",
+      name: "photo",
+      placeholder: "Upload your photo",
+      component: "input",
+      section: "profile",
+      error: errors.photo?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "Applied For",
+      name: "categoryId",
+      placeholder: "Applied For",
+      component: "select",
+      section: "profile",
+      options:
+        categories?.map((item) => ({
+          label: item.label,
+          value: Number(item.value),
+        })) ?? [],
+      error: errors.categoryId?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "Sub Category",
+      name: "subcategoryId",
+      placeholder: "Select Sub Category",
+      component: "multiselect",
+      section: "profile",
+      options: subCategories?.map((item) => ({
+        label: item.name,
+        value: Number(item.id),
+      })),
+      error: errors.subcategoryId?.message,
+    },
     {
       control,
       type: "text",
@@ -195,188 +174,170 @@ export default function PersonalDetailsForm({
       }),
       error: errors.maritalStatus?.message,
     },
+
     {
       control,
-      label: "job type",
-      name: "jobType",
-      placeholder: "Select Marital Status",
-      component: "checkbox",
+      type: "text",
+      label: "Father's Name",
+      name: "fatherName",
+      placeholder: "Father's Name",
+      component: "input",
       section: "profile",
-      options: Object.values(JobType).map((item) => {
-        return {
-          label: item,
-          value: item,
-        };
-      }),
-      error: errors.maritalStatus?.message,
+      error: errors.fatherName?.message,
     },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Father's Name",
-    //   name: "fatherName",
-    //   placeholder: "Father's Name",
-    //   component: "input",
-    //   section: "profile",
-    //   error: errors.fatherName?.message,
-    // },
-    // {
-    //   control,
-    //   type: "date",
-    //   label: "Date of Birth",
-    //   name: "dob",
-    //   placeholder: "Date of Birth",
-    //   component: "input",
-    //   section: "profile",
-    //   error: errors.dob?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Languages",
-    //   name: "languages",
-    //   placeholder: "Select Languages",
-    //   component: "multiselect",
-    //   section: "profile",
-    //   options: [
-    //     {
-    //       label: "Hindi",
-    //       value: "Hindi",
-    //     },
-    //   ],
-    //   error: errors.languages?.message,
-    // },
-    // {
-    //   control,
-    //   type: "tel",
-    //   label: "Mobile Number",
-    //   name: "mobileNumber",
-    //   placeholder: "Mobile Number",
-    //   component: "input",
-    //   section: "profile",
-    //   error: errors.mobileNumber?.message,
-    // },
-    // {
-    //   control,
-    //   type: "tel",
-    //   label: "Alternate Mobile Number",
-    //   name: "alternateMobileNumber",
-    //   placeholder: "Alternate Mobile Number",
-    //   component: "input",
-    //   required: false,
-    //   section: "profile",
-    //   error: errors.alternateMobileNumber?.message,
-    // },
-    // {
-    //   control,
-    //   type: "email",
-    //   label: "Email",
-    //   name: "email",
-    //   placeholder: "Email area",
-    //   component: "input",
-    //   required: false,
-    //   section: "profile",
-    //   error: errors.email?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Latitude",
-    //   name: "latitude",
-    //   placeholder: "Latitude",
-    //   section: "loction",
-    //   component: "input",
-    //   error: errors.latitude?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Longitude",
-    //   name: "longitude",
-    //   placeholder: "Longitude",
-    //   component: "input",
-    //   section: "loction",
-    //   error: errors.longitude?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "area",
-    //   name: "area",
-    //   placeholder: "area",
-    //   component: "input",
-    //   section: "loction",
-    //   error: errors.area?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "Pincode",
-    //   name: "pincode",
-    //   placeholder: "Pincode",
-    //   component: "input",
-    //   section: "loction",
-    //   error: errors.pincode?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "State",
-    //   name: "state",
-    //   placeholder: "Select State",
-    //   component: "select",
-    //   section: "loction",
-    //   options: [
-    //     { label: "Rajasthan", value: 1 },
-    //     { label: "Uttar Pradesh", value: 2 },
-    //   ],
-    //   error: errors.state?.message,
-    // },
-    // {
-    //   control,
-    //   type: "text",
-    //   label: "City",
-    //   name: "city",
-    //   placeholder: "Select City",
-    //   component: "select",
-    //   section: "loction",
-    //   options: [
-    //     { label: "Jaipur", value: 2 },
-    //     { label: "Jodhpur", value: 1 },
-    //   ],
-    //   error: errors.city?.message,
-    // },
+    {
+      control,
+      type: "date",
+      label: "Date of Birth",
+      name: "dob",
+      placeholder: "Date of Birth",
+      component: "input",
+      section: "profile",
+      error: errors.dob?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "Languages",
+      name: "languages",
+      placeholder: "Select Languages",
+      component: "multiselect",
+      section: "profile",
+      options: [
+        {
+          label: "Hindi",
+          value: "Hindi",
+        },
+      ],
+      error: errors.languages?.message,
+    },
+    {
+      control,
+      type: "tel",
+      label: "Mobile Number",
+      name: "mobileNumber",
+      placeholder: "Mobile Number",
+      component: "input",
+      section: "profile",
+      error: errors.mobileNumber?.message,
+    },
+    {
+      control,
+      type: "tel",
+      label: "Alternate Mobile Number",
+      name: "alternativeMobileNumber",
+      placeholder: "Alternate Mobile Number",
+      component: "input",
+      required: false,
+      section: "profile",
+      error: errors.alternativeMobileNumber?.message,
+    },
+    {
+      control,
+      type: "email",
+      label: "Email",
+      name: "email",
+      placeholder: "Email Address",
+      component: "input",
+      required: false,
+      section: "profile",
+      error: errors.email?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "Latitude",
+      name: "latitude",
+      placeholder: "Latitude",
+      section: "loction",
+      component: "input",
+      error: errors.latitude?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "Longitude",
+      name: "longitude",
+      placeholder: "Longitude",
+      component: "input",
+      section: "loction",
+      error: errors.longitude?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "area",
+      name: "area",
+      placeholder: "area",
+      component: "input",
+      section: "loction",
+      error: errors.area?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "Pincode",
+      name: "pincode",
+      placeholder: "Pincode",
+      component: "input",
+      section: "loction",
+      error: errors.pincode?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "State",
+      name: "state",
+      placeholder: "Select State",
+      component: "select",
+      section: "loction",
+      options:
+        states?.map((state) => ({ label: state.label, value: state.value })) ??
+        [],
+      error: errors.state?.message,
+    },
+    {
+      control,
+      type: "text",
+      label: "City",
+      name: "city",
+      placeholder: "Select City",
+      component: "select",
+      section: "loction",
+      options:
+        cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
+      error: errors.city?.message,
+    },
   ];
 
   const onSubmit = (data: PersonalDetailsSchema) => {
     console.log("data", data);
-
-    // setFormValue("photo", data.photo ?? "");
-    // setFormValue("categoryId", data.categoryId ?? "");
-    // setFormValue("subcategoryId", data.subcategoryId?.map(String) ?? []);
-    // setFormValue("name", data.name ?? "");
-    // setFormValue("gender", data.gender ?? []);
-    // setFormValue("maritalStatus", data.maritalStatus ?? "");
-    // setFormValue("fatherName", data.fatherName ?? "");
-    // setFormValue("dob", data.dob ?? "");
-    // setFormValue("languages", data.languages ?? []);
-    // setFormValue("mobileNumber", data.mobileNumber ?? "");
-    // setFormValue("alternateMobileNumber", data.alternateMobileNumber ?? "");
-    // setFormValue("email", data.email ?? "");
-    // setFormValue("latitude", data.latitude ?? "");
-    // setFormValue("longitude", data.longitude ?? "");
-    // setFormValue("area", data.area ?? "");
-    // setFormValue("pincode", data.pincode ?? "");
-    // setFormValue("state", data.state ?? "");
-    // setFormValue("city", data.city ?? "");
+    setFormValue("photo", data.photo ?? "");
+    setFormValue("categoryId", data.categoryId ?? "");
+    setFormValue("subcategoryId", data.subcategoryId ?? []);
+    setFormValue("name", data.name ?? "");
+    setFormValue("gender", data.gender ?? []);
+    setFormValue("maritalStatus", data.maritalStatus ?? "");
+    setFormValue("fatherName", data.fatherName ?? "");
+    setFormValue("dob", data.dob ?? "");
+    setFormValue("languages", data.languages ?? []);
+    setFormValue("mobileNumber", data.mobileNumber ?? "");
+    setFormValue("alternativeMobileNumber", data.alternativeMobileNumber ?? "");
+    setFormValue("email", data.email ?? "");
+    setFormValue("latitude", data.latitude ?? "");
+    setFormValue("longitude", data.longitude ?? "");
+    setFormValue("area", data.area ?? "");
+    setFormValue("pincode", data.pincode ?? "");
+    setFormValue("state", data.state ?? "");
+    setFormValue("city", data.city ?? "");
     nextPage();
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-8 ">
+    <div className="min-h-screen p-4 ">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl"
+        className="max-w-6xl mx-auto bg-gray-100 rounded-lg shadow-xl"
       >
         <div className="p-8 space-y-8">
           <div className="p-6 bg-white rounded-xl shadow">
@@ -410,22 +371,22 @@ export default function PersonalDetailsForm({
                 </Button>
               </div>
 
-              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
-              {/*   {formFields */}
-              {/*     .filter((fields) => fields.section === "loction") */}
-              {/*     .map((field, index) => ( */}
-              {/*       <div */}
-              {/*         key={field.name} */}
-              {/*         className={ */}
-              {/*           field.name === "area" */}
-              {/*             ? "md:col-span-2 lg:col-span-3" */}
-              {/*             : "" */}
-              {/*         } */}
-              {/*       > */}
-              {/*         <FormField {...field} /> */}
-              {/*       </div> */}
-              {/*     ))} */}
-              {/* </div> */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {formFields
+                  .filter((fields) => fields.section === "loction")
+                  .map((field, index) => (
+                    <div
+                      key={field.name}
+                      className={
+                        field.name === "area"
+                          ? "md:col-span-2 lg:col-span-3"
+                          : ""
+                      }
+                    >
+                      <FormField {...field} />
+                    </div>
+                  ))}
+              </div>
             </div>
           </div>
         </div>

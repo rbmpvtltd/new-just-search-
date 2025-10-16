@@ -1,48 +1,102 @@
-import React from "react";
-import { type FieldValues, useForm } from "react-hook-form";
+"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { businessDetailSchema } from "@repo/db/src/schema/business.schema";
+import { useQuery } from "@tanstack/react-query";
+import { useForm, useWatch } from "react-hook-form";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
+import { useTRPC } from "@/trpc/client";
+import type { AddBusinessPageType } from "..";
 
-export default function BusinessDetail() {
-  const { control, handleSubmit } = useForm<FieldValues>();
+type BusinessDetailSchema = z.infer<typeof businessDetailSchema>;
+export default function BusinessDetail({
+  data,
+}: {
+  data: AddBusinessPageType;
+}) {
+  const trpc = useTRPC();
+  const formValue = useBusinessFormStore((state) => state.formValue);
+  const setFormValue = useBusinessFormStore((state) => state.setFormValue);
+  const nextPage = useBusinessFormStore((state) => state.nextPage);
 
-  
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BusinessDetailSchema>({
+    resolver: zodResolver(businessDetailSchema),
+    defaultValues: {
+      photo: formValue.photo ?? "",
+      name: formValue.name ?? "",
+      categoryId: formValue.categoryId ?? "",
+      subcategoryId: formValue.subcategoryId ?? "",
+      specialities: formValue.specialities ?? "",
+      homeDelivery: formValue.homeDelivery ?? false,
+      description: formValue.description ?? "",
+    },
+  });
 
-  const formFields: FormFieldProps<FieldValues>[] = [
+  const categories = data?.getBusinessCategories.map((item: any) => {
+    return {
+      label: item.title,
+      value: item.id,
+    };
+  });
+  const selectedCategoryId = useWatch({ control, name: "categoryId" });
+  const { data: subCategories, isLoading } = useQuery(
+    trpc.businessrouter.getSubCategories.queryOptions({
+      categoryId: selectedCategoryId,
+    }),
+  );
+  if (isLoading) {
+    return <div className="">Loading...</div>;
+  }
+
+  const formFields: FormFieldProps<BusinessDetailSchema>[] = [
+    {
+      control,
+      label: "Business image",
+      name: "photo",
+      placeholder: "Business Image",
+      component: "input",
+      error: errors.photo?.message,
+    },
     {
       control,
       label: "Business Name",
-      name: "businessName",
+      name: "name",
       placeholder: "Business Name",
       component: "input",
-      error: "",
+      error: errors.name?.message,
     },
     {
       control,
       label: "Category",
-      name: "category",
+      name: "categoryId",
       placeholder: "Category",
       component: "select",
-      options: [
-        { label: "Category 1", value: "category1" },
-        { label: "Category 2", value: "category2" },
-      ],
-      error: "",
+      options:
+        categories?.map((item) => ({ label: item.label, value: item.value })) ??
+        [],
+      error: errors.categoryId?.message,
     },
     {
       control,
       label: "Sub Category",
-      name: "subCategory",
+      name: "subcategoryId",
       placeholder: "Sub Category",
       component: "multiselect",
-      options: [
-        { label: "Sub Category 1", value: "subCategory1" },
-        { label: "Sub Category 2", value: "subCategory2" },
-      ],
-      error: "",
+      options:
+        subCategories?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        })) ?? [],
+      error: errors.subcategoryId?.message,
     },
     {
       control,
@@ -51,7 +105,7 @@ export default function BusinessDetail() {
       placeholder: "Specialities",
       component: "input",
       required: false,
-      error: "",
+      error: errors.specialities?.message,
     },
     {
       control,
@@ -60,71 +114,79 @@ export default function BusinessDetail() {
       placeholder: "Home Delivery",
       component: "select",
       options: [
-        { label: "Yes", value: "yes" },
-        { label: "No", value: "no" },
+        { label: "Yes", value: true },
+        { label: "No", value: false },
       ],
       required: false,
-      error: "",
+      error: errors.homeDelivery?.message,
     },
     {
       control,
       label: "About Business",
-      name: "aboutBusiness",
+      name: "description",
       placeholder: "About Business",
       component: "textarea",
       required: false,
-      error: "",
+      error: errors.description?.message,
     },
-    {
-      control,
-      type: "file",
-      label: "Shop Images",
-      name: "shopImage1",
-      component: "input",
-      required: false,
-      error: "",
-    },
-    {
-      control,
-      type: "file",
-      label: "",
-      name: "shopImage2",
-      component: "input",
-      className: "mt-5",
-      required: false,
-      error: "",
-    },
-    {
-      control,
-      type: "file",
-      label: "",
-      name: "shopImage3",
-      component: "input",
-      required: false,
-      error: "",
-    },
-    {
-      control,
-      type: "file",
-      label: "",
-      name: "shopImage4",
-      component: "input",
-      required: false,
-      error: "",
-    },
-    {
-      control,
-      type: "file",
-      label: "",
-      name: "shopImage5",
-      component: "input",
-      required: false,
-      error: "",
-    },
+    // {
+    //   control,
+    //   type: "",
+    //   label: "Shop Images",
+    //   name: "",
+    //   component: "input",
+    //   required: false,
+    //   error: "",
+    // },
+    // {
+    //   control,
+    //   type: "",
+    //   label: "",
+    //   name: "shopImage2",
+    //   component: "input",
+    //   className: "mt-5",
+    //   required: false,
+    //   error: "",
+    // },
+    // {
+    //   control,
+    //   type: "",
+    //   label: "",
+    //   name: "shopImage3",
+    //   component: "input",
+    //   required: false,
+    //   error: "",
+    // },
+    // {
+    //   control,
+    //   type: "",
+    //   label: "",
+    //   name: "shopImage4",
+    //   component: "input",
+    //   required: false,
+    //   error: "",
+    // },
+    // {
+    //   control,
+    //   type: "",
+    //   label: "",
+    //   name: "shopImage5",
+    //   component: "input",
+    //   required: false,
+    //   error: "",
+    // },
   ];
 
-  const onSubmit = (data: FieldValues) => {
+  const onSubmit = (data: BusinessDetailSchema) => {
     console.log(data);
+    setFormValue("photo", data.photo ?? ""),
+      setFormValue("name", data.name ?? ""),
+      setFormValue("categoryId", data.categoryId ?? ""),
+      setFormValue("subcategoryId", data.subcategoryId ?? []),
+      setFormValue("specialities", data.specialities ?? ""),
+      setFormValue("homeDelivery", data.homeDelivery ?? ""),
+      setFormValue("description", data.description ?? "");
+    nextPage();
   };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -138,17 +200,6 @@ export default function BusinessDetail() {
               Business Contact
             </h2>
 
-            <div className="grid grid-cols-1 gap-6">
-              <FormField
-                control={control}
-                type="file"
-                label="Business Logo"
-                name="businessImage"
-                placeholder=""
-                component="input"
-                error=""
-              />
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
               {formFields.map((field, index) => (
                 <FormField key={field.name} {...field} />
