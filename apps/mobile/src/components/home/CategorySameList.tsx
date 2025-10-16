@@ -1,4 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useQuery } from "@tanstack/react-query";
+import { AdvancedImage } from "cloudinary-react-native";
 import { router, useFocusEffect, usePathname } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -15,13 +17,11 @@ import { RadioButton } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CATEGORY_URL } from "@/constants/apis";
 import Colors from "@/constants/Colors";
+import { cld } from "@/lib/cloudinary";
+import { trpc } from "@/lib/trpc";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import { useHeadingStore } from "@/store/heading";
 import Input from "../inputs/Input";
-import { useQuery } from "@tanstack/react-query";
-import { trpc } from "@/lib/trpc";
-import { cld } from "@/lib/cloudinary";
-import { AdvancedImage } from "cloudinary-react-native";
 
 export const CategoryList = () => {
   const colorScheme = useColorScheme();
@@ -138,7 +138,7 @@ export const CategoryList = () => {
             >
               <Pressable
                 onPress={() => {
-                  const targetPath = `/subcategory/${encodeURIComponent(item.id)}`;
+                  const targetPath = `/subcategory/${item.id}`;
                   setHeading(item.title);
                   if (pathname === targetPath || isNavigating) return;
 
@@ -212,32 +212,34 @@ export const CategoryList = () => {
             <ScrollView>
               <View></View>
               <View className="flex-row flex-wrap">
-                {filteredData?.map((item: typeof categories[0], i: number) => {
-                  const categoryImg = cld.image(item.photo)
-                  return (
-                  <Pressable
-                    key={i.toString()}
-                    className="w-[25%] mb-6 items-center"
-                    onPress={() => {
-                      setShowModal(false);
-                      setHeading(item.title);
-                      router.navigate({
-                        pathname: "/subcategory/[subcategory]",
-                        params: { subcategory: item.id },
-                      });
-                    }}
-                  >
-                   <AdvancedImage
-                  className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover"
-                  style={{ width: 48, height: 48, alignSelf: "center" }}
-                  cldImg={categoryImg}
-                />
-                    <Text className="text-xs text-center mt-1 text-secondary">
-                      {item.title}
-                    </Text>
-                  </Pressable>
-                )
-                })}
+                {filteredData?.map(
+                  (item: (typeof categories)[0], i: number) => {
+                    const categoryImg = cld.image(item.photo);
+                    return (
+                      <Pressable
+                        key={i.toString()}
+                        className="w-[25%] mb-6 items-center"
+                        onPress={() => {
+                          setShowModal(false);
+                          setHeading(item.title);
+                          router.navigate({
+                            pathname: "/subcategory/[subcategory]",
+                            params: { subcategory: item.id },
+                          });
+                        }}
+                      >
+                        <AdvancedImage
+                          className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover"
+                          style={{ width: 48, height: 48, alignSelf: "center" }}
+                          cldImg={categoryImg}
+                        />
+                        <Text className="text-xs text-center mt-1 text-secondary">
+                          {item.title}
+                        </Text>
+                      </Pressable>
+                    );
+                  },
+                )}
               </View>
             </ScrollView>
           </View>

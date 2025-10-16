@@ -32,9 +32,7 @@ export default function TabOneScreen() {
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View className="flex items-center r rounded-4xl">
-        <Text className="text-secondary">hi</Text>
-
-        <CustomCarousel />
+        {/* <CustomCarousel /> */}
 
         {/* <Banner1 /> */}
         {/* <Banner1 />
@@ -46,25 +44,25 @@ export default function TabOneScreen() {
         <BoundaryWrapper>
           <CategoryList />
         </BoundaryWrapper>
-        <CustomCarousel />
-        <BoundaryWrapper>
-          <CategoryList />
-        </BoundaryWrapper><BoundaryWrapper>
-          <CategoryList />
-        </BoundaryWrapper>
-        <BoundaryWrapper>
-          <CategoryList />
-        </BoundaryWrapper>
-        <CustomCarousel />
-        <BoundaryWrapper>
-          <CategoryList />
-        </BoundaryWrapper>
-        <CustomCarousel />
-        <CustomCarousel />
-        <CustomCarousel />
-        <CustomCarousel />
-        <CustomCarousel />
-
+        {/* <CustomCarousel /> */}
+        {/* <BoundaryWrapper> */}
+        {/*   <CategoryList /> */}
+        {/* </BoundaryWrapper> */}
+        {/* <BoundaryWrapper> */}
+        {/*   <CategoryList /> */}
+        {/* </BoundaryWrapper> */}
+        {/* <BoundaryWrapper> */}
+        {/*   <CategoryList /> */}
+        {/* </BoundaryWrapper> */}
+        {/* <CustomCarousel /> */}
+        {/* <BoundaryWrapper> */}
+        {/*   <CategoryList /> */}
+        {/* </BoundaryWrapper> */}
+        {/* <CustomCarousel /> */}
+        {/* <CustomCarousel /> */}
+        {/* <CustomCarousel /> */}
+        {/* <CustomCarousel /> */}
+        {/* <CustomCarousel /> */}
 
         {/* <Banner3 />
         <Banner2 />

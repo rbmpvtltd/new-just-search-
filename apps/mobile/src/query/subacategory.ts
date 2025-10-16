@@ -24,11 +24,12 @@
 //     },
 //   });
 // };
-// 
+//
 // --------------------------------------------------------------------------------------------------------
 // import { trpc } from "@/lib/trpc";
 // import { useInfiniteQuery } from "@tanstack/react-query";
 
+import { useInfiniteQuery } from "@tanstack/react-query";
 // export function useSubcategoryList(categoryId: number) {
 //   return useInfiniteQuery({
 //     queryKey: ["subcategoryRouter.subcategory", categoryId],
@@ -49,27 +50,13 @@
 // }
 // ------------------------------------------------------------------------------------------------------
 import { trpc } from "@/lib/trpc";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
 export function useSubcategoryList(categoryId: number) {
-  return useInfiniteQuery(
-    ["subcategoryRouter.subcategory", categoryId], // queryKey
-    async ({ pageParam = 1 }) => {
-      return trpc.subcategoryRouter.subcategory.infiniteQueryOptions({
-        categoryId,
-        limit: 10,
-        page: pageParam,
-      });
-    },
-    {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.page < lastPage.totalPages) {
-          return lastPage.page + 1;
-        }
-        return undefined;
-      },
-      enabled: !!categoryId,
-    }
-  );
+  return useInfiniteQuery({
+    ...trpc.subcategoryRouter.subcategory.infiniteQueryOptions({
+      categoryId,
+      limit: 10,
+      page: 1,
+    }),
+  });
 }
-

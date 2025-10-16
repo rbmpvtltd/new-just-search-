@@ -11,7 +11,7 @@ import { useSubcategoryList } from "@/query/subacategory";
 export default function SubCategory() {
   const { subcategory } = useLocalSearchParams();
   const subcategoryParam = Number(
-    Array.isArray(subcategory) ? subcategory[0] : subcategory
+    Array.isArray(subcategory) ? subcategory[0] : subcategory,
   );
 
   console.log(subcategoryParam);
@@ -25,7 +25,11 @@ export default function SubCategory() {
     isLoading,
   } = useSubcategoryList(Number(subcategoryParam));
 
-  console.log("data is ====================>",JSON.stringify(data, null, 2));
+  return (
+    <View className="flex-1 items-center justify-center">
+      <Text className="bg-secondary text-secondary-100">hi</Text>
+    </View>
+  );
   if (isLoading) {
     return <Loading position="center" />;
   }
