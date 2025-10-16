@@ -35,7 +35,6 @@ export default function TabOneScreen() {
         <Text className="text-secondary">hi</Text>
 
         <CustomCarousel />
-      
 
         {/* <Banner1 /> */}
         {/* <Banner1 />
@@ -47,6 +46,7 @@ export default function TabOneScreen() {
         <BoundaryWrapper>
           <CategoryList />
         </BoundaryWrapper>
+        <CustomCarousel />
         <BoundaryWrapper>
           <CategoryList />
         </BoundaryWrapper><BoundaryWrapper>
@@ -55,9 +55,17 @@ export default function TabOneScreen() {
         <BoundaryWrapper>
           <CategoryList />
         </BoundaryWrapper>
+        <CustomCarousel />
         <BoundaryWrapper>
           <CategoryList />
         </BoundaryWrapper>
+        <CustomCarousel />
+        <CustomCarousel />
+        <CustomCarousel />
+        <CustomCarousel />
+        <CustomCarousel />
+
+
         {/* <Banner3 />
         <Banner2 />
         <Banner4 />  */}

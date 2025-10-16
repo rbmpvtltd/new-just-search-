@@ -18,6 +18,10 @@ import Colors from "@/constants/Colors";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import { useHeadingStore } from "@/store/heading";
 import Input from "../inputs/Input";
+import { useQuery } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
+import { cld } from "@/lib/cloudinary";
+import { AdvancedImage } from "cloudinary-react-native";
 
 export const CategoryList = () => {
   const colorScheme = useColorScheme();
@@ -25,9 +29,9 @@ export const CategoryList = () => {
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const { setHeading } = useHeadingStore();
-  const { data: allCategories, refetch } = useSuspenceData(
-    CATEGORY_URL.url,
-    CATEGORY_URL.key,
+
+  const { data: categories, refetch } = useQuery(
+    trpc.categoryRouter.allCategories.queryOptions(),
   );
 
   const [isNavigating, setIsNavigating] = useState(false);
@@ -36,20 +40,22 @@ export const CategoryList = () => {
   const [showModal, setShowModal] = useState(false);
 
   const visibleData = useMemo(() => {
-    if (!allCategories?.categories) return [];
+    if (!categories) return [];
 
-    return allCategories.categories
-      .filter((cat:any) => (value === "hire" ? cat.type === 2 : cat.type === 1))
+    return categories
+      .filter((cat: any) =>
+        value === "hire" ? cat.type === 2 : cat.type === 1,
+      )
       .slice(0, 11);
-  }, [value, allCategories?.categories]);
+  }, [value, categories]);
 
   const fullData = useMemo(() => {
-    if (!allCategories?.categories) return [];
+    if (!categories) return [];
 
-    return allCategories.categories.filter((cat:any) =>
+    return categories.filter((cat: any) =>
       value === "hire" ? cat.type === 2 : cat.type === 1,
     );
-  }, [value, allCategories?.categories]);
+  }, [value, categories]);
 
   const handleValueChange = (val: string) => {
     if (val === "hire" || val === "business") {
@@ -63,7 +69,7 @@ export const CategoryList = () => {
       setFilteredData(fullData);
       return;
     }
-    const filteredData = fullData.filter((item:any) =>
+    const filteredData = fullData.filter((item: any) =>
       item.title.toLowerCase().includes(text.toLowerCase()),
     );
 
@@ -84,7 +90,7 @@ export const CategoryList = () => {
     }, [refetch]),
   );
 
-  if (!allCategories) {
+  if (!categories) {
     return <ActivityIndicator size={"small"} />;
   }
 
@@ -123,34 +129,39 @@ export const CategoryList = () => {
       </View>
 
       <View className="bg-base-100 w-[100%] h-80 flex-wrap flex-row items-center justify-between">
-        {visibleData?.map((item: any, i: number) => (
-          <View className="w-[25%] justify-center items-center mb-10" key={i.toString()}>
-            <Pressable
-              onPress={() => {
-                const targetPath = `/subcategory/${encodeURIComponent(item.id)}`;
-                setHeading(item.title);
-                if (pathname === targetPath || isNavigating) return;
-
-                setIsNavigating(true);
-                router.navigate({
-                  pathname: "/subcategory/[subcategory]",
-                  params: { subcategory: item?.id },
-                });
-                setTimeout(() => setIsNavigating(false), 500);
-              }}
+        {visibleData?.map((item: (typeof categories)[0], i: number) => {
+          const categoryImage = cld.image(item.photo);
+          return (
+            <View
+              className="w-[25%] justify-center items-center mb-10"
+              key={i.toString()}
             >
-              <Image
-                className="h-10 w-10 rounded-md m-auto"
-                source={{
-                  uri: `https://justsearch.net.in/assets/images/categories/${item?.photo}`,
+              <Pressable
+                onPress={() => {
+                  const targetPath = `/subcategory/${encodeURIComponent(item.id)}`;
+                  setHeading(item.title);
+                  if (pathname === targetPath || isNavigating) return;
+
+                  setIsNavigating(true);
+                  router.navigate({
+                    pathname: "/subcategory/[subcategory]",
+                    params: { subcategory: item?.id },
+                  });
+                  setTimeout(() => setIsNavigating(false), 500);
                 }}
-              />
-              <Text className="text-secondary text-center text-xs">
-                {item.title}
-              </Text>
-            </Pressable>
-          </View>
-        ))}
+              >
+                <AdvancedImage
+                  className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover"
+                  style={{ width: 40, height: 40, alignSelf: "center" }}
+                  cldImg={categoryImage}
+                />
+                <Text className="text-secondary text-center text-xs">
+                  {item.title}
+                </Text>
+              </Pressable>
+            </View>
+          );
+        })}
 
         {fullData?.length > 9 && (
           <Pressable
@@ -201,7 +212,9 @@ export const CategoryList = () => {
             <ScrollView>
               <View></View>
               <View className="flex-row flex-wrap">
-                {filteredData?.map((item: any, i: number) => (
+                {filteredData?.map((item: typeof categories[0], i: number) => {
+                  const categoryImg = cld.image(item.photo)
+                  return (
                   <Pressable
                     key={i.toString()}
                     className="w-[25%] mb-6 items-center"
@@ -214,17 +227,17 @@ export const CategoryList = () => {
                       });
                     }}
                   >
-                    <Image
-                      className="h-12 w-12 rounded-md"
-                      source={{
-                        uri: `https://justsearch.net.in/assets/images/categories/${item.photo}`,
-                      }}
-                    />
+                   <AdvancedImage
+                  className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover"
+                  style={{ width: 48, height: 48, alignSelf: "center" }}
+                  cldImg={categoryImg}
+                />
                     <Text className="text-xs text-center mt-1 text-secondary">
                       {item.title}
                     </Text>
                   </Pressable>
-                ))}
+                )
+                })}
               </View>
             </ScrollView>
           </View>

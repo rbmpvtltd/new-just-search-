@@ -11,6 +11,7 @@ export const subcategoryRouter = router({
   subcategory: publicProcedure
     .input(
       z.object({
+        cursor: z.string().nullish(),
         categoryId: z.number(),
         limit: z.number().min(1).max(20).nullish(),
         page: z.number().min(1),

@@ -5,14 +5,16 @@ import HireCard from "@/components/hirePageComp/HireCard";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import DataNotFound from "@/components/ui/DataNotFound";
 import { Loading } from "@/components/ui/Loading";
-import { useSubCategoryList } from "@/query/subacategory";
+// import { useSubCategoryList } from "@/query/subacategory";
+import { useSubcategoryList } from "@/query/subacategory";
 
 export default function SubCategory() {
   const { subcategory } = useLocalSearchParams();
-  const subcategoryParam = Array.isArray(subcategory)
-    ? subcategory[0]
-    : subcategory;
+  const subcategoryParam = Number(
+    Array.isArray(subcategory) ? subcategory[0] : subcategory
+  );
 
+  console.log(subcategoryParam);
   const {
     data,
     isError,
@@ -21,8 +23,9 @@ export default function SubCategory() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useSubCategoryList(subcategoryParam);
+  } = useSubcategoryList(Number(subcategoryParam));
 
+  console.log("data is ====================>",JSON.stringify(data, null, 2));
   if (isLoading) {
     return <Loading position="center" />;
   }
