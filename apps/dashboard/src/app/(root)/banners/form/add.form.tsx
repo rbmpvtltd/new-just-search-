@@ -1,8 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -34,17 +34,34 @@ const extendedBannerSelectSchema = bannerInsertSchema
   })
   .extend({
     photo: z.any(),
+    isActive: z.number(),
   });
 
 type BannerSelectSchema = z.infer<typeof extendedBannerSelectSchema>;
 
 export function AddBanner() {
   const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog onOpenChange={setOpen} open={open}>
+      <DialogTrigger asChild>
+        <Button>Add</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <Suspense fallback={<div> loading ...</div>}>
+          {open && <BannerAddForm setOpen={setOpen} />}
+        </Suspense>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface AddForm {
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
+function BannerAddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
-  const { mutate: addBanner } = useMutation(
-    trpc.adminBanner.add.mutationOptions(),
-  );
   const { mutate: createBanner } = useMutation(
     trpc.adminBanner.create.mutationOptions(),
   );
@@ -55,17 +72,27 @@ export function AddBanner() {
     formState: { errors, isSubmitting },
   } = useForm<BannerSelectSchema>({
     resolver: zodResolver(extendedBannerSelectSchema),
+    defaultValues: {
+      photo: "",
+      type: 1,
+      isActive: 1,
+      route: "",
+    },
   });
 
   const onSubmit = async (data: BannerSelectSchema) => {
-    const files = await uploadToCloudinary([data.photo]);
+    console.log("submiting started");
+    const files = await uploadToCloudinary([data.photo], "banner");
     if (!files || !files[0]) {
+      console.log("files", files);
       console.error("file uploading to cloudinary failed");
       return;
     }
+    console.log("data is", data);
     createBanner(
       {
         ...data,
+        isActive: data.isActive === 1,
         photo: files[0],
       },
       {
@@ -75,6 +102,9 @@ export function AddBanner() {
             queryKey: trpc.adminBanner.list.queryKey(),
           });
           setOpen(false);
+        },
+        onError: (e) => {
+          console.error(e);
         },
       },
     );
@@ -88,10 +118,10 @@ export function AddBanner() {
       placeholder: "Select Type of banner",
       component: "select",
       options: [
-        { label: "Banner 1", value: "1" },
-        { label: "Banner 2", value: "2" },
-        { label: "Banner 3", value: "3" },
-        { label: "Banner 4", value: "4" },
+        { label: "Banner 1", value: 1 },
+        { label: "Banner 2", value: 2 },
+        { label: "Banner 3", value: 3 },
+        { label: "Banner 4", value: 4 },
       ],
       error: errors.type?.message,
     },
@@ -119,42 +149,30 @@ export function AddBanner() {
       placeholder: "",
       component: "select",
       options: [
-        { label: "True", value: "1" },
-        { label: "False", value: "2" },
+        { label: "True", value: 1 },
+        { label: "False", value: 0 },
       ],
     },
   ];
+
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
-        <Button
-          onClick={() => {
-            addBanner();
-          }}
-        >
-          Add Banner
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <DialogHeader>
+        <DialogTitle>Add</DialogTitle>
+      </DialogHeader>
+      <div className="grid grid-cols-1 gap-6">
+        {formFields.map((field) => (
+          <FormField key={field.name} {...field} />
+        ))}
+      </div>
+      <DialogFooter className="mt-2">
+        <DialogClose asChild>
+          <Button variant="outline">Cancel</Button>
+        </DialogClose>
+        <Button disabled={isSubmitting} type="submit">
+          {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle>Add Banner</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-1 gap-6">
-            {formFields.map((field) => (
-              <FormField key={field.name} {...field} />
-            ))}
-          </div>
-          <DialogFooter className="mt-2">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button disabled={isSubmitting} type="submit">
-              {isSubmitting ? "Submitting " : "Save changes"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      </DialogFooter>
+    </form>
   );
 }

@@ -1,7 +1,9 @@
 export function getTrpcUrl() {
-  const base = (() => {
-    if (process.env.URL) return `https://${process.env.URL}`;
-    return "http://localhost:4000";
-  })();
-  return `${base}/trpc`;
+  const base = () => {
+    if (process.env.NEXT_PUBLIC_BACKEND_URL)
+      return process.env.NEXT_PUBLIC_BACKEND_URL;
+    return "http://192.168.1.50:4000";
+  };
+
+  return `${base()}/trpc`;
 }

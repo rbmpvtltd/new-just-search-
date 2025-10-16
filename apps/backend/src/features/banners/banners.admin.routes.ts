@@ -5,9 +5,14 @@ import {
   banners,
   bannerUpdateSchema,
 } from "@repo/db/src/schema/not-related.schema";
+import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
+import {
+  cloudinaryDeleteImageByPublicId,
+  cloudinaryDeleteImagesByPublicIds,
+} from "@/lib/cloudinary";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -61,7 +66,7 @@ export const adminBannerRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: adminProcedure.mutation(async () => {
+  add: adminProcedure.query(async () => {
     return;
   }),
   create: adminProcedure
@@ -87,11 +92,18 @@ export const adminBannerRouter = router({
     .input(bannerUpdateSchema)
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
+      logger.info("getting in backend");
       if (!id)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Please pass id field",
         });
+      const olddata = (
+        await db.select().from(banners).where(eq(banners.id, id))
+      )[0];
+      if (olddata?.photo && olddata?.photo !== updateData.photo) {
+        await cloudinaryDeleteImageByPublicId(olddata.photo);
+      }
       await db.update(banners).set(updateData).where(eq(banners.id, id));
       return { success: true };
     }),
@@ -102,6 +114,15 @@ export const adminBannerRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
+      const allSeletedPhoto = await db
+        .select({
+          photo: banners.photo,
+        })
+        .from(banners)
+        .where(inArray(banners.id, input.ids));
+      await cloudinaryDeleteImagesByPublicIds(
+        allSeletedPhoto.map((item) => item.photo),
+      );
       await db.delete(banners).where(inArray(banners.id, input.ids));
       return { success: true };
     }),
