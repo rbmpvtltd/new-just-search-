@@ -1,23 +1,24 @@
 // features/banners/banners.admin.routes.ts
-import { db, schemas } from "@repo/db";
-import { sql } from "drizzle-orm";
+import { db } from "@repo/db";
+import {
+  bannerInsertSchema,
+  banners,
+  bannerUpdateSchema,
+} from "@repo/db/src/schema/not-related.schema";
+import { TRPCError } from "@trpc/server";
+import { eq, inArray, sql } from "drizzle-orm";
+import z from "zod";
 import {
   buildOrderByClause,
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
-import {
-  delCountUploadImage,
-  setCountUploadImage,
-} from "@/utils/cloudinaryCount";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
   bannerAllowedSortColumns,
   bannerColumns,
   bannerGlobalFilterColumns,
 } from "./banners.admin.service";
-
-const banners = schemas.not_related.banners;
 
 export const adminBannerRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
@@ -60,15 +61,48 @@ export const adminBannerRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: adminProcedure.mutation(async ({ ctx }) => {
-    console.log("allow image");
-    await setCountUploadImage(ctx.userId, 10);
+  add: adminProcedure.mutation(async () => {
     return;
   }),
   create: adminProcedure
-    .input(schemas.not_related.bannerInsertSchema)
-    .mutation(async ({ ctx }) => {
-      await delCountUploadImage(ctx.userId);
-      return;
+    .input(bannerInsertSchema)
+    .mutation(async ({ input }) => {
+      await db.insert(banners).values(input);
+      return { success: true };
+    }),
+  edit: adminProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const data = await db
+        .select()
+        .from(banners)
+        .where(eq(banners.id, input.id));
+      return data[0];
+    }),
+  update: adminProcedure
+    .input(bannerUpdateSchema)
+    .mutation(async ({ input }) => {
+      const { id, ...updateData } = input;
+      if (!id)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Please pass id field",
+        });
+      await db.update(banners).set(updateData).where(eq(banners.id, id));
+      return { success: true };
+    }),
+  multidelete: adminProcedure
+    .input(
+      z.object({
+        ids: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      await db.delete(banners).where(inArray(banners.id, input.ids));
+      return { success: true };
     }),
 });

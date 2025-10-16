@@ -25,7 +25,7 @@ export default async function Login() {
 
   // only redirect after successful TRPC call
   if (session?.success) {
-    redirect("/banner"); // never wrap this in try/catch
+    redirect("/"); // never wrap this in try/catch
   }
 
   // fallback UI (optional, if session is null or false)

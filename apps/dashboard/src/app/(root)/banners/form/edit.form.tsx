@@ -1,8 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -27,6 +27,7 @@ import { getQueryClient } from "@/trpc/query-client";
 
 const extendedBannerSelectSchema = bannerInsertSchema
   .pick({
+    id: true,
     isActive: true,
     photo: true,
     route: true,
@@ -34,19 +35,41 @@ const extendedBannerSelectSchema = bannerInsertSchema
   })
   .extend({
     photo: z.any(),
+    isActive: z.number(),
   });
 
 type BannerSelectSchema = z.infer<typeof extendedBannerSelectSchema>;
 
-export function AddBanner() {
+export function EditBanner({ id }: { id: number }) {
   const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog onOpenChange={setOpen} open={open}>
+      <DialogTrigger asChild>
+        <Button>Edit</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <Suspense fallback={<div> loading ...</div>}>
+          {open && <BannerEditForm id={id} setOpen={setOpen} />}
+        </Suspense>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface EditForm {
+  id: number;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
+function BannerEditForm({ id, setOpen }: EditForm) {
   const trpc = useTRPC();
 
-  const { mutate: addBanner } = useMutation(
-    trpc.adminBanner.add.mutationOptions(),
+  const { data, refetch } = useSuspenseQuery(
+    trpc.adminBanner.edit.queryOptions({ id }),
   );
-  const { mutate: createBanner } = useMutation(
-    trpc.adminBanner.create.mutationOptions(),
+
+  const { mutate: updateBanner } = useMutation(
+    trpc.adminBanner.update.mutationOptions(),
   );
 
   const {
@@ -55,17 +78,28 @@ export function AddBanner() {
     formState: { errors, isSubmitting },
   } = useForm<BannerSelectSchema>({
     resolver: zodResolver(extendedBannerSelectSchema),
+    defaultValues: {
+      id: data?.id,
+      photo: data?.photo,
+      type: data?.type,
+      isActive: data?.isActive ? 1 : 0,
+      route: data?.route,
+    },
   });
 
   const onSubmit = async (data: BannerSelectSchema) => {
-    const files = await uploadToCloudinary([data.photo]);
+    console.log("submiting started");
+    const files = await uploadToCloudinary([data.photo],"banner","");
     if (!files || !files[0]) {
+      console.log("files", files);
       console.error("file uploading to cloudinary failed");
       return;
     }
-    createBanner(
+    console.log("data is", data);
+    updateBanner(
       {
         ...data,
+        isActive: data.isActive === 1,
         photo: files[0],
       },
       {
@@ -74,7 +108,11 @@ export function AddBanner() {
           queryClient.invalidateQueries({
             queryKey: trpc.adminBanner.list.queryKey(),
           });
+          refetch();
           setOpen(false);
+        },
+        onError: (e) => {
+          console.error(e);
         },
       },
     );
@@ -83,15 +121,24 @@ export function AddBanner() {
   const formFields: FormFieldProps<BannerSelectSchema>[] = [
     {
       control,
+      label: "",
+      name: "id",
+      placeholder: "idis",
+      type: "hidden",
+      component: "input",
+      required: false,
+    },
+    {
+      control,
       label: "Type",
       name: "type",
       placeholder: "Select Type of banner",
       component: "select",
       options: [
-        { label: "Banner 1", value: "1" },
-        { label: "Banner 2", value: "2" },
-        { label: "Banner 3", value: "3" },
-        { label: "Banner 4", value: "4" },
+        { label: "Banner 1", value: 1 },
+        { label: "Banner 2", value: 2 },
+        { label: "Banner 3", value: 3 },
+        { label: "Banner 4", value: 4 },
       ],
       error: errors.type?.message,
     },
@@ -119,42 +166,30 @@ export function AddBanner() {
       placeholder: "",
       component: "select",
       options: [
-        { label: "True", value: "1" },
-        { label: "False", value: "2" },
+        { label: "True", value: 1 },
+        { label: "False", value: 0 },
       ],
     },
   ];
+
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
-        <Button
-          onClick={() => {
-            addBanner();
-          }}
-        >
-          Add Banner
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <DialogHeader>
+        <DialogTitle>Edit</DialogTitle>
+      </DialogHeader>
+      <div className="grid grid-cols-1 gap-6">
+        {formFields.map((field) => (
+          <FormField key={field.name} {...field} />
+        ))}
+      </div>
+      <DialogFooter className="mt-2">
+        <DialogClose asChild>
+          <Button variant="outline">Cancel</Button>
+        </DialogClose>
+        <Button disabled={isSubmitting} type="submit">
+          {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle>Add Banner</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-1 gap-6">
-            {formFields.map((field) => (
-              <FormField key={field.name} {...field} />
-            ))}
-          </div>
-          <DialogFooter className="mt-2">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button disabled={isSubmitting} type="submit">
-              {isSubmitting ? "Submitting " : "Save changes"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      </DialogFooter>
+    </form>
   );
 }

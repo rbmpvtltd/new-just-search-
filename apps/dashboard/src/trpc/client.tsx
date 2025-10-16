@@ -9,23 +9,10 @@ import superjson from "superjson";
 import type { AppRouter } from "types/index";
 import { getToken } from "@/utils/session";
 import { getTrpcUrl } from "./helper";
-import { makeQueryClient } from "./query-client";
+import { getQueryClient } from "./query-client";
 
 export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
 
-let browserQueryClient: QueryClient;
-function getQueryClient() {
-  if (typeof window === "undefined") {
-    // Server: always make a new query client
-    return makeQueryClient();
-  }
-  // Browser: make a new query client if we don't already have one
-  // This is very important, so we don't re-make a new client if React
-  // suspends during the initial render. This may not be needed if we
-  // have a suspense boundary BELOW the creation of the query client
-  if (!browserQueryClient) browserQueryClient = makeQueryClient();
-  return browserQueryClient;
-}
 export function TRPCReactProvider(
   props: Readonly<{
     children: React.ReactNode;

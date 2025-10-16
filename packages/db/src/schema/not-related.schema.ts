@@ -7,7 +7,12 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
+import z from "zod";
 
 const states = pgTable("states", {
   id: serial("id").primaryKey(),
@@ -57,7 +62,10 @@ const banners = pgTable("banners", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 const bannerInsertSchema = createInsertSchema(banners);
-const bannerSelectSchema = createSelectSchema(banners);
+const bannerUpdateSchema = createUpdateSchema(banners);
+const bannerSelectSchema = createSelectSchema(banners, {
+  photo: (z) => z.max(10),
+});
 
 export {
   states,
@@ -67,4 +75,5 @@ export {
   banners,
   bannerInsertSchema,
   bannerSelectSchema,
+  bannerUpdateSchema,
 };

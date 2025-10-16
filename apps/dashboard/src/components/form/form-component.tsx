@@ -71,10 +71,30 @@ export const FormField = <T extends FieldValues>({
               );
 
             case "multiselect":
-              return <MultiSelect options={options} />;
+              return (
+                <MultiSelect
+                  options={options}
+                  defaultValues={
+                    Array.isArray(value)
+                      ? options?.filter((opt) => value.includes(opt.value))
+                      : []
+                  }
+                  onChange={(selected) =>
+                    onChange(selected.map((s) => s.value))
+                  }
+                />
+              );
 
             case "select":
-              return <SingleSelect options={options} />;
+              return (
+                <SingleSelect
+                  options={options}
+                  className="h-12"
+                  value={options?.find((item) => item.value === value) || null}
+                  onChange={(selectedItem) => onChange(selectedItem?.value)}
+                  {...props}
+                />
+              );
             case "checkbox":
               return (
                 <div className="flex gap-3 flex-wrap">

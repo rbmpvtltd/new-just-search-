@@ -8,7 +8,7 @@ import Select, {
 
 type Option = {
   label: string;
-  value: string;
+  value: string | number | boolean;
 };
 
 const selectStyles: StylesConfig<Option, false> = {

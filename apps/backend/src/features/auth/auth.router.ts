@@ -7,7 +7,7 @@ import {
   visitorProcedure,
 } from "@/utils/trpc";
 import { checkPasswordGetUser } from "./auth.service";
-import { createSession } from "./lib/session";
+import { createSession, deleteSession } from "./lib/session";
 
 export const authRouter = router({
   login: publicProcedure
@@ -24,7 +24,7 @@ export const authRouter = router({
       const session = await createSession(user.id);
       return session?.token;
     }),
-  testadmin: visitorProcedure.query(({ ctx }) => {
+  testadmin: visitorProcedure.query(() => {
     return "yes";
   }),
   sendOTP: publicProcedure
@@ -49,11 +49,17 @@ export const authRouter = router({
   verifyauth: protectedProcedure.query(async () => {
     return { success: true };
   }),
-  logout: protectedProcedure.query(async ({ ctx }) => {
-    // TODO: logout is not proper;
-    const userId = ctx.userId;
-    return userId;
+  logout: protectedProcedure.mutation(async ({ ctx }) => {
+    await deleteSession(ctx.sessionId);
+    return { success: true };
+  }),
+  dashboardverify: protectedProcedure.query(async ({ ctx }) => {
+    if (
+      ctx.role === "salesman" ||
+      ctx.role === "franchises" ||
+      ctx.role === "admin"
+    )
+      return { success: true };
+    return { success: false };
   }),
 });
-
-export type AuthRouter = typeof authRouter;

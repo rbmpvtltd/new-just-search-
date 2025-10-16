@@ -1,6 +1,7 @@
 // upload-image.tsx
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { CldImage } from "next-cloudinary";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ImageCropDialog from "./image-crop-dialog";
 
 interface CropperProps {
@@ -10,6 +11,7 @@ interface CropperProps {
 
 const CropperComponent = ({ value, onChange }: CropperProps) => {
   const [image, setImage] = useState<null | string>(null);
+  const firstTime = useRef(true);
 
   useEffect(() => {
     if (image) {
@@ -28,12 +30,14 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
   }, [value]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    firstTime.current = false;
     if (e.target.files && e.target.files.length > 0) {
       onChange("");
       const file = e.target.files[0];
       if (!file) return;
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
+      e.target.value = "";
     }
   };
 
@@ -64,11 +68,22 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
           onChange={onFileChange}
         />
 
-        {value ? (
-          // biome-ignore lint/performance/noImgElement: Using <img> is intentional here
-          <img src={value} alt="Cropped preview" className="w-full h-full " />
-        ) : (
-          <span>no image</span>
+        {!firstTime.current &&
+          (value ? (
+            // biome-ignore lint/performance/noImgElement: Using <img> is intentional here
+            <img src={value} alt="Cropped preview" className="w-full h-full " />
+          ) : (
+            <span>no image</span>
+          ))}
+
+        {firstTime.current && (
+          <CldImage
+            width="100"
+            height="100"
+            className="border rounded p-4 w-full h-full"
+            src={value}
+            alt="cloudinary image not loaded"
+          />
         )}
       </div>
 
@@ -87,4 +102,4 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
   );
 };
 
-export default CropperComponent;
+export default React.memo(CropperComponent);

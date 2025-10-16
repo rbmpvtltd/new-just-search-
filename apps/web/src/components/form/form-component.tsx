@@ -94,7 +94,6 @@ export const FormField = <T extends FieldValues>({
                   options={options}
                   className="h-12"
                   value={options?.find((item) => item.value === value) || null}
-                
                   onChange={(selectedItem) => onChange(selectedItem?.value)}
                   {...props}
                 />

@@ -1,6 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
-import { setCountUploadImage } from "@/utils/cloudinaryCount";
 import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
 
 export const testRouter = router({
@@ -23,7 +22,6 @@ export const testRouter = router({
       return "hi";
     }),
   addImage: protectedProcedure.query(async ({ ctx }) => {
-    await setCountUploadImage(ctx.userId, 2);
     return;
   }),
   table: publicProcedure
