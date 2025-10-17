@@ -26,7 +26,6 @@ app.get("/auth/google/callback", async (req, res) => {
   }
 
   try {
-    // Exchange code for tokens
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -41,7 +40,6 @@ app.get("/auth/google/callback", async (req, res) => {
 
     const tokens = await response.json();
 
-    // Fetch user profile
     const profileRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
       headers: { Authorization: `Bearer ${tokens.access_token}` },
     });
@@ -49,7 +47,6 @@ app.get("/auth/google/callback", async (req, res) => {
 
     const email = profile.email;
 
-    // Find or create user
     const existingUsers = await db
       .select()
       .from(schemas.auth.users)
