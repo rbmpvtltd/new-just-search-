@@ -2,12 +2,13 @@
 
 import { create } from "zustand";
 
+type IsActive = {
+  id: number;
+  isActive: boolean;
+};
 interface TableState {
-  active: number[];
-  addActive: (id: number) => void;
-  addManyActive: (ids: number[]) => void;
-  toggleActive: (id: number) => void;
-  deleteManyActive: (ids: number[]) => void;
+  active: IsActive[];
+  toggleActive: (id: number, isActive: boolean) => void;
   select: number[];
   addSelect: (id: number) => void;
   toggleSelect: (id: number) => void;
@@ -16,31 +17,19 @@ interface TableState {
 
 export const useTableStore = create<TableState>()((set) => ({
   active: [],
-  addActive: (id) =>
-    set((state) => ({
-      active: [...state.active, id],
-    })),
-  addManyActive: (ids) =>
-    set(() => ({
-      active: ids,
-    })),
-  toggleActive: (id) =>
+  toggleActive: (id: number, isActive: boolean) =>
     set((state) => {
-      const isSelected = state.active.includes(id);
+      const isSelected = state.active.some((item) => item.id === id);
       if (isSelected) {
         return {
-          active: state.active.filter((selectedId) => selectedId !== id),
+          active: state.active.filter((item) => item.id !== id),
         };
       } else {
         return {
-          active: [...state.active, id],
+          active: [...state.active, { id, isActive }],
         };
       }
     }),
-  deleteManyActive: (ids) =>
-    set((state) => ({
-      active: state.active.filter((id) => !ids.includes(id)),
-    })),
   select: [],
   addSelect: (id) =>
     set((state) => ({

@@ -126,4 +126,23 @@ export const adminBannerRouter = router({
       await db.delete(banners).where(inArray(banners.id, input.ids));
       return { success: true };
     }),
+  multiactive: adminProcedure
+    .input(
+      z.object({
+        ids: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const allSeletedPhoto = await db
+        .select({
+          photo: banners.photo,
+        })
+        .from(banners)
+        .where(inArray(banners.id, input.ids));
+      await cloudinaryDeleteImagesByPublicIds(
+        allSeletedPhoto.map((item) => item.photo),
+      );
+      await db.delete(banners).where(inArray(banners.id, input.ids));
+      return { success: true };
+    }),
 });

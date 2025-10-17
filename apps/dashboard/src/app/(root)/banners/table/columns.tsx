@@ -40,33 +40,19 @@ function ActionCell({ id }: { id: number }) {
 // SelectHeader.tsx (or inline)
 //
 
-function ActiveHeader({ ids }: { ids: number[] }) {
-  const active = useTableStore((state) => state.active);
-  const addActive = useTableStore((state) => state.addActive);
-  const deleteManyActive = useTableStore((state) => state.deleteManyActive);
-
-  // Derived state
-  const allActived = ids.every((id) => active.includes(id));
-  const someActived = ids.some((id) => active.includes(id));
-
-  const handleToggleAll = () => {
-    if (allActived) {
-      // Deselect all
-      deleteManyActive(ids);
-    } else {
-      // Select all (only those not already selected)
-      ids.forEach((id) => {
-        if (!active.includes(id)) {
-          addActive(id);
-        }
-      });
-    }
+function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
+  const allActive = useTableStore((state) => state.active);
+  const toggleActive = useTableStore((state) => state.toggleActive);
+  const isSelected = allActive.filter((item) => item.id === id)[0];
+  const active = isSelected ? isSelected.isActive : isActive;
+  const handleToggle = () => {
+    toggleActive(id, !active);
   };
 
   return (
     <Checkbox
-      checked={allActived || (someActived && "indeterminate")}
-      onCheckedChange={handleToggleAll}
+      checked={active}
+      onCheckedChange={handleToggle}
       aria-label="Select all"
       className="translate-y-[2px]"
     />
@@ -157,13 +143,15 @@ export const columns: ColumnDef<Banner>[] = [
   },
   {
     accessorKey: "isActive",
-    header: ({ table }) => {
-      const currentPageIds = table
-        .getRowModel()
-        .rows.map((row) => row.original.id);
-      return <ActiveHeader ids={currentPageIds} />;
-    },
-    cell: ({ row }) => <div>{row.original.isActive ? "Yes" : "No"}</div>,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Active" />
+    ),
+    cell: ({ row }) => (
+      <ActiveCell
+        id={row.original.id}
+        isActive={row.original.isActive ?? false}
+      />
+    ),
   },
   {
     accessorKey: "type",

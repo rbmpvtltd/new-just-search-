@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { DebouncedInput } from "@/components/ui/input-debounced";
 import { AddBanner } from "../form/add.form";
 import { active, type } from "./data";
-import { MuiltDeleteButton } from "../form/delete";
+import { MuiltDeleteButton } from "../form/delete.form";
+import { MuiltActiveButton } from "../form/active.form";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -56,6 +57,7 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex items-center gap-2">
+        <MuiltActiveButton />
         <MuiltDeleteButton />
         <DataTableViewOptions table={table} />
         <AddBanner />
