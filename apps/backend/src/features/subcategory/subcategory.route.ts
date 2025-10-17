@@ -1,8 +1,9 @@
-import { publicProcedure, router } from "@/utils/trpc";
-import z from "zod";
 import { db, schemas } from "@repo/db";
-import { sql } from "drizzle-orm";
-import { count, eq } from "drizzle-orm";
+import { categories } from "@repo/db/src/schema/not-related.schema";
+import { logger } from "@repo/helper";
+import { and, count, eq, gt, sql } from "drizzle-orm";
+import z from "zod";
+import { publicProcedure, router } from "@/utils/trpc";
 
 const businessListings = schemas.business.businessListings;
 const businessCategories = schemas.business.businessCategories;
@@ -11,7 +12,7 @@ export const subcategoryRouter = router({
   subcategory: publicProcedure
     .input(
       z.object({
-        cursor: z.string().nullish(),
+        cursor: z.number().nullish(),
         categoryId: z.number(),
         limit: z.number().min(1).max(20).nullish(),
         page: z.number().min(1),
@@ -33,7 +34,9 @@ export const subcategoryRouter = router({
           longitude: businessListings.longitude,
           latitude: businessListings.latitude,
           phoneNumber: businessListings.phoneNumber,
-          rating: sql<string[]>`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
+          rating: sql<
+            string[]
+          >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
           subcategories: sql<string[]>`
           COALESCE(
             ARRAY_AGG(DISTINCT subcategories.name) 
@@ -71,7 +74,10 @@ export const subcategoryRouter = router({
             schemas.not_related.categories.id,
           ),
         )
-        .leftJoin(schemas.business.businessReviews, eq(businessListings.id, schemas.business.businessReviews.businessId))
+        .leftJoin(
+          schemas.business.businessReviews,
+          eq(businessListings.id, schemas.business.businessReviews.businessId),
+        )
         .where(eq(businessCategories.categoryId, input.categoryId))
         .groupBy(businessListings.id)
         .limit(limit)
@@ -91,6 +97,32 @@ export const subcategoryRouter = router({
         data,
         page: input.page,
         totalPages: Math.ceil(Number(totalCount[0]?.count ?? 0) / limit),
+      };
+    }),
+  businessesByCategoryInfinate: publicProcedure
+    .input(
+      z.object({
+        cursor: z.number(),
+        categoryId: z.number(),
+        limit: z.number().min(1).max(20).nullish(),
+      }),
+    )
+    .query(async ({ input }) => {
+      logger.info("execution comes here");
+      logger.info("cursor is", { cursor: input.cursor }, { data: "< --this" });
+      const limit = input.limit ?? 10;
+
+      const data = await db
+        .select()
+        .from(categories)
+        .where(gt(categories.id, input.cursor))
+        .limit(limit);
+      logger.info("data is ", { data });
+      const nextCursor = data[data.length - 1]?.id;
+
+      return {
+        data,
+        nextCursor,
       };
     }),
 });
