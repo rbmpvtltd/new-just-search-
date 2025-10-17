@@ -11,8 +11,74 @@ import express from "express";
 // import { ORPChandler } from "./lib/orpc";
 import { appRouter } from "./route";
 import { createContext } from "./utils/context";
+import { db, schemas } from "@repo/db";
+import {eq} from "drizzle-orm"
+import { UserRole } from "@repo/db/src/schema/auth.schema";
+
 
 const app = express();
+
+app.get("/auth/google/callback", async (req, res) => {
+  const code = req.query.code as string;
+
+  if (!code) {
+    return res.status(400).json({ error: "Missing code parameter" });
+  }
+
+  try {
+    // Exchange code for tokens
+    const response = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        code,
+        redirect_uri: "http://localhost:4000/auth/google/callback",
+        grant_type: "authorization_code",
+      }),
+    });
+
+    const tokens = await response.json();
+
+    // Fetch user profile
+    const profileRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    });
+    const profile = await profileRes.json();
+
+    const email = profile.email;
+
+    // Find or create user
+    const existingUsers = await db
+      .select()
+      .from(schemas.auth.users)
+      .where(eq(schemas.auth.users.email, email));
+
+    let user = existingUsers[0];
+
+    if (!user) {
+      const inserted = await db
+        .insert(schemas.auth.users)
+        .values({
+          displayName: profile?.name || profile?.given_name,
+          email,
+          role: UserRole.guest,
+          googleId: profile.id,
+          createdAt: new Date(),
+        })
+        .returning();
+
+      user = inserted[0];
+    }
+
+    // You can store a session or JWT here before redirecting to frontend
+    res.redirect(`http://localhost:3000/dashboard?email=${user.email}`);
+  } catch (err) {
+    console.error("Google login error:", err);
+    res.status(500).json({ error: "Google login failed" });
+  }
+});
 // console.log("rerun");
 
 // app.use(cors({ origin: "*" }));

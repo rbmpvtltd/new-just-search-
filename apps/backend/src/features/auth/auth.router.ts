@@ -8,8 +8,29 @@ import {
 } from "@/utils/trpc";
 import { checkPasswordGetUser } from "./auth.service";
 import { createSession, deleteSession } from "./lib/session";
+import { db, schemas } from "@repo/db";
+import {eq} from "drizzle-orm"
+import { UserRole } from "@repo/db/src/schema/auth.schema";
+
+console.log("GOOGLE credentials is ", process.env.GOOGLE_CLIENT_ID)
+console.log("GOOGLE credentials is ", process.env.GOOGLE_CLIENT_SECRET)
+
+
 
 export const authRouter = router({
+  googleLogin: publicProcedure.query(async ({ ctx }) => {
+    console.log("google login procedure calling here")
+    const redirectUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
+      new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        redirect_uri: "http://localhost:4000/auth/google/callback", // oo url apne google console me authorized redirect url me add karno howe
+        response_type: "code",
+        scope: "profile email",
+      }).toString();
+    console.log("redirecting to url",redirectUrl)
+    return { url: redirectUrl };
+  }),
+
   login: publicProcedure
     .input(z.object({ username: z.string(), password: z.string().min(6) }))
     .mutation(async ({ input }) => {
