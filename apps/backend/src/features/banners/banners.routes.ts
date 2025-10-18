@@ -7,6 +7,7 @@ export const bannerRouter = router({
     .input(z.object({ type: z.number() }))
     .query(async ({ input }) => {
       const data = getBannerData(input.type);
+      console.log("caraousel data in backend===============>",data)
       return data;
     }),
 

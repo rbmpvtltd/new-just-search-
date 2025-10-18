@@ -105,6 +105,7 @@ const Carousel = () => {
   const { data: carouselData } = useQuery(
     trpc.banners.getBannerData.queryOptions({ type: 1 })
   );
+  console.log("caraousel data is ===========>",carouselData)
 
   // ✅ Update index when user scrolls manually
   const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {

@@ -32,7 +32,7 @@ export default function TabOneScreen() {
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View className="flex items-center r rounded-4xl">
-        {/* <CustomCarousel /> */}
+        <CustomCarousel />
 
         {/* <Banner1 /> */}
         {/* <Banner1 />

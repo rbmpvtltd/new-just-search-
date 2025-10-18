@@ -89,6 +89,7 @@ export const CategoryList = () => {
       refetch();
     }, [refetch]),
   );
+  console.log("category is ==============>",categories)
 
   if (!categories) {
     return <ActivityIndicator size={"small"} />;
