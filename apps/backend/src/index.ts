@@ -70,7 +70,7 @@ app.get("/auth/google/callback", async (req, res) => {
     }
 
     // You can store a session or JWT here before redirecting to frontend
-    res.redirect(`http://localhost:3000/dashboard?email=${user.email}`);
+    res.redirect(`http://localhost:3000/dashboard?email=${user?.email}`);
   } catch (err) {
     console.error("Google login error:", err);
     res.status(500).json({ error: "Google login failed" });
