@@ -89,7 +89,6 @@ export const CategoryList = () => {
       refetch();
     }, [refetch]),
   );
-  console.log("category is ==============>",categories)
 
   if (!categories) {
     return <ActivityIndicator size={"small"} />;
@@ -146,7 +145,7 @@ export const CategoryList = () => {
                   setIsNavigating(true);
                   router.navigate({
                     pathname: "/subcategory/[subcategory]",
-                    params: { subcategory: item?.id },
+                    params: { subcategory: item?.id,type : item.type },
                   });
                   setTimeout(() => setIsNavigating(false), 500);
                 }}
