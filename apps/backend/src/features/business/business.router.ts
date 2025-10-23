@@ -1,7 +1,10 @@
 import { db, schemas } from "@repo/db";
-import { businessInsertSchema } from "@repo/db/src/schema/business.schema";
+import {
+  businessInsertSchema,
+  favourites,
+} from "@repo/db/src/schema/business.schema";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
 import {
   businessProcedure,
@@ -16,7 +19,10 @@ import {
   productReviews,
   products,
 } from "../../../../../packages/db/src/schema/product.schema";
-import { offerPhotos, offers } from "../../../../../packages/db/src/schema/offer.schema";
+import {
+  offerPhotos,
+  offers,
+} from "../../../../../packages/db/src/schema/offer.schema";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -403,29 +409,69 @@ export const businessrouter = router({
           id: offers.id,
           name: offers.productName,
           rate: offers.rate,
-          discountPercent : offers.discountPercent,
-          finalPrice : offers.finalPrice,
-          startDate : offers.offerStartDate,
-          endDate : offers.offerEndDate,
-          description : offers.productDescription,
-          createdAt : offers.createdAt,
+          discountPercent: offers.discountPercent,
+          finalPrice: offers.finalPrice,
+          startDate: offers.offerStartDate,
+          endDate: offers.offerEndDate,
+          description: offers.productDescription,
+          createdAt: offers.createdAt,
           businessId: offers.businessId,
-          shopName : sql<string | null>`COALESCE((
+          shopName: sql<string | null>`COALESCE((
             SELECT name FROM business_listings LIMIT 1
           ), '')`,
-          photos : sql<string[]>`COALESCE(
+          photos: sql<string[]>`COALESCE(
             ARRAY_AGG(DISTINCT offer_photos.photo)
             FILTER (WHERE offer_photos.id IS NOT NULL),
             '{}'
-          )`
+          )`,
         })
         .from(offers)
-        .leftJoin(offerPhotos,eq(offerPhotos.offerId,offers.id))
-        .leftJoin(businessListing,eq(businessListing.id,offers.businessId))
+        .leftJoin(offerPhotos, eq(offerPhotos.offerId, offers.id))
+        .leftJoin(businessListing, eq(businessListing.id, offers.businessId))
         .groupBy(offers.id)
         .where(eq(offers.id, input.offerId));
 
-
       return offer[0];
+    }),
+
+  toggleFavourite: visitorProcedure
+    .input(z.object({ businessId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.userId;
+      const businessId = input.businessId;
+
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const existing = await db
+        .select({ id: favourites.id })
+        .from(favourites)
+        .where(
+          and(
+            eq(favourites.userId, userId),
+            eq(favourites.businessId, businessId),
+          ),
+        );
+
+      if (existing.length > 0) {
+        await db
+          .delete(favourites)
+          .where(
+            and(
+              eq(favourites.userId, userId),
+              eq(favourites.businessId, businessId),
+            ),
+          );
+
+        return { status: "removed" };
+      } else {
+        await db.insert(favourites).values({
+          userId,
+          businessId,
+        });
+
+        return { status: "added" };
+      }
     }),
 });

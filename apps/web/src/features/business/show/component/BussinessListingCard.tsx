@@ -8,29 +8,40 @@ import type { OutputTrpcType } from "@/trpc/type";
 import { Badge } from "@/components/ui/badge";
 import Rating from "@/components/ui/Rating";
 import Link from "next/link";
+import Favourite from "../../shared/Favourite";
 
 type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
 type business = businesses extends (infer T)[] ? T : never;
 
 export const BussinessListingCard = ({ item }: { item: business }) => {
+  console.log(item.isFavourite);
   return (
     <div className="mx-auto p-4">
       <div className="flex flex-col justify-center gap-4">
-      <div className="p-4 flex flex-col md:flex-row gap-6 rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.40)] hover:scale-102 transition-all transform duration-300">
-
+        <div className="p-4 flex flex-col md:flex-row gap-6 rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.40)] hover:scale-102 transition-all transform duration-300">
           <div className="mx-auto md:mx-0">
-            <Link href={{
-              pathname: `/business/shop/${item.id}`,
-            }}>
-              <Image
-                width={300}
-                height={300}
-                className="rounded-md"
-                alt="Bussiness Image"
-                src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change image when upload on cloudinary
-              />
-            </Link>
+            <div className="relative max-w-[400px] mx-auto ">
+              <Link
+                href={{
+                  pathname: `/business/shop/${item.id}`,
+                }}
+              >
+                <Image
+                  width={300}
+                  height={300}
+                  className="rounded-md object-cover"
+                  alt="Bussiness Image"
+                  src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change image when upload on cloudinary
+                />
+              </Link>
+              <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">
+                <Favourite
+                  businessId={Number(item.id)}
+                  initialFav={item.isFavourite}
+                />
+              </div>
+            </div>
           </div>
           <div className="flex flex-col py-2 justify-between gap-2 ">
             <h1 className="text-2xl font-bold ">{item.name}</h1>

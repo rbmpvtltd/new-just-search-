@@ -1,14 +1,15 @@
-import { publicProcedure, router } from "@/utils/trpc";
+import {  router, visitorProcedure } from "@/utils/trpc";
 import z from "zod";
 import { db, schemas } from "@repo/db";
-import { sql } from "drizzle-orm";
+import { and, sql } from "drizzle-orm";
 import { count, eq } from "drizzle-orm";
+import { favourites } from "@repo/db/src/schema/business.schema";
 
 const businessListings = schemas.business.businessListings;
 const businessCategories = schemas.business.businessCategories;
 
 export const subcategoryRouter = router({
-  subcategory: publicProcedure
+  subcategory: visitorProcedure
     .input(
       z.object({
         categoryId: z.number(),
@@ -16,7 +17,7 @@ export const subcategoryRouter = router({
         page: z.number().min(1),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input,ctx }) => {
       console.log("execution comes here");
       const limit = input.limit ?? 10;
       const offset = (input.page - 1) * limit;
@@ -32,7 +33,9 @@ export const subcategoryRouter = router({
           longitude: businessListings.longitude,
           latitude: businessListings.latitude,
           phoneNumber: businessListings.phoneNumber,
-          rating: sql<string[]>`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
+          rating: sql<
+            string[]
+          >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
           subcategories: sql<string[]>`
           COALESCE(
             ARRAY_AGG(DISTINCT subcategories.name) 
@@ -43,6 +46,7 @@ export const subcategoryRouter = router({
           category: sql<string | null>`
       MAX(${schemas.not_related.categories.title})
     `,
+          isFavourite: sql<boolean>`CASE WHEN ${favourites.id} IS NOT NULL THEN true ELSE false END`,
         })
         .from(businessListings)
         .innerJoin(
@@ -70,9 +74,19 @@ export const subcategoryRouter = router({
             schemas.not_related.categories.id,
           ),
         )
-        .leftJoin(schemas.business.businessReviews, eq(businessListings.id, schemas.business.businessReviews.businessId))
+        .leftJoin(
+          schemas.business.businessReviews,
+          eq(businessListings.id, schemas.business.businessReviews.businessId),
+        )
+        .leftJoin(
+                favourites,
+                and(
+                  eq(favourites.businessId, businessListings.id),
+                  eq(favourites.userId, ctx.userId)
+                )
+              )
         .where(eq(businessCategories.categoryId, input.categoryId))
-        .groupBy(businessListings.id)
+        .groupBy(businessListings.id,favourites.id)
         .limit(limit)
         .offset(offset);
       console.log("execution comes here ===================>", data);
