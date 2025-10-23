@@ -30,6 +30,21 @@ export const authRouter = router({
     console.log("redirecting to url",redirectUrl)
     return { url: redirectUrl };
   }),
+  appleLogin: publicProcedure.query(async () => {
+    const redirectUrl =
+      "https://appleid.apple.com/auth/authorize?" +
+      new URLSearchParams({
+        response_type: "code",
+        response_mode: "form_post",  // <-- change here
+        client_id: process.env.APPLE_CLIENT_ID!,
+        redirect_uri: "https://esthetical-cletus-pessimistically.ngrok-free.dev/auth/apple/callback",
+        scope: "name email",         // name/email requires form_post
+        state: crypto.randomUUID(),
+      }).toString();
+      console.log("redirected successfully on ",redirectUrl)
+  
+    return { url: redirectUrl };
+  }),
 
   login: publicProcedure
     .input(z.object({ username: z.string(), password: z.string().min(6) }))

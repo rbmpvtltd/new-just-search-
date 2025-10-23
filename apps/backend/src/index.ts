@@ -12,11 +12,89 @@ import express from "express";
 import { appRouter } from "./route";
 import { createContext } from "./utils/context";
 import { db, schemas } from "@repo/db";
+import jwt from "jsonwebtoken";
+import axios from "axios";
 import {eq} from "drizzle-orm"
 import { UserRole } from "@repo/db/src/schema/auth.schema";
+import fs from "node:fs"
+import bodyParser from "body-parser";
 
 
 const app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+app.post("/auth/apple/callback", async (req, res) => {
+  const code = req.body.code as string;
+
+  if (!code) {
+    return res.status(400).json({ error: "Missing code parameter" });
+  }
+
+  try {
+    const privateKey = fs.readFileSync("/home/meekail/Desktop/justsearch/application/new-just-search-/apps/backend/keys/AuthKey_LSC5HAHRF8.p8");
+
+    const clientSecret = jwt.sign(
+      {
+        iss: process.env.APPLE_TEAM_ID,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + 60 * 5,
+        aud: "https://appleid.apple.com",
+        sub: process.env.APPLE_CLIENT_ID!,
+      },
+      privateKey,
+      {
+        algorithm: "ES256",
+        header: { alg: "ES256", kid: process.env.APPLE_KEY_ID},
+      }
+    );
+
+    const tokenRes = await axios.post(
+      "https://appleid.apple.com/auth/token",
+      new URLSearchParams({
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: "https://esthetical-cletus-pessimistically.ngrok-free.dev/auth/apple/callback",
+        client_id: process.env.APPLE_CLIENT_ID!,
+        client_secret: clientSecret,
+      }).toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    const decoded: any = jwt.decode(tokenRes.data.id_token);
+    const email = decoded.email;
+    const appleId = decoded.sub;
+    const name = decoded?.name?.firstName || decoded?.name?.lastName || "Apple User";
+
+    const existingUsers = await db
+      .select()
+      .from(schemas.auth.users)
+      .where(eq(schemas.auth.users.email, email));
+
+    let user = existingUsers[0];
+
+    if (!user) {
+      const inserted = await db
+        .insert(schemas.auth.users)
+        .values({
+          displayName: name,
+          email,
+          role: UserRole.guest,
+          googleId:appleId,
+          createdAt: new Date(),
+        })
+        .returning();
+
+      user = inserted[0];
+    }
+
+    return res.redirect(`http://localhost:3000?email=${user?.email}`);
+  } catch (err) {
+    console.error("Apple login error:", err);
+    res.status(500).json({ error: "Apple login failed" });
+  }
+});
 
 app.get("/auth/google/callback", async (req, res) => {
   const code = req.query.code as string;
@@ -70,7 +148,7 @@ app.get("/auth/google/callback", async (req, res) => {
     }
 
     // You can store a session or JWT here before redirecting to frontend
-    res.redirect(`http://localhost:3000/dashboard?email=${user?.email}`);
+    res.redirect(`http://localhost:3000?email=${user?.email}`);
   } catch (err) {
     console.error("Google login error:", err);
     res.status(500).json({ error: "Google login failed" });
