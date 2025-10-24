@@ -32,12 +32,16 @@ const categories = pgTable("categories", {
   title: varchar("title", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull(),
   photo: varchar("photo", { length: 255 }).notNull(),
-  isPopular: boolean("is_popular").default(false),
-  status: boolean("status").default(true),
-  type: integer("type"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  isPopular: boolean("is_popular").default(false).notNull(),
+  status: boolean("status").default(true).notNull(),
+  type: integer("type").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+const categoryInsertSchema = createInsertSchema(categories);
+const categoryUpdateSchema = createUpdateSchema(categories);
+const categorySelectSchema = createSelectSchema(categories);
 
 const subcategories = pgTable("subcategories", {
   id: serial("id").primaryKey(),
@@ -76,4 +80,7 @@ export {
   bannerInsertSchema,
   bannerSelectSchema,
   bannerUpdateSchema,
+  categoryInsertSchema,
+  categoryUpdateSchema,
+  categorySelectSchema,
 };

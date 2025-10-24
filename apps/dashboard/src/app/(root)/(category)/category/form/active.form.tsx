@@ -24,7 +24,7 @@ export function MuiltActiveButton() {
   // const isPending = false;
 
   const { mutate, isPending } = useMutation(
-    trpc.adminBanner.multiactive.mutationOptions(),
+    trpc.adminCategoryRouter.multiactive.mutationOptions(),
   );
 
   const buttonDisable = !isActiveExist || isPending;
@@ -33,7 +33,7 @@ export function MuiltActiveButton() {
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
         <Button disabled={buttonDisable} className="">
-          {isPending ? "Saving..." : "Save"}
+          {isPending ? "Saving..." : "Save Status"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -54,7 +54,7 @@ export function MuiltActiveButton() {
                   if (data.success) {
                     const queryClient = getQueryClient();
                     await queryClient.invalidateQueries({
-                      queryKey: trpc.adminBanner.list.queryKey(),
+                      queryKey: trpc.adminCategoryRouter.list.queryKey(),
                     });
                     setTimeout(() => {
                       empty();

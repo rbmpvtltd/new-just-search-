@@ -1,9 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  bannerInsertSchema,
-  categoryInsertSchema,
-} from "@repo/db/src/schema/not-related.schema";
+import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,61 +25,69 @@ import { getQueryClient } from "@/trpc/query-client";
 
 // import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
 
-const extendedCategoryInsertSchema = categoryInsertSchema
+const extendedBannerSelectSchema = bannerInsertSchema
   .pick({
+    id: true,
+    isActive: true,
     photo: true,
-    isPopular: true,
+    route: true,
     type: true,
-    title: true,
-    status: true,
-    slug: true,
   })
   .extend({
     photo: z.any(),
+    isActive: z.number(),
   });
 
-type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
+type BannerSelectSchema = z.infer<typeof extendedBannerSelectSchema>;
 
-export function AddNewEntiry() {
+export function EditBanner({ id }: { id: number }) {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button>Add Entry</Button>
+        <Button>Edit</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <Suspense fallback={<div> loading ...</div>}>
-          {open && <AddForm setOpen={setOpen} />}
+          {open && <BannerEditForm id={id} setOpen={setOpen} />}
         </Suspense>
       </DialogContent>
     </Dialog>
   );
 }
 
-interface AddForm {
+interface EditForm {
+  id: number;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
-function AddForm({ setOpen }: AddForm) {
+function BannerEditForm({ id, setOpen }: EditForm) {
   const trpc = useTRPC();
 
-  const { mutate: createBanner } = useMutation(
-    trpc.adminBanner.create.mutationOptions(),
+  const { data, refetch } = useSuspenseQuery(
+    trpc.adminBanner.edit.queryOptions({ id }),
+  );
+
+  const { mutate: updateBanner } = useMutation(
+    trpc.adminBanner.update.mutationOptions(),
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CategorySelectSchema>({
-    resolver: zodResolver(extendedCategoryInsertSchema),
+  } = useForm<BannerSelectSchema>({
+    resolver: zodResolver(extendedBannerSelectSchema),
     defaultValues: {
-      photo: "",
-      type: 1,
+      id: data?.id,
+      photo: data?.photo,
+      type: data?.type,
+      isActive: data?.isActive ? 1 : 0,
+      route: data?.route,
     },
   });
 
-  const onSubmit = async (data: CategorySelectSchema) => {
+  const onSubmit = async (data: BannerSelectSchema) => {
     console.log("submiting started");
     const files = await uploadToCloudinary([data.photo], "banner");
     if (!files || !files[0]) {
@@ -91,9 +96,10 @@ function AddForm({ setOpen }: AddForm) {
       return;
     }
     console.log("data is", data);
-    createBanner(
+    updateBanner(
       {
         ...data,
+        isActive: data.isActive === 1,
         photo: files[0],
       },
       {
@@ -102,6 +108,7 @@ function AddForm({ setOpen }: AddForm) {
           queryClient.invalidateQueries({
             queryKey: trpc.adminBanner.list.queryKey(),
           });
+          refetch();
           setOpen(false);
         },
         onError: (e) => {
@@ -111,7 +118,16 @@ function AddForm({ setOpen }: AddForm) {
     );
   };
 
-  const formFields: FormFieldProps<CategorySelectSchema>[] = [
+  const formFields: FormFieldProps<BannerSelectSchema>[] = [
+    {
+      control,
+      label: "",
+      name: "id",
+      placeholder: "idis",
+      type: "hidden",
+      component: "input",
+      required: false,
+    },
     {
       control,
       label: "Type",
@@ -159,7 +175,7 @@ function AddForm({ setOpen }: AddForm) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <DialogHeader>
-        <DialogTitle>Add</DialogTitle>
+        <DialogTitle>Edit</DialogTitle>
       </DialogHeader>
       <div className="grid grid-cols-1 gap-6">
         {formFields.map((field) => (
