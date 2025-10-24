@@ -18,15 +18,18 @@ export interface FormFieldProps<T extends FieldValues> {
   name: Path<T>;
   placeholder?: string;
   className?: string;
+  mainDivClassName?: string;
   required?: boolean;
   section?: string;
   error?: string;
   options?: Option[] | undefined;
   component:
     | "input"
+    | "input-slug"
     | "multiselect"
     | "select"
     | "checkbox"
+    | "single-checkbox"
     | "textarea"
     | "image";
 }
@@ -38,6 +41,7 @@ export const FormField = <T extends FieldValues>({
   name,
   placeholder,
   className,
+  mainDivClassName,
   required = true,
   section,
   error,
@@ -46,7 +50,7 @@ export const FormField = <T extends FieldValues>({
   ...props
 }: FormFieldProps<T>) => {
   return (
-    <div>
+    <div className={mainDivClassName}>
       <Label htmlFor={name} className="mb-2 gap-0">
         {label}
         {required && <span className="text-red-500 ">*</span>}
@@ -68,6 +72,22 @@ export const FormField = <T extends FieldValues>({
                   value={value}
                   {...props}
                 />
+              );
+
+            case "input-slug":
+              return (
+                <div>
+                  <Input
+                    type={type}
+                    name={name}
+                    className={className}
+                    placeholder={placeholder}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    {...props}
+                  />
+                </div>
               );
 
             case "multiselect":
@@ -107,11 +127,15 @@ export const FormField = <T extends FieldValues>({
                             key={i.value}
                             name={name}
                             value={value}
+                            id={`checkbox${i.label}`}
                             onChange={onChange}
                           />
                         </div>
                         <div className="">
-                          <label htmlFor="" className="text-sm text-gray-700">
+                          <label
+                            htmlFor={`checkbox${i.label}`}
+                            className="text-sm text-gray-700"
+                          >
                             {i.label}
                           </label>
                         </div>
@@ -119,6 +143,16 @@ export const FormField = <T extends FieldValues>({
                     </div>
                   ))}
                 </div>
+              );
+            case "single-checkbox":
+              return (
+                <Checkbox
+                  className="inline border-gray-300"
+                  name={name}
+                  checked={value}
+                  id={name}
+                  onCheckedChange={onChange}
+                />
               );
 
             case "textarea":

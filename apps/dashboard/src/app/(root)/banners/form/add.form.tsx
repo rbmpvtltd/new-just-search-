@@ -1,9 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  bannerInsertSchema,
-  categoryInsertSchema,
-} from "@repo/db/src/schema/not-related.schema";
+import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,32 +25,31 @@ import { getQueryClient } from "@/trpc/query-client";
 
 // import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
 
-const extendedCategoryInsertSchema = categoryInsertSchema
+const extendedBannerSelectSchema = bannerInsertSchema
   .pick({
+    isActive: true,
     photo: true,
-    isPopular: true,
+    route: true,
     type: true,
-    title: true,
-    status: true,
-    slug: true,
   })
   .extend({
     photo: z.any(),
+    isActive: z.number(),
   });
 
-type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
+type BannerSelectSchema = z.infer<typeof extendedBannerSelectSchema>;
 
-export function AddNewEntiry() {
+export function AddBanner() {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button>Add Entry</Button>
+        <Button>Add</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <Suspense fallback={<div> loading ...</div>}>
-          {open && <AddForm setOpen={setOpen} />}
+          {open && <BannerAddForm setOpen={setOpen} />}
         </Suspense>
       </DialogContent>
     </Dialog>
@@ -63,7 +59,7 @@ export function AddNewEntiry() {
 interface AddForm {
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
-function AddForm({ setOpen }: AddForm) {
+function BannerAddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
   const { mutate: createBanner } = useMutation(
@@ -74,15 +70,17 @@ function AddForm({ setOpen }: AddForm) {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CategorySelectSchema>({
-    resolver: zodResolver(extendedCategoryInsertSchema),
+  } = useForm<BannerSelectSchema>({
+    resolver: zodResolver(extendedBannerSelectSchema),
     defaultValues: {
       photo: "",
       type: 1,
+      isActive: 1,
+      route: "",
     },
   });
 
-  const onSubmit = async (data: CategorySelectSchema) => {
+  const onSubmit = async (data: BannerSelectSchema) => {
     console.log("submiting started");
     const files = await uploadToCloudinary([data.photo], "banner");
     if (!files || !files[0]) {
@@ -94,6 +92,7 @@ function AddForm({ setOpen }: AddForm) {
     createBanner(
       {
         ...data,
+        isActive: data.isActive === 1,
         photo: files[0],
       },
       {
@@ -111,7 +110,7 @@ function AddForm({ setOpen }: AddForm) {
     );
   };
 
-  const formFields: FormFieldProps<CategorySelectSchema>[] = [
+  const formFields: FormFieldProps<BannerSelectSchema>[] = [
     {
       control,
       label: "Type",

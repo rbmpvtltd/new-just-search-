@@ -1,6 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
+import {
+  bannerInsertSchema,
+  categoryInsertSchema,
+} from "@repo/db/src/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -22,34 +25,36 @@ import {
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
 
-const extendedBannerSelectSchema = bannerInsertSchema
+const extendedCategoryInsertSchema = categoryInsertSchema
   .pick({
-    isActive: true,
     photo: true,
-    route: true,
+    isPopular: true,
     type: true,
+    title: true,
+    status: true,
+    slug: true,
   })
   .extend({
     photo: z.any(),
-    isActive: z.number(),
   });
 
-type BannerSelectSchema = z.infer<typeof extendedBannerSelectSchema>;
+type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
 
-export function AddBanner() {
+export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button>Add</Button>
+        <Button>Add Entry</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <Suspense fallback={<div> loading ...</div>}>
-          {open && <BannerAddForm setOpen={setOpen} />}
+          {open && <AddForm setOpen={setOpen} />}
         </Suspense>
       </DialogContent>
     </Dialog>
@@ -59,99 +64,104 @@ export function AddBanner() {
 interface AddForm {
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
-function BannerAddForm({ setOpen }: AddForm) {
+function AddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
-  const { mutate: createBanner } = useMutation(
-    trpc.adminBanner.create.mutationOptions(),
+  const { mutate: create } = useMutation(
+    trpc.adminCategoryRouter.create.mutationOptions(),
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<BannerSelectSchema>({
-    resolver: zodResolver(extendedBannerSelectSchema),
+  } = useForm<CategorySelectSchema>({
+    resolver: zodResolver(extendedCategoryInsertSchema),
     defaultValues: {
       photo: "",
       type: 1,
-      isActive: 1,
-      route: "",
+      status: false,
+      isPopular: false,
     },
   });
 
-  const onSubmit = async (data: BannerSelectSchema) => {
-    console.log("submiting started");
-    const files = await uploadToCloudinary([data.photo], "banner");
-    if (!files || !files[0]) {
-      console.log("files", files);
-      console.error("file uploading to cloudinary failed");
-      return;
-    }
-    console.log("data is", data);
-    createBanner(
-      {
-        ...data,
-        isActive: data.isActive === 1,
-        photo: files[0],
-      },
-      {
-        onSuccess: () => {
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.adminBanner.list.queryKey(),
-          });
-          setOpen(false);
-        },
-        onError: (e) => {
-          console.error(e);
-        },
-      },
-    );
+  const onSubmit = async (data: CategorySelectSchema) => {
+    // const files = await uploadToCloudinary([data.photo], "banner");
+    // if (!files || !files[0]) {
+    //   console.log("files", files);
+    //   console.error("file uploading to cloudinary failed");
+    //   return;
+    // }
+    console.log(data, "data is");
+    // create(
+    //   {
+    //     ...data,
+    //     photo: files[0],
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       const queryClient = getQueryClient();
+    //       queryClient.invalidateQueries({
+    //         queryKey: trpc.adminBanner.list.queryKey(),
+    //       });
+    //       setOpen(false);
+    //     },
+    //     onError: (e) => {
+    //       console.error(e);
+    //     },
+    //   },
+    // );
   };
 
-  const formFields: FormFieldProps<BannerSelectSchema>[] = [
+  const formFields: FormFieldProps<CategorySelectSchema>[] = [
     {
       control,
       label: "Type",
       name: "type",
-      placeholder: "Select Type of banner",
+      placeholder: "Select Type of category",
       component: "select",
       options: [
-        { label: "Banner 1", value: 1 },
-        { label: "Banner 2", value: 2 },
-        { label: "Banner 3", value: 3 },
-        { label: "Banner 4", value: 4 },
+        { label: "Business", value: 1 },
+        { label: "Hire", value: 2 },
       ],
       error: errors.type?.message,
     },
     {
       control,
-      label: "Redirect Route",
-      name: "route",
-      placeholder: "/business/vastrakala",
+      label: "Title",
+      name: "title",
+      placeholder: "eg: garment",
       component: "input",
-      required: false,
+    },
+    {
+      control,
+      label: "Slug",
+      name: "slug",
+      placeholder: "eg: garment",
+      component: "input",
     },
     {
       control,
       label: "Photo",
       name: "photo",
-      placeholder: "",
       component: "image",
-      required: false,
       error: "",
     },
     {
       control,
-      label: "Active",
-      name: "isActive",
+      label: "isPopular",
+      name: "isPopular",
+      mainDivClassName: "flex gap-4",
       placeholder: "",
-      component: "select",
-      options: [
-        { label: "True", value: 1 },
-        { label: "False", value: 0 },
-      ],
+      component: "single-checkbox",
+    },
+    {
+      control,
+      label: "Status",
+      name: "status",
+      mainDivClassName: "flex gap-4",
+      placeholder: "",
+      component: "single-checkbox",
     },
   ];
 
@@ -160,7 +170,7 @@ function BannerAddForm({ setOpen }: AddForm) {
       <DialogHeader>
         <DialogTitle>Add</DialogTitle>
       </DialogHeader>
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-6 ">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
