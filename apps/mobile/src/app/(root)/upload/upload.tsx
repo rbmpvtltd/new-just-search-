@@ -18,19 +18,22 @@ export default function UploadPage() {
   const getUploadSignature = async () => {
     try {
       // Replace with your actual backend endpoint
-      const response = await fetch("http://localhost:4000/v1/api/sign-image", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Add authentication headers if needed
-          // 'Authorization': 'Bearer ' + token,
+      const response = await fetch(
+        "http://192.168.1.49:4000/v1/api/sign-image",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Add authentication headers if needed
+            // 'Authorization': 'Bearer ' + token,
+          },
+          body: JSON.stringify({
+            // You can pass additional parameters here if needed
+            folder: "mobile_uploads",
+            timestamp: Math.round(Date.now() / 1000),
+          }),
         },
-        body: JSON.stringify({
-          // You can pass additional parameters here if needed
-          folder: "mobile_uploads",
-          timestamp: Math.round(Date.now() / 1000),
-        }),
-      });
+      );
 
       const data = await response.json();
 

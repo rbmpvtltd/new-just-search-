@@ -23,6 +23,7 @@ export function TRPCReactProvider(
   //       suspend because React will throw away the client on the initial
   //       render if it suspends and there is no boundary
   const queryClient = getQueryClient();
+  console.log("trpc url is", getTrpcUrl());
   const [trpcClient] = useState(() =>
     createTRPCClient<AppRouter>({
       links: [

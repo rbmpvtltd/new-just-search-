@@ -10,6 +10,7 @@ import { AddBanner } from "../form/add.form";
 import { active, type } from "./data";
 import { MuiltDeleteButton } from "../form/delete.form";
 import { MuiltActiveButton } from "../form/active.form";
+import { MuiltPopularButton } from "../form/popular.form";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -31,11 +32,12 @@ export function DataTableToolbar<TData>({
         />
 
         {/* const allowedColumns = ["id", "route", "photo", "is_active", "type"]; */}
-        {table.getColumn("isActive") && (
+        {table.getColumn("status") && (
           <DataTableFacetedFilter
-            column={table.getColumn("isActive")}
+            column={table.getColumn("status")}
             title="is_active"
             options={active}
+            type="select"
           />
         )}
         {table.getColumn("type") && (
@@ -58,6 +60,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         <MuiltActiveButton />
+        <MuiltPopularButton />
         <MuiltDeleteButton />
         <DataTableViewOptions table={table} />
         <AddBanner />

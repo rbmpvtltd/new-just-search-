@@ -4,6 +4,9 @@ import {
   bannerInsertSchema,
   banners,
   bannerUpdateSchema,
+  categories,
+  categoryInsertSchema,
+  categoryUpdateSchema,
 } from "@repo/db/src/schema/not-related.schema";
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
@@ -20,23 +23,23 @@ import {
 } from "@/lib/tableUtils";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
-  bannerAllowedSortColumns,
-  bannerColumns,
-  bannerGlobalFilterColumns,
-} from "./banners.admin.service";
+  categoryAllowedSortColumns,
+  categoryColumns,
+  categoryGlobalFilterColumns,
+} from "./category.admin.service";
 
-export const adminBannerRouter = router({
+export const adminCategoryRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
       input.globalFilter,
-      bannerColumns,
-      bannerGlobalFilterColumns,
+      categoryColumns,
+      categoryGlobalFilterColumns,
     );
 
     const orderBy = buildOrderByClause(
       input.sorting,
-      bannerAllowedSortColumns,
+      categoryAllowedSortColumns,
       sql`id DESC`,
     );
 
@@ -44,7 +47,7 @@ export const adminBannerRouter = router({
 
     const data = await db
       .select()
-      .from(banners)
+      .from(categories)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
@@ -53,7 +56,7 @@ export const adminBannerRouter = router({
     // PostgreSQL returns `bigint` for count → cast to number
     const totalResult = await db
       .select({ count: sql<number>`count(*)::int` }) // 👈 cast to int
-      .from(banners)
+      .from(categories)
       .where(where);
 
     const total = totalResult[0]?.count ?? 0;
@@ -70,9 +73,9 @@ export const adminBannerRouter = router({
     return;
   }),
   create: adminProcedure
-    .input(bannerInsertSchema)
+    .input(categoryInsertSchema)
     .mutation(async ({ input }) => {
-      await db.insert(banners).values(input);
+      await db.insert(categories).values(input);
       return { success: true };
     }),
   edit: adminProcedure
@@ -89,22 +92,21 @@ export const adminBannerRouter = router({
       return data[0];
     }),
   update: adminProcedure
-    .input(bannerUpdateSchema)
+    .input(categoryUpdateSchema)
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
-      logger.info("getting in backend");
       if (!id)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Please pass id field",
         });
       const olddata = (
-        await db.select().from(banners).where(eq(banners.id, id))
+        await db.select().from(categories).where(eq(categories.id, id))
       )[0];
       if (olddata?.photo && olddata?.photo !== updateData.photo) {
         await cloudinaryDeleteImageByPublicId(olddata.photo);
       }
-      await db.update(banners).set(updateData).where(eq(banners.id, id));
+      await db.update(categories).set(updateData).where(eq(categories.id, id));
       return { success: true };
     }),
   multidelete: adminProcedure
@@ -116,14 +118,14 @@ export const adminBannerRouter = router({
     .mutation(async ({ input }) => {
       const allSeletedPhoto = await db
         .select({
-          photo: banners.photo,
+          photo: categories.photo,
         })
-        .from(banners)
-        .where(inArray(banners.id, input.ids));
+        .from(categories)
+        .where(inArray(categories.id, input.ids));
       await cloudinaryDeleteImagesByPublicIds(
         allSeletedPhoto.map((item) => item.photo),
       );
-      await db.delete(banners).where(inArray(banners.id, input.ids));
+      await db.delete(categories).where(inArray(categories.id, input.ids));
       return { success: true };
     }),
   multiactive: adminProcedure
@@ -137,9 +139,9 @@ export const adminBannerRouter = router({
     )
     .mutation(async ({ input }) => {
       await db
-        .update(banners)
+        .update(categories)
         .set({
-          isActive: sql`CASE ${banners.id} 
+          status: sql`CASE ${categories.id} 
             ${sql.join(
               input.map(
                 (item) =>
@@ -147,12 +149,45 @@ export const adminBannerRouter = router({
               ),
               sql` `,
             )} 
-                ELSE ${banners.isActive} 
+                ELSE ${categories.status} 
                 END`,
         })
         .where(
           inArray(
-            banners.id,
+            categories.id,
+            input.map((item) => item.id),
+          ),
+        );
+
+      return { success: true };
+    }),
+  multipopular: adminProcedure
+    .input(
+      z.array(
+        z.object({
+          id: z.number(),
+          isActive: z.boolean(),
+        }),
+      ),
+    )
+    .mutation(async ({ input }) => {
+      await db
+        .update(categories)
+        .set({
+          isPopular: sql`CASE ${categories.id} 
+            ${sql.join(
+              input.map(
+                (item) =>
+                  sql`WHEN ${item.id} THEN ${item.isActive ? sql`true` : sql`false`}`,
+              ),
+              sql` `,
+            )} 
+                ELSE ${categories.isPopular} 
+                END`,
+        })
+        .where(
+          inArray(
+            categories.id,
             input.map((item) => item.id),
           ),
         );

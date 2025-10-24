@@ -7,14 +7,14 @@ import { DataTableColumnHeader } from "@/components/table/data-table-column-head
 import { useTableStore } from "../store";
 import { EditBanner } from "../form/edit.form";
 
-// Define the type to match your actual backend data
-export interface Banner {
+export interface Category {
   id: number;
-  mysqlId: number | null;
-  route: string | null;
-  photo: string | null;
-  isActive: boolean | null;
-  type: number | null;
+  title: string;
+  photo: string;
+  slug: string;
+  isPopular: boolean;
+  status: boolean;
+  type: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +43,25 @@ function ActionCell({ id }: { id: number }) {
 function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
   const allActive = useTableStore((state) => state.active);
   const toggleActive = useTableStore((state) => state.toggleActive);
+  const isSelected = allActive.filter((item) => item.id === id)[0];
+  const active = isSelected ? isSelected.isActive : isActive;
+  const handleToggle = () => {
+    toggleActive(id, !active);
+  };
+
+  return (
+    <Checkbox
+      checked={active}
+      onCheckedChange={handleToggle}
+      aria-label="Select all"
+      className="translate-y-[2px]"
+    />
+  );
+}
+
+function PopularCell({ isActive, id }: { isActive: boolean; id: number }) {
+  const allActive = useTableStore((state) => state.popular);
+  const toggleActive = useTableStore((state) => state.togglePopular);
   const isSelected = allActive.filter((item) => item.id === id)[0];
   const active = isSelected ? isSelected.isActive : isActive;
   const handleToggle = () => {
@@ -92,7 +111,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-export const columns: ColumnDef<Banner>[] = [
+export const columns: ColumnDef<Category>[] = [
   {
     id: "select",
     header: ({ table }) => {
@@ -132,25 +151,37 @@ export const columns: ColumnDef<Banner>[] = [
       ),
   },
   {
-    accessorKey: "route",
+    accessorKey: "title",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Route" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.route || "No route"}
+        {row.original.title || "No title"}
       </div>
     ),
   },
   {
-    accessorKey: "isActive",
+    accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Active" />
     ),
     cell: ({ row }) => (
       <ActiveCell
         id={row.original.id}
-        isActive={row.original.isActive ?? false}
+        isActive={row.original.status ?? false}
+      />
+    ),
+  },
+  {
+    accessorKey: "isPopular",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Popular" />
+    ),
+    cell: ({ row }) => (
+      <PopularCell
+        id={row.original.id}
+        isActive={row.original.isPopular ?? false}
       />
     ),
   },

@@ -19,3 +19,12 @@ export const cloudinarySignature = async (
     signature,
   });
 };
+
+export const cloudinaryDeleteImageByPublicId = async (public_id: string) => {
+  await cloudinary.uploader.destroy(public_id);
+};
+export const cloudinaryDeleteImagesByPublicIds = async (
+  public_ids: string[],
+) => {
+  await cloudinary.api.delete_resources(public_ids);
+};

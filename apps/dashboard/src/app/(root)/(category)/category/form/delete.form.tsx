@@ -8,6 +8,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger,
@@ -18,21 +19,29 @@ export function MuiltDeleteButton() {
   const [open, setOpen] = useState(false);
   const trpc = useTRPC();
   const select = useTableStore((state) => state.select);
+  const emptySelect = useTableStore((state) => state.emptySelect);
 
   const { mutate: deleteMany, isPending } = useMutation(
-    trpc.adminBanner.multidelete.mutationOptions(),
+    trpc.adminCategoryRouter.multidelete.mutationOptions(),
   );
+
+  const isActiveExist = select.length >= 1;
+
+  const buttonDisable = !isActiveExist || isPending;
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button disabled={isPending} variant="destructive">
+        <Button disabled={buttonDisable} variant="destructive">
           {isPending ? "Deleting..." : "Delete"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogTitle>Delete Selected</DialogTitle>
-        Are you sure you wanna delete selected banner
+
+        <DialogDescription>
+          Are you sure you wanna delete selected banner
+        </DialogDescription>
         <DialogFooter className="mt-2">
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -49,9 +58,12 @@ export function MuiltDeleteButton() {
                     if (data.success) {
                       const queryClient = getQueryClient();
                       queryClient.invalidateQueries({
-                        queryKey: trpc.adminBanner.list.queryKey(),
+                        queryKey: trpc.adminCategoryRouter.list.queryKey(),
                       });
-                      console.log("Yes data deleted  ...");
+                      setTimeout(() => {
+                        emptySelect();
+                      });
+
                       setOpen(false);
                     }
                   },
