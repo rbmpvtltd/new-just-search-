@@ -13,7 +13,6 @@ type MainCardPropsType = {
 const MainCard = memo(({ item }: MainCardPropsType) => {
   const bannerImage = cld.image(item.photo);
 
-  console.log("render card of carousel", item.id);
 
   return (
     <Pressable className="w-full px-4 mx-4">

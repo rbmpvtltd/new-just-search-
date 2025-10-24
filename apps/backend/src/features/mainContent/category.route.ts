@@ -7,6 +7,7 @@ export const categoryRouter = router({
         return data
     }),
     allCategories : publicProcedure.query(async ()=>{
+        console.log("all category in category route file")
         const data = getAllCategories();
         return data
     }),
