@@ -81,31 +81,31 @@ function AddForm({ setOpen }: AddForm) {
   });
 
   const onSubmit = async (data: CategorySelectSchema) => {
-    // const files = await uploadToCloudinary([data.photo], "banner");
-    // if (!files || !files[0]) {
-    //   console.log("files", files);
-    //   console.error("file uploading to cloudinary failed");
-    //   return;
-    // }
+    const files = await uploadToCloudinary([data.photo], "banner");
+    if (!files || !files[0]) {
+      console.log("files", files);
+      console.error("file uploading to cloudinary failed");
+      return;
+    }
     console.log(data, "data is");
-    // create(
-    //   {
-    //     ...data,
-    //     photo: files[0],
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       const queryClient = getQueryClient();
-    //       queryClient.invalidateQueries({
-    //         queryKey: trpc.adminBanner.list.queryKey(),
-    //       });
-    //       setOpen(false);
-    //     },
-    //     onError: (e) => {
-    //       console.error(e);
-    //     },
-    //   },
-    // );
+    create(
+      {
+        ...data,
+        photo: files[0],
+      },
+      {
+        onSuccess: () => {
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.adminBanner.list.queryKey(),
+          });
+          setOpen(false);
+        },
+        onError: (e) => {
+          console.error(e);
+        },
+      },
+    );
   };
 
   const formFields: FormFieldProps<CategorySelectSchema>[] = [
@@ -137,16 +137,16 @@ function AddForm({ setOpen }: AddForm) {
     },
     {
       control,
-      label: "isPopular",
-      name: "isPopular",
+      label: "Active",
+      name: "status",
       mainDivClassName: "flex gap-4",
       placeholder: "",
       component: "single-checkbox",
     },
     {
       control,
-      label: "Status",
-      name: "status",
+      label: "isPopular",
+      name: "isPopular",
       mainDivClassName: "flex gap-4",
       placeholder: "",
       component: "single-checkbox",

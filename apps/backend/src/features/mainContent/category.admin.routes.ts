@@ -11,6 +11,7 @@ import {
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
+import slugify from "slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
@@ -73,9 +74,14 @@ export const adminCategoryRouter = router({
     return;
   }),
   create: adminProcedure
-    .input(categoryInsertSchema)
+    .input(
+      categoryInsertSchema.omit({
+        slug: true,
+      }),
+    )
     .mutation(async ({ input }) => {
-      await db.insert(categories).values(input);
+      const slug = slugify(input.title);
+      await db.insert(categories).values({ ...input, slug });
       return { success: true };
     }),
   edit: adminProcedure
@@ -87,8 +93,8 @@ export const adminCategoryRouter = router({
     .query(async ({ input }) => {
       const data = await db
         .select()
-        .from(banners)
-        .where(eq(banners.id, input.id));
+        .from(categories)
+        .where(eq(categories.id, input.id));
       return data[0];
     }),
   update: adminProcedure

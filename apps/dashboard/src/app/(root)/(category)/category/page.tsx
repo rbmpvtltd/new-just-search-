@@ -38,15 +38,13 @@ export default function Page() {
     },
   };
   return (
-    <div className="container ">
-      <DataTable
-        columns={columns}
-        Toolbar={DataTableToolbar}
-        queryConfig={queryConfig}
-        manualPagination={true}
-        manualSorting={true}
-        manualFiltering={true}
-      />
-    </div>
+    <DataTable
+      columns={columns}
+      Toolbar={DataTableToolbar}
+      queryConfig={queryConfig}
+      manualPagination={true}
+      manualSorting={true}
+      manualFiltering={true}
+    />
   );
 }

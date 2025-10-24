@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -22,23 +21,24 @@ import {
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
+import { categoryInsertSchema } from "@repo/db/src/schema/not-related.schema";
 
 // import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
 
-const extendedBannerSelectSchema = bannerInsertSchema
+const extendedCategoryInsertSchema = categoryInsertSchema
   .pick({
     id: true,
-    isActive: true,
     photo: true,
-    route: true,
+    isPopular: true,
     type: true,
+    title: true,
+    status: true,
   })
   .extend({
     photo: z.any(),
-    isActive: z.number(),
   });
 
-type BannerSelectSchema = z.infer<typeof extendedBannerSelectSchema>;
+type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
 
 export function EditBanner({ id }: { id: number }) {
   const [open, setOpen] = useState(false);
@@ -65,29 +65,30 @@ function BannerEditForm({ id, setOpen }: EditForm) {
   const trpc = useTRPC();
 
   const { data, refetch } = useSuspenseQuery(
-    trpc.adminBanner.edit.queryOptions({ id }),
+    trpc.adminCategoryRouter.edit.queryOptions({ id }),
   );
 
-  const { mutate: updateBanner } = useMutation(
-    trpc.adminBanner.update.mutationOptions(),
+  const { mutate: update } = useMutation(
+    trpc.adminCategoryRouter.update.mutationOptions(),
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<BannerSelectSchema>({
-    resolver: zodResolver(extendedBannerSelectSchema),
+  } = useForm<CategorySelectSchema>({
+    resolver: zodResolver(extendedCategoryInsertSchema),
     defaultValues: {
       id: data?.id,
       photo: data?.photo,
+      title: data?.title,
       type: data?.type,
-      isActive: data?.isActive ? 1 : 0,
-      route: data?.route,
+      status: data?.status,
+      isPopular: data?.isPopular,
     },
   });
 
-  const onSubmit = async (data: BannerSelectSchema) => {
+  const onSubmit = async (data: CategorySelectSchema) => {
     console.log("submiting started");
     const files = await uploadToCloudinary([data.photo], "banner");
     if (!files || !files[0]) {
@@ -96,17 +97,16 @@ function BannerEditForm({ id, setOpen }: EditForm) {
       return;
     }
     console.log("data is", data);
-    updateBanner(
+    update(
       {
         ...data,
-        isActive: data.isActive === 1,
         photo: files[0],
       },
       {
         onSuccess: () => {
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.adminBanner.list.queryKey(),
+            queryKey: trpc.adminCategoryRouter.list.queryKey(),
           });
           refetch();
           setOpen(false);
@@ -118,7 +118,7 @@ function BannerEditForm({ id, setOpen }: EditForm) {
     );
   };
 
-  const formFields: FormFieldProps<BannerSelectSchema>[] = [
+  const formFields: FormFieldProps<CategorySelectSchema>[] = [
     {
       control,
       label: "",
@@ -132,43 +132,43 @@ function BannerEditForm({ id, setOpen }: EditForm) {
       control,
       label: "Type",
       name: "type",
-      placeholder: "Select Type of banner",
+      placeholder: "Select Type of category",
       component: "select",
       options: [
-        { label: "Banner 1", value: 1 },
-        { label: "Banner 2", value: 2 },
-        { label: "Banner 3", value: 3 },
-        { label: "Banner 4", value: 4 },
+        { label: "Business", value: 1 },
+        { label: "Hire", value: 2 },
       ],
       error: errors.type?.message,
     },
     {
       control,
-      label: "Redirect Route",
-      name: "route",
-      placeholder: "/business/vastrakala",
+      label: "Title",
+      name: "title",
+      placeholder: "eg: garment",
       component: "input",
-      required: false,
     },
     {
       control,
       label: "Photo",
       name: "photo",
-      placeholder: "",
       component: "image",
-      required: false,
       error: "",
     },
     {
       control,
       label: "Active",
-      name: "isActive",
+      name: "status",
+      mainDivClassName: "flex gap-4",
       placeholder: "",
-      component: "select",
-      options: [
-        { label: "True", value: 1 },
-        { label: "False", value: 0 },
-      ],
+      component: "single-checkbox",
+    },
+    {
+      control,
+      label: "isPopular",
+      name: "isPopular",
+      mainDivClassName: "flex gap-4",
+      placeholder: "",
+      component: "single-checkbox",
     },
   ];
 
