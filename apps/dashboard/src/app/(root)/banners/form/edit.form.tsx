@@ -72,6 +72,8 @@ function BannerEditForm({ id, setOpen }: EditForm) {
     trpc.adminBanner.update.mutationOptions(),
   );
 
+  console.log("data is", data);
+
   const {
     control,
     handleSubmit,

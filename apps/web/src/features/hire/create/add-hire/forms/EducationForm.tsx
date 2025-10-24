@@ -7,7 +7,9 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 
 type EducationSchema = z.infer<typeof educationSchema>;
@@ -18,7 +20,7 @@ export default function EducationForm() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<EducationSchema>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
@@ -109,6 +111,12 @@ export default function EducationForm() {
         { label: "3", value: 3 },
         { label: "4", value: 4 },
         { label: "5", value: 5 },
+        { label: "6", value: 6 },
+        { label: "7", value: 7 },
+        { label: "8", value: 8 },
+        { label: "9", value: 9 },
+        { label: "10", value: 10 },
+        { label: "11", value: 11 },
       ],
       error: errors.workExperienceMonth?.message,
     },
@@ -141,7 +149,8 @@ export default function EducationForm() {
       error: errors.certificates?.message,
     },
   ];
-  const onSubmit = (data: EducationSchema) => {
+  const onSubmit = async (data: EducationSchema) => {
+    const files = await uploadToCloudinary([data?.certificates], "hire");
     setFormValue("highestQualification", data.highestQualification ?? "");
     setFormValue("skillset", data.skillset ?? "");
     setFormValue("employmentStatus", data.employmentStatus ?? "");
@@ -149,13 +158,11 @@ export default function EducationForm() {
     setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
     setFormValue("previousJobRole", data.previousJobRole ?? "");
     setFormValue("jobRole", data.jobRole ?? "");
-    setFormValue("certificates", data.certificates ?? "");
-    console.log("form value", formValue ?? "");
-    console.log("data", data);
+    setFormValue("certificates", files[0] ?? "");
     nextPage();
   };
   return (
-    <div className="min-h-screen p-4 relative" >
+    <div className="min-h-screen p-4 relative">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl"
@@ -208,11 +215,18 @@ export default function EducationForm() {
           >
             PREVIOUS
           </Button>
+
           <Button
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold "
           >
-            CONTINUE
+            {isSubmitting ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

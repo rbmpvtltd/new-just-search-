@@ -97,7 +97,7 @@ export const hireListing = pgTable("hire_listing", {
   area: varchar("area", { length: 255 }),
   landmark: varchar("landmark", { length: 255 }),
   pincode: varchar("pincode"),
-  state: integer("state"),
+  state: integer("state").notNull(),
   city: integer("city")
     .notNull()
     .references(() => cities.id),
@@ -144,12 +144,6 @@ export const hireListing = pgTable("hire_listing", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// export const hireInsertSchema = createInsertSchema(hireListing).extend({
-//   gender: z.enum(Gender),
-//   maritalStatus: z.enum(MaritalStatus),
-//   categoryId: z.number(),
-//   subcategoryId: z.array(z.number()),
-// });
 export const hireInsertSchema = createInsertSchema(hireListing, {
   photo: () => z.string().min(1, "Photo is required"),
   name: () => z.string().min(3, "Name should be minimum 3 characters long"),
@@ -219,23 +213,23 @@ export const hireUpdateSchema = createUpdateSchema(hireListing).extend({
 
 export const personalDetailsHireSchema = hireInsertSchema.pick({
   photo: true,
-  // name: true,
-  // categoryId: true,
-  // subcategoryId: true,
-  // maritalStatus: true,
-  // gender: true,
-  // fatherName: true,
-  // dob: true,
-  // languages: true,
-  // mobileNumber: true,
-  // alternativeMobileNumber: true,
-  // email: true,
-  // latitude: true,
-  // longitude: true,
-  // area: true,
-  // pincode: true,
-  // state: true,
-  // city: true,
+  name: true,
+  categoryId: true,
+  subcategoryId: true,
+  maritalStatus: true,
+  gender: true,
+  fatherName: true,
+  dob: true,
+  languages: true,
+  mobileNumber: true,
+  alternativeMobileNumber: true,
+  email: true,
+  latitude: true,
+  longitude: true,
+  area: true,
+  pincode: true,
+  state: true,
+  city: true,
 });
 export const educationSchema = hireInsertSchema.pick({
   highestQualification: true,

@@ -11,6 +11,7 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
 import type { AddBusinessPageType } from "..";
@@ -26,7 +27,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
     defaultValues: {
@@ -49,14 +50,14 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     };
   });
   const selectedStateId = useWatch({ control, name: "state" });
-  const { data: cities, isLoading } = useQuery(
-    trpc.businessrouter.getCities.queryOptions({
+  const { data: cities, isLoading } = useQuery({
+    ...trpc.businessrouter.getCities.queryOptions({
       state: selectedStateId,
     }),
-  );
-  if (isLoading) {
-    return <div className="">Loading...</div>;
-  }
+    enabled: !!selectedStateId,
+    placeholderData: (prev) => prev,
+  });
+
   const formFields: FormFieldProps<AddressDetailSchema>[] = [
     {
       control,
@@ -188,7 +189,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
         </div>
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
-          onClick={prevPage}
+            onClick={prevPage}
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
@@ -198,7 +199,13 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
-            CONTINUE
+            {isSubmitting ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

@@ -7,7 +7,7 @@ import Select, {
 } from "react-select";
 
 type Option = {
-  label: string;
+  label: string | boolean;
   value: string | number | boolean;
 };
 

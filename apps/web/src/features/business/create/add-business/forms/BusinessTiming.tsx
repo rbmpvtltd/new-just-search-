@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessTimingSchema } from "@repo/db/src/schema/business.schema";
 import { useForm } from "react-hook-form";
@@ -8,6 +8,7 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 
 type BusinessTimingSchema = z.infer<typeof businessTimingSchema>;
@@ -19,7 +20,7 @@ export default function BusinessTiming() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<BusinessTimingSchema>({
     resolver: zodResolver(businessTimingSchema),
     defaultValues: {
@@ -35,7 +36,7 @@ export default function BusinessTiming() {
       placeholder: "Opening Time",
       component: "input",
       required: false,
-      error: "",
+      error: errors.alternativeMobileNumber?.message,
     },
     // {
     //   control,
@@ -134,7 +135,14 @@ export default function BusinessTiming() {
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
-            CONTINUE
+            {isSubmitting ? (
+              <>
+                <Spinner />
+                Loading...{" "}
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

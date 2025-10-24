@@ -8,7 +8,9 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
 import type { AddBusinessPageType } from "..";
@@ -27,7 +29,7 @@ export default function BusinessDetail({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
     defaultValues: {
@@ -48,14 +50,13 @@ export default function BusinessDetail({
     };
   });
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories, isLoading } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
+  const { data: subCategories, isLoading } = useQuery({
+    ...trpc.businessrouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
-  );
-  if (isLoading) {
-    return <div className="">Loading...</div>;
-  }
+    enabled: !!selectedCategoryId,
+    placeholderData: (prev) => prev,
+  });
 
   const formFields: FormFieldProps<BusinessDetailSchema>[] = [
     {
@@ -63,7 +64,7 @@ export default function BusinessDetail({
       label: "Business image",
       name: "photo",
       placeholder: "Business Image",
-      component: "input",
+      component: "image",
       error: errors.photo?.message,
     },
     {
@@ -177,15 +178,15 @@ export default function BusinessDetail({
     // },
   ];
 
-  const onSubmit = (data: BusinessDetailSchema) => {
-    console.log(data);
-    setFormValue("photo", data.photo ?? ""),
-      setFormValue("name", data.name ?? ""),
-      setFormValue("categoryId", data.categoryId ?? ""),
-      setFormValue("subcategoryId", data.subcategoryId ?? []),
-      setFormValue("specialities", data.specialities ?? ""),
-      setFormValue("homeDelivery", data.homeDelivery ?? ""),
-      setFormValue("description", data.description ?? "");
+  const onSubmit = async (data: BusinessDetailSchema) => {
+    const file = await uploadToCloudinary([data.photo], "business");
+    setFormValue("photo", file[0] ?? "");
+    setFormValue("name", data.name ?? "");
+    setFormValue("categoryId", data.categoryId ?? "");
+    setFormValue("subcategoryId", data.subcategoryId ?? []);
+    setFormValue("specialities", data.specialities ?? "");
+    setFormValue("homeDelivery", data.homeDelivery ?? "");
+    setFormValue("description", data.description ?? "");
     nextPage();
   };
   return (
@@ -212,13 +213,13 @@ export default function BusinessDetail({
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
-            PREVIOUS
-          </Button>
-          <Button
-            type="submit"
-            className="bg-orange-500 hover:bg-orange-700 font-bold"
-          >
-            SUBMIT
+            {isSubmitting ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

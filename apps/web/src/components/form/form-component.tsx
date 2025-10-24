@@ -11,6 +11,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { MultiSelect, type Option } from "../ui/multiselect";
 import { SingleSelect } from "../ui/select";
+import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
 export interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -18,6 +19,7 @@ export interface FormFieldProps<T extends FieldValues> {
   label: string;
   name: Path<T>;
   placeholder?: string;
+  loading?: boolean;
   className?: string;
   required?: boolean;
   section?: string;
@@ -43,6 +45,7 @@ export const FormField = <T extends FieldValues>({
   className,
   required = true,
   section,
+  loading = false,
   error,
   options,
   component,
@@ -74,7 +77,24 @@ export const FormField = <T extends FieldValues>({
                 />
               );
 
-            case "multiselect":
+            case "multiselect": {
+              if (loading)
+                return (
+                  <div className="">
+                    <MultiSelect
+                      options={options}
+                      // defaultValues={
+                      //   Array.isArray(value)
+                      //     ? options?.filter((opt) => value.includes(opt.value))
+                      //     : []
+                      // }
+                      // onChange={(selected) =>
+                      //   onChange(selected.map((s) => s.value))
+                      // }
+                    />
+                    <Spinner />
+                  </div>
+                );
               return (
                 <MultiSelect
                   options={options}
@@ -88,6 +108,7 @@ export const FormField = <T extends FieldValues>({
                   }
                 />
               );
+            }
 
             case "select":
               return (
@@ -103,9 +124,9 @@ export const FormField = <T extends FieldValues>({
               return (
                 <div className="flex gap-3 flex-wrap">
                   {options?.map((option) => (
-                    <div key={option.value} className="">
+                    <div key={option.value.toString()} className="">
                       <div
-                        key={option.value}
+                        key={option.value.toString()}
                         className="flex items-center gap-2 "
                       >
                         <div className="mt-1 flex items-center justify-center">

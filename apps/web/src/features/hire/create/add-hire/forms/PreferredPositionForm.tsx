@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import type z from "zod";
 import { FormField } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
-
+import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 
 type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
@@ -22,7 +22,7 @@ export default function PreferredPositionForm() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
@@ -43,8 +43,6 @@ export default function PreferredPositionForm() {
   });
 
   const onSubmit = (data: PreferredPositionSchema) => {
-    console.log("jobType", data.jobType);
-
     setFormValue("jobType", data.jobType ?? "");
     setFormValue("locationPreferred", data.locationPreferred ?? "");
     setFormValue("relocate", data.relocate ?? undefined);
@@ -59,7 +57,6 @@ export default function PreferredPositionForm() {
     setFormValue("workShift", data.workShift ?? "");
     setFormValue("availability", data.availability ?? "");
     nextPage();
-    console.log("data", data);
   };
 
   return (
@@ -281,7 +278,13 @@ export default function PreferredPositionForm() {
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold "
           >
-            CONTINUE
+            {isSubmitting ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

@@ -1,7 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { da } from "date-fns/locale";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId } from "react";
 import { useForm } from "react-hook-form";
@@ -19,8 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { setToken } from "@/utils/session";
-import Link from "next/link";
+import { setRole, setToken } from "@/utils/session";
 
 const formSchema = z.object({
   username: z.string(),
@@ -36,8 +37,8 @@ export function LoginForm({
   const router = useRouter();
   const id = useId();
   const trpc = useTRPC();
-  const { mutate, isSuccess, isError , error } = useMutation(
-    trpc.auth.login.mutationOptions()
+  const { mutate, isSuccess, isError, error } = useMutation(
+    trpc.auth.login.mutationOptions(),
   );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,15 +49,15 @@ export function LoginForm({
   });
 
   if (isError) {
-    console.log("oo error ho gyo" , error);
+    console.log("oo error ho gyo", error);
   }
 
   function onSubmit(data: { username: string; password: string }) {
     mutate(data, {
-      onSuccess: (data: string | undefined) => {
-        setToken(data?.toString() || "", false);
-        console.log("oo success ho gyo", data);
-        router.push("/banner");
+      onSuccess: (data) => {
+        setToken(data?.session || "", false);
+        setRole(data?.role || "", false);
+        router.push("/");
       },
     });
   }
@@ -139,8 +140,9 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <Link href="#">Terms of Service</Link>{" "}
-        and <Link href="#">Privacy Policy</Link>.
+        By clicking continue, you agree to our{" "}
+        <Link href="#">Terms of Service</Link> and{" "}
+        <Link href="#">Privacy Policy</Link>.
       </div>
     </div>
   );

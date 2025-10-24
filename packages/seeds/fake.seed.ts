@@ -233,6 +233,7 @@ const seedFakeBusiness = async (userId: number) => {
         area: "fake",
         landmark: "fake",
         pincode: 342001,
+        state: city.stateId,
         cityId: city.id,
         schedules: {},
         status: true,

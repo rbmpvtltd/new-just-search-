@@ -20,10 +20,9 @@ import { safeArray } from "./utils";
 import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 export const hireSeed = async () => {
-  console.log("start seeding of hire listing")
   await cleardataofhire();
-  // await addHire();
-  // await seedRecentViewsHire();
+  await addHire();
+  await seedRecentViewsHire();
   await seedHireSubcategories();
   // await seedHireCategories();
 };
