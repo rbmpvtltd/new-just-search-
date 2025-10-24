@@ -7,6 +7,7 @@ import {
   categories,
   categoryInsertSchema,
   categoryUpdateSchema,
+  subcategories,
 } from "@repo/db/src/schema/not-related.schema";
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
@@ -131,6 +132,10 @@ export const adminCategoryRouter = router({
       await cloudinaryDeleteImagesByPublicIds(
         allSeletedPhoto.map((item) => item.photo),
       );
+      //TODO: test that subcategory is also deleting
+      await db
+        .delete(subcategories)
+        .where(inArray(subcategories.categoryId, input.ids));
       await db.delete(categories).where(inArray(categories.id, input.ids));
       return { success: true };
     }),
