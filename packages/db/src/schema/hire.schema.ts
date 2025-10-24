@@ -97,7 +97,7 @@ export const hireListing = pgTable("hire_listing", {
   area: varchar("area", { length: 255 }),
   landmark: varchar("landmark", { length: 255 }),
   pincode: varchar("pincode"),
-  state: integer("state"),
+  state: integer("state").notNull(),
   city: integer("city")
     .notNull()
     .references(() => cities.id),
@@ -144,12 +144,6 @@ export const hireListing = pgTable("hire_listing", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// export const hireInsertSchema = createInsertSchema(hireListing).extend({
-//   gender: z.enum(Gender),
-//   maritalStatus: z.enum(MaritalStatus),
-//   categoryId: z.number(),
-//   subcategoryId: z.array(z.number()),
-// });
 export const hireInsertSchema = createInsertSchema(hireListing, {
   photo: () => z.string().min(1, "Photo is required"),
   name: () => z.string().min(3, "Name should be minimum 3 characters long"),
@@ -183,6 +177,8 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
   highestQualification: () =>
     z.string().min(1, "Highest qualification is required"),
   employmentStatus: () => z.string().min(1, "Employment status is required"),
+  certificates: () => z.string().optional(),
+
   workExperienceYear: () =>
     z.number().min(1, "Work experience year is required"),
   jobRole: () => z.string().min(1, "Job role is required"),
@@ -200,6 +196,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
   }),
   // jobType: z.array(z.enum(JobType), { message: "Job type is required" }),
   jobDuration: z.array(z.enum(JobDuration)),
+
   // workShift: z.array(z.enum(WorkShift), { message: "Work shift is required" }),
 });
 

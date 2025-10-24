@@ -22,19 +22,18 @@ import { UserRole } from "@repo/db/dist/schema/auth.schema";
 export const hireSeed = async () => {
   await cleardataofhire();
   await addHire();
-  // await seedRecentViewsHire();
-  // await seedHireSubcategories();
+  await seedRecentViewsHire();
+  await seedHireSubcategories();
   // await seedHireCategories();
 };
 
 const cleardataofhire = async () => {
-  console.log("start hire clearing")
   // await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
   // await db.execute(
   //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
   // );
   // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
-  console.log("all table cleared successfully")
+  console.log("all tables clear successfully")
 };
 
 export const addHire = async () => {
@@ -74,7 +73,7 @@ export const addHire = async () => {
         console.log("mySqlUser", mySqlUser);
         // return
         try {
-          createUser = await db
+          [createUser] = await db
             .insert(users)
             .values({
               id: mySqlUser.id,
@@ -141,7 +140,7 @@ export const addHire = async () => {
       }
       await db.insert(hireListing).values({
         id: row.id,
-        userId: createUser.id ?? 588,
+        userId: createUser?.id ?? 588,
         city: city!.id,
         name: row.name,
         slug: row.slug,

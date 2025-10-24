@@ -1,4 +1,5 @@
 import type { ORPCMeta } from "@orpc/trpc";
+import { logger } from "@repo/helper";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { validateSessionToken } from "@/features/auth/lib/session";
@@ -47,7 +48,8 @@ export const visitorProcedure = protectedProcedure.use(async (opts) => {
   if (
     ctx.role === "visiter" ||
     ctx.role === "hire" ||
-    ctx.role === "business" 
+    ctx.role === "business" ||
+    ctx.role === "admin"
   ) {
     return opts.next();
   }
@@ -59,7 +61,7 @@ export const visitorProcedure = protectedProcedure.use(async (opts) => {
 
 export const businessProcedure = protectedProcedure.use(async (opts) => {
   const { ctx } = opts;
-  if (ctx.role === "business") {
+  if (ctx.role === "business" || ctx.role === "admin") {
     return opts.next();
   }
   throw new TRPCError({
@@ -70,7 +72,7 @@ export const businessProcedure = protectedProcedure.use(async (opts) => {
 
 export const hireProcedure = protectedProcedure.use(async (opts) => {
   const { ctx } = opts;
-  if (ctx.role === "hire") {
+  if (ctx.role === "hire" || ctx.role === "admin") {
     return opts.next();
   }
   throw new TRPCError({

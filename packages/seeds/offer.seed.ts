@@ -30,7 +30,7 @@ export const offerSeed = async () => {
 
 const clearOfferSeed = async () => {
   // await db.execute(`TRUNCATE TABLE offer_subcagtegorys RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE offer_reviews RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE offer_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE offer_photos RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE offers RESTART IDENTITY CASCADE;`);
   console.log("all tables cleared successfully")

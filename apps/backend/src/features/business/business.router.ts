@@ -1,10 +1,12 @@
 import { db, schemas } from "@repo/db";
 import {
+  bbusinessUpdateSchema,
   businessInsertSchema,
-  favourites,
 } from "@repo/db/src/schema/business.schema";
+import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import slugify from "slugify";
 import z from "zod";
 import {
   businessProcedure,
@@ -12,8 +14,11 @@ import {
   router,
   visitorProcedure,
 } from "@/utils/trpc";
-import { changeRoleInSession } from "../auth/lib/session";
 import { users } from "../../../../../packages/db/src/schema/auth.schema";
+import {
+  offerPhotos,
+  offers,
+} from "../../../../../packages/db/src/schema/offer.schema";
 import {
   productPhotos,
   productReviews,
@@ -23,6 +28,7 @@ import {
   offerPhotos,
   offers,
 } from "../../../../../packages/db/src/schema/offer.schema";
+import { changeRoleInSession } from "../auth/lib/session";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -67,7 +73,6 @@ export const businessrouter = router({
     .input(
       businessInsertSchema.omit({
         userId: true,
-        slug: true,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -109,34 +114,37 @@ export const businessrouter = router({
         });
       }
 
-      // const isStateExists = await db.query.states.findFirst({
-      //   where: (states, { eq }) => eq(states.id, input.s),
-      // });
-      // return isStateExists;
+      const isStateExists = await db.query.states.findFirst({
+        where: (states, { eq }) => eq(states.id, input.state),
+      });
 
-      // if (!isStateExists) {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: "State not found",
-      //   });
-      // }
+      if (!isStateExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "State not found",
+        });
+      }
 
-      // const isCityExists = await db.query.cities.findFirst({
-      //   where: (cities, { eq }) => eq(cities.id, input.cityId),
-      // });
-      // if (!isCityExists) {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: "City not found",
-      //   });
-      // }
+      const isCityExists = await db.query.cities.findFirst({
+        where: (cities, { eq }) => eq(cities.id, input.cityId),
+      });
+      if (!isCityExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "City not found",
+        });
+      }
 
+      const slugifyName = slugify(input.name, {
+        lower: true,
+        strict: true,
+      });
       const [createBusiness] = await db
         .insert(schemas.business.businessListings)
         .values({
           userId: ctx.userId,
           name: input.name,
-          slug: input.name,
+          slug: slugifyName,
           photo: input.photo,
           specialities: input.specialities,
           description: input.description,
@@ -147,7 +155,8 @@ export const businessrouter = router({
           streetName: input.streetName,
           area: input.area,
           landmark: input.landmark,
-          pincode: Number(input.pincode),
+          pincode: input.pincode,
+          state: input.state,
           cityId: Number(input.cityId),
           schedules: input.schedules,
           email: input.email,
@@ -205,22 +214,214 @@ export const businessrouter = router({
       return { success: true, message: "Business created successfully" };
     }),
 
+  update: businessProcedure
+    .input(bbusinessUpdateSchema)
+    .mutation(async ({ ctx, input }) => {
+      const isBusinessExists = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+
+      if (!isBusinessExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business listing not found",
+        });
+      }
+
+      const updateBusiness = await db
+        .update(schemas.business.businessListings)
+        .set({
+          name: input.name,
+          photo: input.photo,
+          specialities: input.specialities,
+          description: input.description,
+          homeDelivery: input.homeDelivery === false,
+          latitude: input.latitude,
+          longitude: input.longitude,
+          buildingName: input.buildingName,
+          streetName: input.streetName,
+          area: input.area,
+          landmark: input.landmark,
+          pincode: input.pincode,
+          state: input.state,
+          cityId: Number(input.cityId),
+          schedules: input.schedules,
+          email: input.email,
+          phoneNumber: input.phoneNumber,
+          whatsappNo: input.whatsappNo,
+          contactPerson: input.contactPerson,
+          ownerNumber: input.ownerNumber,
+          alternativeMobileNumber: input.alternativeMobileNumber,
+        })
+        .where(
+          eq(schemas.business.businessListings.userId, isBusinessExists.userId),
+        );
+      if (!updateBusiness) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
+
+      await db
+        .delete(schemas.business.businessSubcategories)
+        .where(
+          eq(
+            schemas.business.businessSubcategories.businessId,
+            isBusinessExists.id,
+          ),
+        );
+
+      await db.insert(schemas.business.businessSubcategories).values(
+        input.subcategoryId.map((subCategoryId) => ({
+          subcategoryId: subCategoryId,
+          businessId: isBusinessExists.id,
+        })),
+      );
+      return {
+        success: true,
+        message: "Business listing updated successfully",
+      };
+    }),
+
   show: businessProcedure.query(async ({ ctx }) => {
+    if (!ctx.userId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not logged in",
+      });
+    }
     const business = await db.query.businessListings.findFirst({
       where: (businessListings, { eq }) =>
         eq(businessListings.userId, ctx.userId),
     });
 
+    if (!business?.cityId) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "City not found",
+      });
+    }
+
+    const cityRecord = await db.query.cities.findFirst({
+      where: (cities, { eq }) => eq(cities.id, business.cityId),
+      columns: { id: true, city: true },
+    });
+
+    if (!cityRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "City Record not found",
+      });
+    }
+
+    if (!business?.state) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "State not found",
+      });
+    }
+
+    const stateRecord = await db.query.states.findFirst({
+      where: (states, { eq }) => eq(states.id, business.state),
+      columns: { id: true, name: true },
+    });
+
+    if (!stateRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "State record not found",
+      });
+    }
+
+    const businessCategoryRecord = await db.query.businessCategories.findFirst({
+      where: (businessCategories, { eq }) =>
+        eq(businessCategories.businessId, business.id),
+    });
+
+    if (!businessCategoryRecord?.categoryId) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category not found",
+      });
+    }
+
+    const categoryRecord = await db.query.categories.findFirst({
+      where: (categories, { eq }) =>
+        eq(categories.id, businessCategoryRecord.categoryId),
+      columns: { id: true, title: true },
+    });
+    if (!categoryRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category Record not found",
+      });
+    }
+
+    const businessSubcategoryRecords =
+      await db.query.businessSubcategories.findMany({
+        where: (businessSubcategories, { eq }) =>
+          eq(businessSubcategories.businessId, business.id),
+      });
+
+    const subcategoryIds = businessSubcategoryRecords.map(
+      (item) => item.subcategoryId,
+    );
+
+    if (subcategoryIds.length === 0) {
+      logger.info("No subcategories found for this business", subcategoryIds);
+    }
+
+    const subcategoryRecords = await db.query.subcategories.findMany({
+      where: (subcategories, { inArray }) =>
+        inArray(subcategories.id, subcategoryIds),
+      columns: { id: true, name: true },
+    });
+    return {
+      ...business,
+      city: cityRecord,
+      state: stateRecord,
+      category: categoryRecord,
+      subcategory: subcategoryRecords,
+      success: true,
+    };
+  }),
+
+  delete: businessProcedure.mutation(async ({ ctx }) => {
+    const business = await db.query.businessListings.findFirst({
+      where: (businessListings, { eq }) =>
+        eq(businessListings.userId, ctx.userId),
+    });
     if (!business) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Business not found",
       });
     }
+    await db
+      .delete(schemas.business.businessSubcategories)
+      .where(
+        eq(schemas.business.businessSubcategories.businessId, business.id),
+      );
+    await db
+      .delete(schemas.business.businessCategories)
+      .where(eq(schemas.business.businessCategories.businessId, business.id));
 
-    return business;
+    await db
+      .update(schemas.auth.users)
+      .set({
+        role: "visiter",
+      })
+      .where(eq(schemas.auth.users.id, ctx.userId));
+
+    changeRoleInSession(ctx.sessionId, "visiter");
+
+    return {
+      success: true,
+      message: "Hire listing deleted successfully",
+    };
   }),
-
   singleShop: publicProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ input }) => {

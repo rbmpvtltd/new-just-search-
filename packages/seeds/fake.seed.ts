@@ -1,8 +1,15 @@
 import { db, schemas } from "@repo/db";
+import {
+  businessCategories,
+  businessPhotos,
+  businessReviews,
+  businessSubcategories,
+} from "@repo/db/dist/schema/business.schema";
+import { productReviews } from "@repo/db/dist/schema/product.schema";
 import { env, logger } from "@repo/helper";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 const users = schemas.auth.users;
 const businessListings = schemas.business.businessListings;
@@ -17,7 +24,7 @@ export const fakeSeed = async () => {
     logger.info("adding fake admin");
     await seedAdminUser();
     logger.info("added fake admin");
-    return{ user}
+    return { user };
   } catch (error) {
     console.error("Error in fakeSeed:", error);
     throw error;
@@ -91,12 +98,85 @@ const seedFakeUser = async () => {
 
     if (existingUser) {
       // await db.delete(hireListing).where(eq(hireListing.userId, existingUser.id))
-      await db
-        .delete(businessListings)
-        .where(eq(businessListings.userId, existingUser.id));
+      try {
+        // Delete all reviews tied to business listings
+        await db
+          .delete(businessReviews)
+          .where(
+            inArray(
+              businessReviews.businessId,
+              db
+                .select({ id: businessListings.id })
+                .from(businessListings)
+                .where(eq(businessListings.userId, existingUser.id)),
+            ),
+          );
 
-      // Ab user delete karo
-      await db.delete(users).where(eq(users.displayName, "fake user"));
+        // Delete product reviews (foreign key constraint shows this is required)
+        await db
+          .delete(productReviews)
+          .where(
+            inArray(
+              productReviews.businessId,
+              db
+                .select({ id: businessListings.id })
+                .from(businessListings)
+                .where(eq(businessListings.userId, existingUser.id)),
+            ),
+          );
+
+        await db
+          .delete(businessPhotos)
+          .where(
+            inArray(
+              businessPhotos.businessId,
+              db
+                .select({ id: businessListings.id })
+                .from(businessListings)
+                .where(eq(businessListings.userId, existingUser.id)),
+            ),
+          );
+
+        await db
+          .delete(businessCategories)
+          .where(
+            inArray(
+              businessCategories.businessId,
+              db
+                .select({ id: businessListings.id })
+                .from(businessListings)
+                .where(eq(businessListings.userId, existingUser.id)),
+            ),
+          );
+
+        await db
+          .delete(businessSubcategories)
+          .where(
+            inArray(
+              businessSubcategories.businessId,
+              db
+                .select({ id: businessListings.id })
+                .from(businessListings)
+                .where(eq(businessListings.userId, existingUser.id)),
+            ),
+          );
+
+        // Finally, delete the business listings
+        await db
+          .delete(businessListings)
+          .where(eq(businessListings.userId, existingUser.id));
+      } catch (err: any) {
+        console.error(
+          "Error deleting businessListings line 105:",
+          err?.cause?.message || err,
+        );
+      }
+
+      try {
+        await db.delete(users).where(eq(users.displayName, "fake user"));
+      } catch (err: any) {
+        console.error("Error deleting user:", err?.cause?.message || err);
+      }
     }
 
     const uniqueEmail = `fake${Math.floor(Math.random() * 1000)}@example.com`;
@@ -153,6 +233,7 @@ const seedFakeBusiness = async (userId: number) => {
         area: "fake",
         landmark: "fake",
         pincode: 342001,
+        state: city.stateId,
         cityId: city.id,
         schedules: {},
         status: true,

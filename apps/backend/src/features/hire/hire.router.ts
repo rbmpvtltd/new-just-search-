@@ -6,6 +6,7 @@ import {
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import slugify from "slugify";
 import z from "zod";
 import { hireProcedure, router, visitorProcedure } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
@@ -118,6 +119,10 @@ export const hirerouter = router({
           message: "City not found",
         });
       }
+      const slugifyName = slugify(input.name, {
+        lower: true,
+        strict: true,
+      });
 
       const [createHire] = await db
         .insert(schemas.hire.hireListing)
@@ -132,7 +137,7 @@ export const hirerouter = router({
           languages: Array.isArray(input.languages)
             ? input.languages
             : JSON.parse(input.languages || "[]"),
-          slug: input.name,
+          slug: slugifyName,
           specialities: input.specialities,
           description: input.description,
           latitude: input.latitude,
@@ -247,12 +252,16 @@ export const hirerouter = router({
       const isHireExists = await db.query.hireListing.findFirst({
         where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
       });
+
+      logger.info("isHireExists", isHireExists);
+      // return isHireExists;
       if (!isHireExists) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Hire listing not found",
         });
       }
+
       const updateHire = await db
         .update(schemas.hire.hireListing)
         .set({
@@ -306,8 +315,9 @@ export const hirerouter = router({
           resumePhoto: input.resumePhoto,
           aboutYourself: input.aboutYourself,
         })
-        .where(eq(schemas.hire.hireListing.userId, ctx.userId));
+        .where(eq(schemas.hire.hireListing.userId, isHireExists.userId));
 
+      // return { updateHire: updateHire };
       if (!updateHire) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -317,12 +327,13 @@ export const hirerouter = router({
 
       await db
         .delete(schemas.hire.hireSubcategories)
-        .where(eq(schemas.hire.hireSubcategories.hireId, ctx.userId));
+        .where(eq(schemas.hire.hireSubcategories.hireId, isHireExists.id));
 
+      // return { deleteSubCategories: deleteSubCategories };
       await db.insert(schemas.hire.hireSubcategories).values(
         input.subcategoryId.map((subCategoryId) => ({
           subcategoryId: subCategoryId,
-          hireId: ctx.userId,
+          hireId: isHireExists.id,
         })),
       );
       return {
@@ -332,32 +343,73 @@ export const hirerouter = router({
     }),
 
   show: hireProcedure.query(async ({ ctx }) => {
+    if (!ctx.userId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not logged in",
+      });
+    }
     const hireListing = await db.query.hireListing.findFirst({
       where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
     });
 
-    if (!hireListing) {
+    if (!hireListing?.city) {
       throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Hire listing not found",
+        code: "INTERNAL_SERVER_ERROR",
+        message: "City not found",
       });
     }
     const cityRecord = await db.query.cities.findFirst({
-      where: (cities, { eq }) => eq(cities.id, Number(hireListing?.city)),
+      where: (cities, { eq }) => eq(cities.id, hireListing.city),
+      columns: { id: true, city: true },
     });
+    if (!cityRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "City Record not found",
+      });
+    }
+
+    if (!hireListing?.state) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "State not found",
+      });
+    }
     const stateRecord = await db.query.states.findFirst({
-      where: (states, { eq }) => eq(states.id, Number(hireListing?.state)),
+      where: (states, { eq }) => eq(states.id, hireListing.state),
+      columns: { id: true, name: true },
     });
+
+    if (!stateRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "State Record not found",
+      });
+    }
+
     const hireCategoryRecord = await db.query.hireCategories.findFirst({
       where: (hireCategories, { eq }) =>
-        eq(hireCategories.hireId, Number(hireListing?.id)),
+        eq(hireCategories.hireId, hireListing?.id),
     });
 
+    if (!hireCategoryRecord?.categoryId) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category not found",
+      });
+    }
     const categoryRecord = await db.query.categories.findFirst({
       where: (categories, { eq }) =>
-        eq(categories.id, Number(hireCategoryRecord?.categoryId)),
+        eq(categories.id, hireCategoryRecord.categoryId),
+      columns: { id: true, title: true },
     });
-
+    if (!categoryRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category Record not found",
+      });
+    }
     const hireSubcategoryRecords = await db.query.hireSubcategories.findMany({
       where: (hireSubcategories, { eq }) =>
         eq(hireSubcategories.hireId, Number(hireListing?.id)),
@@ -372,19 +424,20 @@ export const hirerouter = router({
         "No subcategories found for this hire listing",
         subcategoryIds,
       );
-      // return [];
     }
     const subcategoryRecords = await db.query.subcategories.findMany({
       where: (subcategories, { inArray }) =>
         inArray(subcategories.id, subcategoryIds),
+      columns: { id: true, name: true },
     });
 
     return {
       ...hireListing,
-      city: cityRecord?.city,
-      state: stateRecord?.name,
-      category: categoryRecord?.title,
-      subCategories: subcategoryRecords.map((item) => item.name),
+      city: cityRecord,
+      state: stateRecord,
+      categoryId: categoryRecord,
+      subcategoryId: subcategoryRecords,
+      success: true,
     };
   }),
 
@@ -415,5 +468,10 @@ export const hirerouter = router({
       .where(eq(schemas.auth.users.id, ctx.userId));
 
     changeRoleInSession(ctx.sessionId, "visiter");
+
+    return {
+      success: true,
+      message: "Hire listing deleted successfully",
+    };
   }),
 });

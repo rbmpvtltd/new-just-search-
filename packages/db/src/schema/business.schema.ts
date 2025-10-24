@@ -8,7 +8,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 import {
   categories,
@@ -24,7 +24,7 @@ export const businessListings = pgTable("business_listings", {
     .notNull()
     .references(() => users.id),
   name: varchar("name", { length: 255 }).notNull(),
-  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  slug: varchar("slug", { length: 255 }),
   photo: text("photo"),
   specialities: text("specialities"),
   description: text("description"),
@@ -35,7 +35,8 @@ export const businessListings = pgTable("business_listings", {
   streetName: varchar("street_name", { length: 255 }),
   area: varchar("area", { length: 255 }),
   landmark: varchar("landmark", { length: 255 }),
-  pincode: integer("pincode"),
+  pincode: varchar("pincode"),
+  state: integer("state").notNull(),
   cityId: integer("city")
     .notNull()
     .references(() => cities.id, { onDelete: "cascade" }),
@@ -55,13 +56,6 @@ export const businessListings = pgTable("business_listings", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
-export const businessSelectSchema = createSelectSchema(businessListings).extend(
-  {
-    categoryId: z.number(),
-    subcategoryId: z.array(z.number()),
-  },
-);
 
 export const businessInsertSchema = createInsertSchema(businessListings, {
   photo: () => z.string().min(1, "Photo is required"),
@@ -103,12 +97,16 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
   state: z.number().min(1, "State is required"),
 });
 
+export const bbusinessUpdateSchema=  createUpdateSchema(businessListings).extend({
+  categoryId: z.number(),
+  subcategoryId: z.array(z.number()),
+  state: z.number()
+})
 export const businessDetailSchema = businessInsertSchema.pick({
   photo: true,
   name: true,
   categoryId: true,
   subcategoryId: true,
-  // slug: true,
   specialities: true,
   description: true,
   homeDelivery: true,

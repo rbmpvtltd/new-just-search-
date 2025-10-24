@@ -2,7 +2,7 @@ import type React from "react";
 import Select, { type StylesConfig } from "react-select";
 
 export interface Option {
-  label: string | number | boolean;
+  label: string | boolean;
   value: number | string | boolean;
 }
 

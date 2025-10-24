@@ -4,19 +4,19 @@ import { Eye, Pencil, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
-import Swal from "sweetalert2";
 
-type MyHireType = OutputTrpcType["hirerouter"]["show"];
-export default function MyHire({ data }: { data: MyHireType }) {
+type MyBusinessType = OutputTrpcType["businessrouter"]["show"];
+export default function MyBusiness({ data }: { data: MyBusinessType }) {
   const trpc = useTRPC();
   const router = useRouter();
   const { mutate, isPending } = useMutation(
-    trpc.hirerouter.delete.mutationOptions({
+    trpc.businessrouter.delete.mutationOptions({
       onSuccess: async (data) => {
         if (data.success) {
           const queryClient = getQueryClient();
@@ -47,7 +47,9 @@ export default function MyHire({ data }: { data: MyHireType }) {
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-100 to-gray-200 p-4">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-4 border-b border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-800">My Hire Listing</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            My Business Listing
+          </h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage and update your active listings
           </p>
@@ -65,18 +67,18 @@ export default function MyHire({ data }: { data: MyHireType }) {
           </div>
 
           <div className="flex-1 flex flex-col justify-start pl-4">
-            {/* <div>
+            <div>
               <h2 className="text-xl font-semibold text-gray-800">
                 {data.name}
               </h2>
               <p className="text-gray-600 mt-2 leading-relaxed">
                 {data.area}, {data.city.city}
               </p>
-            </div> */}
+            </div>
 
             <div className="mt-6 flex gap-2">
               <Link
-                href={`/user/hire/edit/${data.slug}`}
+                href={`/user/business/edit/${data.slug}`}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center justify-center gap-2"
               >
                 <Pencil className="w-4 h-4" />

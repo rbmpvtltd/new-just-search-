@@ -60,7 +60,7 @@ export const authRouter = router({
         });
       }
       const session = await createSession(user.id);
-      return session?.token;
+      return { session: session?.token, role: session?.role };
     }),
   testadmin: visitorProcedure.query(() => {
     return "yes";
