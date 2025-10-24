@@ -4,6 +4,11 @@ import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import superjson from "superjson";
 import { getToken } from "@/utils/secureStore";
+import type { inferRouterOutputs , inferRouterInputs } from "@trpc/server";
+
+export type OutputTrpcType = inferRouterOutputs<AppRouter>
+export type InputTrpcType = inferRouterInputs<AppRouter>
+
 
 export const queryClient = new QueryClient();
 const trpcClient = createTRPCClient<AppRouter>({

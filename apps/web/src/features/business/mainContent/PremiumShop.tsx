@@ -12,6 +12,7 @@ import Rating from "../../../components/ui/Rating";
 import { Badge } from "../../../components/ui/badge";
 import { MdLocationPin } from "react-icons/md";
 import Link from "next/link";
+import Favourite from "../shared/Favourite";
 
 async function PremiumShop() {
   const { data } = await asyncHandler(trpcServer.banners.premiumShops.query());
@@ -23,6 +24,7 @@ async function PremiumShop() {
       <Carousel opts={{ loop: true }} className="w-full ">
         <CarouselContent className="ml-10">
           {data?.map((item, index: number) => {
+            console.log(item.isFavourite)
             return (
               <CarouselItem
                 key={index.toString()}
@@ -46,8 +48,8 @@ async function PremiumShop() {
                               src="https://www.justsearch.net.in/assets/images/banners/uDgo0nRB1738750520.png"
                             />
                           </Link>
-                          <div className="absolute top-2 right-2 bg-primary rounded-full p-2">
-                            <GoHeart />
+                          <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">
+                            <Favourite businessId={Number(item.id)} initialFav={item.isFavourite}/>
                           </div>
                         </div>
                         <Rating

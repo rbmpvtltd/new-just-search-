@@ -1,28 +1,35 @@
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "@repo/db/src/schema/hire.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
+import { setRole } from "@/utils/session";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
 export default function DocumentsForm() {
+  const router = useRouter();
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
   const formValue = useHireFormStore((state) => state.formValue);
-  const { page, prevPage, nextPage, setFormValue } = useHireFormStore();
+  const { prevPage, clearPage, setFormValue } = useHireFormStore();
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<DocumentSchema>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
@@ -35,24 +42,40 @@ export default function DocumentsForm() {
     },
   });
 
-  console.log("form Values before submit", formValue);
-
-  const onSubmit = (data: DocumentSchema) => {
+  const onSubmit = async (data: DocumentSchema) => {
+    const files = await uploadToCloudinary(
+      [data.idProofPhoto, data.resumePhoto],
+      "hire",
+    );
     setFormValue("idProof", data.idProof ?? "");
-    setFormValue("idProofPhoto", data.idProofPhoto ?? "");
+    setFormValue("idProofPhoto", files[0] ?? "");
     setFormValue("coverLetter", data.coverLetter ?? "");
-    setFormValue("resumePhoto", data.resumePhoto ?? "");
+    setFormValue("resumePhoto", files[1] ?? "");
     setFormValue("aboutYourself", data.aboutYourself ?? "");
     // setFormValue("referCode", data.referCode ?? "");
 
-    console.log("form Values after submit", formValue);
-
     mutate(formValue, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
+        if (data?.success) {
+          setRole("hire");
+          await Swal.fire({
+            title: data.message,
+            icon: "success",
+            draggable: true,
+          });
+          clearPage();
+          router.push("/");
+        }
         console.log("success", data);
       },
       onError: (error) => {
         if (isTRPCClientError(error)) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            // footer: '<a href="#">Why do I have this issue?</a>',
+          });
           console.error("error,", error.message);
         }
       },
@@ -81,7 +104,7 @@ export default function DocumentsForm() {
       label: "",
       name: "idProofPhoto",
       placeholder: "Upload your photo",
-      component: "input",
+      component: "image",
       error: errors.idProofPhoto?.message,
     },
     {
@@ -99,7 +122,7 @@ export default function DocumentsForm() {
       label: "Resume/CV",
       name: "resumePhoto",
       placeholder: "",
-      component: "input",
+      component: "image",
       required: false,
       error: errors.resumePhoto?.message,
     },
@@ -122,17 +145,17 @@ export default function DocumentsForm() {
     // },
   ];
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="min-h-screen p-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
+        className="max-w-6xl mx-auto bg-gray-100 rounded-lg shadow-xl"
       >
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Documents
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {formFields.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
@@ -151,7 +174,14 @@ export default function DocumentsForm() {
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
-            SUBMIT
+            {isSubmitting ? (
+              <>
+                {" "}
+                <Spinner /> Submitting...{" "}
+              </>
+            ) : (
+              "SUBMIT"
+            )}
           </Button>
         </div>
       </form>

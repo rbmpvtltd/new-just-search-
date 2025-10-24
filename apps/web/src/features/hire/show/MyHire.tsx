@@ -1,20 +1,36 @@
-"use client"
-import { logger } from "@repo/helper";
+"use client";
 import { useMutation } from "@tanstack/react-query";
 import { Eye, Pencil, Trash } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
+import Swal from "sweetalert2";
 
 type MyHireType = OutputTrpcType["hirerouter"]["show"];
 export default function MyHire({ data }: { data: MyHireType }) {
   const trpc = useTRPC();
-
+  const router = useRouter();
   const { mutate, isPending } = useMutation(
     trpc.hirerouter.delete.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async (data) => {
+        if (data.success) {
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.hirerouter.show.queryKey(),
+          });
+
+          await Swal.fire({
+            title: "Deleted!",
+            icon: "success",
+            draggable: true,
+          });
+        }
+        router.push("/");
         console.log("deleted");
       },
       onError: (err) => {
@@ -45,28 +61,27 @@ export default function MyHire({ data }: { data: MyHireType }) {
               className="sm:w-60 w-full h-60 object-cover rounded-xl shadow-md border border-gray-200"
               width={640}
               height={640}
-              //   loading="lazy"
             />
           </div>
 
           <div className="flex-1 flex flex-col justify-start pl-4">
-            <div>
+            {/* <div>
               <h2 className="text-xl font-semibold text-gray-800">
                 {data.name}
               </h2>
               <p className="text-gray-600 mt-2 leading-relaxed">
-                {data.area}, {data.city}
+                {data.area}, {data.city.city}
               </p>
-            </div>
+            </div> */}
 
             <div className="mt-6 flex gap-2">
-              <Button
-                type="button"
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm"
+              <Link
+                href={`/user/hire/edit/${data.slug}`}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center justify-center gap-2"
               >
                 <Pencil className="w-4 h-4" />
                 Edit
-              </Button>
+              </Link>
               <Button
                 type="button"
                 className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm"
@@ -80,8 +95,16 @@ export default function MyHire({ data }: { data: MyHireType }) {
                 type="submit"
                 className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm"
               >
-                <Trash className="w-4 h-4" />
-                {isPending ? "Deleting..." : "Delete"}
+                {isPending ? (
+                  <>
+                    <Spinner /> Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash className="w-4 h-4" />
+                    Delete
+                  </>
+                )}
               </Button>
             </div>
           </div>

@@ -14,7 +14,7 @@
 // export const SomethingWrong = () => {
 //   return (
 //     <View style={styles.container}>
-//       <Text style={styles.icon}>⚠️</Text>
+//       <Text style={styles.icon}>!</Text>
 //       <Text style={styles.title}>Something went wrong</Text>
 //       <Text style={styles.subtitle}>
 //         Please try again later or check your connection.
@@ -81,7 +81,7 @@ export const SomethingWrong = () => {
 
   return (
     <View className="flex-1 justify-center items-center bg-base-100 p-5">
-      <Text className="text-6xl mb-2">⚠️</Text>
+      <Text className="text-6xl mb-2">!</Text>
       <Text className="text-xl font-bold text-slate-800 mb-2">
         Something went wrong
       </Text>
@@ -95,7 +95,7 @@ export const SomethingWrong = () => {
         }}
         className="px-8 py-3 rounded-lg shadow"
       >
-        <Pressable onPress={() => router.replace("/user/bottomNav")}>
+        <Pressable onPress={() => router.replace("/")}>
           <Text className="text-secondary bg-base-100 font-bold">
             Go To Home
           </Text>

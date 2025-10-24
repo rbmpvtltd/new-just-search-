@@ -7,8 +7,8 @@ import Select, {
 } from "react-select";
 
 type Option = {
-  label: string;
-  value: string;
+  label: string | boolean;
+  value: string | number | boolean;
 };
 
 const selectStyles: StylesConfig<Option, false> = {
@@ -42,7 +42,6 @@ const selectStyles: StylesConfig<Option, false> = {
     color: "#9ca3af", // gray-400
   }),
 };
-
 
 export function SingleSelect(props: SelectProps<Option, false>) {
   return <Select {...props} styles={selectStyles} />;

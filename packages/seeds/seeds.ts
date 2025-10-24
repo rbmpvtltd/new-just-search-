@@ -1,18 +1,16 @@
 import dotenv from "dotenv";
-// import { businessSeed } from "./business.seed";
-// import { communicationSeed } from "./communication.seed";
 import { businessSeed } from "./business.seed";
 // import { communicationSeed } from "./communication.seed";
-// import { fakeSeed } from "./fake.seed";
+import { fakeSeed } from "./fake.seed";
 // import { feedbackseed } from "./feedback.seed";
 import { hireSeed } from "./hires.seeds";
-import { sql } from "./mysqldb.seed";
+// import { sql } from "./mysqldb.seed";
 import { notRelated } from "./notrelated.seed";
-// import { offerSeed } from "./offer.seed";
+import { offerSeed } from "./offer.seed";
 // import { planSeed } from "./plan.seed";
-// import { productSeed } from "./product.seed";
+import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
-// import { userSeed } from "./user.seed";
+import { userSeed } from "./user.seed";
 
 export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
@@ -20,13 +18,13 @@ dotenv.config();
 (async () => {
   try {
     // Postgres seeding
-    await notRelated();
+    // await notRelated();
     // await userSeed();
-    await fakeSeed();
-    // await businessSeed();
+    // await fakeSeed();
+    await businessSeed();
     // await hireSeed();
     // await productSeed();
-    await offerSeed();
+    // await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();
     // await planSeed();

@@ -20,6 +20,12 @@ import { useShopIdStore } from "@/store/shopIdStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
+import { OutputTrpcType } from "@/lib/trpc";
+
+
+type DetailCardType = OutputTrpcType["subcategoryRouter"]["businessesByCategoryInfinate"]["data"][number];
+
+
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -29,7 +35,7 @@ function DetailCard({
   category,
   subcategories,
 }: {
-  item: any;
+  item: DetailCardType;
   type: number;
   category: string;
   subcategories: any;
@@ -43,30 +49,9 @@ function DetailCard({
   const { data: wishlist = [] } = useWishlist();
   const { mutate: startChat } = useStartChat();
 
-  const latitude = Number(item?.latitude.split(",").shift());
-  const longitude = Number(item?.longitude.split(",").pop());
+  const latitude = Number(item?.latitude?.split(",").shift());
+  const longitude = Number(item?.longitude?.split(",").pop());
 
-  // console.log("item", item.photo, item.image1, item.image2, item.image3, item.image4, item.image5);
-
-  const imgUrl = item?.photo
-    ? `https://www.justsearch.net.in/assets/images/${item?.photo}`
-    : `https://www.justsearch.net.in/assets/images/${item?.image1 || item?.image2 || item?.image3 || item?.image4 || item?.image5}`;
-  useEffect(() => {
-    if (imgUrl) {
-      // const imgUrl = `https://www.justsearch.net.in/assets/images/${item?.photo}`;
-      Image.getSize(
-        imgUrl,
-        (width, height) => {
-          if (width > 0 && height > 0) {
-            setAspectRatio(Number((width / height).toFixed(2))); // safe float
-          }
-        },
-        () => {
-          setAspectRatio(3 / 4); // fallback if image fails
-        },
-      );
-    }
-  }, [item?.photo]);
 
   const wishlistArray = Array.isArray(wishlist?.data) ? wishlist.data : [];
 
@@ -76,7 +61,7 @@ function DetailCard({
   );
   let rating: number;
 
-  const rawRate = Number(item?.reviews_avg_rate);
+  const rawRate = Number(item.rating);
 
   if (!isNaN(rawRate)) {
     rating = Number(rawRate.toFixed(0));
@@ -89,7 +74,7 @@ function DetailCard({
       {/* Image Section */}
       <Pressable
         onPress={() => {
-          setShopId(item.id);
+          setShopId(String(item.id));
           router.navigate({
             pathname: "/aboutBusiness/[premiumshops]",
             params: { premiumshops: item.id.toString() },
@@ -106,7 +91,7 @@ function DetailCard({
           <Image
             className="h-full w-full"
             source={{
-              uri: imgUrl,
+              uri:"https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png", // TODO : change image when upload on cloudinary
             }}
             resizeMode="contain"
           />
@@ -124,9 +109,9 @@ function DetailCard({
         <Text className="text-secondary text-2xl font-semibold w-[65%] ">
           {item.name}
         </Text>
-        {Number(item?.user?.verify) === 1 && (
+        {/* {Number(item?.user?.verify) === 1 && (
           <Ionicons name="checkmark-circle" size={28} color="green" />
-        )}
+        )} */}
         {Number(type) === 1 && (
           <View className="w-[10%]">
             <Pressable
@@ -136,7 +121,7 @@ function DetailCard({
                     message: "Need to login to add to your wishlist",
                     onConfirm: () => {
                       clearToken();
-                      router.push("/user/bottomNav/profile");
+                      router.push("/(root)/profile/profile");
                     },
                   });
                   return;
@@ -177,23 +162,25 @@ function DetailCard({
             className="bg-error-content rounded-lg py-2 px-4"
             key={i.toString()}
           >
-            <Text className="text-pink-700 font-semibold text-xs">
-              {item?.name}
-            </Text>
+            <Text className="text-pink-700 font-semibold text-xs">{item}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       {/* Location Section */}
       <Text className="text-secondary-content my-4 mx-3">
-        <Ionicons name="location" /> {item.building_name} {item.street_name}
+        <Ionicons name="location" /> {item.buildingName} {item.streetName}
         {item.area}
       </Text>
 
       <View className="w-full items-center gap-4 my-4">
         {Number(type) === 1 && (
           <View className="w-[90%] bg-primary rounded-lg py-2 px-4">
-            <Pressable onPress={() => openInGoogleMaps(latitude, longitude)}>
+            <Pressable
+              onPress={() =>
+                openInGoogleMaps(String(latitude), String(longitude))
+              }
+            >
               <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
                 <Ionicons size={20} name="location" color={"white"} />
                 <Text className="text-[#ffffff] font-semibold">
@@ -204,7 +191,7 @@ function DetailCard({
           </View>
         )}
         <View className="w-[90%] bg-primary rounded-lg py-2 px-4">
-          <Pressable onPress={() => dialPhone(item?.phone_number)}>
+          <Pressable onPress={() => dialPhone(item?.phoneNumber || "")}>
             <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
               <Ionicons size={20} name="call" color={"white"} />
               <Text className="text-[#ffffff] font-semibold">Contact Now</Text>
@@ -214,7 +201,7 @@ function DetailCard({
         <View className="w-[90%] bg-primary rounded-lg py-2 px-4">
           <Pressable
             onPress={() => {
-              startChat(item?.id, {
+              startChat(String(item?.id), {
                 onSuccess: (res) => {
                   if (!res?.chat_session_id) {
                     Alert.alert(
@@ -230,7 +217,7 @@ function DetailCard({
                           style: "destructive",
                           onPress: () => {
                             clearToken();
-                            router.replace("/user/bottomNav/profile");
+                            router.replace("/(root)/profile/profile");
                           },
                         },
                       ],

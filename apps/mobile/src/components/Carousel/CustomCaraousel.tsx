@@ -79,8 +79,7 @@
 
 // export default Carousel;
 
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   FlatList,
@@ -88,12 +87,12 @@ import {
   StyleSheet,
   NativeSyntheticEvent,
   NativeScrollEvent,
-} from 'react-native';
-import MainCard from '../cards/MainCard';
-import { useQuery } from '@tanstack/react-query';
-import { trpc } from '@/lib/trpc';
+} from "react-native";
+import MainCard from "../cards/MainCard";
+import { useQuery } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 const ITEM_WIDTH = 320;
 const ITEM_SPACING = 16;
 
@@ -103,11 +102,13 @@ const Carousel = () => {
   const [isInteracting, setIsInteracting] = useState(false);
 
   const { data: carouselData } = useQuery(
-    trpc.banners.getBannerData.queryOptions({ type: 1 })
+    trpc.banners.getBannerData.queryOptions({ type: 1 }),
   );
 
   // ✅ Update index when user scrolls manually
-  const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const onMomentumScrollEnd = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / (ITEM_WIDTH + ITEM_SPACING));
     setCurrentIndex(index);
@@ -124,8 +125,12 @@ const Carousel = () => {
         const nextIndex =
           prevIndex + 1 < carouselData.length ? prevIndex + 1 : 0;
 
-        flatListRef.current?.scrollToIndex({
-          index: nextIndex,
+        const offset =
+          nextIndex * (ITEM_WIDTH + ITEM_SPACING) +
+          (screenWidth - ITEM_WIDTH) / 2; // ✅ add instead of subtract
+
+        flatListRef.current?.scrollToOffset({
+          offset: offset - screenWidth / 8,
           animated: true,
         });
 
@@ -159,7 +164,7 @@ const Carousel = () => {
           paddingHorizontal: (screenWidth - ITEM_WIDTH) / 2,
         }}
         onMomentumScrollEnd={onMomentumScrollEnd}
-        onScrollBeginDrag={() => setIsInteracting(true)}   // pause when user starts dragging
+        onScrollBeginDrag={() => setIsInteracting(true)} // pause when user starts dragging
         onScrollEndDrag={() => {
           // resume after small delay (user stopped interaction)
           setTimeout(() => setIsInteracting(false), 2500);
@@ -172,11 +177,11 @@ const Carousel = () => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   slide: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

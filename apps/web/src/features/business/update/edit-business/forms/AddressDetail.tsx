@@ -1,32 +1,83 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addressDetailSchema } from "@repo/db/src/schema/business.schema";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { type FieldValues, useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
+import { useTRPC } from "@/trpc/client";
+import type { FormReferenceDataType, UserBusinessListingType } from "..";
 
-export default function AddressDetail() {
-  const { control } = useForm<FieldValues>();
+type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
+export default function AddressDetail({
+  businessListing,
+  formReferenceData,
+}: {
+  businessListing: UserBusinessListingType;
+  formReferenceData: FormReferenceDataType;
+}) {
+  const trpc = useTRPC();
+  const formValue = useBusinessFormStore((state) => state.formValue);
+  const setFormValue = useBusinessFormStore((state) => state.setFormValue);
+  const nextPage = useBusinessFormStore((state) => state.nextPage);
+  const prevPage = useBusinessFormStore((state) => state.prevPage);
 
-  const formFields: FormFieldProps<FieldValues>[] = [
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<AddressDetailSchema>({
+    resolver: zodResolver(addressDetailSchema),
+    defaultValues: {
+      buildingName: businessListing?.buildingName ?? "",
+      streetName: businessListing?.streetName ?? "",
+      area: businessListing?.area ?? "",
+      landmark: businessListing?.landmark ?? "",
+      latitude: businessListing?.latitude ?? "",
+      longitude: businessListing?.longitude ?? "",
+      pincode: businessListing?.pincode,
+      state: businessListing?.state.id,
+      cityId: businessListing?.cityId,
+    },
+  });
+
+  const states = formReferenceData?.getStates.map((item) => {
+    return {
+      label: item.name,
+      value: item.id,
+    };
+  });
+  const selectedStateId = useWatch({ control, name: "state" });
+  const { data: cities, isLoading } = useQuery(
+    trpc.businessrouter.getCities.queryOptions({
+      state: selectedStateId,
+    }),
+  );
+
+  const formFields: FormFieldProps<AddressDetailSchema>[] = [
     {
       control,
-
       label: "Block No/Building Name",
       name: "buildingName",
       placeholder: "Block No/Building Name",
       component: "input",
-      error: "",
+      error: errors.buildingName?.message,
     },
     {
       control,
-
       label: "Street Name/Colony Name",
       name: "streetName",
       placeholder: "Street Name/Colony Name",
       component: "input",
-      error: "",
+      error: errors.streetName?.message,
     },
     {
       control,
@@ -35,26 +86,24 @@ export default function AddressDetail() {
       name: "area",
       placeholder: "Area",
       component: "input",
-      error: "",
+      error: errors.area?.message,
     },
     {
       control,
-
       label: "Landmark",
       name: "landmark",
       placeholder: "Landmark",
       component: "input",
       required: false,
-      error: "",
+      error: errors.landmark?.message,
     },
     {
       control,
-
       label: "Latitude",
       name: "latitude",
       placeholder: "Latitude",
       component: "input",
-      error: "",
+      error: errors.latitude?.message,
     },
     {
       control,
@@ -63,39 +112,59 @@ export default function AddressDetail() {
       name: "longitude",
       placeholder: "Longitude",
       component: "input",
-      error: "",
+      error: errors.longitude?.message,
     },
     {
       control,
-
       label: "Pincode",
       name: "pincode",
       placeholder: "Pincode",
       component: "input",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
-
       label: "State",
       name: "state",
       placeholder: "State",
-      component: "input",
-      error: "",
+      component: "select",
+      options:
+        states?.map((state) => ({ label: state.label, value: state.value })) ??
+        [],
+      error: errors.state?.message,
     },
     {
       control,
-
       label: "City",
-      name: "city",
+      name: "cityId",
       placeholder: "City",
-      component: "input",
-      error: "",
+      component: "select",
+      loading: isLoading,
+      options:
+        cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
+      error: errors.cityId?.message,
     },
   ];
+
+  const onSubmit = (data: AddressDetailSchema) => {
+    console.log("Address Data", data);
+    setFormValue("buildingName", data.buildingName ?? "");
+    setFormValue("streetName", data.streetName ?? "");
+    setFormValue("area", data.area ?? "");
+    setFormValue("landmark", data.landmark ?? "");
+    setFormValue("latitude", data.latitude ?? "");
+    setFormValue("longitude", data.longitude ?? "");
+    setFormValue("pincode", data.pincode ?? "");
+    setFormValue("state", Number(data.state) ?? "");
+    setFormValue("cityId", Number(data.cityId) ?? "");
+    nextPage();
+  };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <form className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
+      >
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -123,6 +192,7 @@ export default function AddressDetail() {
         </div>
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
+            onClick={prevPage}
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
@@ -132,7 +202,13 @@ export default function AddressDetail() {
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
-            CONTINUE
+            {isSubmitting ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

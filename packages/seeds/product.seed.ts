@@ -25,7 +25,7 @@ dotenv.config();
 export const productSeed = async () => {
   await clearAllTablesBusiness();
   // await addProduct();
-  await addProductReviews();
+  // await addProductReviews();
   // await addRecentViewProduct();
   // await addProductSubCategroy();
 };
@@ -34,7 +34,7 @@ export const clearAllTablesBusiness = async () => {
   // await db.execute(
   //   `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
   // );
-  await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };

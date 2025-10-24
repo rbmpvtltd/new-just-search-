@@ -1,124 +1,177 @@
 "use client";
-import { type FieldValues, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { educationSchema } from "@repo/db/src/schema/hire.schema";
+import { useForm } from "react-hook-form";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
+import type { UserHireListingType } from "..";
+import { Spinner } from "@/components/ui/spinner";
 
-export default function EducationForm() {
-  const { control } = useForm<FieldValues>();
+type EducationSchema = z.infer<typeof educationSchema>;
+export default function EducationForm({
+  hireListing,
+}: {
+  hireListing: UserHireListingType;
+}) {
+  const setFormValue = useHireFormStore((state) => state.setFormValue);
+  const nextPage = useHireFormStore((state) => state.nextPage);
+  const prevPage = useHireFormStore((state) => state.prevPage);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<EducationSchema>({
+    resolver: zodResolver(educationSchema),
+    defaultValues: {
+      highestQualification: hireListing?.highestQualification ?? "",
+      skillset: hireListing?.skillset ?? "",
+      employmentStatus: hireListing?.employmentStatus ?? "",
+      workExperienceYear: hireListing?.workExperienceYear ?? 0,
+      workExperienceMonth: hireListing?.workExperienceMonth ?? undefined,
+      jobRole: hireListing?.jobRole ?? "",
+      previousJobRole: hireListing?.previousJobRole ?? "",
+      certificates: hireListing?.certificates ?? "",
+    },
+  });
 
-  const formFields: FormFieldProps<FieldValues>[] = [
+  const formFields: FormFieldProps<EducationSchema>[] = [
     {
       control,
-
       label: "Highest Qualification",
       name: "highestQualification",
       placeholder: "Highest Qualification",
       component: "select",
       options: [
-        { label: "SSC", value: "SSC" },
-        { label: "HSC", value: "HSC" },
-        { label: "BSC", value: "BSC" },
-        { label: "MSC", value: "MSC" },
-        { label: "PHD", value: "PHD" },
+        { label: "B.E / B.Tech", value: "b-e / b-tech" },
+        { label: "M.E / M.Tech", value: "m-e / m-tech" },
+        { label: "M.S Engineering", value: "m-s engineering" },
+        { label: "M.Eng (Hons)", value: "m-eng (hons)" },
+        { label: "B.Eng (Hons)", value: "b-eng (hons)" },
+        { label: "Engineering Diploma", value: "engineering diploma" },
+        { label: "AE", value: "ae" },
       ],
-      error: "",
+      error: errors.highestQualification?.message,
     },
     {
       control,
-
       label: "Skill Set",
-      name: "skillSet",
+      name: "skillset",
       placeholder: "Skill Set",
       component: "input",
       required: false,
-      error: "",
+      error: errors.skillset?.message,
     },
     {
       control,
-
       label: "Currently Employed",
-      name: "currentlyEmployed",
+      name: "employmentStatus",
       placeholder: "Currently Employed",
       component: "select",
       options: [
-        { label: "Yes", value: "Yes" },
-        { label: "No", value: "No" },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
       ],
-      error: "",
+      error: errors.employmentStatus?.message,
     },
     {
       control,
-
       label: "Work Experience (Years)",
-      name: "workExperienceYears",
+      name: "workExperienceYear",
       placeholder: "Years",
       component: "select",
       options: [
-        { label: "Fresher", value: "Fresher" },
-        { label: "1 Year", value: "1 Year" },
-        { label: "2 Years", value: "2 Years" },
-        { label: "3 Years", value: "3 Years" },
-        { label: "4 Years", value: "4 Years" },
-        { label: "5 Years", value: "5 Years" },
+        { label: "0", value: 0 },
+        { label: "1", value: 1 },
+        { label: "2", value: 2 },
+        { label: "3", value: 3 },
+        { label: "4", value: 4 },
+        { label: "5", value: 5 },
       ],
-      error: "",
+      error: errors.workExperienceYear?.message,
     },
     {
       control,
-
       label: "Months",
-      name: "workExperienceMonths",
+      name: "workExperienceMonth",
       placeholder: "Months",
       component: "select",
       required: false,
-      options: Array.from({ length: 11 }, (_, i) => ({
-        label: `${i + 1} Month${i + 1 > 1 ? "s" : ""}`,
-        value: `${i + 1} Month${i + 1 > 1 ? "s" : ""}`,
-      })),
-      error: "",
+      options: [
+        { label: "fresher", value: "fresher" },
+        { label: "0", value: 0 },
+        { label: "1", value: 1 },
+        { label: "2", value: 2 },
+        { label: "3", value: 3 },
+        { label: "4", value: 4 },
+        { label: "5", value: 5 },
+        { label: "6", value: 6 },
+        { label: "7", value: 7 },
+        { label: "8", value: 8 },
+        { label: "9", value: 9 },
+        { label: "10", value: 10 },
+        { label: "11", value: 11 },
+        { label: "12", value: 12 },
+      ],
+      error: errors.workExperienceMonth?.message,
     },
     {
       control,
-
       label: "Job Role",
       name: "jobRole",
       placeholder: "Job Role",
       component: "input",
-      error: "",
+      error: errors.jobRole?.message,
     },
     {
       control,
-
       label: "Previous Job Role",
       name: "previousJobRole",
       placeholder: "Previous Job Role",
       component: "input",
       required: false,
-      error: "",
+      error: errors.previousJobRole?.message,
     },
     {
       control,
-      type: "file",
       label: "Certificate",
-      name: "certificate",
+      name: "certificates",
       placeholder: "Certificate",
-      component: "checkbox",
-      options: [
-        { label: "Full Time", value: "Full Time" },
-        { label: "Part Time", value: "Part Time" },
-        { label: "Internship", value: "Internship" },
-      ],
+      component: "image",
       required: false,
-      error: "",
+      error: errors.certificates?.message,
     },
   ];
 
+  const onSubmit = async (data: EducationSchema) => {
+    const files = await uploadToCloudinary([data?.certificates], "hire");
+    setFormValue("highestQualification", data.highestQualification ?? "");
+    setFormValue("skillset", data.skillset ?? "");
+    setFormValue("employmentStatus", data.employmentStatus ?? "");
+    setFormValue("workExperienceYear", data.workExperienceYear ?? "");
+    setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
+    setFormValue("previousJobRole", data.previousJobRole ?? "");
+    setFormValue("jobRole", data.jobRole ?? "");
+    setFormValue("certificates", files[0] ?? "");
+    nextPage();
+  };
   return (
     <div className="bg-gray-100 min-h-screen p-8">
-      <form className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl"
+      >
         <div className="p-8 space-y-8">
           <div className="p-6 bg-white rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -127,9 +180,9 @@ export default function EducationForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {formFields.map((field) => {
-                if (field.name === "workExperienceYears") {
+                if (field.name === "workExperienceYear") {
                   const monthsField = formFields.find(
-                    (f) => f.name === "workExperienceMonths",
+                    (f) => f.name === "workExperienceMonth",
                   );
 
                   return (
@@ -145,7 +198,7 @@ export default function EducationForm() {
                   );
                 }
 
-                if (field.name === "workExperienceMonths") return null;
+                if (field.name === "workExperienceMonth") return null;
 
                 return <FormField key={field.name} {...field} />;
               })}
@@ -155,16 +208,21 @@ export default function EducationForm() {
 
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
-            type="button"
+            type="submit"
+            onClick={prevPage}
             className="bg-orange-500 hover:bg-orange-700  font-bold"
           >
             PREVIOUS
           </Button>
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-700  font-bold "
+            disabled={isSubmitting}
+            className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-md min-w-[120px]"
           >
-            CONTINUE
+            {isSubmitting ? <>
+            <Spinner/>
+            Loading...
+            </> : "CONTINUE"}
           </Button>
         </div>
       </form>

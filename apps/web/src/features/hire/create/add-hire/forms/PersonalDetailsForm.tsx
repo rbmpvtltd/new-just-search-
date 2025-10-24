@@ -12,7 +12,9 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
 import type { AddHirePageType } from "..";
@@ -25,13 +27,12 @@ export default function PersonalDetailsForm({
   data: AddHirePageType;
 }) {
   const trpc = useTRPC();
-  const { page, prevPage, nextPage, setFormValue, formValue } =
-    useHireFormStore();
+  const { nextPage, setFormValue, formValue } = useHireFormStore();
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
@@ -65,11 +66,13 @@ export default function PersonalDetailsForm({
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
-  const { data: subCategories, isLoading } = useQuery(
-    trpc.hirerouter.getSubCategories.queryOptions({
+  const { data: subCategories, isLoading } = useQuery({
+    ...trpc.hirerouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
-  );
+    enabled: !!selectedCategoryId,
+    placeholderData: (prev) => prev,
+  });
 
   const states = data?.getStates.map((item: any) => {
     return {
@@ -80,18 +83,13 @@ export default function PersonalDetailsForm({
 
   const selectedStateId = useWatch({ control, name: "state" });
 
-  const { data: cities, isLoading: cityLoading } = useQuery(
-    trpc.hirerouter.getCities.queryOptions({
+  const { data: cities, isLoading: cityLoading } = useQuery({
+    ...trpc.hirerouter.getCities.queryOptions({
       state: Number(selectedStateId),
     }),
-  );
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (cityLoading) {
-    return <div>Loading...</div>;
-  }
+    enabled: !!selectedStateId,
+    placeholderData: (prev) => prev,
+  });
 
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
     {
@@ -100,7 +98,7 @@ export default function PersonalDetailsForm({
       label: "Profile Image",
       name: "photo",
       placeholder: "Upload your photo",
-      component: "input",
+      component: "image",
       section: "profile",
       error: errors.photo?.message,
     },
@@ -310,9 +308,9 @@ export default function PersonalDetailsForm({
     },
   ];
 
-  const onSubmit = (data: PersonalDetailsSchema) => {
-    console.log("data", data);
-    setFormValue("photo", data.photo ?? "");
+  const onSubmit = async (data: PersonalDetailsSchema) => {
+    const files = await uploadToCloudinary([data.photo], "hire");
+    setFormValue("photo", files[0] ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
     setFormValue("subcategoryId", data.subcategoryId ?? []);
     setFormValue("name", data.name ?? "");
@@ -394,9 +392,17 @@ export default function PersonalDetailsForm({
         <div className="flex justify-end p-6 border-t border-gray-200">
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-700 font-bold "
+            disabled={isSubmitting}
+            className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-md min-w-[120px]"
           >
-            CONTINUE
+            {isSubmitting ? (
+              <>
+                <Spinner />
+                Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

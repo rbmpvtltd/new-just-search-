@@ -3,29 +3,34 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { contactDetailSchema } from "@repo/db/src/schema/business.schema";
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import React from "react";
-import { type FieldValues, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
+import { setRole } from "@/utils/session";
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail() {
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(trpc.businessrouter.create.mutationOptions());
   const formValue = useBusinessFormStore((state) => state.formValue);
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
+  const clearPage = useBusinessFormStore((state) => state.clearPage);
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ContactDetailSchema>({
     resolver: zodResolver(contactDetailSchema),
     defaultValues: {
@@ -96,11 +101,27 @@ export default function ContactDetail() {
     mutate(
       { ...formValue, pincode: formValue.pincode },
       {
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
+          if (data.success) {
+            setRole("business");
+            await Swal.fire({
+              title: data.message,
+              icon: "success",
+              draggable: true,
+            });
+            clearPage();
+            router.push("/");
+          }
           console.log("Success", data);
         },
         onError: (error) => {
           if (isTRPCClientError(error)) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+              // footer: '<a href="#">Why do I have this issue?</a>',
+            });
             console.error("Error", error.message);
           }
         },
@@ -137,7 +158,13 @@ export default function ContactDetail() {
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
-            SUBMIT
+            {isSubmitting ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              "SUBMIT"
+            )}
           </Button>
         </div>
       </form>

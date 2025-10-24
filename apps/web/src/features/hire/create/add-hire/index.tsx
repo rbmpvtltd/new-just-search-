@@ -9,6 +9,7 @@ import PreferredPositionForm from "./forms/PreferredPositionForm";
 
 export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
 export default function AddHirePage({ data }: { data: AddHirePageType }) {
+  // return <div>hi ...</div>;
   const { page } = useHireFormStore();
 
   const steps = [

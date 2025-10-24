@@ -28,7 +28,7 @@ export default function NotFoundScreen() {
           </Text>
         </View>
 
-        <Pressable onPress={() => router.replace("/user/bottomNav")}>
+        <Pressable onPress={() => router.replace("/")}>
           <Text className="text-sm text-info">Go to home screen one!</Text>
         </Pressable>
         <View className="w-[8em] h-20 border-2 border-primary bg-base-100">
