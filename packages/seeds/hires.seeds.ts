@@ -17,21 +17,24 @@ import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { safeArray } from "./utils";
+import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 export const hireSeed = async () => {
-  // await cleardataofhire();
+  console.log("start seeding of hire listing")
+  await cleardataofhire();
   // await addHire();
   // await seedRecentViewsHire();
   await seedHireSubcategories();
-  await seedHireCategories();
+  // await seedHireCategories();
 };
 
 const cleardataofhire = async () => {
-  await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
-  );
-  await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
+  // );
+  // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  console.log("all tables clear successfully")
 };
 
 export const addHire = async () => {
@@ -71,7 +74,7 @@ export const addHire = async () => {
         console.log("mySqlUser", mySqlUser);
         // return
         try {
-          createUser = await db
+          [createUser] = await db
             .insert(users)
             .values({
               id: mySqlUser.id,
@@ -79,7 +82,7 @@ export const addHire = async () => {
               email: mySqlUser.email,
               googleId: mySqlUser.google_id,
               password: mySqlUser.password,
-              role: "hire",
+              role: UserRole.hire,
               phoneNumber: mySqlUser.phone,
             })
             .returning();
@@ -138,7 +141,7 @@ export const addHire = async () => {
       }
       await db.insert(hireListing).values({
         id: row.id,
-        userId: createUser.id ?? 588,
+        userId: createUser?.id ?? 588,
         city: city!.id,
         name: row.name,
         slug: row.slug,

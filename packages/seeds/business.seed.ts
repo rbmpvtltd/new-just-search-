@@ -23,7 +23,7 @@ import { clouadinaryFake } from "./seeds";
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
   // await addBusiness();
-  await seedFavourites();
+  // await seedFavourites();
   // await businessesSubcategory();
   // await businessesCategories();
   // await BusinessReviews();
@@ -31,7 +31,7 @@ export const businessSeed = async () => {
 };
 
 export const clearAllTablesBusiness = async () => {
-  await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
   // await db.execute(
   //   `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
   // );

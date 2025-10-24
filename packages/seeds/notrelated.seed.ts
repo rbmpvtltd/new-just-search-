@@ -18,7 +18,7 @@ export const notRelated = async () => {
   await clearAllTablesNotRelated();
   // await state();
   // await citie();
-  await bannerSeed();
+  // await bannerSeed();
   // await seedCategories();
   // await seedSubcategories();
 };
@@ -27,7 +27,7 @@ export const clearAllTablesNotRelated = async () => {
   // logger.info("================== execution comes here ====================");
   // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
