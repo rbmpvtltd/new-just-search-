@@ -1,10 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  bannerInsertSchema,
-  categoryInsertSchema,
-} from "@repo/db/src/schema/not-related.schema";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { categoryInsertSchema } from "@repo/db/src/schema/not-related.schema";
+import { useMutation } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,7 +22,6 @@ import {
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
-import { Checkbox } from "@/components/ui/checkbox";
 
 // import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
 
@@ -36,7 +32,6 @@ const extendedCategoryInsertSchema = categoryInsertSchema
     type: true,
     title: true,
     status: true,
-    slug: true,
   })
   .extend({
     photo: z.any(),
@@ -130,13 +125,6 @@ function AddForm({ setOpen }: AddForm) {
       control,
       label: "Title",
       name: "title",
-      placeholder: "eg: garment",
-      component: "input",
-    },
-    {
-      control,
-      label: "Slug",
-      name: "slug",
       placeholder: "eg: garment",
       component: "input",
     },

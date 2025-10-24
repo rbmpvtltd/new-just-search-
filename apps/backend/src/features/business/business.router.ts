@@ -1,11 +1,19 @@
 import { db, schemas } from "@repo/db";
+import { users } from "@repo/db/src/schema/auth.schema";
 import {
   bbusinessUpdateSchema,
   businessInsertSchema,
+  favourites,
 } from "@repo/db/src/schema/business.schema";
+import { offerPhotos, offers } from "@repo/db/src/schema/offer.schema";
+import {
+  productPhotos,
+  productReviews,
+  products,
+} from "@repo/db/src/schema/product.schema";
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
 import {
@@ -14,20 +22,6 @@ import {
   router,
   visitorProcedure,
 } from "@/utils/trpc";
-import { users } from "../../../../../packages/db/src/schema/auth.schema";
-import {
-  offerPhotos,
-  offers,
-} from "../../../../../packages/db/src/schema/offer.schema";
-import {
-  productPhotos,
-  productReviews,
-  products,
-} from "../../../../../packages/db/src/schema/product.schema";
-import {
-  offerPhotos,
-  offers,
-} from "../../../../../packages/db/src/schema/offer.schema";
 import { changeRoleInSession } from "../auth/lib/session";
 
 const businessListing = schemas.business.businessListings;

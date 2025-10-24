@@ -1,18 +1,25 @@
 import type { ORPCMeta } from "@orpc/trpc";
-import { logger } from "@repo/helper";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+// import { ZodError } from "zod";
 import { validateSessionToken } from "@/features/auth/lib/session";
 import type { Context } from "./context";
-import { logger } from "@repo/helper";
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { db, schemas } from "@repo/db";
-import { eq } from "drizzle-orm";
-import { UserRole } from "@repo/db/src/schema/auth.schema";
 
 export const t = initTRPC.context<Context>().meta<ORPCMeta>().create({
   transformer: superjson,
+  // errorFormatter(opts) {
+  //   const { shape, error } = opts;
+  //   return {
+  //     ...shape,
+  //     data: {
+  //       ...shape.data,
+  //       zodError:
+  //         error.code === "BAD_REQUEST" && error.cause instanceof ZodError
+  //           ? error.cause.message
+  //           : null,
+  //     },
+  //   };
+  // },
 });
 
 export const router = t.router;

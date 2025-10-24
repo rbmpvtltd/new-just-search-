@@ -1,29 +1,42 @@
 // import { logger } from "@repo/helper";
 
+import fs from "node:fs";
+import { db, schemas } from "@repo/db";
+import { UserRole } from "@repo/db/src/schema/auth.schema";
 import { logger } from "@repo/helper";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import axios from "axios";
+import bodyParser from "body-parser";
 // import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { eq } from "drizzle-orm";
 import express from "express";
+import jwt from "jsonwebtoken";
 // import * as ws from "ws";
 // import { cloudinarySignature } from "./lib/cloudinary";
 // import { ORPChandler } from "./lib/orpc";
 import { appRouter } from "./route";
 import { createContext } from "./utils/context";
-import { db, schemas } from "@repo/db";
-import jwt from "jsonwebtoken";
-import axios from "axios";
-import {eq} from "drizzle-orm"
-import { UserRole } from "@repo/db/src/schema/auth.schema";
-import fs from "node:fs"
-import bodyParser from "body-parser";
-
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.get("/", (req, res) => {
+  res.send("hello");
+});
+app.use(
+  "/trpc",
+  createExpressMiddleware({
+    router: appRouter,
+    createContext,
+    middleware: cors({ origin: "*" }),
+    onError: (opts) => {
+      logger.error(opts.error.code);
+    },
+  }),
+);
 
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/auth/apple/callback", async (req, res) => {
   const code = req.body.code as string;
@@ -33,7 +46,9 @@ app.post("/auth/apple/callback", async (req, res) => {
   }
 
   try {
-    const privateKey = fs.readFileSync("/home/meekail/Desktop/justsearch/application/new-just-search-/apps/backend/keys/AuthKey_LSC5HAHRF8.p8");
+    const privateKey = fs.readFileSync(
+      "/home/meekail/Desktop/justsearch/application/new-just-search-/apps/backend/keys/AuthKey_LSC5HAHRF8.p8",
+    );
 
     const clientSecret = jwt.sign(
       {
@@ -46,8 +61,8 @@ app.post("/auth/apple/callback", async (req, res) => {
       privateKey,
       {
         algorithm: "ES256",
-        header: { alg: "ES256", kid: process.env.APPLE_KEY_ID},
-      }
+        header: { alg: "ES256", kid: process.env.APPLE_KEY_ID },
+      },
     );
 
     const tokenRes = await axios.post(
@@ -55,17 +70,19 @@ app.post("/auth/apple/callback", async (req, res) => {
       new URLSearchParams({
         grant_type: "authorization_code",
         code,
-        redirect_uri: "https://esthetical-cletus-pessimistically.ngrok-free.dev/auth/apple/callback",
+        redirect_uri:
+          "https://esthetical-cletus-pessimistically.ngrok-free.dev/auth/apple/callback",
         client_id: process.env.APPLE_CLIENT_ID!,
         client_secret: clientSecret,
       }).toString(),
-      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } },
     );
 
     const decoded: any = jwt.decode(tokenRes.data.id_token);
     const email = decoded.email;
     const appleId = decoded.sub;
-    const name = decoded?.name?.firstName || decoded?.name?.lastName || "Apple User";
+    const name =
+      decoded?.name?.firstName || decoded?.name?.lastName || "Apple User";
 
     const existingUsers = await db
       .select()
@@ -81,7 +98,7 @@ app.post("/auth/apple/callback", async (req, res) => {
           displayName: name,
           email,
           role: UserRole.guest,
-          googleId:appleId,
+          googleId: appleId,
           createdAt: new Date(),
         })
         .returning();
@@ -118,9 +135,12 @@ app.get("/auth/google/callback", async (req, res) => {
 
     const tokens = await response.json();
 
-    const profileRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-      headers: { Authorization: `Bearer ${tokens.access_token}` },
-    });
+    const profileRes = await fetch(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: { Authorization: `Bearer ${tokens.access_token}` },
+      },
+    );
     const profile = await profileRes.json();
 
     const email = profile.email;
@@ -160,21 +180,6 @@ app.get("/auth/google/callback", async (req, res) => {
 // app.use(cookieParser());
 
 // adding trpc
-
-app.get("/", (req, res) => {
-  res.send("hello");
-});
-app.use(
-  "/trpc",
-  createExpressMiddleware({
-    router: appRouter,
-    createContext,
-    middleware: cors({ origin: "*" }),
-    onError: (opts) => {
-      logger.error(opts.error.code);
-    },
-  }),
-);
 
 // adding websocket in trpc
 // const wsServer = new ws.WebSocketServer({ port: 5500 });

@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { TRPCClientError } from "@trpc/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,7 +39,9 @@ export function LoginForm({
   const router = useRouter();
   const id = useId();
   const trpc = useTRPC();
-  const { mutate, isError } = useMutation(trpc.auth.login.mutationOptions());
+  const { mutate, isError, error } = useMutation(
+    trpc.auth.login.mutationOptions(),
+  );
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,14 +51,18 @@ export function LoginForm({
   });
 
   if (isError) {
-    console.log("oo error ho gyo");
+    if (error instanceof TRPCClientError) {
+      console.log("error trpc is", error.message);
+    } else {
+      console.log("error is", error);
+    }
   }
 
   function onSubmit(data: FormSchema) {
     mutate(data, {
       onSuccess: (data) => {
-        setToken(data?.toString() || "");
-        console.log("oo success ho gyo", data);
+        setToken(data?.session || "", false);
+        setRole(data?.role || "", false);
         router.push("/");
       },
     });
