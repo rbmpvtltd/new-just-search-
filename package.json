@@ -25,6 +25,8 @@
     "bun": "1.2.20"
   },
   "dependencies": {
+    "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth20": "^2.0.16",
     "fs": "^0.0.1-security",
     "react-easy-crop": "^5.5.3"
   }

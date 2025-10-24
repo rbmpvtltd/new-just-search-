@@ -4,6 +4,10 @@ import superjson from "superjson";
 import { validateSessionToken } from "@/features/auth/lib/session";
 import type { Context } from "./context";
 import { logger } from "@repo/helper";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { db, schemas } from "@repo/db";
+import { eq } from "drizzle-orm";
 import { UserRole } from "@repo/db/src/schema/auth.schema";
 
 export const t = initTRPC.context<Context>().meta<ORPCMeta>().create({
