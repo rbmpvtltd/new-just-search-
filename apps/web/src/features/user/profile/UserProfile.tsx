@@ -1,32 +1,106 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
-import React from "react";
-import { type FieldValues, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  MaritalStatus,
+  userUpdateSchema,
+} from "@repo/db/src/schema/user.schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
+import { useForm, useWatch } from "react-hook-form";
+import Swal from "sweetalert2";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
+import type { OutputTrpcType } from "@/trpc/type";
 
-export default function UserProfile() {
-  const { control, handleSubmit } = useForm<FieldValues>();
+type UserProfile = OutputTrpcType["userRouter"]["getUserProfile"] | null;
+type FormReferenceDataType = OutputTrpcType["userRouter"]["add"] | null;
+
+type UserUpdateSchema = z.infer<typeof userUpdateSchema>;
+export default function UserProfile({
+  user,
+  formReferenceData,
+}: {
+  user: UserProfile;
+  formReferenceData: FormReferenceDataType;
+}) {
   const trpc = useTRPC();
-  const { mutate } = useMutation(
-    trpc.userRouter.updateProfile.mutationOptions(),
-  );
-
-  const onSubmit = (data: FieldValues) => {
-    console.log(data);
-    mutate(data, {
-      onSuccess: () => {
+  const router = useRouter();
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<UserUpdateSchema>({
+    resolver: zodResolver(userUpdateSchema),
+    defaultValues: {
+      profileImage: user?.profileImage ?? "",
+      firstName: user?.firstName ?? "",
+      dob: user?.dob ?? "",
+      lastName: user?.lastName ?? "",
+      email: user?.email ?? "",
+      salutation: user?.salutation ?? "",
+      occupation: user?.occupation ?? "",
+      maritalStatus: user?.maritalStatus ?? "Married",
+      area: user?.area ?? "",
+      pincode: user?.pincode ?? "",
+      city: user?.city ?? 0,
+      state: user?.state ?? 0,
+    },
+  });
+  const { mutate } = useMutation(trpc.userRouter.update.mutationOptions());
+  const onSubmit = async (data: UserUpdateSchema) => {
+    const file = await uploadToCloudinary([data.profileImage], "user");
+    const finalData = {
+      ...data,
+      profileImage: file[0] ?? "",
+    };
+    mutate(finalData, {
+      onSuccess: (data) => {
         console.log("success", data);
+        Swal.fire({
+          title: data.message,
+          icon: "success",
+          draggable: true,
+        });
+        router.push("/");
+      },
+      onError: (error) => {
+        if (isTRPCClientError(error)) {
+          Swal.fire({
+            title: error.message,
+            icon: "error",
+            draggable: true,
+          });
+          console.error("error,", error.message);
+        }
       },
     });
   };
 
-  const formFields: FormFieldProps<FieldValues>[] = [
+  const states = formReferenceData?.getStates.map((item: any) => {
+    return {
+      label: item.name,
+      value: item.id,
+    };
+  });
+
+  const selectedStateId = useWatch({ control, name: "state" });
+
+  const { data: cities, isLoading } = useQuery(
+    trpc.hirerouter.getCities.queryOptions({
+      state: Number(selectedStateId),
+    }),
+  );
+
+  const formFields: FormFieldProps<UserUpdateSchema>[] = [
     {
       control,
       label: "Email",
@@ -38,8 +112,9 @@ export default function UserProfile() {
     },
     {
       control,
+      // type: "date",
       label: "Date of Birth",
-      name: "dateOfBirth",
+      name: "dob",
       placeholder: "Date of Birth",
       required: false,
       component: "calendar",
@@ -77,12 +152,12 @@ export default function UserProfile() {
       placeholder: "Marital Status",
       required: false,
       component: "select",
-      options: [
-        { label: "Married", value: "married" },
-        { label: "Unmarried", value: "unmarried" },
-        { label: "Widowed", value: "widowed" },
-        { label: "Divorced", value: "divorced" },
-      ],
+      options: Object.values(MaritalStatus).map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      }),
     },
     {
       control,
@@ -104,38 +179,26 @@ export default function UserProfile() {
     },
     {
       control,
-      label: "City",
-      name: "city",
-      placeholder: "City",
-      required: false,
-      component: "select",
-      options: [
-        { label: "Pune", value: "Pune" },
-        { label: "Mumbai", value: "Mumbai" },
-        { label: "Kolkata", value: "Kolkata" },
-        { label: "Delhi", value: "Delhi" },
-        { label: "Chennai", value: "Chennai" },
-        { label: "Bangalore", value: "Bangalore" },
-        { label: "Hyderabad", value: "Hyderabad" },
-      ],
-      error: "",
-    },
-    {
-      control,
       label: "State",
       name: "state",
       placeholder: "State",
       required: false,
       component: "select",
-      options: [
-        { label: "Pune", value: "Pune" },
-        { label: "Mumbai", value: "Mumbai" },
-        { label: "Kolkata", value: "Kolkata" },
-        { label: "Delhi", value: "Delhi" },
-        { label: "Chennai", value: "Chennai" },
-        { label: "Bangalore", value: "Bangalore" },
-        { label: "Hyderabad", value: "Hyderabad" },
-      ],
+      options:
+        states?.map((state) => ({ label: state.label, value: state.value })) ??
+        [],
+      error: "",
+    },
+    {
+      control,
+      label: "City",
+      name: "city",
+      placeholder: "City",
+      required: false,
+      component: "select",
+      loading: isLoading,
+      options:
+        cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
       error: "",
     },
   ];
@@ -146,13 +209,29 @@ export default function UserProfile() {
         className="shadow-xl mx-auto rounded-xl max-w-4xl bg-white"
       >
         <div className="w-[90%] mx-auto bg-white shadow rounded-xl p-6 flex flex-col md:flex-row items-center gap-6">
-          <Avatar className="w-24 h-24 border shadow-sm">
+          <Avatar className="w-32 h-32 border shadow-sm">
             <AvatarImage src="/placeholder-user.jpg" alt="User Profile" />
+            <div className="-mt-4 -ml-2">
+              <FormField
+                control={control}
+                label=""
+                name="profileImage"
+                required={false}
+                component="image"
+              />
+            </div>
             <AvatarFallback className="text-2xl font-bold">UP</AvatarFallback>
           </Avatar>
+
           <div className="text-center md:text-left space-y-1">
-            <h2 className="text-2xl font-bold">User Name</h2>
-            <p className="text-muted-foreground">Admin</p>
+            <h2 className="text-2xl font-bold">
+              {user?.firstName
+                ? `${user?.firstName} ${user?.lastName ?? ""}`
+                : "User Name"}
+            </h2>
+            <p className="text-muted-foreground">
+              {user?.role ? user.role : ""}
+            </p>
             <p className="text-muted-foreground">Activated Plan: Free</p>
           </div>
         </div>
@@ -201,8 +280,27 @@ export default function UserProfile() {
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
-            UPDATE
+            {isSubmitting ? (
+              <>
+                {" "}
+                <Spinner /> Saving...
+              </>
+            ) : (
+              "Save"
+            )}
           </Button>
+          {/* <Button
+            type="button"
+            onClick={() =>
+              console.log(
+                normalizeDate(
+                  "Date Fri Oct 17 2025 00:00:00 GMT+0530 (India Standard Time)",
+                ),
+              )
+            }
+          >
+            DEBUG VALUES
+          </Button> */}
         </div>
       </form>
     </div>

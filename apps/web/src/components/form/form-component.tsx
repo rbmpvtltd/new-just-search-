@@ -4,6 +4,7 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
+import { denormalizeDate, normalizeDate } from "@/utils/normalizeDate";
 import CropperComponent from "../image/upload-image";
 import { Checkbox } from "../ui/checkbox";
 import { DatePicker } from "../ui/date-picker";
@@ -63,20 +64,26 @@ export const FormField = <T extends FieldValues>({
         name={name}
         render={({ field: { onChange, onBlur, value } }) => {
           switch (component) {
-            case "input":
+            case "input": {
               return (
                 <Input
                   type={type}
                   name={name}
                   className={`h-[41px] ${className}`}
                   placeholder={placeholder}
-                  onChange={onChange}
+                  onChange={(e) =>
+                    onChange(
+                      type === "number"
+                        ? Number(e.target.value)
+                        : e.target.value,
+                    )
+                  }
                   onBlur={onBlur}
                   value={value}
                   {...props}
                 />
               );
-
+            }
             case "multiselect": {
               if (loading)
                 return (
@@ -165,7 +172,15 @@ export const FormField = <T extends FieldValues>({
               return <Textarea value={value} onChange={onChange} />;
 
             case "calendar":
-              return <DatePicker value={value} onChange={onChange} />;
+              return (
+                <DatePicker
+                  value={denormalizeDate(value)}
+                  onChange={(e) => {
+                    console.log(e);
+                    onChange(normalizeDate(e));
+                  }}
+                />
+              );
             case "image":
               return <CropperComponent onChange={onChange} value={value} />;
             default:

@@ -1,7 +1,6 @@
 import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/src/schema/auth.schema";
 import {
-  bbusinessUpdateSchema,
   businessInsertSchema,
   favourites,
 } from "@repo/db/src/schema/business.schema";
@@ -16,6 +15,7 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   businessProcedure,
   publicProcedure,
@@ -209,7 +209,7 @@ export const businessrouter = router({
     }),
 
   update: businessProcedure
-    .input(bbusinessUpdateSchema)
+    .input(businessUpdateSchema)
     .mutation(async ({ ctx, input }) => {
       const isBusinessExists = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
@@ -403,6 +403,9 @@ export const businessrouter = router({
       .where(eq(schemas.business.businessCategories.businessId, business.id));
 
     await db
+      .delete(schemas.business.businessListings)
+      .where(eq(schemas.business.businessListings.userId, Number(ctx.userId)));
+    await db
       .update(schemas.auth.users)
       .set({
         role: "visiter",
@@ -413,9 +416,219 @@ export const businessrouter = router({
 
     return {
       success: true,
-      message: "Hire listing deleted successfully",
+      message: "Business listing deleted successfully",
     };
   }),
+
+  addOffer: businessProcedure
+    .input(offersInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
+      const slugifyName = slugify(input.offerName, {
+        lower: true,
+        strict: true,
+      });
+
+      const startDate = new Date();
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 5);
+      const [offer] = await db
+        .insert(schemas.offer.offers)
+        .values({
+          businessId: business.id,
+          offerName: input.offerName,
+          offerSlug: slugifyName,
+          categoryId: input.categoryId,
+          rate: input.rate,
+          discountPercent: input.discountPercent,
+          finalPrice: input.finalPrice,
+          offerDescription: input.offerDescription,
+          offerStartDate: startDate,
+          offerEndDate: endDate,
+        })
+        .returning({
+          id: offers.id,
+        });
+
+      if (!offer) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Offer not created",
+        });
+      }
+      const offerId = offer.id;
+      if (input.subcategoryId.length > 0) {
+        await db.insert(schemas.offer.offerSubcategory).values(
+          input.subcategoryId.map((subCategoryId) => ({
+            offerId,
+            subcategoryId: Number(subCategoryId),
+          })),
+        );
+      }
+
+      const allPhotos = [
+        input.photo,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(schemas.offer.offerPhotos).values(
+          allPhotos.map((photo) => ({
+            offerId,
+            photo,
+          })),
+        );
+      }
+
+      return {
+        success: true,
+        message: "Offer added successfully",
+      };
+    }),
+
+  addProduct: businessProcedure
+    .input(productInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
+      const slugifyName = slugify(input.productName, {
+        lower: true,
+        strict: true,
+      });
+
+      const [product] = await db
+        .insert(schemas.product.products)
+        .values({
+          businessId: business.id,
+          productName: input.productName,
+          productSlug: slugifyName,
+          categoryId: input.categoryId,
+          rate: input.rate,
+          discountPercent: input.discountPercent,
+          finalPrice: input.finalPrice,
+          productDescription: input.productDescription,
+        })
+        .returning({
+          id: products.id,
+        });
+
+      if (!product) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Offer not created",
+        });
+      }
+      const productId = product.id;
+      if (input.subcategoryId.length > 0) {
+        await db.insert(schemas.product.productSubCategories).values(
+          input.subcategoryId.map((subCategoryId) => ({
+            productId,
+            subcategoryId: Number(subCategoryId),
+          })),
+        );
+      }
+
+      const allPhotos = [
+        input.photo,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(schemas.product.productPhotos).values(
+          allPhotos.map((photo) => ({
+            productId,
+            photo,
+          })),
+        );
+      }
+
+      return {
+        success: true,
+        message: "Product added successfully",
+      };
+    }),
+
+  showProduct: businessProcedure.query(async ({ ctx }) => {
+    if (!ctx.userId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not looged in",
+      });
+    }
+
+    logger.info("ctx.userId", ctx.userId);
+    const business = await db.query.businessListings.findFirst({
+      where: (businessListings, { eq }) =>
+        eq(businessListings.userId, ctx.userId),
+    });
+
+    // return { business}
+    if (!business) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Business not found",
+      });
+    }
+
+    const products = await db.query.products.findMany({
+      where: (products, { eq }) => eq(products.businessId, business.id),
+      with: {
+        productPhotos: true,
+      },
+    });
+
+    return { products };
+  }),
+
+  deleteProduct: businessProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // return { success: true};
+      const allSeletedPhoto = await db.query.productPhotos.findMany({
+        where: (productPhotos, { eq }) => eq(productPhotos.productId, input.id),
+      });
+
+      await cloudinaryDeleteImagesByPublicIds(
+        allSeletedPhoto.map((item) => String(item.photo)),
+      );
+      // await db
+      //   .delete(schemas.product.productSubCategories)
+      //   .where(eq(schemas.product.productSubCategories.productId, input.id));
+
+      await db
+        .delete(schemas.product.products)
+        .where(eq(schemas.product.products.id, input.id));
+
+      return { success: true };
+    }),
+
   singleShop: publicProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ input }) => {
@@ -602,13 +815,13 @@ export const businessrouter = router({
       const offer = await db
         .select({
           id: offers.id,
-          name: offers.productName,
+          name: offers.offerName,
           rate: offers.rate,
           discountPercent: offers.discountPercent,
           finalPrice: offers.finalPrice,
           startDate: offers.offerStartDate,
           endDate: offers.offerEndDate,
-          description: offers.productDescription,
+          description: offers.offerDescription,
           createdAt: offers.createdAt,
           businessId: offers.businessId,
           shopName: sql<string | null>`COALESCE((

@@ -82,7 +82,7 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
             height="100"
             className="border rounded p-4 w-full h-full"
             src={value}
-            alt="cloudinary image not loaded"
+            alt=""
           />
         )}
       </div>

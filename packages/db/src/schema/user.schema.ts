@@ -10,15 +10,17 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import z from "zod";
 import { users } from "./auth.schema";
 import { cities, states } from "./not-related.schema";
 
-// 1. Profiles
 export const MaritalStatus = {
-  married: "married",
-  unmarried: "unmarried",
-  widowed: "widowed",
-  divorced: "divorced",
+  Married: "Married",
+  Unmarried: "Unmarried",
+  Widowed: "Widowed",
+  Divorced: "Divorced",
+  Others: "Others",
 } as const;
 
 export const maritalStatusEnum = pgEnum("user_marital_status", MaritalStatus);
@@ -31,14 +33,15 @@ export const profiles = pgTable("profiles", {
   mysqlUserId: integer("mysql_user_id"),
   profileImage: varchar("profileImage", { length: 255 }),
   salutation: varchar("salutation", { length: 100 }),
-  firstName: varchar("first_name", { length: 100 }).notNull(),
+  firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   email: varchar("email", { length: 255 }),
   dob: date("dob"),
   occupation: varchar("occupation", { length: 100 }),
   maritalStatus: maritalStatusEnum("marital_status"),
   address: varchar("address", { length: 255 }),
-  pincode: varchar("pincode", { length: 10 }).default("000000"),
+  pincode: varchar("pincode", { length: 10 }),
+  state: integer("state").notNull(),
   city: integer("city")
     .notNull()
     .references(() => cities.id),
@@ -46,6 +49,10 @@ export const profiles = pgTable("profiles", {
   area: varchar("area", { length: 100 }),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
+});
+
+export const userUpdateSchema = createUpdateSchema(profiles).extend({
+  maritalStatus: z.enum(MaritalStatus),
 });
 
 // 2. request_delete_accounts

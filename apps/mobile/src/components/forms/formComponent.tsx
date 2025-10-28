@@ -1,6 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Controller } from "react-hook-form";
+import {
+  type Control,
+  Controller,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
 import {
   Alert,
   Image,
@@ -24,9 +29,9 @@ import TextAreaInput from "../inputs/TextAreaInput";
 import ErrorText from "../ui/ErrorText";
 import TimePickerField from "../ui/TimePickerField";
 
-export interface FormFieldProps {
-  control: any;
-  name: string;
+export interface FormFieldProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
   label: string;
   placeholder?: string;
   keyboardType?: "default" | "numeric" | "email-address";
@@ -54,7 +59,7 @@ export interface FormFieldProps {
   disable?: boolean;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField = <T extends FieldValues>({
   control,
   name,
   label,
@@ -72,7 +77,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   editable = true,
   disable = false,
   ...props
-}) => {
+}: FormFieldProps<T>) => {
   const colorScheme = useColorScheme();
   // const [editorState, setEditorState] = useState<string | null>(null);
   const [_, setPlainText] = useState("");

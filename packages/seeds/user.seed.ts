@@ -89,6 +89,21 @@ export const seedUsers = async () => {
       cityId = 1; // 👈 fallback
     }
 
+    if(row.marital_status ==="married"){
+      row.marital_status = "Married"
+    }
+    if(row.marital_status ==="unmarried"){
+      row.marital_status = "Unmarried"
+    }
+    if(row.marital_status ==="widowed"){
+      row.marital_status = "Widowed"
+    }
+    if(row.marital_status ==="divorced"){
+      row.marital_status = "Divorced"
+    }
+    if(row.marital_status ==="others"){
+      row.marital_status = "Others"
+    }
     // 5 Insert profile
     const profileData = {
       userId: insertedUser!.id,
@@ -100,7 +115,7 @@ export const seedUsers = async () => {
       dob: row.dob ?? null,
       maritalStatus: row.marital_status ?? null,
       occupation: row.occupation ?? null,
-      state: row.state ?? null,
+      state: row.state ?? 19,
       website: row.website ?? null,
       area: row.area ?? null,
       zipcode: row.zip ?? "000000",

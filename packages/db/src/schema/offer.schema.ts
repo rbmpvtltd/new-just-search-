@@ -1,16 +1,17 @@
 import {
   boolean,
   integer,
-  numeric,
   pgTable,
   serial,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth.schema";
+import { createInsertSchema } from "drizzle-zod";
+import z from "zod";
 import { businessListings } from "../schema/business.schema";
 import { categories, subcategories } from "../schema/not-related.schema";
+import { users } from "./auth.schema";
 
 //1.offers
 export const offers = pgTable("offers", {
@@ -21,12 +22,12 @@ export const offers = pgTable("offers", {
   categoryId: integer("category_id")
     .notNull()
     .references(() => categories.id),
-  productName: varchar("product_name", { length: 255 }).notNull(),
-  productSlug: varchar("product_slug", { length: 255 }).notNull(),
-  rate: numeric("rate", { precision: 10, scale: 2 }).notNull(),
-  discountPercent: numeric("discount_percent").notNull(),
-  finalPrice: numeric("final_price").notNull(),
-  productDescription: text("product_description").notNull(),
+  offerName: varchar("offer_name", { length: 255 }).notNull(),
+  offerSlug: varchar("offer_slug", { length: 255 }),
+  rate: integer("rate").notNull(),
+  discountPercent: integer("discount_percent"),
+  finalPrice: integer("final_price").notNull(),
+  offerDescription: text("offer_description").notNull(),
   offerStartDate: timestamp("offer_start_date").notNull(),
   offerEndDate: timestamp("offer_end_date").notNull(),
   reuploadCount: integer("reupload_count").default(0).notNull(),
@@ -34,6 +35,32 @@ export const offers = pgTable("offers", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const offersInsertSchema = createInsertSchema(offers, {
+  categoryId: () => z.number().min(1, "Category is required"),
+  offerName: () =>
+    z.string().min(3, "Offer name should be minimum 3 characters long"),
+  rate: () => z.number().min(1, "Rate is required"),
+  finalPrice: () => z.number().min(1, "Final price is required"),
+  offerDescription: () =>
+    z.string().min(3, "Offer description should be minimum 3 characters long"),
+})
+  .omit({
+    offerStartDate: true,
+    offerEndDate: true,
+    // reuploadCount: true,
+    // offerSlug: true,
+    businessId: true,
+  })
+  .extend({
+    subcategoryId: z
+      .array(z.number())
+      .min(1, "Select at least one subcategory"),
+    photo: z.string().min(1, "Photo is required"),
+    image2: z.string().optional(),
+    image3: z.string().optional(),
+    image4: z.string().optional(),
+    image5: z.string().optional(),
+  });
 // 2 OfferPhoto
 export const offerPhotos = pgTable("offer_photos", {
   id: serial("id").primaryKey(),
@@ -67,10 +94,10 @@ export const offerReviews = pgTable("offer_reviews", {
 // 4. OfferSubcategory
 export const offerSubcategory = pgTable("offer_subcagtegorys", {
   id: serial("id").primaryKey(),
-  offer_id: integer("offer_id")
+  offerId: integer("offer_id")
     .references(() => offers.id)
     .notNull(),
-  subcategory_id: integer("subcategory_id")
+  subcategoryId: integer("subcategory_id")
     .references(() => subcategories.id)
     .notNull(),
 });

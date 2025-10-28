@@ -4,12 +4,13 @@ import { Eye, Pencil, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
+import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
-import Swal from "sweetalert2";
 
 type MyHireType = OutputTrpcType["hirerouter"]["show"];
 export default function MyHire({ data }: { data: MyHireType }) {
@@ -55,13 +56,17 @@ export default function MyHire({ data }: { data: MyHireType }) {
 
         <div className="flex sm:flex-row flex-col gap-4 p-2">
           <div className=" pl-4 flex justify-center">
-            <Image
-              src="https://www.justsearch.net.in/assets/images/17014923821760515259.png"
-              alt="Hire Listing"
-              className="sm:w-60 w-full h-60 object-cover rounded-xl shadow-md border border-gray-200"
-              width={640}
-              height={640}
-            />
+            {data.photo ? (
+              <CldImage
+                width="640"
+                height="640"
+                className="border rounded "
+                src={data.photo}
+                alt="cloudinary image not loaded"
+              />
+            ) : (
+              "no photo"
+            )}
           </div>
 
           <div className="flex-1 flex flex-col justify-start pl-4">

@@ -97,7 +97,7 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
   state: z.number().min(1, "State is required"),
 });
 
-export const bbusinessUpdateSchema=  createUpdateSchema(businessListings).extend({
+export const businessUpdateSchema=  createUpdateSchema(businessListings).extend({
   categoryId: z.number(),
   subcategoryId: z.array(z.number()),
   state: z.number()
