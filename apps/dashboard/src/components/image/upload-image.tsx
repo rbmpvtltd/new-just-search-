@@ -1,5 +1,6 @@
 // upload-image.tsx
 "use client";
+import { error } from "console";
 import { CldImage } from "next-cloudinary";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ImageCropDialog from "./image-crop-dialog";
@@ -76,13 +77,16 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
             <span>no image</span>
           ))}
 
-        {firstTime.current && (
+        {firstTime.current && value && (
           <CldImage
             width="100"
             height="100"
             className="border rounded p-4 w-full h-full"
             src={value}
-            alt="cloudinary image not loaded"
+            alt="Cloudinary image not loaded"
+            onError={(error) =>
+              console.error("Error loading Cloudinary image:", error)
+            }
           />
         )}
       </div>

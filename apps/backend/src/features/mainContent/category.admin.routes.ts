@@ -40,7 +40,7 @@ export const adminCategoryRouter = router({
     const orderBy = buildOrderByClause(
       input.sorting,
       categoryAllowedSortColumns,
-      sql`id DESC`,
+      sql`created_at DESC`,
     );
 
     const offset = input.pagination.pageIndex * input.pagination.pageSize;
@@ -116,6 +116,7 @@ export const adminCategoryRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
+      //TODO: remove subcategory of these categories;
       const allSeletedPhoto = await db
         .select({
           photo: categories.photo,
