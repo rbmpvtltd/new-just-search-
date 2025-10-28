@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
-import { categoryInsertSchema } from "@repo/db/src/schema/not-related.schema";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 
 // import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
 
@@ -49,9 +49,9 @@ export function EditBanner({ id }: { id: number }) {
         <Button>Edit</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <Suspense fallback={<div> loading ...</div>}>
+        <BoundaryWrapper>
           {open && <BannerEditForm id={id} setOpen={setOpen} />}
-        </Suspense>
+        </BoundaryWrapper>
       </DialogContent>
     </Dialog>
   );
@@ -152,7 +152,8 @@ function BannerEditForm({ id, setOpen }: EditForm) {
       label: "Photo",
       name: "photo",
       component: "image",
-      error: "",
+      required: false,
+      // error: errors.photo?.message,
     },
     {
       control,

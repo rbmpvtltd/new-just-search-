@@ -24,8 +24,8 @@ export const businessSeed = async () => {
   await clearAllTablesBusiness();
   await addBusiness();
   // await seedFavourites();
-  await businessesSubcategory();
-  await businessesCategories();
+  // await businessesSubcategory();
+  // await businessesCategories();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
@@ -193,30 +193,6 @@ export const clearAllTablesBusiness = async () => {
 //       //   console.error("row id is ", row.id, "user id", row.user_id);
 //       // }
 
-//       // // images handle
-//       // if (businessListing) {
-//       //   const images = ["image1", "image2", "image3", "image4", "image5"];
-//       //   for (const image of images) {
-//       //     if (row[image]) {
-//       //       const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-//       //       const uploaded = await uploadOnCloudinary(
-//       //         liveBusinessImageUrl,
-//       //         "Business",
-//       //         clouadinaryFake,
-//       //       );
-//       //       const businessPhotoUrl = uploaded;
-
-//       //       if (businessPhotoUrl) {
-//       //         await db.insert(businessPhotos).values({
-//       //           businessId: businessListing.id,
-//       //           photo: businessPhotoUrl,
-//       //           createdAt: row.created_at,
-//       //           updatedAt: row.updated_at,
-//       //         });
-//       //       }
-//       //     }
-//       //   }
-//       // }
 //     }
 //   }
 //   console.log(" Business migration completed!");
@@ -237,6 +213,7 @@ const addBusiness = async () => {
   }
 
   for (const row of rows) {
+    // const row = rows[0];
     let [createUser] = await db
       .select()
       .from(users)
@@ -321,7 +298,7 @@ const addBusiness = async () => {
       if (!createUser) {
         console.log("User not found" + row.id);
       }
-      await db
+      const [newbusinessListing] = await db
         .insert(businessListings)
         .values({
           id: row.id,
@@ -356,6 +333,30 @@ const addBusiness = async () => {
           updatedAt: row.updated_at,
         })
         .returning();
+
+      // images handle
+      if (newbusinessListing) {
+        const images = ["image1", "image2", "image3", "image4", "image5"];
+        for (const image of images) {
+          if (row[image]) {
+            const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
+            const businessPhotoUrl = await uploadOnCloudinary(
+              liveBusinessImageUrl,
+              "Business",
+              clouadinaryFake,
+            );
+
+            if (businessPhotoUrl) {
+              await db.insert(businessPhotos).values({
+                businessId: newbusinessListing.id,
+                photo: businessPhotoUrl,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at,
+              });
+            }
+          }
+        }
+      }
     } catch (e) {
       console.error("row id is ", row.id, "user id", row.user_id);
     }

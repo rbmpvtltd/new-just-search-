@@ -130,7 +130,7 @@ function buildFilterCondition<T extends Record<string, AnyPgColumn>>(
 export function buildOrderByClause(
   sorting: { id: string; desc: boolean }[],
   allowedColumns: string[],
-  defaultOrder: SQL = sql`id DESC`,
+  defaultOrder: SQL = sql`created_at DESC`,
 ): SQL {
   if (sorting.length === 0) return defaultOrder;
 
