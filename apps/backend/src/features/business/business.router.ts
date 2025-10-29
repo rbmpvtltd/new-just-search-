@@ -3,6 +3,10 @@ import { users } from "@repo/db/src/schema/auth.schema";
 import {
   businessInsertSchema,
   businessUpdateSchema,
+  businessListings,
+  businessPhotos,
+  businessReviews,
+  businessSubcategories,
   favourites,
 } from "@repo/db/src/schema/business.schema";
 import {
@@ -24,11 +28,17 @@ import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   businessProcedure,
+  guestProcedure,
+  protectedProcedure,
   publicProcedure,
   router,
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
+import {
+  categories,
+  subcategories,
+} from "@repo/db/src/schema/not-related.schema";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -756,37 +766,22 @@ export const businessrouter = router({
         })
         .from(businessListing)
         .leftJoin(
-          schemas.business.businessSubcategories,
-          eq(
-            businessListing.id,
-            schemas.business.businessSubcategories.businessId,
-          ),
+          businessSubcategories,
+          eq(businessListing.id, businessSubcategories.businessId),
         )
+        .leftJoin(products, eq(businessListing.id, products.businessId))
+        .leftJoin(offers, eq(businessListing.id, offers.businessId))
         .leftJoin(
-          schemas.product.products,
-          eq(businessListing.id, schemas.product.products.businessId),
-        )
-        .leftJoin(
-          schemas.offer.offers,
-          eq(businessListing.id, schemas.offer.offers.businessId),
-        )
-        .leftJoin(
-          schemas.not_related.subcategories,
+          subcategories,
           eq(
             schemas.business.businessSubcategories.subcategoryId,
-            schemas.not_related.subcategories.id,
+            subcategories.id,
           ),
         )
+        .leftJoin(categories, eq(subcategories.categoryId, categories.id))
         .leftJoin(
-          schemas.not_related.categories,
-          eq(
-            schemas.not_related.subcategories.categoryId,
-            schemas.not_related.categories.id,
-          ),
-        )
-        .leftJoin(
-          schemas.business.businessPhotos,
-          eq(businessListing.id, schemas.business.businessPhotos.businessId),
+          businessPhotos,
+          eq(businessListing.id, businessPhotos.businessId),
         )
         .leftJoin(
           business_reviews,
@@ -911,7 +906,67 @@ export const businessrouter = router({
           businessId,
         });
 
-        return { status: "added" };
+        return { status: "added", success: true };
       }
     }),
+
+  favouritesShops: protectedProcedure.query(async ({ ctx }) => {
+    // TODO : add pagination after complete some work
+    const data = await db
+      .select({
+        id: favourites.id,
+        shop: sql<string[]>`COALESCE(
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
+            'id', business_listings.id,
+            'name', business_listings.name,
+            'photo', business_listings.photo,
+            'latitude', business_listings.latitude,
+            'longitude', business_listings.longitude,
+            'phoneNumber', business_listings.phone_number,
+            'area', business_listings.area,
+            'streetName', business_listings.street_name,
+            'buildingName', business_listings.building_name
+          ))
+          FILTER (WHERE business_listings.id IS NOT NULL),
+          '[]'
+        )`,
+        rating: sql<
+          string
+        >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
+        subcategories: sql<string[]>`
+          COALESCE(
+            ARRAY_AGG(DISTINCT subcategories.name) 
+            FILTER (WHERE subcategories.id IS NOT NULL),
+            '{}'
+          )
+        `,
+        category: sql<string | null>`MAX(${categories.title})`,
+      })
+      .from(favourites)
+      .leftJoin(
+        businessSubcategories,
+        eq(favourites.businessId, businessSubcategories.businessId),
+      )
+      .leftJoin(
+        subcategories,
+        eq(
+          schemas.business.businessSubcategories.subcategoryId,
+          subcategories.id,
+        ),
+      )
+      .leftJoin(businessReviews,eq(favourites.businessId,businessReviews.businessId))
+      .leftJoin(categories, eq(subcategories.categoryId, categories.id))
+      .leftJoin(
+        businessListings,
+        eq(favourites.businessId, businessListings.id),
+      )
+      .groupBy(favourites.id)
+      .where(eq(favourites.userId, ctx.userId));
+
+    return {
+      data: data,
+      success: true,
+      ctx: { userId: ctx.userId },
+    };
+  }),
 });

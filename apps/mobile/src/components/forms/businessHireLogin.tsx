@@ -2,9 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
-import { role } from "@/store/authStore";
 
-import { fetchLogin } from "@/query/auth";
 import {
   type LoginBusinessFormData,
   loginBusinesSchema,
@@ -14,6 +12,7 @@ import { setToken } from "@/utils/secureStore";
 import Input from "../inputs/Input";
 import { useMutation } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
+import { UserRole } from "@repo/db/src/schema/auth.schema";
 
 export default function BusinessHireLogin() {
   
@@ -26,7 +25,7 @@ export default function BusinessHireLogin() {
   } = useForm<LoginBusinessFormData>({
     resolver: zodResolver(loginBusinesSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -36,8 +35,8 @@ export default function BusinessHireLogin() {
       onSuccess: async (data) => {
         if (data) {
           console.log("data is ======>",data)
-          setAuthStoreToken(data, role.visitor); // TODO : set role as the response comes in future
-          await setToken(data);
+          setAuthStoreToken(data?.session ?? "", UserRole.business); // TODO : set role as the response comes in future
+          await setToken(data?.session ?? "");
           Alert.alert("Login Successfully");
           // router.push("/(root)/(home)/home");
           return router.back();
@@ -50,7 +49,7 @@ export default function BusinessHireLogin() {
     }),
   );
 
-  const onSubmit = async (data: {email:string,password:string}) => {
+  const onSubmit = async (data: {username:string,password:string}) => {
     loginMutation.mutate(data);
   };
 
@@ -66,7 +65,7 @@ export default function BusinessHireLogin() {
         </Text>
         <Controller
           control={businessControl}
-          name="email"
+          name="username"
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
               className="text-secondary bg-base-200"
@@ -78,9 +77,9 @@ export default function BusinessHireLogin() {
             />
           )}
         />
-        {errors.email && (
+        {errors.username && (
           <Text className="text-error text-sm mb-4">
-            {errors.email.message}
+            {errors.username.message}
           </Text>
         )}
 

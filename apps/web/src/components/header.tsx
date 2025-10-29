@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { object } from "zod";
 
 const menuItems = [
-  { name: "Home", href: "#link" },
-  { name: "Hire", href: "#link" },
+  { name: "Home", href: "/" },
+  { name: "Hire", href: "/hire?page=1" },
   { name: "Offers", href: "#link" },
-  { name: "Favourite", href: "#link" },
+  { name: "Favourite", href: "/favourite" },
 ];
 
 export const HeroHeader = () => {

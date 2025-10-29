@@ -21,8 +21,8 @@ import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 export const hireSeed = async () => {
   await cleardataofhire();
-  await addHire();
-  await seedRecentViewsHire();
+  // await addHire();
+  // await seedRecentViewsHire();
   await seedHireSubcategories();
   // await seedHireCategories();
 };

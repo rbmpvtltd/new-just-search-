@@ -1,15 +1,24 @@
 import { db, schemas } from "@repo/db";
 import {
+  hireCategories,
   hireInsertSchema,
+  hireListing,
   hireUpdateSchema,
 } from "@repo/db/src/schema/hire.schema";
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
-import { hireProcedure, router, visitorProcedure } from "@/utils/trpc";
+import {
+  hireProcedure,
+  publicProcedure,
+  router,
+  visitorProcedure,
+} from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
+import { cities, states } from "@repo/db/src/schema/not-related.schema";
+import { users } from "@repo/db/src/schema/auth.schema";
 
 export const hirerouter = router({
   add: visitorProcedure.query(async ({ ctx }) => {
@@ -474,4 +483,156 @@ export const hirerouter = router({
       message: "Hire listing deleted successfully",
     };
   }),
+  allHireLising: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(20).nullish(),
+        page: z.number().min(1),
+      }),
+    )
+    .query(async ({ input }) => {
+      console.log("execution comes here");
+      const limit = input.limit ?? 10;
+      const offset = (input.page - 1) * limit;
+
+      const data = await db
+        .select({
+          id: hireListing.id,
+          name: hireListing.name,
+          photo: hireListing.photo,
+          area: hireListing.area,
+          streetName: hireListing.streetName,
+          buildingName: hireListing.buildingName,
+          longitude: hireListing.longitude,
+          latitude: hireListing.latitude,
+          phoneNumber: hireListing.mobileNumber,
+          subcategories: sql<string[]>`
+            COALESCE(
+              ARRAY_AGG(DISTINCT subcategories.name) 
+              FILTER (WHERE subcategories.id IS NOT NULL),
+              '{}'
+            )
+          `,
+          category: sql<string | null>`
+        MAX(${schemas.not_related.categories.title})
+      `,
+        })
+        .from(hireListing)
+        .innerJoin(
+          schemas.hire.hireCategories,
+          eq(hireListing.id, schemas.hire.hireCategories.hireId),
+        )
+        .leftJoin(
+          schemas.hire.hireSubcategories,
+          eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
+        )
+        .leftJoin(
+          schemas.not_related.subcategories,
+          eq(
+            schemas.hire.hireSubcategories.subcategoryId,
+            schemas.not_related.subcategories.id,
+          ),
+        )
+        .leftJoin(
+          schemas.not_related.categories,
+          eq(
+            schemas.not_related.subcategories.categoryId,
+            schemas.not_related.categories.id,
+          ),
+        )
+        .groupBy(hireListing.id)
+        .limit(limit)
+        .offset(offset);
+      console.log("execution comes here ===================>", data);
+
+      const totalCount = await db.select({ count: count() }).from(hireListing);
+
+      return {
+        data,
+        page: input.page,
+        totalPages: Math.ceil(Number(totalCount[0]?.count ?? 0) / limit),
+      };
+    }),
+
+  singleHire: publicProcedure
+    .input(z.object({ hireId: z.number() }))
+    .query(async ({ input }) => {
+      console.log(
+        "execution comes here with hire id =============>",
+        input.hireId,
+      );
+      const data = await db
+        .select({
+          id: hireListing.id,
+          name: hireListing.name,
+          email: hireListing.email,
+          photo : hireListing.photo,
+          languages: hireListing.languages,
+          area: hireListing.area,
+          streetName: hireListing.streetName,
+          buildingName: hireListing.buildingName,
+          qualification: hireListing.highestQualification,
+          yearOfExp: hireListing.workExperienceYear,
+          monthOfExp: hireListing.workExperienceMonth,
+          dob: hireListing.dob,
+          gender: hireListing.gender,
+          employmentStatus: hireListing.employmentStatus,
+          phone: hireListing.mobileNumber,
+          wtspNumber: hireListing.whatsappNo,
+          workingShift: hireListing.workShift,
+          jobRole: hireListing.jobRole,
+          expertise: hireListing.expertise,
+          skillSet: hireListing.skillset,
+          martialStatus: hireListing.maritalStatus,
+          relocate: hireListing.relocate,
+          specilities: hireListing.specialities,
+          description: hireListing.description,
+          latitude: hireListing.latitude,
+          longitude: hireListing.latitude,
+          pincode: hireListing.pincode,
+          jobType : hireListing.jobType,
+          city: cities.city,
+          mobileNo : users.phoneNumber,
+          state: states.name,
+          subcategories: sql<string[]>`
+            COALESCE(
+              ARRAY_AGG(DISTINCT subcategories.name) 
+              FILTER (WHERE subcategories.id IS NOT NULL),
+              '{}'
+            )
+          `,
+          category: sql<
+            string | null
+          >`MAX(${schemas.not_related.categories.title})`,
+        })
+        .from(hireListing)
+        .leftJoin(cities, eq(hireListing.city, cities.id))
+        .leftJoin(states, eq(hireListing.state, states.id))
+        .leftJoin(users,eq(hireListing.userId,users.id))
+        .leftJoin(
+          schemas.hire.hireSubcategories,
+          eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
+        )
+        .leftJoin(
+          schemas.not_related.subcategories,
+          eq(
+            schemas.hire.hireSubcategories.subcategoryId,
+            schemas.not_related.subcategories.id,
+          ),
+        )
+        .leftJoin(
+          schemas.not_related.categories,
+          eq(
+            schemas.not_related.subcategories.categoryId,
+            schemas.not_related.categories.id,
+          ),
+        )
+        
+        .groupBy(hireListing.id,cities.city,states.name,users.phoneNumber)
+        .where(eq(hireListing.id, input.hireId));
+      return {
+        data: data[0],
+        status: true,
+      };
+    }),
 });

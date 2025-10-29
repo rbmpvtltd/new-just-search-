@@ -18,6 +18,14 @@ type SingleShopType = OutputTrpcType["businessrouter"]["singleShop"] | null;
 
 export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
   const schedule = Object.entries(singleShop?.schedule ?? {});
+  const latitude = Number(singleShop?.latitude?.split(",").shift());
+  const longitude = Number(singleShop?.longitude?.split(",").pop());
+
+  const handleClick = () => {
+    const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    window.open(googleMapsUrl, "_blank"); // opens in new tab
+  };
+
   return (
     <div className="flex w-full  flex-col gap-6 mb-12">
       <Tabs defaultValue="about">
@@ -84,13 +92,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
             </div>
             <div className="flex gap-4 w-[70%] justify-between">
               <Button
-                onClick={() => {
-                  console.log(
-                    "clicked",
-                    singleShop?.latitude,
-                    singleShop?.longitude,
-                  );
-                }}
+                onClick={handleClick}
                 type="button"
                 className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 hover:scale-105 transition-all transform duration-300"
               >
