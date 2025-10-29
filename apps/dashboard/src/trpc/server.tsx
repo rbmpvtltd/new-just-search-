@@ -6,7 +6,7 @@ import {
   type TRPCQueryOptions,
 } from "@trpc/tanstack-react-query";
 import superjson from "superjson";
-import type { AppRouter } from "types/index";
+import type { AppRouter } from "@repo/types"; // file no 2
 import { getToken } from "@/utils/session";
 import { getTrpcUrl } from "./helper";
 import { getQueryClient } from "./query-client";

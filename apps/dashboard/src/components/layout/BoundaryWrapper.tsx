@@ -34,8 +34,8 @@ const BoundaryWrapper: React.FC<BoundaryWrapperProps> = ({
   return (
     <ErrorBoundary
       {...(typeof errorFallback === "function"
-        ? { fallbackRender: errorFallback }
-        : { FallbackComponent: errorFallback })}
+  ? { FallbackComponent: errorFallback }
+  : { fallback: errorFallback })}
       onError={(error, info) => {
         console.error("Error caught in ErrorBoundary:", error, info);
       }}

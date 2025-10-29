@@ -28,7 +28,7 @@ export const appRouter = router({
   categoryRouter,
   adminCategoryRouter,
   subcategoryRouter,
-  offerrouter
+  offerrouter,
   adminSubcategoryRouter,
   // cloudinary: cloudinaryRouter,
   // test: testRouter,

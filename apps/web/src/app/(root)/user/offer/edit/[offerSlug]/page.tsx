@@ -7,8 +7,9 @@ interface OfferEditPageProps {
     offerSlug: string;
   };
 }
-export default async function page({ params }: OfferEditPageProps) {
-  const { offerSlug } = params;
+export default async function page({ params }: { params: Promise<{ [key: string]: string | string[] | undefined }>;}) {
+  const { offerSlug } =  await params;
+  const slug = Array.isArray(offerSlug) ? offerSlug[0] : offerSlug
   console.log("param", offerSlug);
 
   const { data: referenceData, error } = await asyncHandler(
@@ -16,7 +17,7 @@ export default async function page({ params }: OfferEditPageProps) {
   );
 
   const { data: myOffer, error: myBusinessError } = await asyncHandler(
-    trpcServer.offerrouter.edit.query({ offerSlug }),
+    trpcServer.offerrouter.edit.query({ offerSlug : slug ?? "" }),
   );
 
   return <EditOffer myOffer={myOffer} formReferenceData={referenceData} />;

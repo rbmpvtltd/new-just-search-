@@ -1,6 +1,7 @@
 import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { TRPCError } from "@trpc/server";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -13,8 +14,16 @@ async function page() {
     data,
   );
 
-  if (error?.error?.shape?.data?.httpStatus === 401) {
-    redirect("/login");
+  console.log(`${JSON.stringify(error,null,2)}`)
+  // if (error?.error?.shape?.data?.httpStatus === 401) {
+  //   redirect("/login");
+  // }
+   if (error?.trpcError ) {
+    
+    if( error.error.shape?.data.code === "UNAUTHORIZED"){
+      // redirect("/login");
+      console.log("---- I am here ------");
+    }
   }
   if (data?.data?.length === 0) {
     return (
