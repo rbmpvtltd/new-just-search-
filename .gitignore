@@ -47,7 +47,6 @@ coverage
 
 # OS
 Thumbs.db
-packages/db/drizzle
 packages/redis/data
 package-lock.json
 yarn.lock
