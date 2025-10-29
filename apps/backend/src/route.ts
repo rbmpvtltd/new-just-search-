@@ -7,6 +7,7 @@ import { cloudinarySignature } from "./features/cloudinary/cloudinary.route";
 import { hirerouter } from "./features/hire/hire.router";
 import { adminCategoryRouter } from "./features/mainContent/category.admin.routes";
 import { categoryRouter } from "./features/mainContent/category.route";
+import { offerrouter } from "./features/offer/offer.router";
 import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
@@ -26,6 +27,7 @@ export const appRouter = router({
   categoryRouter,
   adminCategoryRouter,
   subcategoryRouter,
+  offerrouter
   // cloudinary: cloudinaryRouter,
   // test: testRouter,
   // test : chatRouter,

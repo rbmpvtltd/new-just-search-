@@ -15,12 +15,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 
-type AddOfferSchema = z.infer<typeof offersInsertSchema>;
+type EditOfferSchema = z.infer<typeof offersInsertSchema>;
 
 type FormReferenceDataType = OutputTrpcType["businessrouter"]["add"] | null;
+type OfferTypeSchema = OutputTrpcType["offerrouter"]["edit"] | null;
 export default function EditOffer({
+  myOffer,
   formReferenceData,
 }: {
+  myOffer: OfferTypeSchema;
   formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
@@ -33,21 +36,21 @@ export default function EditOffer({
     handleSubmit,
     getValues,
     formState: { errors, isSubmitting },
-  } = useForm<AddOfferSchema>({
+  } = useForm<EditOfferSchema>({
     resolver: zodResolver(offersInsertSchema),
     defaultValues: {
-      offerName: "",
-      rate: 0,
-      discountPercent: 0,
-      finalPrice: 0,
-      offerDescription: "",
-      photo: "",
-      image2: "",
-      image3: "",
-      image4: "",
-      image5: "",
-      categoryId: 0,
-      subcategoryId: [],
+      offerName: myOffer?.offer.offerName,
+      rate: myOffer?.offer?.rate,
+      discountPercent: myOffer?.offer?.discountPercent,
+      finalPrice: myOffer?.offer?.finalPrice,
+      offerDescription: myOffer?.offer?.offerDescription,
+      photo: myOffer?.offer.offerPhotos[0]?.photo || "",
+      image2: myOffer?.offer.offerPhotos[1]?.photo || "",
+      image3: myOffer?.offer.offerPhotos[2]?.photo || "",
+      image4: myOffer?.offer.offerPhotos[3]?.photo || "",
+      image5: myOffer?.offer.offerPhotos[4]?.photo || "",
+      categoryId: myOffer?.offer.categoryId,
+      subcategoryId: myOffer?.offer.offerSubcategory.map((item) => item.subcategoryId),
     },
   });
 
@@ -66,7 +69,7 @@ export default function EditOffer({
     }),
   );
 
-  const formFields: FormFieldProps<AddOfferSchema>[] = [
+  const formFields: FormFieldProps<EditOfferSchema>[] = [
     {
       control,
       label: "Product Name",
@@ -221,7 +224,7 @@ export default function EditOffer({
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Business Contact
+              Edit Offer
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">

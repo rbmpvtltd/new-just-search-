@@ -1,11 +1,18 @@
-import AddOffer from "@/features/offer/forms/add-offer/AddOffer";
-import { trpcServer } from "@/trpc/trpc-server";
-import { asyncHandler } from "@/utils/error/asyncHandler";
+import Link from "next/link";
+import { Button } from "@/components/ui/button"; // assuming shadcn/ui or similar
+import MyOffer from "@/features/offer/show/MyOffer";
 
-export default async function page() {
-  const { data: referenceData, error } = await asyncHandler(
-    trpcServer.businessrouter.add.query(),
+export default function page() {
+  return (
+    <div className="space-y-6 p-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">My Offers</h1>
+        <Link href="/user/product/add">
+          <Button>Add Offer</Button>
+        </Link>
+      </div>
+
+      <MyOffer />
+    </div>
   );
-
-  return <AddOffer formReferenceData={referenceData} />;
 }

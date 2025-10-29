@@ -10,9 +10,6 @@ import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
-export type MyProductsType =
-  | OutputTrpcType["businessrouter"]["showProduct"]
-  | null;
 export default function MyProduct() {
   const trpc = useTRPC();
   const { data: myProducts, isLoading } = useQuery(

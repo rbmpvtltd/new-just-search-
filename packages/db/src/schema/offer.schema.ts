@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -47,8 +48,6 @@ export const offersInsertSchema = createInsertSchema(offers, {
   .omit({
     offerStartDate: true,
     offerEndDate: true,
-    // reuploadCount: true,
-    // offerSlug: true,
     businessId: true,
   })
   .extend({
@@ -117,3 +116,25 @@ export const recentViewsOffers = pgTable("recent_views_offers", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const offersRelations = relations(offers, ({ many }) => ({
+  offerPhotos: many(offerPhotos),
+  offerSubcategory: many(offerSubcategory),
+}));
+
+export const offerPhotosRelations = relations(offerPhotos, ({ one }) => ({
+  offer: one(offers, {
+    fields: [offerPhotos.offerId],
+    references: [offers.id],
+  }),
+}));
+
+export const offerSubcategoryRelations = relations(
+  offerSubcategory,
+  ({ one }) => ({
+    offer: one(offers, {
+      fields: [offerSubcategory.offerId],
+      references: [offers.id],
+    }),
+  }),
+);

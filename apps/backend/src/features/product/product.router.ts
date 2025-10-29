@@ -1,0 +1,164 @@
+import { db, schemas } from "@repo/db";
+import {
+  productInsertSchema,
+  products,
+} from "@repo/db/src/schema/product.schema";
+import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
+import slugify from "slugify";
+import z from "zod";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
+import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
+
+export const businessrouter = router({
+  add: visitorProcedure.query(async ({ ctx }) => {
+    const getBusinessCategories = await db.query.categories.findMany({
+      where: (categories, { eq }) => eq(categories.type, 1),
+    });
+    const getStates = await db.query.states.findMany();
+
+    return {
+      getBusinessCategories,
+      getStates,
+    };
+  }),
+
+  getSubCategories: visitorProcedure
+    .input(z.object({ categoryId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const businessSubCategories = await db.query.subcategories.findMany({
+        where: (subcategories, { eq }) =>
+          eq(subcategories.categoryId, input.categoryId),
+      });
+      return businessSubCategories;
+    }),
+
+  addProduct: businessProcedure
+    .input(productInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
+      const slugifyName = slugify(input.productName, {
+        lower: true,
+        strict: true,
+      });
+
+      const [product] = await db
+        .insert(schemas.product.products)
+        .values({
+          businessId: business.id,
+          productName: input.productName,
+          productSlug: slugifyName,
+          categoryId: input.categoryId,
+          rate: input.rate,
+          discountPercent: input.discountPercent,
+          finalPrice: input.finalPrice,
+          productDescription: input.productDescription,
+        })
+        .returning({
+          id: products.id,
+        });
+
+      if (!product) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Offer not created",
+        });
+      }
+      const productId = product.id;
+      if (input.subcategoryId.length > 0) {
+        await db.insert(schemas.product.productSubCategories).values(
+          input.subcategoryId.map((subCategoryId) => ({
+            productId,
+            subcategoryId: Number(subCategoryId),
+          })),
+        );
+      }
+
+      const allPhotos = [
+        input.photo,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(schemas.product.productPhotos).values(
+          allPhotos.map((photo) => ({
+            productId,
+            photo,
+          })),
+        );
+      }
+
+      return {
+        success: true,
+        message: "Product added successfully",
+      };
+    }),
+
+  showProduct: businessProcedure.query(async ({ ctx }) => {
+    if (!ctx.userId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not looged in",
+      });
+    }
+
+    const business = await db.query.businessListings.findFirst({
+      where: (businessListings, { eq }) =>
+        eq(businessListings.userId, ctx.userId),
+    });
+
+    if (!business) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Business not found",
+      });
+    }
+
+    const products = await db.query.products.findMany({
+      where: (products, { eq }) => eq(products.businessId, business.id),
+      with: {
+        productPhotos: true,
+      },
+    });
+
+    return { products };
+  }),
+
+  deleteProduct: businessProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // return { success: true};
+      const allSeletedPhoto = await db.query.productPhotos.findMany({
+        where: (productPhotos, { eq }) => eq(productPhotos.productId, input.id),
+      });
+
+      await cloudinaryDeleteImagesByPublicIds(
+        allSeletedPhoto.map((item) => String(item.photo)),
+      );
+      // await db
+      //   .delete(schemas.product.productSubCategories)
+      //   .where(eq(schemas.product.productSubCategories.productId, input.id));
+
+      await db
+        .delete(schemas.product.products)
+        .where(eq(schemas.product.products.id, input.id));
+
+      return { success: true };
+    }),
+});

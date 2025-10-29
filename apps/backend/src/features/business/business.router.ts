@@ -2,10 +2,16 @@ import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/src/schema/auth.schema";
 import {
   businessInsertSchema,
+  businessUpdateSchema,
   favourites,
 } from "@repo/db/src/schema/business.schema";
-import { offerPhotos, offers } from "@repo/db/src/schema/offer.schema";
 import {
+  offerPhotos,
+  offers,
+  offersInsertSchema,
+} from "@repo/db/src/schema/offer.schema";
+import {
+  productInsertSchema,
   productPhotos,
   productReviews,
   products,
@@ -498,6 +504,33 @@ export const businessrouter = router({
       };
     }),
 
+  showOffer: businessProcedure.query(async ({ ctx }) => {
+    if (!ctx.userId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not logged in",
+      });
+    }
+    const business = await db.query.businessListings.findFirst({
+      where: (businessListings, { eq }) =>
+        eq(businessListings.userId, ctx.userId),
+    });
+    if (!business) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Business not found",
+      });
+    }
+
+    const offers = await db.query.offers.findMany({
+      where: (offers, { eq }) => eq(offers.businessId, business.id),
+      with: {
+        offerPhotos: true,
+      },
+    });
+
+    return { offers };
+  }),
   addProduct: businessProcedure
     .input(productInsertSchema)
     .mutation(async ({ ctx, input }) => {
@@ -579,7 +612,6 @@ export const businessrouter = router({
       });
     }
 
-    logger.info("ctx.userId", ctx.userId);
     const business = await db.query.businessListings.findFirst({
       where: (businessListings, { eq }) =>
         eq(businessListings.userId, ctx.userId),

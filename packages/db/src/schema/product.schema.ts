@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -12,7 +13,6 @@ import z from "zod";
 import { users } from "./auth.schema";
 import { businessListings } from "./business.schema";
 import { categories, subcategories } from "./not-related.schema";
-import { relations } from "drizzle-orm";
 
 // 1.products
 export const products = pgTable("products", {

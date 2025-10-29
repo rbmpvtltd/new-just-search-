@@ -61,8 +61,8 @@ export function LoginForm({
   function onSubmit(data: FormSchema) {
     mutate(data, {
       onSuccess: (data) => {
-        setToken(data?.session || "", false);
-        setRole(data?.role || "", false);
+        setToken(data?.session || "");
+        // setRole(data?.role || "", false);
         router.push("/");
       },
     });
