@@ -55,6 +55,10 @@ const subcategories = pgTable("subcategories", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+const subcategoryInsertSchema = createInsertSchema(subcategories);
+const subcategoryupdateschema = createUpdateSchema(subcategories);
+const subcategoryselectschema = createSelectSchema(subcategories);
+
 const banners = pgTable("banners", {
   id: serial("id").primaryKey(),
   mysqlId: integer("mysql_id"),
@@ -83,4 +87,7 @@ export {
   categoryInsertSchema,
   categoryUpdateSchema,
   categorySelectSchema,
+  subcategoryInsertSchema,
+  subcategoryupdateschema,
+  subcategoryselectschema,
 };
