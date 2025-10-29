@@ -153,7 +153,7 @@ export const columns: ColumnDef<Category>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
+      <DataTableColumnHeader column={column} title="Route" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
