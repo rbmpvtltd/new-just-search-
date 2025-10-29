@@ -1,5 +1,5 @@
 {
-  "id": "d86a08b0-b3e9-4f17-9a3d-a39bdca2de44",
+  "id": "666e6357-2479-454d-99df-a1f2234cb5e0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1860,38 +1860,38 @@
           "primaryKey": false,
           "notNull": true
         },
-        "product_name": {
-          "name": "product_name",
+        "offer_name": {
+          "name": "offer_name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "product_slug": {
-          "name": "product_slug",
+        "offer_slug": {
+          "name": "offer_slug",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "rate": {
           "name": "rate",
-          "type": "numeric(10, 2)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "discount_percent": {
           "name": "discount_percent",
-          "type": "numeric",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "final_price": {
           "name": "final_price",
-          "type": "numeric",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "product_description": {
-          "name": "product_description",
+        "offer_description": {
+          "name": "offer_description",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -2420,9 +2420,9 @@
         },
         "photo": {
           "name": "photo",
-          "type": "varchar(500)",
+          "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -2684,19 +2684,19 @@
         },
         "rate": {
           "name": "rate",
-          "type": "real",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "discount_percent": {
           "name": "discount_percent",
-          "type": "real",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "final_price": {
           "name": "final_price",
-          "type": "real",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -3017,7 +3017,7 @@
           "name": "first_name",
           "type": "varchar(100)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "last_name": {
           "name": "last_name",
@@ -3059,8 +3059,13 @@
           "name": "pincode",
           "type": "varchar(10)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'000000'"
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         },
         "city": {
           "name": "city",
@@ -3343,10 +3348,11 @@
       "name": "user_marital_status",
       "schema": "public",
       "values": [
-        "married",
-        "unmarried",
-        "widowed",
-        "divorced"
+        "Married",
+        "Unmarried",
+        "Widowed",
+        "Divorced",
+        "Others"
       ]
     }
   },

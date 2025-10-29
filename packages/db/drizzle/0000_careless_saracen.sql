@@ -4,7 +4,7 @@ CREATE TYPE "public"."hire_job_duration" AS ENUM('Day', 'Week', 'Month', 'Year')
 CREATE TYPE "public"."hire_job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
 CREATE TYPE "public"."hire_marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
 CREATE TYPE "public"."hire_work_shift" AS ENUM('Morning', 'Evening', 'Night');--> statement-breakpoint
-CREATE TYPE "public"."user_marital_status" AS ENUM('married', 'unmarried', 'widowed', 'divorced');--> statement-breakpoint
+CREATE TYPE "public"."user_marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"display_name" varchar(100),
@@ -262,12 +262,12 @@ CREATE TABLE "offers" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"business_id" integer NOT NULL,
 	"category_id" integer NOT NULL,
-	"product_name" varchar(255) NOT NULL,
-	"product_slug" varchar(255) NOT NULL,
-	"rate" numeric(10, 2) NOT NULL,
-	"discount_percent" numeric NOT NULL,
-	"final_price" numeric NOT NULL,
-	"product_description" text NOT NULL,
+	"offer_name" varchar(255) NOT NULL,
+	"offer_slug" varchar(255),
+	"rate" integer NOT NULL,
+	"discount_percent" integer,
+	"final_price" integer NOT NULL,
+	"offer_description" text NOT NULL,
 	"offer_start_date" timestamp NOT NULL,
 	"offer_end_date" timestamp NOT NULL,
 	"reupload_count" integer DEFAULT 0 NOT NULL,
@@ -339,7 +339,7 @@ CREATE TABLE "user_subscriptions" (
 CREATE TABLE "product_photos" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"product_id" integer NOT NULL,
-	"photo" varchar(500) NOT NULL,
+	"photo" varchar(255),
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -371,9 +371,9 @@ CREATE TABLE "products" (
 	"category_id" integer NOT NULL,
 	"product_name" varchar(255) NOT NULL,
 	"product_slug" varchar(255),
-	"rate" real NOT NULL,
-	"discount_percent" real,
-	"final_price" real,
+	"rate" integer NOT NULL,
+	"discount_percent" integer,
+	"final_price" integer,
 	"product_description" text NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
@@ -416,14 +416,15 @@ CREATE TABLE "profiles" (
 	"mysql_user_id" integer,
 	"profileImage" varchar(255),
 	"salutation" varchar(100),
-	"first_name" varchar(100) NOT NULL,
+	"first_name" varchar(100),
 	"last_name" varchar(100),
 	"email" varchar(255),
 	"dob" date,
 	"occupation" varchar(100),
 	"marital_status" "user_marital_status",
 	"address" varchar(255),
-	"pincode" varchar(10) DEFAULT '000000',
+	"pincode" varchar(10),
+	"state" integer NOT NULL,
 	"city" integer NOT NULL,
 	"area" varchar(100),
 	"created_at" timestamp DEFAULT NOW(),
