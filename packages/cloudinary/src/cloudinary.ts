@@ -27,7 +27,7 @@ const uploadOnCloudinary = async (
   if (!localFilePath) return null;
   try {
     if (test) {
-      const customName = `${Date.now()}.${Math.random().toString(36).substring(2, 15)}`;
+      const customName = `Banner/od5jlaui25sb8djl3mfc`;
       const result = {
         public_id: customName,
       };

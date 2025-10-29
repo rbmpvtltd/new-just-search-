@@ -4,8 +4,15 @@ import { useState } from "react";
 import { useTRPC } from "@/trpc/client";
 import { useMutation } from "@tanstack/react-query";
 import { IoMdHeart } from "react-icons/io";
+import Swal from "sweetalert2";
 
-function Favourite({businessId,initialFav}:{businessId:number,initialFav:boolean}) {
+function Favourite({
+  businessId,
+  initialFav,
+}: {
+  businessId: number;
+  initialFav: boolean;
+}) {
   const trpc = useTRPC();
 
   const [isFavourite, setIsFavourite] = useState<boolean>(initialFav);
@@ -17,7 +24,15 @@ function Favourite({businessId,initialFav}:{businessId:number,initialFav:boolean
       },
       onError: (err) => {
         setIsFavourite((prev) => !prev);
-        console.error("Error toggling favourite:", err.message);
+        if (err.shape?.data.httpStatus === 401) {
+          Swal.fire({
+            title: "Login Require",
+            icon: "warning",
+            text : "Need To Login For Add In Favourite",
+            draggable: true,
+            timer: 5000,
+          });
+        }
       },
     }),
   );
@@ -27,7 +42,7 @@ function Favourite({businessId,initialFav}:{businessId:number,initialFav:boolean
   };
 
   const handleClick = () => {
-    mutation.mutate({businessId});
+    mutation.mutate({ businessId });
   };
 
   return (

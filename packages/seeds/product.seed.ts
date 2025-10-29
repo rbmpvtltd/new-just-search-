@@ -34,7 +34,7 @@ export const clearAllTablesBusiness = async () => {
   // await db.execute(
   //   `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
   // );
-  // await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };

@@ -2,13 +2,18 @@ import { db, schemas } from "@repo/db";
 import { favourites } from "@repo/db/src/schema/business.schema";
 import { and, count, eq, gt, sql } from "drizzle-orm";
 import z from "zod";
-import { publicProcedure, router, visitorProcedure } from "@/utils/trpc";
+import {
+  guestProcedure,
+  publicProcedure,
+  router,
+  visitorProcedure,
+} from "@/utils/trpc";
 
 const businessListings = schemas.business.businessListings;
 const businessCategories = schemas.business.businessCategories;
 
 export const subcategoryRouter = router({
-  subcategory: visitorProcedure
+  subcategory: guestProcedure
     .input(
       z.object({
         cursor: z.number().nullish(),
@@ -18,78 +23,147 @@ export const subcategoryRouter = router({
       }),
     )
     .query(async ({ input, ctx }) => {
-      console.log("execution comes here");
       const limit = input.limit ?? 10;
       const offset = (input.page - 1) * limit;
+      let data: any;
 
-      const data = await db
-        .select({
-          id: businessListings.id,
-          name: businessListings.name,
-          photo: businessListings.photo,
-          area: businessListings.area,
-          streetName: businessListings.streetName,
-          buildingName: businessListings.buildingName,
-          longitude: businessListings.longitude,
-          latitude: businessListings.latitude,
-          phoneNumber: businessListings.phoneNumber,
-          rating: sql<
-            string[]
-          >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
-          subcategories: sql<string[]>`
+      if (ctx.userId) {
+        data = await db
+          .select({
+            id: businessListings.id,
+            name: businessListings.name,
+            photo: businessListings.photo,
+            area: businessListings.area,
+            streetName: businessListings.streetName,
+            buildingName: businessListings.buildingName,
+            longitude: businessListings.longitude,
+            latitude: businessListings.latitude,
+            phoneNumber: businessListings.phoneNumber,
+            rating: sql<
+              string[]
+            >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
+            subcategories: sql<string[]>`
           COALESCE(
             ARRAY_AGG(DISTINCT subcategories.name) 
             FILTER (WHERE subcategories.id IS NOT NULL),
             '{}'
           )
         `,
-          category: sql<string | null>`
+            category: sql<string | null>`
       MAX(${schemas.not_related.categories.title})
     `,
-          isFavourite: sql<boolean>`CASE WHEN ${favourites.id} IS NOT NULL THEN true ELSE false END`,
-        })
-        .from(businessListings)
-        .innerJoin(
-          businessCategories,
-          eq(businessListings.id, businessCategories.businessId),
-        )
-        .leftJoin(
-          schemas.business.businessSubcategories,
-          eq(
-            businessListings.id,
-            schemas.business.businessSubcategories.businessId,
-          ),
-        )
-        .leftJoin(
-          schemas.not_related.subcategories,
-          eq(
-            schemas.business.businessSubcategories.subcategoryId,
-            schemas.not_related.subcategories.id,
-          ),
-        )
-        .leftJoin(
-          schemas.not_related.categories,
-          eq(
-            schemas.not_related.subcategories.categoryId,
-            schemas.not_related.categories.id,
-          ),
-        )
-        .leftJoin(
-          schemas.business.businessReviews,
-          eq(businessListings.id, schemas.business.businessReviews.businessId),
-        )
-        .leftJoin(
-          favourites,
-          and(
-            eq(favourites.businessId, businessListings.id),
-            eq(favourites.userId, ctx.userId),
-          ),
-        )
-        .where(eq(businessCategories.categoryId, input.categoryId))
-        .groupBy(businessListings.id, favourites.id)
-        .limit(limit)
-        .offset(offset);
-      console.log("execution comes here ===================>", data);
+            isFavourite: sql<boolean>`CASE WHEN ${favourites.id} IS NOT NULL THEN true ELSE false END`,
+          })
+          .from(businessListings)
+          .innerJoin(
+            businessCategories,
+            eq(businessListings.id, businessCategories.businessId),
+          )
+          .leftJoin(
+            schemas.business.businessSubcategories,
+            eq(
+              businessListings.id,
+              schemas.business.businessSubcategories.businessId,
+            ),
+          )
+          .leftJoin(
+            schemas.not_related.subcategories,
+            eq(
+              schemas.business.businessSubcategories.subcategoryId,
+              schemas.not_related.subcategories.id,
+            ),
+          )
+          .leftJoin(
+            schemas.not_related.categories,
+            eq(
+              schemas.not_related.subcategories.categoryId,
+              schemas.not_related.categories.id,
+            ),
+          )
+          .leftJoin(
+            schemas.business.businessReviews,
+            eq(
+              businessListings.id,
+              schemas.business.businessReviews.businessId,
+            ),
+          )
+          .leftJoin(
+            favourites,
+            and(
+              eq(favourites.businessId, businessListings.id),
+              eq(favourites.userId, ctx.userId),
+            ),
+          )
+          .where(eq(businessCategories.categoryId, input.categoryId))
+          .groupBy(businessListings.id, favourites.id)
+          .limit(limit)
+          .offset(offset);
+      } else {
+        data = await db
+          .select({
+            id: businessListings.id,
+            name: businessListings.name,
+            photo: businessListings.photo,
+            area: businessListings.area,
+            streetName: businessListings.streetName,
+            buildingName: businessListings.buildingName,
+            longitude: businessListings.longitude,
+            latitude: businessListings.latitude,
+            phoneNumber: businessListings.phoneNumber,
+            rating: sql<
+              string[]
+            >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
+            subcategories: sql<string[]>`
+          COALESCE(
+            ARRAY_AGG(DISTINCT subcategories.name) 
+            FILTER (WHERE subcategories.id IS NOT NULL),
+            '{}'
+          )
+        `,
+            category: sql<
+              string | null
+            >`MAX(${schemas.not_related.categories.title})`,
+            // default value if not logged in
+            isFavourite: sql<boolean>`false`,
+          })
+          .from(businessListings)
+          .innerJoin(
+            businessCategories,
+            eq(businessListings.id, businessCategories.businessId),
+          )
+          .leftJoin(
+            schemas.business.businessSubcategories,
+            eq(
+              businessListings.id,
+              schemas.business.businessSubcategories.businessId,
+            ),
+          )
+          .leftJoin(
+            schemas.not_related.subcategories,
+            eq(
+              schemas.business.businessSubcategories.subcategoryId,
+              schemas.not_related.subcategories.id,
+            ),
+          )
+          .leftJoin(
+            schemas.not_related.categories,
+            eq(
+              schemas.not_related.subcategories.categoryId,
+              schemas.not_related.categories.id,
+            ),
+          )
+          .leftJoin(
+            schemas.business.businessReviews,
+            eq(
+              businessListings.id,
+              schemas.business.businessReviews.businessId,
+            ),
+          )
+          .where(eq(businessCategories.categoryId, input.categoryId))
+          .groupBy(businessListings.id)
+          .limit(limit)
+          .offset(offset);
+      }
 
       const totalCount = await db
         .select({ count: count() })
@@ -137,10 +211,11 @@ export const subcategoryRouter = router({
           FILTER (WHERE subcategories.id IS NOT NULL),
           '{}'
         )
-      `,
+        `,
           category: sql<string | null>`
-    MAX(${schemas.not_related.categories.title})
-  `,
+          MAX(${schemas.not_related.categories.title})
+        `,
+          isFavourite: sql<boolean>`false`,
         })
         .from(businessListings)
         .innerJoin(
@@ -183,8 +258,6 @@ export const subcategoryRouter = router({
 
       const nextCursor = data[data.length - 1]?.id;
 
-      console.log("data is ====================>", data.length);
-      console.log("cursor is ====================>", nextCursor);
 
       return {
         data,

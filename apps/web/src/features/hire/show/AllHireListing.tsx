@@ -1,6 +1,6 @@
 "use client";
 import { getPagination } from "@/utils/getPagination";
-import { BussinessListingCard } from "./component/BussinessListingCard";
+import { HireListingCard } from "./component/HireListingCard";
 import {
   Pagination,
   PaginationContent,
@@ -11,15 +11,16 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-export default function BussinessList({ business, page, totalPages, id }: any) {
+export default function AllHireList({ hire, page, totalPages, }: any) {
   const pagination = getPagination(page, totalPages);
 
   return (
     <div>
       <div>
-        {business?.map((item: any) => (
-          <BussinessListingCard key={item.id} item={item} rating={item.rating} category={item.category} subcategory={item.subcategory} initialFav={item.isFavourite}/>
-        ))}
+        {hire?.map((item: any) => {
+            return (
+          <HireListingCard key={item.id} item={item} />
+        )})}
       </div>
       <div className="mt-4 mb-5">
         <Pagination>
@@ -28,7 +29,7 @@ export default function BussinessList({ business, page, totalPages, id }: any) {
               <PaginationItem>
                 <PaginationPrevious
                   href={{
-                    pathname: `/business/listings/${id}`,
+                    pathname: `/hire`,
                     query: { page: page - 1 },
                   }}
                 />
@@ -49,7 +50,7 @@ export default function BussinessList({ business, page, totalPages, id }: any) {
                 >
                   <PaginationLink
                     href={{
-                      pathname: `/business/listings/${id}`,
+                      pathname: `/hire`,
                       query: { page: item },
                     }}
                   >
@@ -62,7 +63,7 @@ export default function BussinessList({ business, page, totalPages, id }: any) {
               <PaginationItem>
                 <PaginationNext
                   href={{
-                    pathname: `/business/listings/${id}`,
+                    pathname: `/hire`,
                     query: { page: page + 1 },
                   }}
                 />

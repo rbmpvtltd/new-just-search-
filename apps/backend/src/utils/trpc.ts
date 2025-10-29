@@ -26,6 +26,41 @@ export const router = t.router;
 
 export const publicProcedure = t.procedure;
 
+
+export const guestProcedure = publicProcedure.use(async (opts) => {
+  const { ctx } = opts;
+
+  if (!ctx.token) {
+     return opts.next(
+      {
+    ctx: {
+      userId: null,
+      role: "guest",
+    },
+  }
+     );
+  }
+
+  const session = await validateSessionToken(ctx.token);
+  if (!session) {
+   return opts.next({
+    ctx: {
+      userId: null,
+      role: "guest",
+    },
+  });
+  }
+
+  return opts.next({
+    ctx: {
+      userId: session.userId,
+      role: session.role,
+      sessionId: session.id,
+    },
+  });
+});
+
+
 export const protectedProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
 

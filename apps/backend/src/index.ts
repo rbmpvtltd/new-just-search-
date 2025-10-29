@@ -22,7 +22,7 @@ import { createContext } from "./utils/context";
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("hello");
+  return res.send("hello");
 });
 app.use(
   "/trpc",

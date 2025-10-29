@@ -3,24 +3,25 @@
 import { create } from "zustand";
 import { deleteToken } from "@/utils/secureStore";
 import { queryClient } from "@/lib/trpc";
+import { UserRole } from "@repo/db";
 
-export enum role {
-  business = "business",
-  hire = "hire",
-  visitor = "visitor",
-  lister = "lister",
-}
+// export enum role {
+//   business = "business",
+//   hire = "hire",
+//   visitor = "visitor",
+//   lister = "lister",
+// }
 type AuthState = {
   token: string | null;
   authenticated: boolean;
-  role: role;
-  setToken: (token: string | null, role: role) => void;
+  role: UserRole;
+  setToken: (token: string | null, role: UserRole) => void;
   clearToken: () => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
-  role: role.visitor,
+  role: "visiter",
   authenticated: false,
   setToken: (token, role) => {
     queryClient.invalidateQueries();

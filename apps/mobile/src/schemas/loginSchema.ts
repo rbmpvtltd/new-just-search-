@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const loginBusinesSchema = z.object({
-  email: z
+  username: z
     .string()
-    .min(6, "Email Should Be Atleast 6 Character")
-    .max(50, "Email Should Be Atmost 50 Character"),
+    .min(2, "username Should Be Atleast 2 Character")
+    .max(50, "username Should Be Atmost 50 Character"),
   password: z.string().min(1, "Password Should Not Be Empty"),
 });
 
