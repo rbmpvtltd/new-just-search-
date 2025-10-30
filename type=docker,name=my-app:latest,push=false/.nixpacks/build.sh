@@ -1,1 +1,0 @@
-docker build type=docker,name=my-app:latest,push=false -f type=docker,name=my-app:latest,push=false/.nixpacks/Dockerfile -t 06762b1c-229c-44dd-8b2a-3c3935dd8b8d --build-arg CI=true --build-arg NIXPACKS_METADATA=node --build-arg NODE_ENV=production --build-arg NPM_CONFIG_PRODUCTION=false
