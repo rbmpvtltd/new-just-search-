@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "apps/backend" },
+    // { "path": "apps/web" },
+    // { "path": "apps/mobile" },
+    { "path": "apps/dashboard" },
+    { "path": "packages/types" },
+    { "path": "packages/helper" },
+    { "path": "packages/db" },
+    { "path": "packages/cloudinary" }
+  ],
+  "exclude": ["node_modules", "dist", "build", "**/*.spec.ts"]
+}
