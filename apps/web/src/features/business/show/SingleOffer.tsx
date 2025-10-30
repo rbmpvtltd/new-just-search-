@@ -11,6 +11,7 @@ import type { OutputTrpcType } from "@/trpc/type";
 import { Button } from "@/components/ui/button";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import Rating from "@/components/ui/Rating";
+import parse from "html-react-parser";
 
 type SingleOfferType = OutputTrpcType["businessrouter"]["singleOffer"] | null;
 
@@ -21,6 +22,7 @@ function SingleOfferComp({
   offerPhotos: string[];
   offer: SingleOfferType;
 }) {
+   const content = parse(offer?.description ?? "");
   return (
     <div>
       <div className="flex gap-6 items-center">
@@ -54,14 +56,11 @@ function SingleOfferComp({
           <h1 className="text-2xl line-clamp-1 text-secondary font-semibold">
             {offer?.name}
           </h1>
-          <div
-            className="line-clamp-5"
-            dangerouslySetInnerHTML={{ __html: offer?.description }}
-          />
+          <div>{content}</div>
 
           <h1 className="text-xl text-primary">
             <span className="text-secondary">
-              <strike>₹ {offer?.rate}</strike>
+              <span className="line-through">₹ {offer?.rate}</span>
             </span>{" "}
             ₹ {offer?.finalPrice}
           </h1>

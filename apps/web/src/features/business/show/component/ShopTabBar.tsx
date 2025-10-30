@@ -191,7 +191,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                 </Link>
                 <h2 className="text-center font-medium line-clamp-2 px-4">{item.name}</h2>
                 <h2>
-                  ₹ <strike>{item.price}</strike>
+                  ₹ <span className="line-through">{item.price}</span>
                 </h2>
                 <h2 className="font-semibold text-primary">
                   ₹ {item.final_price}

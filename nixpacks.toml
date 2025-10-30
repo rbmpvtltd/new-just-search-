@@ -10,5 +10,5 @@ cmds = [
 ]
 
 [start]
-cmd = "bun run start"
-# cmd = "/bin/bash"
+#cmd = "bun run start"
+cmd = "/bin/bash"

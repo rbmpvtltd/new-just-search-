@@ -698,7 +698,7 @@ export const businessrouter = router({
           description: businessListing.description,
           updatedAt: businessListing.updatedAt,
           specialities: businessListing.specialities,
-          rating: sql<string[]>`COALESCE(
+          rating: sql<{id:number,created_at:string,rating:number,message:string,user:string}[]>`COALESCE(
             JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
               'id', business_reviews.id,
               'created_at', business_reviews.created_at,
@@ -814,7 +814,7 @@ export const businessrouter = router({
           shopName: sql<string | null>`COALESCE((
               SELECT name FROM business_listings LIMIT 1
           ), '')`,
-          rating: sql<string[]>`COALESCE(
+          rating: sql<{id:number,created_at:string,rating:number,message:string,user:string}[]>`COALESCE(
             JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
               'id', product_reviews.id,
               'created_at', product_reviews.created_at,

@@ -11,10 +11,14 @@ import type { OutputTrpcType } from "@/trpc/type";
 import { Button } from "@/components/ui/button";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import Rating from "@/components/ui/Rating";
+import parse from "html-react-parser";
+
 
 type SingleProductType =
   | OutputTrpcType["businessrouter"]["singleProduct"]
   | null;
+
+type ProductRatingType = OutputTrpcType["businessrouter"]["singleProduct"]
 
 function SingleProductComp({
   productPhotos,
@@ -23,6 +27,7 @@ function SingleProductComp({
   productPhotos: string[];
   product: SingleProductType;
 }) {
+  const content = parse(product?.description ?? "");
   return (
     <div>
       <div className="flex gap-6 items-center">
@@ -52,10 +57,7 @@ function SingleProductComp({
           <h1 className="text-2xl line-clamp-1 text-secondary font-semibold">
             {product?.name}
           </h1>
-          <div
-            className="line-clamp-5"
-            dangerouslySetInnerHTML={{ __html: product?.description }}
-          />
+          <div>{content}</div>
 
           <h1 className="text-xl text-primary">
             ₹ <span className="text-secondary">{product?.rate}</span>
@@ -87,19 +89,19 @@ function SingleProductComp({
             >
               <div className="flex justify-between items-center w-full ">
                 <h1 className="text-xl font-medium text-secondary">
-                  {item.user}
+                  {item?.user}
                 </h1>
                 <p className="flex items-center gap-2 text-sm">
                   <FaRegCalendarAlt className="text-primary" />{" "}
-                  {new Date(item.created_at).toLocaleDateString("en-GB", {
+                  {new Date(item?.created_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",
                   })}
                 </p>
               </div>
-              <Rating rating={item.rating} />
-              <p>{item.message}</p>
+              <Rating rating={item?.rating} />
+              <p>{item?.message}</p>
             </div>
           );
         })}
