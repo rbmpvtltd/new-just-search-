@@ -674,7 +674,6 @@ export const businessrouter = router({
   singleShop: publicProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ input }) => {
-      console.log("execution comes here line number 234");
       const shop = await db
         .select({
           id: businessListing.id,
@@ -791,7 +790,6 @@ export const businessrouter = router({
         .groupBy(businessListing.id)
         .where(eq(businessListing.id, input.businessId));
 
-      console.log("execution comes here line number 317");
 
       return shop[0];
     }),

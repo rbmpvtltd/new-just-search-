@@ -4,6 +4,8 @@ import HireSearchForm from "@/components/forms/hireSearchForm";
 import HireCard from "@/components/hirePageComp/HireCard";
 import { Loading } from "@/components/ui/Loading";
 import { useHireList } from "@/query/hireListing";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
 
 export default function HireListScreen() {
   const {
@@ -14,7 +16,17 @@ export default function HireListScreen() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useHireList();
+  } = useInfiniteQuery(
+    trpc.hirerouter.MobileAllHireLising.infiniteQueryOptions(
+      {
+        cursor: 0,
+        limit: 10,
+      },
+      {
+        getNextPageParam: (data) => data.nextCursor,
+      },
+    ),
+  );
 
   if (isLoading) {
     return <Loading position="center" />;
@@ -30,13 +42,13 @@ export default function HireListScreen() {
   const allData = data?.pages.flatMap((page) => page?.data || []) || [];
 
   return (
-    <SafeAreaView>
-      <View className="mb-40">
+    <SafeAreaView className="flex-1">
+      <View>
         <View className="">
           <HireSearchForm />
         </View>
         <FlatList
-          className="mt-1 "
+          className="mt-1"
           data={allData}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => {
@@ -48,7 +60,8 @@ export default function HireListScreen() {
                   </Text>
                 </View>
               );
-            return <HireCard item={item} />;
+            return< HireCard item={item} />;
+            // return <Text className="text-secondary">{item?.name}</Text>;
           }}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
