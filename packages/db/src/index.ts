@@ -8,7 +8,6 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
   user: process.env.PGUSER ?? "root",
@@ -17,6 +16,7 @@ const pool = new Pool({
   port: Number(process.env.PGPORT) ?? 5432,
 });
 
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as auth from "./schema/auth.schema";
 import * as business from "./schema/business.schema";
 import * as hire from "./schema/hire.schema";
@@ -59,3 +59,9 @@ export const db = drizzle({
     ...user,
   },
 });
+
+export const dbmigration = async () => {
+  await migrate(db, {
+    migrationsFolder: "../drizzle",
+  });
+};
