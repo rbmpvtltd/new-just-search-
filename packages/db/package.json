@@ -16,7 +16,6 @@
   "scripts": {
     "dev": "bunx drizzle-kit studio",
     "build": "bunx tsc -b",
-    "prebuild": "bunx tsc -b && bunx drizzle-kit generate && bunx drizzle-kit migrate",
     "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"
   },
   "peerDependencies": {
