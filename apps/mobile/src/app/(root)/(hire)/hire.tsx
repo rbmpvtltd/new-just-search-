@@ -4,6 +4,8 @@ import HireSearchForm from "@/components/forms/hireSearchForm";
 import HireCard from "@/components/hirePageComp/HireCard";
 import { Loading } from "@/components/ui/Loading";
 import { useHireList } from "@/query/hireListing";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
 
 export default function HireListScreen() {
   const {
@@ -14,7 +16,17 @@ export default function HireListScreen() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useHireList();
+  } = useInfiniteQuery(
+    trpc.hirerouter.MobileAllHireLising.infiniteQueryOptions(
+      {
+        cursor: 0,
+        limit: 10,
+      },
+      {
+        getNextPageParam: (data) => data.nextCursor,
+      },
+    ),
+  );
 
   if (isLoading) {
     return <Loading position="center" />;
@@ -48,7 +60,8 @@ export default function HireListScreen() {
                   </Text>
                 </View>
               );
-            return <HireCard item={item} />;
+            // return< HireCard item={item} />;
+            return <Text className="text-secondary">{item?.name}</Text>;
           }}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {

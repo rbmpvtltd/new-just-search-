@@ -17,6 +17,8 @@ export const setToken = async (value: string) => {
   } else {
     await SecureStore.setItemAsync(TOKEN_KEY, value);
   }
+
+  console.log( "token in secureStore seted ",await getToken())
 };
 
 export const deleteToken = async () => {

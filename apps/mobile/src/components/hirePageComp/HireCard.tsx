@@ -17,7 +17,7 @@ import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 
 const screenWidth = Dimensions.get("window").width;
-export default function HireCard({ item, title }: any) {
+export default function HireCard({ item }: any) {
   const colorScheme = useColorScheme();
   const { mutate: startChat } = useStartChat();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
@@ -125,7 +125,7 @@ export default function HireCard({ item, title }: any) {
               message: "Need to login to chat on your behalf",
               onConfirm: () => {
                 clearToken();
-                router.push("/user/bottomNav/profile");
+                router.push("/(root)/profile/profile");
               },
             });
           } else {
