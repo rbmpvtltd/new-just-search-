@@ -25,7 +25,10 @@ export const getTokenRole = async (): Promise<Token> => {
   }
 };
 
-export const setTokenRole = async (token: string, role: UserRole): Promise<void> => {
+export const setTokenRole = async (
+  token: string,
+  role: UserRole,
+): Promise<void> => {
   if (Platform.OS === "web") {
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem(ROLE_KEY, role);
