@@ -1,9 +1,9 @@
 // src/store/authStore.ts
 
 import { create } from "zustand";
-import { deleteToken } from "@/utils/secureStore";
+import { deleteTokenRole } from "@/utils/secureStore";
 import { queryClient } from "@/lib/trpc";
-import { UserRole } from "@repo/db";
+import type { UserRole } from "@repo/db";
 
 // export enum role {
 //   business = "business",
@@ -29,6 +29,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   clearToken: () => {
     set({ token: null, authenticated: false });
-    deleteToken();
+    deleteTokenRole();
   },
 }));

@@ -61,7 +61,6 @@ export default function HireListScreen() {
                 </View>
               );
             return< HireCard item={item} />;
-            // return <Text className="text-secondary">{item?.name}</Text>;
           }}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {

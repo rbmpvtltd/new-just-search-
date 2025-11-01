@@ -5,6 +5,7 @@ import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import superjson from "superjson";
 import { getToken } from "@/utils/secureStore";
 import type { inferRouterOutputs , inferRouterInputs } from "@trpc/server";
+import { useAuthStore } from "@/store/authStore";
 
 export type OutputTrpcType = inferRouterOutputs<AppRouter>
 export type InputTrpcType = inferRouterInputs<AppRouter>
@@ -17,7 +18,8 @@ const trpcClient = createTRPCClient<AppRouter>({
       url: getTrpcUrl(),
       transformer: superjson,
       async headers() {
-        const token = await getToken();
+        const token = useAuthStore.getState().token;
+        console.log("token in trpc lib file $444444$$$4$*888888888888888****",token)
         return {
           authorization: token ? `Bearer ${token}` : "",
         };

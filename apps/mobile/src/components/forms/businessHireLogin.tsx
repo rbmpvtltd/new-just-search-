@@ -33,9 +33,10 @@ export default function BusinessHireLogin() {
   const loginMutation = useMutation(
     trpc.auth.login.mutationOptions({
       onSuccess: async (data) => {
+        console.log("data isn businessHireLogin.tsx line 36",data)
         if (data) {
-          console.log("data is ======>",data)
-          setAuthStoreToken(data?.session ?? "", UserRole.business); // TODO : set role as the response comes in future
+          console.log("data is =dfsfsfsdfsdfsdfsdf=====>",data)
+          setAuthStoreToken(data?.session ?? "", data.role ?? "visiter"); // TODO : set role as the response comes in future
           await setToken(data?.session ?? "");
           Alert.alert("Login Successfully");
           // router.push("/(root)/(home)/home");
