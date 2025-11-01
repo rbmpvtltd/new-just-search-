@@ -20,20 +20,16 @@ type EditProductSchema = z.infer<typeof productInsertSchema>;
 export type FormReferenceDataType =
   | OutputTrpcType["businessrouter"]["add"]
   | null;
-export type MyProductsType =
-  | OutputTrpcType["businessrouter"]["showProduct"]
-  | null;
+export type MyProductType = OutputTrpcType["productrouter"]["edit"] | null;
 export default function EditProduct({
-  myProducts,
+  myProduct,
   formReferenceData,
 }: {
-  myProducts: MyProductsType;
+  myProduct: MyProductType;
   formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
-  const { mutate } = useMutation(
-    trpc.businessrouter.addProduct.mutationOptions(),
-  );
+  const { mutate } = useMutation(trpc.productrouter.update.mutationOptions());
 
   const {
     control,
@@ -43,18 +39,18 @@ export default function EditProduct({
   } = useForm<EditProductSchema>({
     resolver: zodResolver(productInsertSchema),
     defaultValues: {
-      productName: "",
-      rate: 0,
-      discountPercent: 0,
-      finalPrice: 0,
-      productDescription: "",
-      photo: "",
-      image2: "",
-      image3: "",
-      image4: "",
-      image5: "",
-      categoryId: 0,
-      subcategoryId: [],
+      productName: myProduct?.product.productName,
+      rate: myProduct?.product.rate,
+      productDescription: myProduct?.product.productDescription,
+      photo: myProduct?.product.productPhotos[0]?.photo ?? "",
+      image2: myProduct?.product.productPhotos[1]?.photo ?? "",
+      image3: myProduct?.product.productPhotos[2]?.photo ?? "",
+      image4: myProduct?.product.productPhotos[3]?.photo ?? "",
+      image5: myProduct?.product.productPhotos[4]?.photo ?? "",
+      categoryId: myProduct?.product.categoryId,
+      subcategoryId: myProduct?.product.productSubCategories.map(
+        (item) => item.subcategoryId,
+      ),
     },
   });
 
@@ -90,24 +86,6 @@ export default function EditProduct({
       type: "number",
       component: "input",
       error: errors.rate?.message,
-    },
-    {
-      control,
-      label: "Discount Percent",
-      name: "discountPercent",
-      placeholder: "Discount Percent",
-      component: "input",
-      type: "number",
-      error: errors.discountPercent?.message,
-    },
-    {
-      control,
-      label: "Final Price",
-      name: "finalPrice",
-      placeholder: "Final Price",
-      component: "input",
-      type: "number",
-      error: errors.finalPrice?.message,
     },
     {
       control,
@@ -202,6 +180,7 @@ export default function EditProduct({
         image3: file[2] ?? "",
         image4: file[3] ?? "",
         image5: file[4] ?? "",
+        productSlug: myProduct?.product.productSlug,
       },
       {
         onSuccess: (data) => {

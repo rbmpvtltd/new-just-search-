@@ -22,30 +22,30 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  // await addBusiness();
+  await addBusiness();
   // await seedFavourites();
   await businessesSubcategory();
-  // await businessesCategories();
+  await businessesCategories();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
 export const clearAllTablesBusiness = async () => {
   // await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
-  // );
-  // await db.execute(
-  //   `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
-  // // );
+  await db.execute(
+    `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(
+    `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
+  );
   // await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(
   //   `TRUNCATE TABLE recent_view_business RESTART IDENTITY CASCADE;`,
   // );
   // await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
-  // );
+  await db.execute(
+    `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
+  );
   console.log(" All tables cleared successfully!");
 };
 

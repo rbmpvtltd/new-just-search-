@@ -1,17 +1,36 @@
 "use client";
-import React from "react";
-import type { OutputTrpcType } from "@/trpc/type";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/trpc/client";
 import { useHireFormStore } from "../../shared/store/useCreateHireStore";
 import DocumentsForm from "./forms/DocumentsForm";
 import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
 
-export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
-export default function AddHirePage({ data }: { data: AddHirePageType }) {
-  // return <div>hi ...</div>;
+export default function CreateHireListing() {
+  const [open, setOpen] = useState(true);
+  return open ? (
+    <Button onClick={() => setOpen(false)}>add hire</Button>
+  ) : (
+    <AddHirePage />
+  );
+}
+function AddHirePage() {
+  const trpc = useTRPC();
+  const { data, error, isLoading, isError } = useQuery(
+    trpc.hirerouter.add.queryOptions(),
+  );
   const { page } = useHireFormStore();
 
+  if (isLoading) {
+    return;
+  }
+  if (isError) {
+    console.log(error);
+    return;
+  }
   const steps = [
     "Personal Details",
     "Education",

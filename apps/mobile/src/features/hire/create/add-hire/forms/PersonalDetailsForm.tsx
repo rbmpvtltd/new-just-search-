@@ -1,11 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { personalDetailsHireSchema } from "@repo/db/src/schema/hire.schema";
+import { uploadOnCloudinary } from "@repo/cloudinary";
+import {
+  Gender,
+  MaritalStatus,
+  personalDetailsHireSchema,
+} from "@repo/db/src/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 import type z from "zod";
 import {
   FormField,
@@ -13,51 +19,58 @@ import {
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import LocationAutoDetect from "@/components/ui/LocationAutoDetect";
-import { trpc } from "@/lib/trpc";
-import useFormValidationStore from "@/store/formHireStore";
+import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
+import { type OutputTrpcType, trpc } from "@/lib/trpc";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
+export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
 
-export default function PersonalDetailsForm({ data }: { data: any }) {
+export default function PersonalDetailsForm({
+  data,
+}: {
+  data: AddHirePageType;
+}) {
   const router = useRouter();
-  const setPage = useFormValidationStore((s) => s.setPage);
-  const setFormValue = useFormValidationStore((s) => s.setFormValue);
+  const setFormValue = useHireFormStore((s) => s.setFormValue);
+  const nextPage = useHireFormStore((s) => s.nextPage);
+  const formValue = useHireFormStore((s) => s.formValue);
+  const prevPage = useHireFormStore((s) => s.prevPage);
 
   const {
     control,
     handleSubmit,
-    setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
       photo: "",
-      name: "",
-      categoryId: 0,
-      subcategoryId: [],
-      email: "",
-      gender: "Male",
-      maritalStatus: "Married",
-      fatherName: "",
-      dob: "",
-      languages: [],
-      mobileNumber: "",
-      alternativeMobileNumber: "",
-      latitude: "",
-      longitude: "",
-      area: "",
-      pincode: "",
-      state: 0,
-      city: 0,
+      name: formValue.name ?? "",
+      categoryId: formValue.categoryId ?? 0,
+      subcategoryId: formValue.subcategoryId ?? [],
+      email: formValue.email ?? "",
+      gender: formValue.gender ?? "Male",
+      maritalStatus: formValue.maritalStatus ?? "Married",
+      fatherName: formValue.fatherName ?? "",
+      dob: formValue.dob ?? "",
+      languages: formValue.languages ?? [],
+      mobileNumber: formValue.mobileNumber ?? "",
+      alternativeMobileNumber: formValue.alternativeMobileNumber ?? "",
+      latitude: formValue.latitude ?? "",
+      longitude: formValue.longitude ?? "",
+      area: formValue.area ?? "",
+      pincode: formValue.pincode ?? "",
+      state: formValue.state ?? 0,
+      city: formValue.city ?? 0,
     },
   });
 
-//   const categories = data?.getHireCategories.map((item: any) => {
-//     return {
-//       label: item.title,
-//       value: item.id,
-//     };
-//   });
+  const categories = data?.getHireCategories.map((item: any) => {
+    return {
+      label: item.title,
+      value: item.id,
+    };
+  });
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
@@ -67,43 +80,43 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
     }),
   );
 
-//   const states = data?.getStates.map((item: any) => {
-//     return {
-//       label: item.name,
-//       value: item.id,
-//     };
-//   });
+  const states = data?.getStates.map((item: any) => {
+    return {
+      label: item.name,
+      value: item.id,
+    };
+  });
 
   const selectedStateId = useWatch({ control, name: "state" });
 
-//   const { data: cities, isLoading: cityLoading } = useQuery(
-//     trpc.hirerouter.getCities.queryOptions({
-//       state: Number(selectedStateId),
-//     }),
-//   );
+  const { data: cities, isLoading: cityLoading } = useQuery(
+    trpc.hirerouter.getCities.queryOptions({
+      state: Number(selectedStateId),
+    }),
+  );
 
-  const onSubmit = (data: PersonalDetailsSchema) => {
-    setFormValue("photo", data.photo);
-    setFormValue("name", data.name ?? "");
+  const onSubmit = async (data: PersonalDetailsSchema) => {
+    console.log("data", data);
+
+    setFormValue("photo", data.photo ?? "");
+    setFormValue("name", data.name);
     setFormValue("categoryId", data.categoryId);
     setFormValue("subcategoryId", data.subcategoryId);
-    setFormValue("email", data.email);
+    setFormValue("email", data.email ?? "");
     setFormValue("gender", data.gender);
     setFormValue("maritalStatus", data.maritalStatus);
-    setFormValue("fatherName", data.fatherName);
-    // setFormValue("dob", data.dob);
+    setFormValue("fatherName", data.fatherName ?? "");
+    setFormValue("dob", data.dob ?? "");
     setFormValue("languages", data.languages);
-    setFormValue("mobileNumber", data.mobileNumber);
+    setFormValue("mobileNumber", data.mobileNumber ?? "");
     setFormValue("alternativeMobileNumber", data.alternativeMobileNumber ?? "");
-    setFormValue("latitude", data.latitude);
-    setFormValue("longitude", data.longitude);
-    setFormValue("area", data.area);
-    setFormValue("pincode", data.pincode);
+    setFormValue("latitude", data.latitude ?? "");
+    setFormValue("longitude", data.longitude ?? "");
+    setFormValue("area", data.area ?? "");
+    setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state);
     setFormValue("city", data.city);
-
-    setPage(1);
-    // router.push("/hirelistingforms/qualificationsAndSkills");
+    nextPage();
   };
 
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
@@ -129,10 +142,10 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       name: "categoryId",
       label: "Applied For",
       data: [
-        {
-          label: "Select Category",
-          value: "Select Category",
-        },
+        ...(categories ?? []).map((item, index) => ({
+          label: item.label,
+          value: item.value,
+        })),
       ],
       component: "dropdown",
       placeholder: "Select Category",
@@ -143,12 +156,13 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       name: "subcategoryId",
       label: "Sub Category",
       data: [
-        {
-          label: "Select Sub Category",
-          value: "Select Sub Category",
-        },
+        ...(subCategories ?? []).map((item, index) => ({
+          label: item.name,
+          value: item.id,
+        })),
       ],
       component: "multiselectdropdown",
+      dropdownPosition: "auto",
       placeholder: "Select Sub Category",
       error: errors.subcategoryId?.message,
     },
@@ -168,12 +182,10 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       name: "gender",
       label: "Gender",
       component: "dropdown",
-      data: [
-        {
-          label: "Male",
-          value: "Male",
-        },
-      ],
+      data: Object.values(Gender).map((item) => ({
+        label: item,
+        value: item,
+      })),
       dropdownPosition: "top",
       placeholder: "Select Gender",
       error: errors.gender?.message,
@@ -183,12 +195,12 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       name: "maritalStatus",
       label: "Marital Status",
       component: "dropdown",
-      data: [
-        {
-          label: "Married",
-          value: "Married",
-        },
-      ],
+      data: Object.values(MaritalStatus).map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      }),
       dropdownPosition: "top",
       error: errors.maritalStatus?.message,
       placeholder: "Select Marital Status",
@@ -203,14 +215,14 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       className: "w-[90%] bg-base-200",
       error: errors.fatherName?.message,
     },
-    // {
-    //   control,
-    //   name: "dob",
-    //   label: "Date of Birth",
-    //   component: "datepicker",
-    //   className: "w-[90%] bg-base-200",
-    //   error: errors.dob?.message,
-    // },
+    {
+      control,
+      name: "dob",
+      label: "Date of Birth",
+      component: "datepicker",
+      className: "w-[90%] bg-base-200",
+      error: errors.dob?.message,
+    },
     {
       control,
       name: "languages",
@@ -233,7 +245,6 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       placeholder: "Enter your Mobile Number",
       keyboardType: "numeric",
       component: "input",
-      editable: false,
       className: "w-[90%] bg-base-200",
       error: errors.mobileNumber?.message,
     },
@@ -294,7 +305,12 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       placeholder: "Enter your State",
       component: "dropdown",
       className: "w-[90%] bg-base-200 rounded-lg",
-      data: [{ label: "Job", value: "job" }],
+      data: [
+        ...(states ?? []).map((state) => ({
+          label: state.label,
+          value: state.value,
+        })),
+      ],
       dropdownPosition: "top",
       error: errors.state?.message,
     },
@@ -306,19 +322,20 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
       component: "dropdown",
       className: "w-[90%] bg-base-200 rounded-lg",
       data: [
-        {
-          label: "Job",
-          value: "job",
-        },
+        ...(cities ?? []).map((city) => ({
+          label: city.city,
+          value: city.id,
+        })),
       ],
       dropdownPosition: "top",
       error: errors.city?.message,
     },
   ];
   return (
+    // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
-        className="w-[100%] h-full"
+        className="w-[100%]"
         extraScrollHeight={0}
         enableOnAndroid={true}
         keyboardShouldPersistTaps="handled"
@@ -380,27 +397,15 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
           ))}
         </View>
 
-        <View className="w-[37%] mx-auto m-4">
+        <View className="flex-row justify-between w-[35%] self-center mt-6 mb-60">
           <PrimaryButton
-            isLoading={isSubmitting}
             title="Next"
-            loadingText="Processing..."
-            style={{
-              width: "100%",
-              padding: 12,
-              borderRadius: 8,
-              marginLeft: "auto",
-              marginRight: "auto",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            textClassName="text-secondary text-lg font-semibold"
-            disabled={isSubmitting}
             onPress={handleSubmit(onSubmit)}
+            isLoading={isSubmitting}
           />
         </View>
       </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
+    // </SafeAreaView>
   );
 }

@@ -1,6 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { offersInsertSchema } from "@repo/db/src/schema/offer.schema";
+import {
+  offersUpdateSchema,
+} from "@repo/db/src/schema/offer.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
@@ -15,7 +17,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 
-type EditOfferSchema = z.infer<typeof offersInsertSchema>;
+type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
 
 type FormReferenceDataType = OutputTrpcType["businessrouter"]["add"] | null;
 type OfferTypeSchema = OutputTrpcType["offerrouter"]["edit"] | null;
@@ -27,9 +29,7 @@ export default function EditOffer({
   formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
-  const { mutate } = useMutation(
-    trpc.businessrouter.addOffer.mutationOptions(),
-  );
+  const { mutate } = useMutation(trpc.offerrouter.update.mutationOptions());
 
   const {
     control,
@@ -37,7 +37,7 @@ export default function EditOffer({
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<EditOfferSchema>({
-    resolver: zodResolver(offersInsertSchema),
+    resolver: zodResolver(offersUpdateSchema),
     defaultValues: {
       offerName: myOffer?.offer.offerName,
       rate: myOffer?.offer?.rate,
@@ -50,7 +50,9 @@ export default function EditOffer({
       image4: myOffer?.offer.offerPhotos[3]?.photo || "",
       image5: myOffer?.offer.offerPhotos[4]?.photo || "",
       categoryId: myOffer?.offer.categoryId,
-      subcategoryId: myOffer?.offer.offerSubcategory.map((item) => item.subcategoryId),
+      subcategoryId: myOffer?.offer.offerSubcategory.map(
+        (item) => item.subcategoryId,
+      ),
     },
   });
 
@@ -76,6 +78,7 @@ export default function EditOffer({
       name: "offerName",
       placeholder: "Product Name",
       component: "input",
+      disabled: true,
       error: errors.offerName?.message,
     },
     {
@@ -111,6 +114,7 @@ export default function EditOffer({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
+      disabled: true,
       options:
         categories?.map((item) => ({ label: item.label, value: item.value })) ??
         [],
@@ -198,6 +202,7 @@ export default function EditOffer({
         image3: file[2] ?? "",
         image4: file[3] ?? "",
         image5: file[4] ?? "",
+        offerSlug: myOffer?.offer.offerSlug,
       },
       {
         onSuccess: (data) => {
@@ -211,9 +216,6 @@ export default function EditOffer({
         },
       },
     );
-    console.log("file is", file);
-
-    console.log("data is", data);
   };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

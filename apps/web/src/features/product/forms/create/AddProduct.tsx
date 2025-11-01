@@ -38,8 +38,6 @@ export default function AddProduct({
     defaultValues: {
       productName: "",
       rate: 0,
-      discountPercent: 0,
-      finalPrice: 0,
       productDescription: "",
       photo: "",
       image2: "",
@@ -83,24 +81,6 @@ export default function AddProduct({
       type: "number",
       component: "input",
       error: errors.rate?.message,
-    },
-    {
-      control,
-      label: "Discount Percent",
-      name: "discountPercent",
-      placeholder: "Discount Percent",
-      component: "input",
-      type: "number",
-      error: errors.discountPercent?.message,
-    },
-    {
-      control,
-      label: "Final Price",
-      name: "finalPrice",
-      placeholder: "Final Price",
-      component: "input",
-      type: "number",
-      error: errors.finalPrice?.message,
     },
     {
       control,

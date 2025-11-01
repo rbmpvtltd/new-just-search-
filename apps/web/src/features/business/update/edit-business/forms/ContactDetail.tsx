@@ -60,6 +60,7 @@ export default function ContactDetail({
       label: "Contact Person Number",
       name: "phoneNumber",
       component: "input",
+      disabled: true,
       error: errors.phoneNumber?.message,
     },
     {

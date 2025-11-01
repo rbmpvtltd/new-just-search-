@@ -23,6 +23,7 @@ export interface FormFieldProps<T extends FieldValues> {
   loading?: boolean;
   className?: string;
   required?: boolean;
+  disabled?: boolean;
   section?: string;
   error?: string;
   onChangeValue?: (value: string | undefined | null) => void;
@@ -45,6 +46,7 @@ export const FormField = <T extends FieldValues>({
   placeholder,
   className,
   required = true,
+  disabled = false,
   section,
   loading = false,
   error,
@@ -67,6 +69,7 @@ export const FormField = <T extends FieldValues>({
             case "input": {
               return (
                 <Input
+                  disabled={disabled}
                   type={type}
                   name={name}
                   className={`h-[41px] ${className}`}
@@ -120,6 +123,7 @@ export const FormField = <T extends FieldValues>({
             case "select":
               return (
                 <SingleSelect
+                  isDisabled={disabled}
                   options={options}
                   className="h-12"
                   value={options?.find((item) => item.value === value) || null}

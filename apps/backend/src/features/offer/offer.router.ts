@@ -1,11 +1,15 @@
 import { db, schemas } from "@repo/db";
-import { offers, offersInsertSchema } from "@repo/db/src/schema/offer.schema";
+import {
+  offers,
+  offersInsertSchema,
+  offersUpdateSchema,
+} from "@repo/db/src/schema/offer.schema";
 import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
-
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
 
 export const offerrouter = router({
@@ -163,8 +167,6 @@ export const offerrouter = router({
         },
       });
 
-      logger.info({ offer: offer });
-
       if (!offer) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -176,7 +178,7 @@ export const offerrouter = router({
     }),
 
   update: businessProcedure
-    .input(offersInsertSchema)
+    .input(offersUpdateSchema)
     .mutation(async ({ ctx, input }) => {
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
@@ -188,8 +190,10 @@ export const offerrouter = router({
           message: "Business not found",
         });
       }
+
       const isOfferExists = await db.query.offers.findFirst({
-        where: (offers, { eq }) => eq(offers.id, Number(input.id)),
+        where: (offers, { eq }) =>
+          eq(offers.offerSlug, String(input.offerSlug)),
       });
       if (!isOfferExists) {
         throw new TRPCError({
@@ -247,5 +251,31 @@ export const offerrouter = router({
         success: true,
         message: "Offer updated successfully",
       };
+    }),
+
+  deleteOffer: businessProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // return { success: true};
+      const allSeletedPhoto = await db.query.offerPhotos.findMany({
+        where: (offerPhotos, { eq }) => eq(offerPhotos.offerId, input.id),
+      });
+
+      await cloudinaryDeleteImagesByPublicIds(
+        allSeletedPhoto.map((item) => String(item.photo)),
+      );
+      // await db
+      //   .delete(schemas.product.productSubCategories)
+      //   .where(eq(schemas.product.productSubCategories.productId, input.id));
+
+      await db
+        .delete(schemas.offer.offers)
+        .where(eq(schemas.offer.offers.id, input.id));
+
+      return { success: true };
     }),
 });

@@ -26,6 +26,22 @@ const drawerFields: DrawerField[] = [
     name: "profile",
     route: "/(root)/profile/profile",
   },
+  {
+    name: "Hire Listings",
+    route: "/(root)/user/hire",
+  },
+  {
+    name: "Business Listings",
+    route: "/(root)/user/business",
+  },
+  {
+    name: "My Offers",
+    route: "/(root)/user/offer",
+  },
+  {
+    name: "Add Offer",
+    route: "/(root)/user/offer/add-offer",
+  }
 ];
 
 interface DrawerField {

@@ -4,8 +4,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import Colors from "@/constants/Colors";
 
 export type Option = {
-  label: string;
-  value: string;
+  label: string | number;
+  value: string | number;
 };
 
 interface Props {

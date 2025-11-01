@@ -36,7 +36,7 @@ export interface FormFieldProps<T extends FieldValues> {
   placeholder?: string;
   keyboardType?: "default" | "numeric" | "email-address";
   onBlurEvent?: (value: string | undefined | null) => void;
-  onValueChange?: (value: string | undefined | null) => void;
+  onValueChange?: (value: string | number | undefined | null) => void;
   error?: string;
   component:
     | "input"
@@ -79,7 +79,6 @@ export const FormField = <T extends FieldValues>({
   ...props
 }: FormFieldProps<T>) => {
   const colorScheme = useColorScheme();
-  // const [editorState, setEditorState] = useState<string | null>(null);
   const [_, setPlainText] = useState("");
   return (
     <>
@@ -98,7 +97,7 @@ export const FormField = <T extends FieldValues>({
                   onBlur={() => {
                     onBlur();
                     if (props.onBlurEvent) {
-                      props.onBlurEvent(value as string);
+                      props.onBlurEvent(value);
                     }
                   }}
                   onChangeText={(value) => {
@@ -107,7 +106,7 @@ export const FormField = <T extends FieldValues>({
                     }
                     onChange(value);
                   }}
-                  value={value as string}
+                  value={value}
                   editable={editable}
                 />
               );
@@ -129,14 +128,15 @@ export const FormField = <T extends FieldValues>({
                 return null;
               }
 
-            case "datepicker":
+            case "datepicker": {
               return (
                 <DatePickerComponent
-                  value={value as Date}
+                  value={value}
                   onChange={onChange}
                   onBlur={onBlur}
                 />
               );
+            }
             case "image":
               return (
                 <View className={`items-center w-30 h-30  ${className}`}>

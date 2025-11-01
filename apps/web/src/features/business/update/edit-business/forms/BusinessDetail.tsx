@@ -72,6 +72,7 @@ export default function BusinessDetail({
       label: "Business Name",
       name: "name",
       placeholder: "Business Name",
+      disabled: true,
       component: "input",
       error: errors.name?.message,
     },
@@ -81,6 +82,7 @@ export default function BusinessDetail({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
+      disabled: true,
       options:
         categories?.map((item) => ({ label: item.label, value: item.value })) ??
         [],

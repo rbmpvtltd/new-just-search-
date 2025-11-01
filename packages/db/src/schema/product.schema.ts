@@ -37,7 +37,6 @@ export const productInsertSchema = createInsertSchema(products, {
   productName: () => z.string().min(3, "Product name is required"),
   categoryId: () => z.number().min(1, "Category is required"),
   rate: () => z.number().min(1, "Rate is required"),
-  finalPrice: () => z.number().min(1, "Final price is required"),
   productDescription: () =>
     z
       .string()
@@ -66,20 +65,7 @@ export const productPhotos = pgTable("product_photos", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const productsRelations = relations(products, ({ many }) => ({
-  // Define a one-to-many relationship.
-  // When querying 'products', this property will hold an array of all related photos.
-  productPhotos: many(productPhotos),
-}));
 
-// 4. PRODUCT PHOTOS RELATIONS (For completeness, linking photos back to the product)
-export const productPhotosRelations = relations(productPhotos, ({ one }) => ({
-  // Define a many-to-one relationship.
-  product: one(products, {
-    fields: [productPhotos.productId],
-    references: [products.id],
-  }),
-}));
 // 3.products_reviews
 export const productReviews = pgTable("product_reviews", {
   id: serial("id").primaryKey(),
@@ -131,3 +117,32 @@ export const productSubCategories = pgTable("product_subcategories", {
     .notNull()
     .references(() => subcategories.id, { onDelete: "cascade" }),
 });
+
+
+
+
+export const productsRelations = relations(products, ({ many }) => ({
+  // Define a one-to-many relationship.
+  // When querying 'products', this property will hold an array of all related photos.
+  productPhotos: many(productPhotos),
+  productSubCategories: many(productSubCategories),
+}));
+
+// 4. PRODUCT PHOTOS RELATIONS (For completeness, linking photos back to the product)
+export const productPhotosRelations = relations(productPhotos, ({ one }) => ({
+  // Define a many-to-one relationship.
+  product: one(products, {
+    fields: [productPhotos.productId],
+    references: [products.id],
+  }),
+}));
+
+export const productSubCategoriesRelations = relations(
+  productSubCategories,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [productSubCategories.productId],
+      references: [products.id],
+    }),
+  }),
+);

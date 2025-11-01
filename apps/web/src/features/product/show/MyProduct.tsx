@@ -43,6 +43,7 @@ function ProductCard({ product }: { product: ProductType }) {
     trpc.businessrouter.deleteProduct.mutationOptions(),
   );
 
+
   return (
     <div className="bg-gray-100 rounded-2xl shadow-lg overflow-hidden flex sm:flex-row flex-col gap-4 p-4">
       <div className="flex justify-center sm:w-48">
@@ -71,7 +72,7 @@ function ProductCard({ product }: { product: ProductType }) {
 
         <div className="mt-4 flex gap-2">
           <Link
-            href={`/business/product/edit/${product.productSlug}`}
+            href={`/user/product/edit/${product.productSlug}`}
             className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center gap-2"
           >
             <Pencil className="w-4 h-4" />

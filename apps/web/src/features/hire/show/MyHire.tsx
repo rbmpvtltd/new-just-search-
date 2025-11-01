@@ -70,14 +70,14 @@ export default function MyHire({ data }: { data: MyHireType }) {
           </div>
 
           <div className="flex-1 flex flex-col justify-start pl-4">
-            {/* <div>
+            <div>
               <h2 className="text-xl font-semibold text-gray-800">
                 {data.name}
               </h2>
               <p className="text-gray-600 mt-2 leading-relaxed">
                 {data.area}, {data.city.city}
               </p>
-            </div> */}
+            </div>
 
             <div className="mt-6 flex gap-2">
               <Link

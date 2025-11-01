@@ -60,6 +60,10 @@ export const offersInsertSchema = createInsertSchema(offers, {
     image4: z.string().optional(),
     image5: z.string().optional(),
   });
+export const offersUpdateSchema = offersInsertSchema.extend({
+  offerSlug: z.string().optional(), 
+});
+
 // 2 OfferPhoto
 export const offerPhotos = pgTable("offer_photos", {
   id: serial("id").primaryKey(),

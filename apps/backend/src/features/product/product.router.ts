@@ -10,7 +10,7 @@ import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
 
-export const businessrouter = router({
+export const productrouter = router({
   add: visitorProcedure.query(async ({ ctx }) => {
     const getBusinessCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 1),
@@ -135,6 +135,119 @@ export const businessrouter = router({
 
     return { products };
   }),
+
+  edit: businessProcedure
+    .input(z.object({ productSlug: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
+
+      const product = await db.query.products.findFirst({
+        where: (products, { and, eq }) =>
+          and(
+            eq(products.productSlug, input.productSlug),
+            eq(products.businessId, business.id),
+          ),
+        with: {
+          productPhotos: true,
+          productSubCategories: true,
+        },
+      });
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        });
+      }
+      return { product };
+    }),
+  update: businessProcedure
+    .input(productInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
+
+      const isProductExists = await db.query.products.findFirst({
+        where: (products, { eq }) =>
+          eq(products.productSlug, String(input.productSlug)),
+      });
+
+      if (!isProductExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        });
+      }
+
+      const updateProduct = await db
+        .update(schemas.product.products)
+        .set({
+          productName: input.productName,
+          categoryId: input.categoryId,
+          rate: input.rate,
+          productDescription: input.productDescription,
+        })
+        .where(eq(schemas.product.products.id, isProductExists.id));
+
+      if (!updateProduct) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Product not updated",
+        });
+      }
+
+      await db
+        .delete(schemas.product.productSubCategories)
+        .where(
+          eq(
+            schemas.product.productSubCategories.productId,
+            isProductExists.id,
+          ),
+        );
+      await db.insert(schemas.product.productSubCategories).values(
+        input.subcategoryId.map((subCategoryId) => ({
+          productId: isProductExists.id,
+          subcategoryId: Number(subCategoryId),
+        })),
+      );
+      const allPhotos = [
+        input.photo,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(schemas.product.productPhotos).values(
+          allPhotos.map((photo) => ({
+            productId: isProductExists.id,
+            photo,
+          })),
+        );
+      }
+      return {
+        success: true,
+        message: "Product updated successfully",
+      };
+    }),
 
   deleteProduct: businessProcedure
     .input(

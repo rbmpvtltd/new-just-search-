@@ -145,7 +145,7 @@ export const hireListing = pgTable("hire_listing", {
 });
 
 export const hireInsertSchema = createInsertSchema(hireListing, {
-  photo: () => z.string().min(1, "Photo is required"),
+  // photo: () => z.string().min(1, "Photo is required"),
   name: () => z.string().min(3, "Name should be minimum 3 characters long"),
   fatherName: () =>
     z.string().min(3, "Name should be minimum 3 characters long"),

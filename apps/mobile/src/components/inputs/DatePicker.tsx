@@ -1,15 +1,12 @@
-import React from "react";
-import { View, Platform, Pressable, Text } from "react-native";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import { useColorScheme } from "react-native";
-import Colors from "@/constants/Colors";
+import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
+import React from "react";
+import { Platform, Pressable, Text, useColorScheme, View } from "react-native";
+import Colors from "@/constants/Colors";
 
 type Props = {
-  value: Date;
-  onChange: (val: Date) => void;
+  value: string; // ✅ accept string now
+  onChange: (val: string) => void; // ✅ output string
   onBlur?: () => void;
   minimumDate?: Date;
   maximumDate?: Date;
@@ -25,10 +22,13 @@ const DatePickerComponent: React.FC<Props> = ({
   const colorScheme = useColorScheme();
   const [showPicker, setShowPicker] = React.useState(false);
 
+  // Safely convert string -> Date for display
+  const parsedDate = value ? new Date(value) : new Date();
+
   const handleChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
     if (event.type === "set" && selectedDate) {
-      onChange(selectedDate);
+      onChange(selectedDate.toISOString()); // ✅ output string
     }
     onBlur?.();
   };
@@ -41,14 +41,16 @@ const DatePickerComponent: React.FC<Props> = ({
             color: Colors[colorScheme ?? "light"]["secondary-content"],
           }}
         >
-          {format(value, "dd MMM yyyy")}
+          {value
+            ? format(parsedDate, "dd MMM yyyy")
+            : "Select Date"}
         </Text>
       </Pressable>
 
       {showPicker && (
         <DateTimePicker
           mode="date"
-          value={value}
+          value={parsedDate}
           onChange={handleChange}
           display={Platform.OS === "ios" ? "inline" : "default"}
           minimumDate={minimumDate}

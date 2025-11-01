@@ -113,6 +113,7 @@ export default function PersonalDetailsForm({
       placeholder: "Applied For",
       component: "select",
       section: "profile",
+      disabled: true,
       options: categories?.map((item) => ({
         label: item.label,
         value: Number(item.value),
