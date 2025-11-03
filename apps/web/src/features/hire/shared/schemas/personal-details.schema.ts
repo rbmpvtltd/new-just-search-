@@ -1,8 +1,6 @@
 "use client";
 // import { GENDER, LANGUAGES, MARITAL_STATUS } from "@repo/db";
 import { z } from "zod";
-import { GENDER, LANGUAGES, MaritalStatus } from "../constants/hire";
-
 //  readonly Married: "Married";
 //   readonly Unmarried: "Unmarried";
 //   readonly Widowed: "Widowed";

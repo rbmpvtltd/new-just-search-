@@ -2,7 +2,11 @@ import dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-dotenv.config({ path: "../../.env" });
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({
+    path: "../../.env",
+  });
+}
 
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
@@ -12,6 +16,7 @@ const pool = new Pool({
   port: Number(process.env.PGPORT) ?? 5432,
 });
 
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as auth from "./schema/auth.schema";
 import * as business from "./schema/business.schema";
 import * as hire from "./schema/hire.schema";
@@ -54,3 +59,9 @@ export const db = drizzle({
     ...user,
   },
 });
+
+export const dbmigration = async () => {
+  await migrate(db, {
+    migrationsFolder: "../drizzle",
+  });
+};

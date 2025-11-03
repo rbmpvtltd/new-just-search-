@@ -13,9 +13,9 @@ import { useRouter } from "next/navigation";
 
 type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
-type business = businesses extends (infer T)[] ? T : never;
 
-export const BussinessListingCard = ({ item ,category,subcategory,rating,initialFav}: { item: business,category?:string,subcategory?:string[],rating?:string|undefined,initialFav?:boolean }) => {
+
+export const BussinessListingCard = ({ item ,category,subcategory,rating,initialFav}: { item: businesses[0],category?:string,subcategory?:string[],rating?:string|undefined,initialFav?:boolean }) => {
   const router = useRouter()
   return (
     <div className="mx-auto p-4">

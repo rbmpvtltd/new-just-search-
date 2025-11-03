@@ -1,14 +1,13 @@
 // import { logger } from "@repo/logger";
 
 import fs from "node:fs";
-import { db, schemas } from "@repo/db";
+import { db, dbmigration, schemas } from "@repo/db";
 import { UserRole } from "@repo/db/src/schema/auth.schema";
 import { logger } from "@repo/logger";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import axios from "axios";
 import bodyParser from "body-parser";
 // import { applyWSSHandler } from "@trpc/server/adapters/ws";
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import { eq } from "drizzle-orm";
 import express from "express";
@@ -20,6 +19,16 @@ import { appRouter } from "./route";
 import { createContext } from "./utils/context";
 
 const app = express();
+
+(async () => {
+  try {
+    await dbmigration();
+    console.log("Migrations applied successfully");
+  } catch (error) {
+    console.error("Migration failed:", error);
+    process.exit(1); // Exit on failure in prod; log only in dev
+  }
+})();
 
 app.get("/", (req, res) => {
   return res.send("hello");
