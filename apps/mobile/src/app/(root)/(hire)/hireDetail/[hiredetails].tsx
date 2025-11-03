@@ -9,7 +9,7 @@ export default function HireDetailsScreen() {
   const { hiredetails } = useLocalSearchParams();
   
   return (
-    <SafeAreaView className="flex-1" edges={[""]}>
+    <SafeAreaView className="flex-1" edges={["top"]}>
 
     <View className=" flex-1 ">
       <HireDetailsCard item={hiredetails} />

@@ -22,6 +22,7 @@ import { dialPhone } from "@/utils/getContact";
 import Review from "../forms/review";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
+import { Loading } from "../ui/Loading";
 
 const screenWidth = Dimensions.get("window").width;
 export default function HireDetailsCard(item: any) {
@@ -38,7 +39,7 @@ export default function HireDetailsCard(item: any) {
   );
   if (isLoading) {
     return (
-      <Text className="text-secondary text-3xl">data load ho riye hai</Text>
+      <Loading position="center" size={"large"}/>
     );
   }
   console.log("data is ===========>", JSON.stringify(data, null, 2));
