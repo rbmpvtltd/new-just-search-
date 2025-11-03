@@ -1,4 +1,4 @@
-import { logger } from "@repo/helper";
+import { logger } from "@repo/logger";
 
 export const sendSMSOTP = (phoneNumber: string) => {
   // WARN: add real otp generator

@@ -34,7 +34,7 @@ export const clearAllTablesBusiness = async () => {
   // await db.execute(
   //   `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
   // );
-  await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
@@ -183,7 +183,7 @@ const addProductSubCategroy = async () => {
 
     await db.insert(productSubCategories).values({
       productId: Product.id,
-      subCategoryId: subCategory.id,
+      subcategoryId: subCategory.id,
     });
   }
   console.log("succcessfully seed of product_subcategory");

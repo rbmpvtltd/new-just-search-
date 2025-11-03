@@ -21,7 +21,7 @@ dotenv.config();
     // await notRelated();
     // await userSeed();
     // await fakeSeed();
-    await businessSeed();
+    // await businessSeed();
     // await hireSeed();
     // await productSeed();
     // await offerSeed();

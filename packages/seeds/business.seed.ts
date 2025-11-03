@@ -250,8 +250,10 @@ const addBusiness = async () => {
       }
     }
 
-    if (!createUser);
-    console.log("User not found" + row.id);
+    if (!createUser){
+
+      console.log("User not found" + row.id);
+    }
 
     let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
 

@@ -21,6 +21,7 @@ import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import { OutputTrpcType } from "@/lib/trpc";
+import Favourite from "../shared/FaouritBtn";
 
 
 type DetailCardType = OutputTrpcType["subcategoryRouter"]["businessesByCategoryInfinate"]["data"][number];
@@ -114,40 +115,7 @@ function DetailCard({
         )} */}
         {Number(type) === 1 && (
           <View className="w-[10%]">
-            <Pressable
-              onPress={() => {
-                if (!isAuthenticated) {
-                  showLoginAlert({
-                    message: "Need to login to add to your wishlist",
-                    onConfirm: () => {
-                      clearToken();
-                      router.push("/(root)/profile/profile");
-                    },
-                  });
-                  return;
-                }
-                toggleWishlist(
-                  { listing_id: item?.id?.toString() },
-                  {
-                    onSuccess: () => {
-                      console.log("Wishlist added successfully");
-                    },
-                    onError: (error) => {
-                      console.log("error", error);
-                      Alert.alert("Error toggling wishlist", error?.message);
-                    },
-                  },
-                );
-              }}
-            >
-              <Ionicons
-                size={30}
-                color={
-                  isFavourite ? "red" : Colors[colorScheme ?? "light"].secondary
-                }
-                name={isFavourite ? "heart" : "heart-outline"}
-              />
-            </Pressable>
+           <Favourite initialFav={item.isFavourite} businessId={item.id}/>
           </View>
         )}
       </View>

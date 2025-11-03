@@ -12,6 +12,8 @@ const env = cleanEnv(process.env, {
     choices: ["development", "test", "production"],
     default: "development",
   }),
+  NEXT_PUBLIC_BACKEND_URL: str(),
+  EXPO_PUBLIC_BACKEND_URL: str(),
   CLOUDINARY_CLOUD_NAME: str(),
   CLOUDINARY_API_KEY: str(),
   CLOUDINARY_API_SECRET: str(),

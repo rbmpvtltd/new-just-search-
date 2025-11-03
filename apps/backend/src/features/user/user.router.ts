@@ -1,6 +1,6 @@
 import { db, schemas } from "@repo/db";
 import { userUpdateSchema } from "@repo/db/src/schema/user.schema";
-import { logger } from "@repo/helper";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";

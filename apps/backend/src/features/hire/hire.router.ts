@@ -1,13 +1,12 @@
-import { db, schemas } from "@repo/db";
+import { schemas,db } from "@repo/db";
 import {
-  hireCategories,
   hireInsertSchema,
   hireListing,
   hireUpdateSchema,
 } from "@repo/db/src/schema/hire.schema";
-import { logger } from "@repo/helper";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { count, eq, sql } from "drizzle-orm";
+import { count, eq, gt, sql } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
 import {
@@ -21,7 +20,7 @@ import { cities, states } from "@repo/db/src/schema/not-related.schema";
 import { users } from "@repo/db/src/schema/auth.schema";
 
 export const hirerouter = router({
-  add: visitorProcedure.query(async ({ ctx }) => {
+  add: visitorProcedure.query(async () => {
     const getHireCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 2),
     });
@@ -491,7 +490,6 @@ export const hirerouter = router({
       }),
     )
     .query(async ({ input }) => {
-      console.log("execution comes here");
       const limit = input.limit ?? 10;
       const offset = (input.page - 1) * limit;
 
@@ -543,7 +541,6 @@ export const hirerouter = router({
         .groupBy(hireListing.id)
         .limit(limit)
         .offset(offset);
-      console.log("execution comes here ===================>", data);
 
       const totalCount = await db.select({ count: count() }).from(hireListing);
 
@@ -557,16 +554,13 @@ export const hirerouter = router({
   singleHire: publicProcedure
     .input(z.object({ hireId: z.number() }))
     .query(async ({ input }) => {
-      console.log(
-        "execution comes here with hire id =============>",
-        input.hireId,
-      );
+      
       const data = await db
         .select({
           id: hireListing.id,
           name: hireListing.name,
           email: hireListing.email,
-          photo : hireListing.photo,
+          photo: hireListing.photo,
           languages: hireListing.languages,
           area: hireListing.area,
           streetName: hireListing.streetName,
@@ -590,9 +584,9 @@ export const hirerouter = router({
           latitude: hireListing.latitude,
           longitude: hireListing.latitude,
           pincode: hireListing.pincode,
-          jobType : hireListing.jobType,
+          jobType: hireListing.jobType,
           city: cities.city,
-          mobileNo : users.phoneNumber,
+          mobileNo: users.phoneNumber,
           state: states.name,
           subcategories: sql<string[]>`
             COALESCE(
@@ -608,7 +602,7 @@ export const hirerouter = router({
         .from(hireListing)
         .leftJoin(cities, eq(hireListing.city, cities.id))
         .leftJoin(states, eq(hireListing.state, states.id))
-        .leftJoin(users,eq(hireListing.userId,users.id))
+        .leftJoin(users, eq(hireListing.userId, users.id))
         .leftJoin(
           schemas.hire.hireSubcategories,
           eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
@@ -627,12 +621,83 @@ export const hirerouter = router({
             schemas.not_related.categories.id,
           ),
         )
-        
-        .groupBy(hireListing.id,cities.city,states.name,users.phoneNumber)
+
+        .groupBy(hireListing.id, cities.city, states.name, users.phoneNumber)
         .where(eq(hireListing.id, input.hireId));
       return {
         data: data[0],
         status: true,
+      };
+    }),
+
+  MobileAllHireLising: publicProcedure
+    .input(
+      z.object({
+        cursor: z.number(),
+        limit: z.number().min(1).max(20).nullish(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const limit = input.limit ?? 10;
+
+      const data = await db
+        .select({
+          id: hireListing.id,
+          name: hireListing.name,
+          photo: hireListing.photo,
+          area: hireListing.area,
+          streetName: hireListing.streetName,
+          buildingName: hireListing.buildingName,
+          longitude: hireListing.longitude,
+          latitude: hireListing.latitude,
+          phoneNumber: hireListing.mobileNumber,
+          jobType : hireListing.jobType,
+          jobRole : hireListing.jobRole,
+          subcategories: sql<string[]>`
+            COALESCE(
+              ARRAY_AGG(DISTINCT subcategories.name) 
+              FILTER (WHERE subcategories.id IS NOT NULL),
+              '{}'
+            )
+          `,
+          category: sql<string | null>`
+        MAX(${schemas.not_related.categories.title})
+      `,
+        })
+        .from(hireListing)
+        .innerJoin(
+          schemas.hire.hireCategories,
+          eq(hireListing.id, schemas.hire.hireCategories.hireId),
+        )
+        .leftJoin(
+          schemas.hire.hireSubcategories,
+          eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
+        )
+        .leftJoin(
+          schemas.not_related.subcategories,
+          eq(
+            schemas.hire.hireSubcategories.subcategoryId,
+            schemas.not_related.subcategories.id,
+          ),
+        )
+        .leftJoin(
+          schemas.not_related.categories,
+          eq(
+            schemas.not_related.subcategories.categoryId,
+            schemas.not_related.categories.id,
+          ),
+        )
+        .where(
+          gt(hireListing.id, input.cursor),
+        )
+        .groupBy(hireListing.id)
+        .limit(limit)
+
+      const nextCursor = data[data.length - 1]?.id;
+
+      return {
+        data,
+        nextCursor
       };
     }),
 });

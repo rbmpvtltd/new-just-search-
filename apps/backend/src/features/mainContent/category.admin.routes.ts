@@ -9,7 +9,7 @@ import {
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/src/schema/not-related.schema";
-import { logger } from "@repo/helper";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";

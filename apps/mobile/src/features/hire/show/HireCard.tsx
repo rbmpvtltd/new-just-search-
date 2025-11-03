@@ -15,9 +15,13 @@ import { useStartChat } from "@/query/startChat";
 import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
+import { OutputTrpcType } from "@/lib/trpc";
+
+type HireCardType = OutputTrpcType["hirerouter"]["MobileAllHireLising"]["data"][0] | null
+
 
 const screenWidth = Dimensions.get("window").width;
-export default function HireCard({ item, title }: any) {
+export default function HireCard({ item, title }: {item : HireCardType ,title? :any}) {
   const colorScheme = useColorScheme();
   const { mutate: startChat } = useStartChat();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
@@ -52,7 +56,7 @@ export default function HireCard({ item, title }: any) {
         className="mx-auto mt-2 w-[60%]"
         style={{ aspectRatio, height: screenWidth * 0.6 * (1 / aspectRatio) }}
       >
-        <Pressable onPress={() => router.navigate(`/hireDetail/${item?.slug}`)}>
+        <Pressable onPress={() => router.navigate(`/hireDetail/${item?.id}`)}>
           <Image
             className="w-full h-full rounded-lg"
             source={{
@@ -68,54 +72,45 @@ export default function HireCard({ item, title }: any) {
             {item?.name}
           </Text>
         </View>
-        <View className="w-[20%] flex items-center justify-center">
+        {/* <View className="w-[20%] flex items-center justify-center">
           {Number(item?.user?.verify) === 1 && (
             <Ionicons name="checkmark-circle" size={28} color="green" />
           )}
-        </View>
+        </View> */}
       </View>
       <View className="flex-row gap-2 m-4 flex-wrap">
-        {item?.categories?.map((item: any, i: number) => (
+     
           <TouchableOpacity
-            key={i.toString()}
             className="bg-success-content rounded-lg py-2 px-3 mb-1"
           >
             <Text className="text-success font-semibold text-xs">
-              {item.title}
+              {item?.category ?? "fake category"}
             </Text>
           </TouchableOpacity>
-        ))}
-        {item?.subcategories?.map((item: any, i: number) => (
+        {item?.subcategories?.map((item: string, i: number) => (
           <TouchableOpacity
             key={i.toString()}
             className="bg-error-content rounded-lg py-2 px-3 mb-1"
           >
             <Text className="text-pink-700 font-semibold text-xs">
-              {item.name}
+              {item}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
       <View className="mx-4 ">
-        <Text className="text-secondary-content">{item.job_role}</Text>
+        <Text className="text-secondary-content">{item.jobRole}</Text>
       </View>
       <View className="mx-4 my-2">
         <Text className="text-secondary-content">
-          {(() => {
-            try {
-              const parsed = JSON.parse(item.job_type); // turn it into an array
-              return Array.isArray(parsed) ? parsed.join(", ") : parsed;
-            } catch {
-              return item.job_type; // fallback if it's not JSON
-            }
-          })()}
+          {item?.jobType}
         </Text>
       </View>
       <View className="mx-4 my-2">
         <Text className="text-secondary-content">
           <Ionicons name="location" />
-          {item?.real_address}
+          {item?.area} {item.streetName}, {item.buildingName}
         </Text>
       </View>
       <Pressable
@@ -125,11 +120,11 @@ export default function HireCard({ item, title }: any) {
               message: "Need to login to chat on your behalf",
               onConfirm: () => {
                 clearToken();
-                router.push("/user/bottomNav/profile");
+                router.push("/(root)/profile/profile");
               },
             });
           } else {
-            startChat(item.id, {
+            startChat(String(item.id), {
               onSuccess: (res) => {
                 console.log("Chat started:", res.chat_session_id);
 
@@ -161,7 +156,7 @@ export default function HireCard({ item, title }: any) {
         </View>
       </Pressable>
       <Pressable
-        onPress={() => dialPhone(item?.phone_number)}
+        onPress={() => dialPhone(item?.phoneNumber ?? "")}
         style={{
           width: "90%",
           backgroundColor: Colors[colorScheme ?? "light"].primary,

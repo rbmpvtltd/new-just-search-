@@ -1,27 +1,21 @@
-import { useEffect, useState } from "react";
-import { deleteToken, getToken } from "../utils/secureStore";
+import { useQuery } from "@tanstack/react-query";
+import { getTokenRole } from "@/utils/secureStore";
 import { useAuthStore } from "../store/authStore";
-import { fetchVerifyAuth } from "@/query/auth";
 
 export function useLoadToken() {
-  const setToken = useAuthStore((state) => state.setToken);
-  const clearToken = useAuthStore((state) => state.clearToken);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const initAuth = async () => {
-      const token = await getToken();
-      const user = await fetchVerifyAuth(token);
-      if (!user.success) {
-        await deleteToken();
-        clearToken();
-      } else {
-        setToken(user.token, user.role);
-      }
-      setLoading(false);
-    };
-    initAuth();
-  }, []);
-
-  return { loading };
+  const setTokenRole = useAuthStore((state) => state.setToken);
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["getexpostore"],
+    queryFn: async () => await getTokenRole(),
+  });
+  if (!isLoading) {
+    if (isError) {
+      // TODO: send to online logger;
+      console.error(error);
+      return;
+    }
+    setTokenRole(data?.token || null, data?.role || null);
+    return { success: true };
+  }
+  return { isLoading };
 }

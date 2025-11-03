@@ -1,8 +1,8 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { MemoizedDetailCard } from "@/components/cards/DetailCard";
-import HireCard from "@/components/hirePageComp/HireCard";
+import { MemoizedDetailCard } from "@/features/ business/show/DetailCard";
+import HireCard from "@/features/hire/show/HireCard";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import DataNotFound from "@/components/ui/DataNotFound";
 import { Loading } from "@/components/ui/Loading";
@@ -94,7 +94,8 @@ export default function SubCategory() {
               subcategories={item?.subcategories}
             />
           ) : (
-            <HireCard item={item} />
+            // <HireCard item={item} />\
+            <Text className="text-secondary">Hire Card Here</Text>
           );
         }}
         onEndReached={() => {

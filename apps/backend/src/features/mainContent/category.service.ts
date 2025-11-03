@@ -10,9 +10,7 @@ async function getPopularCategories(){
 }
 
 async function getAllCategories(){
-    console.log("execution comes here")
     const data = await db.select({photo : category.photo,title : category.title,id:category.id,type : category.type}).from(category)
-    console.log("categories data in backend ============>",data)
     return data
 }
 

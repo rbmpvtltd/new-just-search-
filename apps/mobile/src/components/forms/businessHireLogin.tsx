@@ -1,22 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { UserRole } from "@repo/db/src/schema/auth.schema";
+import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
-
+import { trpc } from "@/lib/trpc";
 import {
   type LoginBusinessFormData,
   loginBusinesSchema,
 } from "@/schemas/loginSchema";
 import { useAuthStore } from "@/store/authStore";
-import { setToken } from "@/utils/secureStore";
+import { setTokenRole } from "@/utils/secureStore";
 import Input from "../inputs/Input";
-import { useMutation } from "@tanstack/react-query";
-import { trpc } from "@/lib/trpc";
-import { UserRole } from "@repo/db/src/schema/auth.schema";
 
 export default function BusinessHireLogin() {
-  
-
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
   const {
     control: businessControl,
@@ -33,23 +30,24 @@ export default function BusinessHireLogin() {
   const loginMutation = useMutation(
     trpc.auth.login.mutationOptions({
       onSuccess: async (data) => {
+        console.log("data isn businessHireLogin.tsx line 36", data);
         if (data) {
-          console.log("data is ======>",data)
-          setAuthStoreToken(data?.session ?? "", UserRole.business); // TODO : set role as the response comes in future
-          await setToken(data?.session ?? "");
+          console.log("data is =dfsfsfsdfsdfsdfsdf=====>", data);
+          setAuthStoreToken(data?.session ?? "", data.role ?? "visiter"); // TODO : set role as the response comes in future
+          await setTokenRole(data?.session ?? "", data.role ?? "visiter");
           Alert.alert("Login Successfully");
           // router.push("/(root)/(home)/home");
           return router.back();
         }
       },
-      onError : async (error) => {
-        console.log("error",error)
+      onError: async (error) => {
+        console.log("error", error);
         Alert.alert("Something Went Wrong");
-      }
+      },
     }),
   );
 
-  const onSubmit = async (data: {username:string,password:string}) => {
+  const onSubmit = async (data: { username: string; password: string }) => {
     loginMutation.mutate(data);
   };
 

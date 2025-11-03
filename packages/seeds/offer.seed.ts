@@ -23,9 +23,9 @@ dotenv.config();
 
 export const offerSeed = async () => {
   await clearOfferSeed();
-  // await addOffer();
-  await addOfferReviews();
-  await addOfferSubcategories();
+  await addOffer();
+  // await addOfferReviews();
+  // await addOfferSubcategories();
 };
 
 const clearOfferSeed = async () => {
@@ -66,15 +66,14 @@ export const addOffer = async () => {
     const [offerCreate] = await db
       .insert(offers)
       .values({
-        id: row.id,
         businessId: business.id,
         categoryId: category.id,
-        productName: row.product_name,
-        productSlug: row.product_slug,
+        offerName: row.product_name,
+        offerSlug: row.product_slug,
         rate: row.rate,
         discountPercent: row.discount_percent,
         finalPrice: row.final_price,
-        productDescription: row.product_description,
+        offerDescription: row.product_description,
         offerStartDate: row.offer_start_date,
         offerEndDate: row.offer_end_date,
         reuploadCount: row.reupload_count,
@@ -167,8 +166,8 @@ export const addOfferSubcategories = async () => {
     }
 
     await db.insert(offerSubcategory).values({
-      offer_id: offer.id,
-      subcategory_id: subcategory.id,
+      offerId: offer.id,
+      subcategoryId: subcategory.id,
     });
   }
   console.log("successfully seed of OfferSubcategories");
