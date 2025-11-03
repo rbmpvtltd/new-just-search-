@@ -15,6 +15,7 @@
   },
   "scripts": {
     "dev": "bunx drizzle-kit studio",
+    "start": "bunx drizzle-kit migrate",
     "build": "bunx tsc -b",
     "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"
   },
