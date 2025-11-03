@@ -98,35 +98,35 @@ export default function ContactDetail() {
     setFormValue("email", data.email ?? "");
     console.log("formValue", formValue);
 
-    mutate(
-      { ...formValue, pincode: formValue.pincode },
-      {
-        onSuccess: async (data) => {
-          if (data.success) {
-            setRole("business");
-            await Swal.fire({
-              title: data.message,
-              icon: "success",
-              draggable: true,
-            });
-            clearPage();
-            router.push("/");
-          }
-          console.log("Success", data);
-        },
-        onError: (error) => {
-          if (isTRPCClientError(error)) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong!",
-              // footer: '<a href="#">Why do I have this issue?</a>',
-            });
-            console.error("Error", error.message);
-          }
-        },
-      },
-    );
+    // mutate(
+    //   { ...formValue, pincode: formValue.pincode },
+    //   {
+    //     onSuccess: async (data) => {
+    //       if (data.success) {
+    //         setRole("business");
+    //         await Swal.fire({
+    //           title: data.message,
+    //           icon: "success",
+    //           draggable: true,
+    //         });
+    //         clearPage();
+    //         router.push("/");
+    //       }
+    //       console.log("Success", data);
+    //     },
+    //     onError: (error) => {
+    //       if (isTRPCClientError(error)) {
+    //         Swal.fire({
+    //           icon: "error",
+    //           title: "Oops...",
+    //           text: "Something went wrong!",
+    //           // footer: '<a href="#">Why do I have this issue?</a>',
+    //         });
+    //         console.error("Error", error.message);
+    //       }
+    //     },
+    //   },
+    // );
   };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

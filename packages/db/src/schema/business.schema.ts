@@ -8,7 +8,11 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 import z from "zod";
 import {
   categories,
@@ -40,7 +44,9 @@ export const businessListings = pgTable("business_listings", {
   cityId: integer("city")
     .notNull()
     .references(() => cities.id, { onDelete: "cascade" }),
-  schedules: json("schedules"),
+  days: varchar("day", { length: 255 }).array(),
+  fromHour: varchar("from_hour", { length: 255 }),
+  toHour: varchar("to_hour", { length: 255 }),
   contactPerson: varchar("contact_person", { length: 255 }),
   status: boolean("status").default(true),
   ownerNumber: varchar("owner_number"),
@@ -84,7 +90,7 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
   pincode: () =>
     z.string().min(6, "Pincode should be minimum 6 characters long"),
   cityId: () => z.number().min(1, "City is required"),
-
+  state: () => z.number().min(1, "State is required"),
   contactPerson: () =>
     z.string().min(3, "Contact person should be minimum 3 characters long"),
   phoneNumber: () =>
@@ -94,14 +100,14 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
 }).extend({
   categoryId: z.number().min(1, "Category is required"),
   subcategoryId: z.array(z.number()).min(1, "Select at least one subcategory"),
-  state: z.number().min(1, "State is required"),
 });
 
-export const businessUpdateSchema=  createUpdateSchema(businessListings).extend({
-  categoryId: z.number(),
-  subcategoryId: z.array(z.number()),
-  state: z.number()
-})
+export const businessUpdateSchema = createUpdateSchema(businessListings).extend(
+  {
+    categoryId: z.number(),
+    subcategoryId: z.array(z.number()),
+  },
+);
 export const businessDetailSchema = businessInsertSchema.pick({
   photo: true,
   name: true,
@@ -125,7 +131,9 @@ export const addressDetailSchema = businessInsertSchema.pick({
 });
 
 export const businessTimingSchema = businessInsertSchema.pick({
-  alternativeMobileNumber: true,
+  days: true,
+  fromHour: true,
+  toHour: true,
 });
 
 export const contactDetailSchema = businessInsertSchema.pick({

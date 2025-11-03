@@ -113,33 +113,54 @@ export const offerrouter = router({
       };
     }),
 
-  showOffer: businessProcedure.query(async ({ ctx }) => {
-    if (!ctx.userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User not logged in",
+  showOffer: businessProcedure
+    .input(
+      z.object({
+        lastId: z.number().nullish(),
+        limit: z.number().default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit;
+      const lastId = input.lastId ?? 0;
+      if (!ctx.userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not logged in",
+        });
+      }
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
       });
-    }
-    const business = await db.query.businessListings.findFirst({
-      where: (businessListings, { eq }) =>
-        eq(businessListings.userId, ctx.userId),
-    });
-    if (!business) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Business not found",
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
+
+      const offers = await db.query.offers.findMany({
+        where: (offers, { and, gt, eq }) =>
+          and(
+            eq(offers.businessId, business.id),
+            lastId ? gt(offers.id, lastId) : undefined,
+          ),
+        orderBy: (offers, { asc }) => [asc(offers.id)],
+        limit,
+        // with: {
+        //   offerPhotos: true,
+        // },
       });
-    }
 
-    const offers = await db.query.offers.findMany({
-      where: (offers, { eq }) => eq(offers.businessId, business.id),
-      with: {
-        offerPhotos: true,
-      },
-    });
+      // if (!offers) {
+      //   return { message: "Offers not found" };
+      // }
 
-    return { offers };
-  }),
+      const nextId = offers.length > 0 ? offers[offers.length - 1]?.id : null;
+
+      return { offers, nextId };
+    }),
 
   edit: businessProcedure
     .input(z.object({ offerSlug: z.string() }))

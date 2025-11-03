@@ -11,7 +11,6 @@ import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SafeAreaView } from "react-native-safe-area-context";
 import type z from "zod";
 import {
   FormField,
@@ -30,16 +29,13 @@ export default function PersonalDetailsForm({
 }: {
   data: AddHirePageType;
 }) {
-  const router = useRouter();
   const setFormValue = useHireFormStore((s) => s.setFormValue);
   const nextPage = useHireFormStore((s) => s.nextPage);
   const formValue = useHireFormStore((s) => s.formValue);
-  const prevPage = useHireFormStore((s) => s.prevPage);
 
   const {
     control,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),

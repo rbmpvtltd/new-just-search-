@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessDetailSchema } from "@repo/db/src/schema/business.schema";
-import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
+import { useForm, useWatch } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
@@ -10,7 +11,7 @@ import {
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
-import type { OutputTrpcType } from "@/lib/trpc";
+import { type OutputTrpcType, trpc } from "@/lib/trpc";
 
 type BusinessDetailSchema = z.infer<typeof businessDetailSchema>;
 type AddBusinessPAgeType = OutputTrpcType["businessrouter"]["add"] | null;
@@ -20,6 +21,7 @@ export default function BusinessDetail({
   data: AddBusinessPAgeType;
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
+  const formValue = useBusinessFormStore((s) => s.formValue);
 
   const {
     control,
@@ -28,19 +30,34 @@ export default function BusinessDetail({
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
     defaultValues: {
-      name: "",
-      photo: "",
-      categoryId: 0,
-      subcategoryId: [],
-      specialities: "",
-      homeDelivery: false,
-      description: "",
+      name: formValue?.name ?? "",
+      photo: formValue?.photo ?? "",
+      categoryId: formValue?.categoryId ?? 0,
+      subcategoryId: formValue?.subcategoryId ?? [],
+      specialities: formValue?.specialities ?? "",
+      homeDelivery: formValue?.homeDelivery ?? false,
+      description: formValue?.description ?? "",
       // image2: "",
       // image3: "",
       // image4: "",
       // image5: "",
     },
   });
+
+  const categories = data?.getBusinessCategories.map((item: any) => {
+    return {
+      label: item.title,
+      value: item.id,
+    };
+  });
+
+  const selectedCategoryId = useWatch({ control, name: "categoryId" });
+
+  const { data: subCategories, isLoading } = useQuery(
+    trpc.businessrouter.getSubCategories.queryOptions({
+      categoryId: selectedCategoryId,
+    }),
+  );
 
   const onSubmit = (data: BusinessDetailSchema) => {
     setFormValue("name", data.name ?? "");
@@ -81,7 +98,12 @@ export default function BusinessDetail({
       name: "categoryId",
       label: "Category",
       placeholder: "Select Category",
-      data: [{ label: "Hire", value: "1" }],
+      data: [
+        ...(categories ?? []).map((item, index) => ({
+          label: item.label,
+          value: item.value,
+        })),
+      ],
       component: "dropdown",
       multiselect: 1,
       className: "w-[90%] bg-base-200",
@@ -92,7 +114,12 @@ export default function BusinessDetail({
       name: "subcategoryId",
       label: "Sub Category",
       placeholder: "Select Sub Category",
-      data: [{ label: "Hire", value: "1" }],
+      data: [
+        ...(subCategories ?? []).map((item, index) => ({
+          label: item.name,
+          value: item.id,
+        })),
+      ],
       component: "multiselectdropdown",
       className: "w-[90%] bg-base-200",
       error: errors.subcategoryId?.message,
