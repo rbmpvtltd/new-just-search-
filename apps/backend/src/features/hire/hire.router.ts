@@ -557,10 +557,15 @@ export const hirerouter = router({
   singleHire: publicProcedure
     .input(z.object({ hireId: z.number() }))
     .query(async ({ input }) => {
+<<<<<<< Updated upstream
       console.log(
         "execution comes here with hire id =============>",
         input.hireId,
       );
+=======
+      console.log("execution comes here with id ==============>",input.hireId)
+      
+>>>>>>> Stashed changes
       const data = await db
         .select({
           id: hireListing.id,
@@ -630,6 +635,8 @@ export const hirerouter = router({
         
         .groupBy(hireListing.id,cities.city,states.name,users.phoneNumber)
         .where(eq(hireListing.id, input.hireId));
+
+        console.log("================data is =============",data)
       return {
         data: data[0],
         status: true,

@@ -52,7 +52,11 @@ export default function HireCard({ item, title }: any) {
         className="mx-auto mt-2 w-[60%]"
         style={{ aspectRatio, height: screenWidth * 0.6 * (1 / aspectRatio) }}
       >
+<<<<<<< Updated upstream:apps/mobile/src/components/hirePageComp/HireCard.tsx
         <Pressable onPress={() => router.navigate(`/hireDetail/${item?.slug}`)}>
+=======
+        <Pressable onPress={() => router.push(`/(root)/(hire)/hireDetail/${item.id}`)}>
+>>>>>>> Stashed changes:apps/mobile/src/features/hire/show/HireCard.tsx
           <Image
             className="w-full h-full rounded-lg"
             source={{
