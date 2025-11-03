@@ -3,7 +3,6 @@
 import type { UserRole } from "@repo/db";
 import { create } from "zustand";
 import { queryClient } from "@/lib/trpc";
-import { deleteTokenRole } from "@/utils/secureStore";
 
 // export enum role {
 //   business = "business",
@@ -29,6 +28,5 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   clearToken: () => {
     set({ token: null, authenticated: false });
-    deleteTokenRole();
   },
 }));

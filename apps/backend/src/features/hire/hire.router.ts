@@ -4,7 +4,7 @@ import {
   hireListing,
   hireUpdateSchema,
 } from "@repo/db/src/schema/hire.schema";
-import { logger } from "@repo/helper";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { count, eq, gt, sql } from "drizzle-orm";
 import slugify from "slugify";

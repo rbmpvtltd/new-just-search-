@@ -27,6 +27,7 @@
         "@oslojs/encoding": "^1.1.0",
         "@repo/db": "*",
         "@repo/helper": "*",
+        "@repo/logger": "*",
         "@trpc/server": "^11.5.0",
         "@types/cookie-parser": "^1.4.9",
         "@types/cors": "^2.8.19",
@@ -339,6 +340,20 @@
       "version": "0.1.0",
       "dependencies": {
         "cloudinary": "^2.7.0",
+        "winston": "^3.17.0",
+      },
+      "devDependencies": {
+        "@repo/typescript-config": "*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/logger": {
+      "name": "@repo/logger",
+      "version": "0.1.0",
+      "dependencies": {
         "winston": "^3.17.0",
       },
       "devDependencies": {
@@ -1295,6 +1310,8 @@
     "@repo/db": ["@repo/db@workspace:packages/db"],
 
     "@repo/helper": ["@repo/helper@workspace:packages/helper"],
+
+    "@repo/logger": ["@repo/logger@workspace:packages/logger"],
 
     "@repo/types": ["@repo/types@workspace:packages/types"],
 

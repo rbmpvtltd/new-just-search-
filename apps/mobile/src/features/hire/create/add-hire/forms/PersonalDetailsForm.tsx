@@ -52,12 +52,12 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
     },
   });
 
-//   const categories = data?.getHireCategories.map((item: any) => {
-//     return {
-//       label: item.title,
-//       value: item.id,
-//     };
-//   });
+  //   const categories = data?.getHireCategories.map((item: any) => {
+  //     return {
+  //       label: item.title,
+  //       value: item.id,
+  //     };
+  //   });
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
@@ -67,20 +67,20 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
     }),
   );
 
-//   const states = data?.getStates.map((item: any) => {
-//     return {
-//       label: item.name,
-//       value: item.id,
-//     };
-//   });
+  //   const states = data?.getStates.map((item: any) => {
+  //     return {
+  //       label: item.name,
+  //       value: item.id,
+  //     };
+  //   });
 
   const selectedStateId = useWatch({ control, name: "state" });
 
-//   const { data: cities, isLoading: cityLoading } = useQuery(
-//     trpc.hirerouter.getCities.queryOptions({
-//       state: Number(selectedStateId),
-//     }),
-//   );
+  //   const { data: cities, isLoading: cityLoading } = useQuery(
+  //     trpc.hirerouter.getCities.queryOptions({
+  //       state: Number(selectedStateId),
+  //     }),
+  //   );
 
   const onSubmit = (data: PersonalDetailsSchema) => {
     setFormValue("photo", data.photo);
@@ -132,6 +132,10 @@ export default function PersonalDetailsForm({ data }: { data: any }) {
         {
           label: "Select Category",
           value: "Select Category",
+        },
+        {
+          label: "Select Categorys",
+          value: "Select Category1",
         },
       ],
       component: "dropdown",

@@ -1,0 +1,23 @@
+{
+  "name": "@repo/logger",
+	"version": "0.1.0",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@repo/typescript-config": "*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "prebuild": "tsc -b"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "winston": "^3.17.0"
+  }
+}

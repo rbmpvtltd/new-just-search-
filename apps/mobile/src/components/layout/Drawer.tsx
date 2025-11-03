@@ -26,6 +26,10 @@ const drawerFields: DrawerField[] = [
     name: "profile",
     route: "/(root)/profile/profile",
   },
+  {
+    name: "logout",
+    route: "/logout",
+  },
 ];
 
 interface DrawerField {

@@ -20,7 +20,7 @@ import {
   productReviews,
   products,
 } from "@repo/db/src/schema/product.schema";
-import { logger } from "@repo/helper";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import slugify from "slugify";

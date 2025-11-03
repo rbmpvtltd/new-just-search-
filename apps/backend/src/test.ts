@@ -1,3 +1,3 @@
-import { logger } from "@repo/helper";
+import { logger } from "@repo/logger";
 
 logger.info("hi");
