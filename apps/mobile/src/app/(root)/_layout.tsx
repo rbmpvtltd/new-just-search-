@@ -177,7 +177,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="(hire)/hire"
+        name="(hire)"
         options={{
           headerShown: false,
           title: "Hire",

@@ -56,7 +56,7 @@ export default function HireCard({ item, title }: {item : HireCardType ,title? :
         className="mx-auto mt-2 w-[60%]"
         style={{ aspectRatio, height: screenWidth * 0.6 * (1 / aspectRatio) }}
       >
-        <Pressable onPress={() => router.navigate(`/hireDetail/${item?.id}`)}>
+        <Pressable onPress={() => router.push(`/(root)/(hire)/hireDetail/${item.id}`)}>
           <Image
             className="w-full h-full rounded-lg"
             source={{

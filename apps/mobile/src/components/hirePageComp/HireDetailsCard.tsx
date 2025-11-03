@@ -20,6 +20,8 @@ import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import Review from "../forms/review";
+import { useQuery } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
 
 const screenWidth = Dimensions.get("window").width;
 export default function HireDetailsCard(item: any) {
@@ -31,52 +33,34 @@ export default function HireDetailsCard(item: any) {
   const clearToken = useAuthStore((state) => state.clearToken);
 
   const hiredetails = item?.item;
-
-  const { data } = useSuspenceData(
-    HIRE_DETAIL_URL.url,
-    HIRE_DETAIL_URL.key,
-    hiredetails,
+  const { data, isLoading, error } = useQuery(
+    trpc.hirerouter.singleHire.queryOptions({ hireId: Number(hiredetails) }),
   );
-
-  const hireDetails = data?.data?.listing;
-
-  const languages = useMemo(() => {
-    try {
-      const langParse = JSON.parse(hireDetails.languages);
-      if (Array.isArray(langParse)) {
-        return langParse.join(", ");
-      }
-    } catch (error) {
-      if (typeof hireDetails.languages === "string")
-        return hireDetails.languages;
-    }
-    return "";
-  }, [hireDetails]);
-
-  useEffect(() => {
-    if (hireDetails?.photo) {
-      const imgUrl = `https://www.justsearch.net.in/assets/images/${hireDetails?.photo}`;
-      Image.getSize(
-        imgUrl,
-        (width, height) => {
-          setAspectRatio(width / height);
-        },
-        (error) => {
-          console.log("Failed to load image dimensions", error);
-        },
-      );
-    }
-  }, [hireDetails?.photo]);
-
-  const imgUrl = hireDetails?.photo
-    ? `https://www.justsearch.net.in/assets/images/${hireDetails?.photo}`
-    : "https://www.justsearch.net.in/assets/images/9706277681737097544.jpg";
-  if (typeof hiredetails !== "string") {
-    return <Text>Invalid or missing slug</Text>;
+  if (isLoading) {
+    return (
+      <Text className="text-secondary text-3xl">data load ho riye hai</Text>
+    );
   }
+  console.log("data is ===========>", JSON.stringify(data, null, 2));
+  // return <Text className="text-secondary text-3xl">for test purpose {hiredetails}</Text>
 
-  const calculateAge = (dob: string): number => {
-    const birthDate = new Date(dob);
+  // useEffect(() => {
+  //   if (hireDetails?.photo) {
+  //     const imgUrl = `https://www.justsearch.net.in/assets/images/${hireDetails?.photo}`;
+  //     Image.getSize(
+  //       imgUrl,
+  //       (width, height) => {
+  //         setAspectRatio(width / height);
+  //       },
+  //       (error) => {
+  //         console.log("Failed to load image dimensions", error);
+  //       },
+  //     );
+  //   }
+  // }, [hireDetails?.photo]);
+
+  const calculateAge = (dob: string | null): number => {
+    const birthDate = new Date(String(dob));
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
 
@@ -92,8 +76,8 @@ export default function HireDetailsCard(item: any) {
     return age;
   };
 
-  if (!data?.data?.listing) {
-    Alert.alert("Not Found", data?.data?.message);
+  if (!data?.data?.id) {
+    Alert.alert("Not Found", "Listing Not Found");
     router.back();
     return;
   }
@@ -117,7 +101,7 @@ export default function HireDetailsCard(item: any) {
           <Image
             className=""
             source={{
-              uri: imgUrl,
+              uri: "https://www.justsearch.net.in/assets/images/9706277681737097544.jpg"
             }}
             style={{
               width: "100%",
@@ -129,28 +113,26 @@ export default function HireDetailsCard(item: any) {
 
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-xl font-semibold text-secondary">
-            {hireDetails?.name}
+            {data.data?.name}
           </Text>
           <Text className="text-secondary">
-            {hireDetails?.gender === 1 ? "M," : "F,"} AGE
-            {calculateAge(hireDetails?.dob)}
+            {data?.data?.gender} AGE
+            {calculateAge(data?.data?.dob)}
           </Text>
         </View>
         <View className="flex-row gap-2 mb-2 flex-wrap">
-          {hireDetails.categories && (
             <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">
               <Text className="text-success font-semibold text-xs">
-                {hireDetails.categories[0].title}
+                {data?.data?.category ?? "Fake Category"}
               </Text>
             </TouchableOpacity>
-          )}
-          {hireDetails?.subcategories?.map((item) => (
+          {data?.data?.subcategories?.map((item,i) => (
             <TouchableOpacity
-              key={item.id}
+              key={i.toString()}
               className="bg-error-content rounded-lg py-2 px-3 mb-1"
             >
               <Text className="text-pink-700 font-semibold text-xs">
-                {item.name}
+                {item}
               </Text>
             </TouchableOpacity>
           ))}
@@ -159,13 +141,13 @@ export default function HireDetailsCard(item: any) {
         <View className="flex-row items-center gap-4 mb-1">
           <Ionicons name="mail-outline" size={16} color="#888" />
           <Text className="text-lg text-secondary items-baseline">
-            {hireDetails.email}
+            {data?.data?.email}
           </Text>
         </View>
         <View className="flex-row items-center gap-4 mb-2">
           <Ionicons name="call-outline" size={16} color="#888" />
           <Text className="text-lg text-secondary">
-            {hireDetails.phone_number}
+            {data?.data?.mobileNo ?? "9087654321"}
           </Text>
         </View>
         <View className="mb-2">
@@ -174,7 +156,7 @@ export default function HireDetailsCard(item: any) {
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Job Type:</Text>
               <Text className="text-secondary font-normal">
-                {hireDetails.job_type}
+                {data?.data?.jobType?.[0] ?? "Fake Job"}
               </Text>
             </Text>
           </View>
@@ -182,69 +164,66 @@ export default function HireDetailsCard(item: any) {
             <Ionicons name="time-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Experience:</Text>
-              {hireDetails.work_experience_year} Year
-              {hireDetails.work_experience_month} Month
+              {data?.data?.yearOfExp} Year
+              {data?.data?.monthOfExp} Month
             </Text>
           </View>
           <View className="flex-row items-center gap-4 mb-3">
             <Ionicons name="school-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Qualification:</Text>
-              {hireDetails.highest_qualification === "2"
+              {data?.data?.qualification === "2"
                 ? "Graduation"
-                : hireDetails.highest_qualification}
+                : data?.data?.qualification}
             </Text>
           </View>
           <View className="flex-row items-center gap-4 mb-3">
             <Ionicons name="time-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Shift: </Text>
-              {hireDetails.shift === "1"
-                ? "Morning"
-                : hireDetails.shift === "2"
-                  ? "Evening"
-                  : "Night"}
+              {data?.data?.workingShift?.join(",")}
+              {!data?.data?.workingShift.length && "Morning Shift"}
             </Text>
           </View>
           <View className="flex-row items-center gap-4 mb-3">
             <Ionicons name="star-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Expertise:</Text>
-              {hireDetails.expertise || "Unknown"}
+              {data?.data?.expertise || "Unknown"}
             </Text>
           </View>
           <View className="flex-row items-center gap-4 mb-3">
             <Ionicons name="language-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Languages: </Text>
-              <Text>{languages}</Text>
+              <Text>{data?.data?.languages?.join(",")}</Text>
+              {data?.data?.languages?.length && (<Text>Hindi</Text>)}
             </Text>
           </View>
 
-          {hireDetails.skillset && (
+          
             <View className="flex-row items-center gap-4 mb-3">
               <Ionicons name="construct-outline" size={16} color="#888" />
               <Text className="text-lg text-secondary">
                 <Text className="font-semibold">Skillsets:</Text>
                 <Text className="text-secondary font-light">
-                  {hireDetails?.skillset}
+                  {data?.data?.skillSet}
                 </Text>
               </Text>
             </View>
-          )}
           <View className="flex-row items-center gap-4 mb-3">
             <Ionicons name="globe-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Willing to Relocate:</Text>
-              {hireDetails.relocate === 1 ? "Yes" : "No"}
+              {Number(data?.data?.relocate) === 1 ? "Yes" : "No"}
             </Text>
           </View>
           <View className="w-[95%] flex-row items-center gap-4 mb-3">
             <Ionicons name="location-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary w-[100%]">
               <Text className="font-semibold w-[90%]">Location:</Text>
-              {hireDetails.real_address}, {data?.data?.city?.city},
-              {data?.data?.state?.name}, {hireDetails.pincode}
+              {data?.data?.area}, {data?.data?.city},
+              {data?.data?.state}, {data?.data?.pincode}
             </Text>
           </View>
         </View>
@@ -258,11 +237,11 @@ export default function HireDetailsCard(item: any) {
                       message: "Need to login to chat on your behalf",
                       onConfirm: () => {
                         clearToken();
-                        router.push("/user/bottomNav/profile");
+                        router.push("/(root)/profile/profile");
                       },
                     });
                   } else {
-                    startChat(hireDetails.id, {
+                    startChat(String(data?.data?.id), {
                       onSuccess: (res) => {
                         console.log("Chat started:", res.chat_session_id);
 
@@ -287,7 +266,7 @@ export default function HireDetailsCard(item: any) {
               </Pressable>
             </View>
             <View className="w-[45%] bg-primary rounded-lg py-2 px-4">
-              <Pressable onPress={() => dialPhone(hireDetails.phone_number)}>
+              <Pressable onPress={() => dialPhone(String(data?.data?.mobileNo))}>
                 <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
                   <Ionicons size={20} name="call" color={"white"} />
                   <Text className="text-[#ffffff] font-semibold">
@@ -298,7 +277,7 @@ export default function HireDetailsCard(item: any) {
             </View>
           </View>
         </View>
-        <Review listingId={hireDetails.id} />
+        <Review listingId={data?.data?.id} />
       </View>
     </ScrollView>
   );
