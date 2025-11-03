@@ -115,13 +115,13 @@ export const offerrouter = router({
   showOffer: businessProcedure
     .input(
       z.object({
-        lastId: z.number().nullish(),
+        cursor: z.number().nullish(),
         limit: z.number().default(10),
       }),
     )
     .query(async ({ ctx, input }) => {
       const limit = input.limit;
-      const lastId = input.lastId ?? 0;
+      const cursor = input.cursor ?? 0;
       if (!ctx.userId) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -143,22 +143,23 @@ export const offerrouter = router({
         where: (offers, { and, gt, eq }) =>
           and(
             eq(offers.businessId, business.id),
-            lastId ? gt(offers.id, lastId) : undefined,
+            cursor ? gt(offers.id, cursor) : undefined,
           ),
         orderBy: (offers, { asc }) => [asc(offers.id)],
         limit,
-        // with: {
-        //   offerPhotos: true,
-        // },
+        with: {
+          offerPhotos: true,
+        },
       });
 
       // if (!offers) {
       //   return { message: "Offers not found" };
       // }
 
-      const nextId = offers.length > 0 ? offers[offers.length - 1]?.id : null;
+      const nextCursor =
+        offers.length > 0 ? offers[offers.length - 1]?.id : null;
 
-      return { offers, nextId };
+      return { offers, nextCursor };
     }),
 
   edit: businessProcedure

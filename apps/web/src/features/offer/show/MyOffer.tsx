@@ -1,5 +1,5 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,13 +11,23 @@ import type { OutputTrpcType } from "@/trpc/type";
 
 export default function MyOffer() {
   const trpc = useTRPC();
-  const { data: myOffers, isLoading } = useQuery(
-    trpc.businessrouter.showOffer.queryOptions(),
+  const { data: myOffers, isLoading } = useInfiniteQuery(
+    trpc.offerrouter.showOffer.infiniteQueryOptions(
+      {
+        cursor: 0,
+        limit: 10,
+      },
+      {
+        getNextPageParam: (data) => data.nextCursor,
+      },
+    ),
   );
 
   if (isLoading) {
     return <Spinner />;
   }
+
+  const offersData = myOffers?.pages.flatMap((page) => page.offers || []) ?? [];
 
   return (
     <div className="p-6">
@@ -30,12 +40,12 @@ export default function MyOffer() {
         <div>Action</div>
       </div>
 
-      {myOffers?.offers ? (
-        myOffers.offers.map((offer, index) => (
+      {offersData ? (
+        offersData.map((offer, index) => (
           <OfferCard key={offer.id} offer={offer} index={index} />
         ))
       ) : (
-        <p className="text-center text-gray-500">No products found</p>
+        <p className="text-center text-gray-500">No offers found</p>
       )}
     </div>
   );

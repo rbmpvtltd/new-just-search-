@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 export default function MyOffersList() {
@@ -17,13 +18,26 @@ export default function MyOffersList() {
     data: myOffers,
     isLoading,
     isError,
-  } = useQuery(trpc.offerrouter.showOffer.queryOptions());
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    trpc.offerrouter.showOffer.infiniteQueryOptions(
+      {
+        cursor: 0,
+        limit: 10,
+      },
+      {
+        getNextPageParam: (data) => data.nextCursor,
+      },
+    ),
+  );
   const router = useRouter();
   if (isLoading) return <ActivityIndicator />;
 
   if (isError) return <SomethingWrong />;
 
-  if (!myOffers?.offers || myOffers.offers.length === 0)
+  if (!myOffers?.pages[0].offers || myOffers.pages[0].offers.length === 0)
     return (
       <View className="px-4 mt-4">
         <Pressable
@@ -37,17 +51,18 @@ export default function MyOffersList() {
         </Pressable>
       </View>
     );
-  const offersData = myOffers?.offers ?? [];
+  const offersData = myOffers?.pages.flatMap((page) => page.offers || []) ?? [];
 
   return (
     <View className="flex-1 bg-base-100">
       <FlatList
         data={offersData}
         renderItem={({ item }) => <OfferCard item={item} />}
-        // onEndReached={() => {
-        //   if (hasNextPage) fetchNextPage();
-        // }}
+        onEndReached={() => {
+          if (hasNextPage) fetchNextPage();
+        }}
         onEndReachedThreshold={0.5}
+        ListFooterComponent={() => (isFetchingNextPage ? <Loading /> : null)}
       />
     </View>
   );
