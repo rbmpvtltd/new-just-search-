@@ -115,7 +115,7 @@ export const offerrouter = router({
   showOffer: businessProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.number(),
         limit: z.number().default(10),
       }),
     )
