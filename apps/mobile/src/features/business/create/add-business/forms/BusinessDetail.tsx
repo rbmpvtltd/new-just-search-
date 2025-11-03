@@ -5,6 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
@@ -59,14 +60,17 @@ export default function BusinessDetail({
     }),
   );
 
-  const onSubmit = (data: BusinessDetailSchema) => {
+  const onSubmit = async (data: BusinessDetailSchema) => {
+    const file = await uploadToCloudinary([data.photo], "business");
+    console.log(file[0]);
     setFormValue("name", data.name ?? "");
-    setFormValue("photo", data.photo ?? "");
+    setFormValue("photo", file[0] ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
     setFormValue("subcategoryId", data.subcategoryId ?? "");
     setFormValue("specialities", data.specialities ?? "");
     setFormValue("homeDelivery", data.homeDelivery ?? "");
     setFormValue("description", data.description ?? "");
+
     // setFormValue("image1", data.image1 ?? "");
     // setFormValue("image2", data.image2 ?? "");
     // setFormValue("image3", data.image3 ?? "");

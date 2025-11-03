@@ -1,5 +1,5 @@
-import { trpc } from "@/lib/trpc";
-import { asyncHandler } from "@/utils/error/asyncHandler";
+import { trpcClient } from "@/lib/trpc";
+import { asyncHandler } from "@/utils/asyncHandler";
 
 function isBlobUrl(url: string) {
   try {
@@ -14,13 +14,13 @@ export const uploadToCloudinary = async (
   folder: string = "unknown",
   tags: string = "",
   eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
-): Promise<(string | null )[]> => {
+): Promise<(string | null)[]> => {
   const signResponse = await asyncHandler(
-      trpc.cloudinarySignature.signUploadForm.queryOptions({
+    trpcClient.cloudinarySignature.signUploadForm.query({
       eager,
       folder,
       tags,
-    })
+    }),
   );
 
   const uploadPromises: Promise<string | null>[] = [];
