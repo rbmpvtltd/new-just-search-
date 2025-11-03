@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { getTokenRole } from "@/utils/secureStore";
 import { useAuthStore } from "../store/authStore";
 
@@ -8,15 +9,17 @@ export function useLoadToken() {
     queryKey: ["getexpostore"],
     queryFn: async () => await getTokenRole(),
   });
-  if (!isLoading) {
+
+  useEffect(() => {
+    if (!isLoading && !isError && data) {
+      setTokenRole(data?.token || null, data?.role || null);
+    }
+
     if (isError) {
       // TODO: send to online logger;
       console.error(error);
-      return;
     }
-    setTokenRole(data?.token || null, data?.role || null);
-    return { success: true };
-  }
+  }, [isLoading, isError, data, error, setTokenRole]);
   return { isLoading };
 }
 
@@ -46,7 +49,7 @@ export function useLoadToken() {
 //   // Step 2: Only verify if token exists
 //   const { data, error, isLoading: isVerifying } = useQuery({
 //     ...trpc.auth.verifyauth.queryOptions(),
-//     enabled: !!token, // ⚠️ Only run when token is available
+//     enabled: !!token, // ! Only run when token is available
 //   });
 
 //   // Step 3: React to verification result
