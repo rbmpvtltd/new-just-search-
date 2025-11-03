@@ -1,6 +1,6 @@
 import { db, schemas } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import { eq, sql } from "drizzle-orm";
-import { users } from "../../../../../packages/db/src/schema/auth.schema";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;

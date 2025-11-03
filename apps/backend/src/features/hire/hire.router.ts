@@ -1,9 +1,11 @@
-import { schemas,db } from "@repo/db";
+import { db, schemas } from "@repo/db";
+import { users } from "@repo/db/src/schema/auth.schema";
 import {
   hireInsertSchema,
   hireListing,
   hireUpdateSchema,
 } from "@repo/db/src/schema/hire.schema";
+import { cities, states } from "@repo/db/src/schema/not-related.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { count, eq, gt, sql } from "drizzle-orm";
@@ -16,14 +18,13 @@ import {
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
-import { cities, states } from "@repo/db/src/schema/not-related.schema";
-import { users } from "@repo/db/src/schema/auth.schema";
 
 export const hirerouter = router({
   add: visitorProcedure.query(async () => {
     const getHireCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 2),
     });
+
     const getStates = await db.query.states.findMany();
 
     return {
@@ -554,7 +555,6 @@ export const hirerouter = router({
   singleHire: publicProcedure
     .input(z.object({ hireId: z.number() }))
     .query(async ({ input }) => {
-      
       const data = await db
         .select({
           id: hireListing.id,
@@ -625,7 +625,7 @@ export const hirerouter = router({
         .groupBy(hireListing.id, cities.city, states.name, users.phoneNumber)
         .where(eq(hireListing.id, input.hireId));
 
-        console.log("================data is =============",data)
+      console.log("================data is =============", data);
       return {
         data: data[0],
         status: true,
@@ -653,8 +653,8 @@ export const hirerouter = router({
           longitude: hireListing.longitude,
           latitude: hireListing.latitude,
           phoneNumber: hireListing.mobileNumber,
-          jobType : hireListing.jobType,
-          jobRole : hireListing.jobRole,
+          jobType: hireListing.jobType,
+          jobRole: hireListing.jobRole,
           subcategories: sql<string[]>`
             COALESCE(
               ARRAY_AGG(DISTINCT subcategories.name) 
@@ -689,17 +689,15 @@ export const hirerouter = router({
             schemas.not_related.categories.id,
           ),
         )
-        .where(
-          gt(hireListing.id, input.cursor),
-        )
+        .where(gt(hireListing.id, input.cursor))
         .groupBy(hireListing.id)
-        .limit(limit)
+        .limit(limit);
 
       const nextCursor = data[data.length - 1]?.id;
 
       return {
         data,
-        nextCursor
+        nextCursor,
       };
     }),
 });

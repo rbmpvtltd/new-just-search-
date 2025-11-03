@@ -12,14 +12,6 @@
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
-  "include": [
-    "./src/**/*",
-    "test/offer.schema.ts",
-    "test/business.schema.ts",
-    "test/user.schema.ts",
-    "test/hire.schema.ts",
-    "test/plan.schema.ts",
-    "test/product.shema.ts"
-  ],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist", "test"]
 }
