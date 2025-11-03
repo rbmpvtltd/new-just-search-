@@ -10,17 +10,13 @@ export type OutputTrpcType = inferRouterOutputs<AppRouter>;
 export type InputTrpcType = inferRouterInputs<AppRouter>;
 
 export const queryClient = new QueryClient();
-const trpcClient = createTRPCClient<AppRouter>({
+export const trpcClient = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: getTrpcUrl(),
       transformer: superjson,
       async headers() {
         const token = useAuthStore.getState().token;
-        console.log(
-          "token in trpc lib file $444444$$$4$*888888888888888****",
-          token,
-        );
         return {
           authorization: token ? `Bearer ${token}` : "",
         };
