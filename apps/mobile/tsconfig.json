@@ -17,6 +17,5 @@
     "expo-env.d.ts",
     "nativewind-env.d.ts",
     "components/ui/radio"
-  ],
-  "references": [{ "path": "../../packages/types" }]
+  ]
 }

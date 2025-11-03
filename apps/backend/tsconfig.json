@@ -12,6 +12,5 @@
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
   "include": ["./src/**/*", "../web/src/utils/asyncHandler.ts"],
-  "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../../packages/db" }]
+  "exclude": ["node_modules", "dist"]
 }

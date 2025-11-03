@@ -10,7 +10,5 @@
       "@apps/backend": ["../../apps/backend/src/index.ts"]
     }
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../../apps/backend" }]
+  "include": ["./src/**/*"]
 }

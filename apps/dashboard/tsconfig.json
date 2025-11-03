@@ -22,6 +22,5 @@
     "next.config.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../backend" }]
+  "exclude": ["node_modules", "dist"]
 }
