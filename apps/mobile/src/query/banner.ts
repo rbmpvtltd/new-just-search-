@@ -1,6 +1,6 @@
+import { trpc } from "@/lib/trpc";
 
 async function bannersFirst() {
-  console.log("execution comes here");
   const data = await trpc.banners.firstBanner.query();
   console.log("res is ");
   return data;
