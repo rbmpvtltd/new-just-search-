@@ -83,7 +83,7 @@ export default function HireDetailsCard(item: any) {
   }
 
   return (
-    <ScrollView className="flex-1 px-4 h-full w-[100%] mb-8 mx-auto">
+    <ScrollView className="flex-1 px-4 h-full w-[100%]  mx-auto">
       <View className="m-2 mx-auto bg-base-200 w-full rounded-2xl p-4 shadow-md ">
         <View
           className="border m-4"

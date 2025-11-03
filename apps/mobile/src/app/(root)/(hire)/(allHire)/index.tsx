@@ -27,10 +27,11 @@ export default function HireListScreen() {
       },
     ),
   );
-
+  console.log(error)
   if (isLoading) {
     return <Loading position="center" />;
   }
+
   if (isError) {
     return (
       <View className="flex-1 items-center justify-center">

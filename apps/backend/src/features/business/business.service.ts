@@ -16,7 +16,7 @@ async function singleShop(shopId: number) {
       phoneNumber: businessListing.phoneNumber,
       pincode: businessListing.pincode,
       homeDelivery: businessListing.homeDelivery,
-      schedule: businessListing.schedules,
+      // schedule: businessListing.schedules,
       status: businessListing.status,
       area: businessListing.area,
       streetName: businessListing.streetName,
