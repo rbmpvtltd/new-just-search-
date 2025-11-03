@@ -1,5 +1,5 @@
 "use client";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,7 @@ import type { OutputTrpcType } from "@/trpc/type";
 export default function MyOffer() {
   const trpc = useTRPC();
   const { data: myOffers, isLoading } = useInfiniteQuery(
-    trpc.offerrouter.showOffer.infiniteQueryOptions(
+    trpc.offerrouter.showOffer!.infiniteQueryOptions(
       {
         cursor: 0,
         limit: 10,

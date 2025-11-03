@@ -9,12 +9,14 @@ export default function AvatarWithFallback({
   imageClass = "w-[50px] h-[50px]",
   iconSize = 35,
   iconClass = "w[50px]",
+  imageStyle,
 }: {
   uri: string;
   index?: number;
   imageClass?: string;
   iconSize?: number;
   iconClass?: string;
+  imageStyle?: any;
 }) {
   const colorScheme = useColorScheme();
   const [hasError, setHasError] = useState(false);
@@ -35,6 +37,8 @@ export default function AvatarWithFallback({
       className={`rounded-full ${imageClass}`}
       source={{ uri }}
       onError={() => setHasError(true)}
+      style={imageStyle}
+
     />
   );
 }

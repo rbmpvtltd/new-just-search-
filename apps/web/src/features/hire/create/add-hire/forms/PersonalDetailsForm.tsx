@@ -17,14 +17,13 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
-import type { AddHirePageType } from "..";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 
 export default function PersonalDetailsForm({
   data,
 }: {
-  data: AddHirePageType;
+  data: any; // TODO : set datatype when change variable name 
 }) {
   const trpc = useTRPC();
   const { nextPage, setFormValue, formValue } = useHireFormStore();
@@ -112,7 +111,7 @@ export default function PersonalDetailsForm({
       component: "select",
       section: "profile",
       options:
-        categories?.map((item) => ({
+        categories?.map((item : any) => ({
           label: item.label,
           value: Number(item.value),
         })) ?? [],
@@ -291,7 +290,7 @@ export default function PersonalDetailsForm({
       component: "select",
       section: "loction",
       options:
-        states?.map((state) => ({ label: state.label, value: state.value })) ??
+        states?.map((state:any) => ({ label: state.label, value: state.value })) ??
         [],
       error: errors.state?.message,
     },

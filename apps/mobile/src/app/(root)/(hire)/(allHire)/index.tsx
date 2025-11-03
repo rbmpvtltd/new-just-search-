@@ -3,7 +3,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HireSearchForm from "@/components/forms/hireSearchForm";
 import HireCard from "@/features/hire/show/HireCard";
 import { Loading } from "@/components/ui/Loading";
-import { useHireList } from "@/query/hireListing";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
 
@@ -43,13 +42,13 @@ export default function HireListScreen() {
   const allData = data?.pages.flatMap((page) => page?.data || []) || [];
 
   return (
-    <SafeAreaView className="flex-1">
-      <View>
+    <SafeAreaView className="flex-1" edges={["top"]}>
+      <View className="flex-1">
         <View className="">
           <HireSearchForm />
         </View>
         <FlatList
-          className="mt-1"
+          className="mt-1 gap-4"
           data={allData}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => {

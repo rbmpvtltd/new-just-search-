@@ -17,7 +17,7 @@ import Link from "next/link";
 type SingleShopType = OutputTrpcType["businessrouter"]["singleShop"] | null;
 
 export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
-  const schedule = Object.entries(singleShop?.schedule ?? {});
+  // const schedule = Object.entries(singleShop?.schedule ?? {});
   const latitude = Number(singleShop?.latitude?.split(",").shift());
   const longitude = Number(singleShop?.longitude?.split(",").pop());
 
@@ -207,7 +207,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
               longitude={singleShop?.longitude}
               title={singleShop?.name}
             />
-            <div className="md:w-[80%] w-full mx-auto">
+            {/* <div className="md:w-[80%] w-full mx-auto">
               {schedule.map((item, index) => {
                 return (
                   <div
@@ -226,7 +226,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                   </div>
                 );
               })}
-            </div>
+            </div> */}
           </div>
         </TabsContent>
         <TabsContent value="reviews">
