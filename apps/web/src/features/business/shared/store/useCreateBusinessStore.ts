@@ -47,7 +47,9 @@ const initialFormValue: CombinedBusinessForm = {
   state: 0,
   cityId: 0,
 
-  alternativeMobileNumber: "",
+  days: [],
+  fromHour: "10:30",
+  toHour: "20:30",
 
   contactPerson: "",
   phoneNumber: "",
@@ -57,7 +59,7 @@ const initialFormValue: CombinedBusinessForm = {
   // slug: "",
 };
 export const useBusinessFormStore = create<BusinessFormProps>((set) => ({
-  page: 0,
+  page: 2,
   formValue: initialFormValue,
 
   prevPage: () =>

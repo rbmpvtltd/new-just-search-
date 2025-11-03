@@ -18,23 +18,23 @@ type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 type AddBusinessPAgeType = OutputTrpcType["businessrouter"]["add"] | null;
 export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
+  const formValue = useBusinessFormStore((s) => s.formValue);
   const {
     control,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
     defaultValues: {
-      buildingName: "",
-      streetName: "",
-      area: "",
-      landmark: "",
-      latitude: "",
-      longitude: "",
-      pincode: "",
-      state: 0,
-      cityId: 0,
+      buildingName: formValue?.buildingName ?? "",
+      streetName: formValue?.streetName ?? "",
+      area: formValue?.area ?? "",
+      landmark: formValue?.landmark ?? "",
+      latitude: formValue?.latitude ?? "",
+      longitude: formValue?.longitude ?? "",
+      pincode: formValue?.pincode ?? "",
+      state: formValue.state ?? 0,
+      cityId: formValue?.cityId ?? 0,
     },
   });
   const states = data?.getStates.map((item) => {

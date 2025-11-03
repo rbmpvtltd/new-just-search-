@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { offersUpdateSchema } from "@repo/db/src/schema/offer.schema";
+import { productInsertSchema } from "@repo/db/src/schema/product.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import {
@@ -19,12 +19,16 @@ import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useAuthStore } from "@/store/authStore";
 
-type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
-type EditOfferType = OutputTrpcType["offerrouter"]["edit"] | null;
-export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
+type EditProductSchema = z.infer<typeof productInsertSchema>;
+type EditProductType = OutputTrpcType["productrouter"]["edit"] | null;
+export default function EditProduct({
+  myProduct,
+}: {
+  myProduct: EditProductType;
+}) {
   const token = useAuthStore((state) => state.token);
   const { data, error, isLoading, isError } = useQuery(
-    trpc.businessrouter.add.queryOptions(),
+    trpc.productrouter.add.queryOptions(),
   );
 
   const {
@@ -33,21 +37,19 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
     setValue,
     getValues,
     formState: { errors, isSubmitting },
-  } = useForm<EditOfferSchema>({
-    resolver: zodResolver(offersUpdateSchema),
+  } = useForm<EditProductSchema>({
+    resolver: zodResolver(productInsertSchema),
     defaultValues: {
-      offerName: myOffer?.offer.offerName,
-      rate: myOffer?.offer?.rate,
-      discountPercent: myOffer?.offer?.discountPercent,
-      finalPrice: myOffer?.offer?.finalPrice,
-      offerDescription: myOffer?.offer?.offerDescription,
-      photo: myOffer?.offer.offerPhotos[0]?.photo || "",
-      image2: myOffer?.offer.offerPhotos[1]?.photo || "",
-      image3: myOffer?.offer.offerPhotos[2]?.photo || "",
-      image4: myOffer?.offer.offerPhotos[3]?.photo || "",
-      image5: myOffer?.offer.offerPhotos[4]?.photo || "",
-      categoryId: myOffer?.offer.categoryId,
-      subcategoryId: myOffer?.offer.offerSubcategory.map(
+      productName: myProduct?.product?.productName,
+      rate: myProduct?.product?.rate,
+      productDescription: myProduct?.product?.productDescription,
+      photo: myProduct?.product.productPhotos[0]?.photo || "",
+      image2: myProduct?.product.productPhotos[1]?.photo || "",
+      image3: myProduct?.product.productPhotos[2]?.photo || "",
+      image4: myProduct?.product.productPhotos[3]?.photo || "",
+      image5: myProduct?.product.productPhotos[4]?.photo || "",
+      categoryId: myProduct?.product.categoryId,
+      subcategoryId: myProduct?.product.productSubCategories.map(
         (item) => item.subcategoryId,
       ),
     },
@@ -99,18 +101,18 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
     );
   }
 
-  const onSubmit = async (data: EditOfferSchema) => {};
+  const onSubmit = async (data: EditProductSchema) => {};
 
-  const formFields: FormFieldProps<EditOfferSchema>[] = [
+  const formFields: FormFieldProps<EditProductSchema>[] = [
     {
       control,
-      name: "offerName",
+      name: "productName",
       label: "Product Name",
       component: "input",
       keyboardType: "default",
       placeholder: "Offer Name",
       className: "w-[90%] bg-base-200",
-      error: errors.offerName?.message,
+      error: errors.productName?.message,
     },
     {
       control,
@@ -121,38 +123,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       placeholder: "Offer Price",
       className: "w-[90%] bg-base-200",
       error: errors.rate?.message,
-      onValueChange: (value) => {
-        if (!value) return;
-        setValue("finalPrice", Number(value));
-      },
-    },
-    {
-      control,
-      name: "discountPercent",
-      label: " Discount",
-      component: "input",
-      keyboardType: "numeric",
-      placeholder: "e.g 10",
-      className: "w-[90%] bg-base-200",
-      error: errors.discountPercent?.message,
-      onValueChange: (value) => {
-        if (!value) return;
-        const discount = parseFloat(String(value));
-        const price = parseFloat((getValues("rate") || 0).toString());
-        const final = (price * (100 - discount)) / 100;
-        setValue("discountPercent", Number(value));
-        setValue("finalPrice", parseFloat(final.toFixed(2)));
-      },
-    },
-    {
-      control,
-      name: "finalPrice",
-      label: " Final Price",
-      component: "input",
-      keyboardType: "numeric",
-      placeholder: "Final Price",
-      className: "w-[90%] bg-base-200",
-      error: errors.finalPrice?.message,
     },
     {
       control,
@@ -185,13 +155,13 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
     },
     {
       control,
-      name: "offerDescription",
+      name: "productDescription",
       label: "Offer Description",
       component: "editor",
       keyboardType: "default",
       placeholder: "Offer Description",
       className: "w-[90%] bg-base-200",
-      error: errors.offerDescription?.message,
+      error: errors.productDescription?.message,
     },
   ];
   //   const formFields2: FormFieldProps<AddOfferSchema>[] = [

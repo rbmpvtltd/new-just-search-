@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
+import { formatTime } from "@/utils/timeFormat";
 
 type BusinessTimingSchema = z.infer<typeof businessTimingSchema>;
 export default function BusinessTiming() {
@@ -24,55 +25,39 @@ export default function BusinessTiming() {
   } = useForm<BusinessTimingSchema>({
     resolver: zodResolver(businessTimingSchema),
     defaultValues: {
-      alternativeMobileNumber: formValue.alternativeMobileNumber ?? "",
+      days: formValue.days ?? [],
+      fromHour: formValue.fromHour ?? "",
+      toHour: formValue.toHour ?? "",
     },
   });
 
   const formFields: FormFieldProps<BusinessTimingSchema>[] = [
     {
       control,
+      type: "time",
       label: "Opening Time",
-      name: "alternativeMobileNumber",
+      name: "fromHour",
       placeholder: "Opening Time",
       component: "input",
       required: false,
-      error: errors.alternativeMobileNumber?.message,
+      error: errors.fromHour?.message,
     },
-    // {
-    //   control,
-
-    //   label: "",
-    //   name: "openingTimePeriod",
-    //   placeholder: "",
-    //   component: "select",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-
-    //   label: "Closing Time",
-    //   name: "closingTime",
-    //   placeholder: "Closing Time",
-    //   component: "select",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-
-    //   label: "",
-    //   name: "closingTimePeriod",
-    //   placeholder: "",
-    //   component: "select",
-    //   required: false,
-    //   error: "",
-    // },
+    {
+      control,
+      type: "time",
+      label: "time",
+      name: "toHour",
+      placeholder: "Closing Time",
+      component: "input",
+      required: false,
+      error: errors.toHour?.message,
+    },
   ];
 
   const onSubmit = (data: BusinessTimingSchema) => {
-    console.log("Business Timing data", data);
-    setFormValue("alternativeMobileNumber", data.alternativeMobileNumber ?? "");
+    setFormValue("days", data.days ?? []);
+    setFormValue("fromHour", data.fromHour ?? "");
+    setFormValue("toHour", data.toHour ?? "");
     nextPage();
   };
 
@@ -90,7 +75,7 @@ export default function BusinessTiming() {
             <p className="mt-3 text-sm text-gray-500 italic mb-4">
               Let your customers know when you are available for them
             </p>
-            {/* <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <FormField
                 control={control}
                 type=""
@@ -110,13 +95,13 @@ export default function BusinessTiming() {
                 required={false}
                 error=""
               />
-            </div> */}
+            </div>
             <div className="flex flex-col space-y-4 mt-4">
               <h3 className="text-base font-medium text-gray-700">
                 Perffered Working Hours
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
-                {formFields.map((field, index) => (
+                {formFields.map((field) => (
                   <FormField key={field.name} {...field} />
                 ))}
               </div>

@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { useDeleteOffer } from "@/query/deleteOffer";
 export default function MyOffersList() {
   const {
     data: myOffers,
@@ -137,7 +136,11 @@ function OfferCard({ item }: { item: OfferType }) {
         <View className="flex-row justify-between">
           <View className="flex-row justify-between mt-2">
             <Pressable
-              onPress={() => router.navigate("/(root)/user/offer")}
+              onPress={() =>
+                router.navigate(
+                  `/(root)/user/offer/edit-offer/${item?.offerSlug}`,
+                )
+              }
               className="w-[48%] flex-row items-center justify-center rounded-xl bg-success py-3 px-4 shadow-sm shadow-black/10 active:opacity-80"
             >
               <Ionicons name="create-outline" size={20} color="#fff" />
