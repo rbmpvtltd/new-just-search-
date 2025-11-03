@@ -4,7 +4,6 @@ import {
   offersInsertSchema,
   offersUpdateSchema,
 } from "@repo/db/src/schema/offer.schema";
-import { logger } from "@repo/helper";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import slugify from "slugify";
