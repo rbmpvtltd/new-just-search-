@@ -25,6 +25,7 @@
         "@orpc/zod": "^1.9.4",
         "@oslojs/crypto": "^1.0.1",
         "@oslojs/encoding": "^1.1.0",
+        "@repo/cloudinary": "*",
         "@repo/db": "*",
         "@repo/helper": "*",
         "@repo/logger": "*",
@@ -373,6 +374,7 @@
         "@repo/cloudinary": "*",
         "@repo/db": "*",
         "@repo/helper": "*",
+        "@repo/logger": "*",
         "bcryptjs": "^3.0.2",
       },
       "devDependencies": {

@@ -21,14 +21,15 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@repo/db": "*",
+    "@repo/helper": "*",
+    "@repo/logger": "*",
+    "@repo/cloudinary": "*",
     "@orpc/openapi": "^1.8.7",
     "@orpc/trpc": "^1.8.7",
     "@orpc/zod": "^1.9.4",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
-    "@repo/db": "*",
-    "@repo/helper": "*",
-    "@repo/logger": "*",
     "@trpc/server": "^11.5.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",

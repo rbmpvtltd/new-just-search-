@@ -1,14 +1,6 @@
 import { trpcClient } from "@/lib/trpc";
 import { asyncHandler } from "@/utils/asyncHandler";
 
-function isBlobUrl(url: string) {
-  try {
-    return new URL(url).protocol === "blob:";
-  } catch (_) {
-    return false;
-  }
-}
-
 export const uploadToCloudinary = async (
   files: (string | null | undefined)[],
   folder: string = "unknown",
@@ -32,28 +24,27 @@ export const uploadToCloudinary = async (
       continue;
     }
 
-    if (!isBlobUrl(fileUrl)) {
-      uploadPromises.push(Promise.resolve(fileUrl));
-      continue;
-    }
-
     if (signResponse.error || !signResponse.data) {
       uploadPromises.push(Promise.resolve(fileUrl));
       continue;
     }
     const url = `https://api.cloudinary.com/v1_1/${signResponse.data.cloudname}/auto/upload`;
-    // Fetch the blob from the blob URL
-    const blobResponse = await fetch(fileUrl);
-    const blob = await blobResponse.blob();
 
-    // Determine type and extension from blob
-    const type = blob.type || "image/jpeg";
-    const ext = type.split("/")[1] || "jpg";
-    const timestamp = Date.now();
-    const fileName = `${timestamp}_${Math.floor(Math.random() * 10000)}.${ext}`;
+    const fileName = fileUrl.split("/").pop();
+    const ext = fileName?.split(".").pop() ?? "jpg";
+    let type = "image/jpeg";
+    if (ext === "png") type = "image/png";
+    else if (ext === "pdf") type = "application/pdf";
 
     const formData = new FormData();
-    formData.append("file", blob, fileName);
+
+    // formData.append("file", blob, fileName);
+    formData.append("file", {
+      uri: fileUrl,
+      type: type,
+      name: fileName,
+      filename: fileName,
+    }) as any;
     formData.append("api_key", signResponse.data.apikey);
     formData.append("timestamp", signResponse.data.timestamp.toString());
     formData.append("signature", signResponse.data.signature);
@@ -67,6 +58,7 @@ export const uploadToCloudinary = async (
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("data on cloudinary", data);
         if (data.public_id) {
           return data.public_id;
         } else {
