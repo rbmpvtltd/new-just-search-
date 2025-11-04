@@ -4,11 +4,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "@apps/backend": ["../../apps/backend/src/index.ts"]
-    }
+    "baseUrl": "."
   },
   "include": ["./src/**/*"]
 }

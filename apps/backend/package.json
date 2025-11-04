@@ -13,8 +13,8 @@
   },
   "scripts": {
     "dev": "concurrently \"tsc -b -w\" \"bun run --watch dist/index.js\"",
-    "prebuild": "tsc -b",
     "build": "tsc -b",
+    "prebuild": "tsc -p tsconfig.json",
     "start": "bun run --watch dist/index.js"
   },
   "peerDependencies": {

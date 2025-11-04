@@ -1,12 +1,12 @@
 {
   "name": "@repo/types",
-	"version": "0.1.0",
+  "version": "0.1.0",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "tsc -b -w",
-    "prebuild": "tsc -b"
+    "prebuild": "tsc -p tsconfig.json"
   },
   "private": true,
   "devDependencies": {

@@ -19,7 +19,10 @@
     },
     "prebuild": {
       "cache": false,
-      "persistent": false
+      "persistent": false,
+      "dependsOn": ["^prebuild"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "dbsync": {
       "cache": false,

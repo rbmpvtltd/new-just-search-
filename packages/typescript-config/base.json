@@ -8,6 +8,7 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "incremental": true,
+    "composite": false,
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
     "moduleDetection": "force",

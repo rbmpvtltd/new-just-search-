@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "prebuild": "tsc -b"
+    "prebuild": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
     "typescript": "^5"
