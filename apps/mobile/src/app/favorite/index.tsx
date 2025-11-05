@@ -1,7 +1,7 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
-import { MemoizedDetailCard } from "@/features/ business/show/DetailCard";
+import { MemoizedDetailCard } from "@/features/business/show/DetailCard";
 import DataNotFound from "@/components/ui/DataNotFound";
 import { useWishlist } from "@/query/favorite";
 

@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { MemoizedDetailCard } from "@/features/ business/show/DetailCard";
+import { MemoizedDetailCard } from "@/features/business/show/DetailCard";
 import HireCard from "@/features/hire/show/HireCard";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import DataNotFound from "@/components/ui/DataNotFound";
@@ -75,9 +75,16 @@ export default function SubCategory() {
   }
   
   const subcategoryData = data?.pages.flatMap((page) => page?.data || []) || [];
+  const title = subcategoryData[0].category
   
   return (
     <BoundaryWrapper>
+      <Stack.Screen
+        options={{
+          title : title ?? "",
+          headerShown : true
+        }}
+      />
       <FlatList
         className="bg-base-100 mb-16"
         data={subcategoryData}

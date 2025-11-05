@@ -138,13 +138,13 @@ export const CategoryList = () => {
             >
               <Pressable
                 onPress={() => {
-                  const targetPath = `/subcategory/${item.id}`;
+                  const targetPath = `/(root)/(home)/subcategory/${item.id}`;
                   setHeading(item.title);
                   if (pathname === targetPath || isNavigating) return;
 
                   setIsNavigating(true);
                   router.navigate({
-                    pathname: "/subcategory/[subcategory]",
+                    pathname: "/(root)/(home)/subcategory/[subcategory]",
                     params: { subcategory: item?.id,type : item.type },
                   });
                   setTimeout(() => setIsNavigating(false), 500);

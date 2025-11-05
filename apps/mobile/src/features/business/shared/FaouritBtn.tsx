@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { IoMdHeart } from "react-icons/io";
 import Swal from "sweetalert2";
 import { trpc } from "@/lib/trpc";
@@ -8,6 +8,7 @@ import { Alert } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/store/authStore";
 
 function Favourite({
   businessId,
@@ -18,6 +19,8 @@ function Favourite({
 }) {
   const [isFavourite, setIsFavourite] = useState<boolean>(initialFav);
   const colorScheme = useColorScheme();
+  const authenticated = useQuery(trpc.auth.verifyauth.queryOptions());
+
   const mutation = useMutation(
     trpc.businessrouter.toggleFavourite.mutationOptions({
       onSuccess: (data) => {
@@ -40,10 +43,28 @@ function Favourite({
   );
 
   const handleToggle = () => {
+    if (!authenticated.data) {
+      Alert.alert(
+        "Login Required",
+        "Need To Login For Add In Your Favourites",
+        [
+          { text: "No Thanks", onPress: () => console.log("OK Pressed") },
+          {
+            text: "Login Now",
+            onPress: () => router.push("/(root)/profile/profile"),
+            style: "cancel",
+          },
+        ],
+      );
+      return;
+    }
     setIsFavourite((prev) => !prev);
   };
 
   const handleClick = () => {
+    if (!authenticated.data) {
+      return;
+    }
     mutation.mutate({ businessId });
   };
 

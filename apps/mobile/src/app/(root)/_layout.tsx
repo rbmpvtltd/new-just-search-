@@ -9,6 +9,7 @@ import { showLoginAlert } from "@/utils/alert";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { useNotificationCount } from "@/query/notification/notication";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { data: noticationcount, isLoading, isError } = useNotificationCount();
@@ -39,6 +40,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="home-outline" size={24} color={color} />
           ),
+          headerShown: false,
           headerLeft: () => {
             return (
               <View className="flex-row items-center">
@@ -200,6 +202,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="profile"
         options={{

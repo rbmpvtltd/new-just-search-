@@ -1,6 +1,6 @@
 import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, FlatList } from "react-native";
-import { MemoizedDetailCard } from "@/features/ business/show/DetailCard";
+import { MemoizedDetailCard } from "@/features/business/show/DetailCard";
 import HireCard from "@/features/hire/show/HireCard";
 import { Loading } from "@/components/ui/Loading";
 import { useSearchLists } from "@/query/searchList";

@@ -20,13 +20,12 @@ import { useShopIdStore } from "@/store/shopIdStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
-import { OutputTrpcType } from "@/lib/trpc";
+import { OutputTrpcType, trpc } from "@/lib/trpc";
 import Favourite from "../shared/FaouritBtn";
+import { useQuery } from "@tanstack/react-query";
 
-
-type DetailCardType = OutputTrpcType["subcategoryRouter"]["businessesByCategoryInfinate"]["data"][number];
-
-
+type DetailCardType =
+  OutputTrpcType["subcategoryRouter"]["businessesByCategoryInfinate"]["data"][number];
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -52,7 +51,6 @@ function DetailCard({
 
   const latitude = Number(item?.latitude?.split(",").shift());
   const longitude = Number(item?.longitude?.split(",").pop());
-
 
   const wishlistArray = Array.isArray(wishlist?.data) ? wishlist.data : [];
 
@@ -92,7 +90,7 @@ function DetailCard({
           <Image
             className="h-full w-full"
             source={{
-              uri:"https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png", // TODO : change image when upload on cloudinary
+              uri: "https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png", // TODO : change image when upload on cloudinary
             }}
             resizeMode="contain"
           />
@@ -114,9 +112,9 @@ function DetailCard({
           <Ionicons name="checkmark-circle" size={28} color="green" />
         )} */}
         {Number(type) === 1 && (
-          <View className="w-[10%]">
-           <Favourite initialFav={item.isFavourite} businessId={item.id}/>
-          </View>
+          <Pressable className="w-[10%]">
+              <Favourite initialFav={item.isFavourite} businessId={item.id} />
+          </Pressable>
         )}
       </View>
 

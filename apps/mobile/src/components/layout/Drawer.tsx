@@ -110,6 +110,7 @@ export default function DrawerLayout() {
               key={field.key ?? field.name}
               options={{
                 title: field.title ?? field.name,
+                headerShown: false,// TODO: do something here
                 headerLeft: (props) => (
                   <>
                     {/* Default back button */}
