@@ -1,6 +1,6 @@
 {
   "name": "@repo/helper",
-	"version": "0.1.0",
+  "version": "0.1.0",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
@@ -11,8 +11,8 @@
     "@repo/typescript-config": "*"
   },
   "scripts": {
-    "build": "tsc -b",
-    "prebuild": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "setup": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
     "typescript": "^5"

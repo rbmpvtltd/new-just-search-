@@ -18,10 +18,10 @@
       "cache": false,
       "persistent": true
     },
-    "prebuild": {
+    "setup": {
       "cache": false,
       "persistent": false,
-      "dependsOn": ["^prebuild"],
+      "dependsOn": ["^setup"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"]
     },

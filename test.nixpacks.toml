@@ -1,14 +1,14 @@
 [phases.setup]
-nixPkgs = ["bun","nodejs"]
+nixPkgs = ['nodejs_18', 'bun']
 
 [phases.install]
-cmds = ["bun install"]
-
-[phases.build]
 cmds = [
-  "bun run build"
+  'npm install -g corepack@0.24.1 && corepack enable',
+  'bun i --no-save'
 ]
 
-[start]
-cmd = "bun run start"
-# cmd = "/bin/bash"
+[phases.build]
+cmds = ['turbo run build --filter=web']
+
+[phases.start]
+cmds = ['turbo run start --filter=web']

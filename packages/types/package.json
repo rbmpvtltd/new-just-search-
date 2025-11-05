@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "tsc -b -w",
+    "dev": "tsc -p tsconfig.json -w",
     "prebuild": "tsc -p tsconfig.json"
   },
   "private": true,

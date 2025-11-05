@@ -12,9 +12,9 @@
     "trpc-ui": "^1.0.15"
   },
   "scripts": {
-    "dev": "concurrently \"tsc -b -w\" \"bun run --watch dist/index.js\"",
+    "dev": "concurrently \"tsc -p tsconfig.json -w\" \"bun run --watch dist/index.js\"",
     "build": "tsc -p tsconfig.json",
-    "prebuild": "tsc -p tsconfig.json",
+    "setup": "tsc -p tsconfig.json",
     "start": "bun run --watch dist/index.js"
   },
   "peerDependencies": {

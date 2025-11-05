@@ -11,8 +11,8 @@
     "@repo/typescript-config": "*"
   },
   "scripts": {
-    "build": "tsc -b",
-    "prebuild": "tsc -b"
+    "build": "tsc -p tsconfig.json",
+    "setup": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
     "typescript": "^5"
