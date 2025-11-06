@@ -24,11 +24,11 @@ export const notRelated = async () => {
 
 export const clearAllTablesNotRelated = async () => {
   // logger.info("================== execution comes here ====================");
-  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };
@@ -51,7 +51,6 @@ const state = async () => {
 const citie = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM cities");
   for (const row of rows) {
-    console.log(row.state_id);
     const [state] = await db
       .select()
       .from(states)

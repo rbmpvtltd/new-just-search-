@@ -1,13 +1,4 @@
-import dotenv from "dotenv";
 import mysql from "mysql2/promise";
-
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config({
-    path: "../../.env",
-  });
-}
-
-
 
 const connect = {
   host: process.env.MYSQL_HOST,
