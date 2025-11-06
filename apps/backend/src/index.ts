@@ -1,4 +1,4 @@
-// import { logger } from "@repo/logger";
+console.log(process.env);
 
 import fs from "node:fs";
 import { db, schemas } from "@repo/db";
@@ -7,14 +7,10 @@ import { logger } from "@repo/logger";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import axios from "axios";
 import bodyParser from "body-parser";
-// import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import cors from "cors";
 import { eq } from "drizzle-orm";
 import express from "express";
 import jwt from "jsonwebtoken";
-// import * as ws from "ws";
-// import { cloudinarySignature } from "./lib/cloudinary";
-// import { ORPChandler } from "./lib/orpc";
 import { appRouter } from "./route";
 import { createContext } from "./utils/context";
 
