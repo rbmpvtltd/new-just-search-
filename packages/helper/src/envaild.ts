@@ -2,9 +2,7 @@ import dotenv from "dotenv";
 import { cleanEnv, num, str } from "envalid";
 
 if (process.env.NODE_ENV !== "production") {
-  dotenv.config({
-    path: "../../.env",
-  });
+  dotenv.config({});
 }
 
 const env = cleanEnv(process.env, {

@@ -4,7 +4,7 @@ import { Pool } from "pg";
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({
-    path: "../../.env",
+    // path: "../../.env",
   });
 }
 

@@ -5,9 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 
 if (process.env.NODE_ENV !== "production") {
-  dotenv.config({
-    path: "../../.env",
-  });
+  dotenv.config({});
 }
 
 const config = {

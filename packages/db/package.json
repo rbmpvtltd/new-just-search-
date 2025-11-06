@@ -17,6 +17,7 @@
     "dev": "bunx drizzle-kit studio",
     "start": "bunx drizzle-kit migrate",
     "build": "bunx tsc -p tsconfig.json",
+    "setup": "bunx tsc -p tsconfig.json",
     "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"
   },
   "peerDependencies": {
