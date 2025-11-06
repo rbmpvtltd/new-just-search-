@@ -1,11 +1,14 @@
 "use server";
 
 import { v2 as cloudinary } from "cloudinary";
+
 import dotenv from "dotenv";
 
-dotenv.config({
-  path: "../../.env",
-});
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({
+    path: "../../.env",
+  });
+}
 
 const config = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
