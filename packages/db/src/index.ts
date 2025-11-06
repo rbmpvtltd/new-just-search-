@@ -1,12 +1,5 @@
-import dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config({
-    // path: "../../.env",
-  });
-}
 
 const pool = new Pool({
   host: process.env.PGHOST ?? "localhost",
