@@ -6,7 +6,6 @@ import {
   businessSubcategories,
 } from "@repo/db/dist/schema/business.schema";
 import { productReviews } from "@repo/db/dist/schema/product.schema";
-import { env } from "@repo/helper";
 import { logger } from "@repo/logger";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
@@ -63,7 +62,7 @@ const seedAdminUser = async () => {
 
       return;
     }
-    const salt = await bcrypt.genSalt(env.BCRYPT_SALT);
+    const salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT));
     const hashPassword = await bcrypt.hash("admin@123", salt);
 
     logger.info("....start ...");

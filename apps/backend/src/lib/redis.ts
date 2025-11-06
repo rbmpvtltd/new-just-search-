@@ -1,5 +1,5 @@
-import { env } from "@repo/helper";
 import { Redis } from "ioredis";
+import env from "@/utils/envaild";
 
 export const redis = new Redis({
   port: env.REDIS_PORT,

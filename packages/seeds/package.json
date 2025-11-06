@@ -5,7 +5,6 @@
   "dependencies": {
     "@repo/cloudinary": "*",
     "@repo/db": "*",
-    "@repo/helper": "*",
     "@repo/logger": "*",
     "bcryptjs": "^3.0.2"
   },
