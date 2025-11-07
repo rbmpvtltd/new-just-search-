@@ -23,25 +23,41 @@ const drawerFields: DrawerField[] = [
     },
   },
   {
-    name: "profile",
-    route: "/(root)/profile/profile",
+    name: "Profile",
+    route: "/(root)/profile",
   },
   {
     name: "Hire Listings",
-    route: "/(root)/user/hire",
+    route: "/(root)/profile/hire",
   },
   {
     name: "Business Listings",
-    route: "/(root)/user/business",
+    route: "/(root)/profile/business",
   },
   {
     name: "My Offers",
-    route: "/(root)/user/offer",
+    route: "/(root)/profile/offer",
   },
   {
     name: "Add Offer",
-    route: "/(root)/user/offer/add-offer",
-  }
+    route: "/(root)/profile/offer/add-offer",
+  },
+  {
+    name: "Add Product",
+    route: "/(root)/profile/product/add-product",
+  },
+  {
+    name: "My Products",
+    route: "/(root)/profile/product",
+  },
+  {
+    name: "Request to Delete Account",
+    route: "/(root)/profile/account-delete-request",
+  },
+  {
+    name: "Feedback",
+    route: "/(root)/profile/feedback",
+  },
 ];
 
 interface DrawerField {
@@ -110,7 +126,7 @@ export default function DrawerLayout() {
               key={field.key ?? field.name}
               options={{
                 title: field.title ?? field.name,
-                headerShown: false,// TODO: do something here
+                headerShown: false, // TODO: do something here
                 headerLeft: (props) => (
                   <>
                     {/* Default back button */}

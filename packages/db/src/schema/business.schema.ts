@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -32,7 +33,7 @@ export const businessListings = pgTable("business_listings", {
   photo: text("photo"),
   specialities: text("specialities"),
   description: text("description"),
-  homeDelivery: boolean("home_delivery").default(false),
+  homeDelivery: varchar("home_delivery", { length: 255 }),
   latitude: varchar("latitude", { length: 50 }),
   longitude: varchar("longitude", { length: 50 }),
   buildingName: varchar("building_name", { length: 255 }),
@@ -44,7 +45,7 @@ export const businessListings = pgTable("business_listings", {
   cityId: integer("city")
     .notNull()
     .references(() => cities.id, { onDelete: "cascade" }),
-  days: varchar("day", { length: 255 }).array(),
+  days: varchar("days", { length: 255 }).array(),
   fromHour: varchar("from_hour", { length: 255 }),
   toHour: varchar("to_hour", { length: 255 }),
   contactPerson: varchar("contact_person", { length: 255 }),
@@ -100,12 +101,22 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
 }).extend({
   categoryId: z.number().min(1, "Category is required"),
   subcategoryId: z.array(z.number()).min(1, "Select at least one subcategory"),
+  image1: z.string().min(1, "Image 1 is required"),
+  image2: z.string().optional(),
+  image3: z.string().optional(),
+  image4: z.string().optional(),
+  image5: z.string().optional(),
 });
 
 export const businessUpdateSchema = createUpdateSchema(businessListings).extend(
   {
     categoryId: z.number(),
     subcategoryId: z.array(z.number()),
+    image1: z.string(),
+    image2: z.string().optional(),
+    image3: z.string().optional(),
+    image4: z.string().optional(),
+    image5: z.string().optional(),
   },
 );
 export const businessDetailSchema = businessInsertSchema.pick({
@@ -116,6 +127,11 @@ export const businessDetailSchema = businessInsertSchema.pick({
   specialities: true,
   description: true,
   homeDelivery: true,
+  image1: true,
+  image2: true,
+  image3: true,
+  image4: true,
+  image5: true,
 });
 
 export const addressDetailSchema = businessInsertSchema.pick({
@@ -250,3 +266,27 @@ export const recentViewBusiness = pgTable("recent_view_business", {
 //   createdAt: timestamp("created_at").defaultNow().notNull(),
 //   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 // });
+
+export const businessListingsRelations = relations(
+  businessListings,
+  ({ many }) => ({
+    businessPhotos: many(businessPhotos),
+  }),
+);
+
+export const businessPhotosRelations = relations(businessPhotos, ({ one }) => ({
+  business: one(businessListings, {
+    fields: [businessPhotos.businessId],
+    references: [businessListings.id],
+  }),
+}));
+
+// export const productSubCategoriesRelations = relations(
+//   productSubCategories,
+//   ({ one }) => ({
+//     product: one(products, {
+//       fields: [productSubCategories.productId],
+//       references: [products.id],
+//     }),
+//   }),
+// );

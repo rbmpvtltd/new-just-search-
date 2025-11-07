@@ -1,4 +1,9 @@
+import { thumbnail } from "@cloudinary/url-gen/actions/resize";
+import { byRadius } from "@cloudinary/url-gen/actions/roundCorners";
+import { FocusOn } from "@cloudinary/url-gen/qualifiers/focusOn";
+import { focusOn } from "@cloudinary/url-gen/qualifiers/gravity";
 import { Ionicons } from "@expo/vector-icons";
+import { AdvancedImage } from "cloudinary-react-native";
 import { useState } from "react";
 import {
   type Control,
@@ -7,6 +12,7 @@ import {
   type Path,
 } from "react-hook-form";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Platform,
@@ -18,6 +24,7 @@ import {
 import { Pressable } from "react-native-gesture-handler";
 import { Checkbox, Text } from "react-native-paper";
 import Colors from "@/constants/Colors";
+import { cld } from "@/lib/cloudinary";
 import { pickImage } from "@/lib/imagePicker";
 import Editor from "../dom-components/hello-dom";
 import DatePickerComponent from "../inputs/DatePicker";
@@ -32,7 +39,7 @@ import TimePickerField from "../ui/TimePickerField";
 export interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
-  label: string;
+  label?: string;
   placeholder?: string;
   keyboardType?: "default" | "numeric" | "email-address";
   onBlurEvent?: (value: string | undefined | null) => void;
@@ -52,11 +59,13 @@ export interface FormFieldProps<T extends FieldValues> {
   data?: Option[] | undefined;
   className?: string;
   labelHidden?: boolean;
+  required?: boolean;
   multiselect?: number;
   dropdownPosition?: "bottom" | "auto" | "top";
   fileSize?: number;
   editable?: boolean;
   disable?: boolean;
+  mode?: "date" | "time";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -71,24 +80,34 @@ export const FormField = <T extends FieldValues>({
   data,
   className,
   labelHidden = false,
+  required = true,
   multiselect,
   dropdownPosition,
   fileSize = 2,
   editable = true,
   disable = false,
+  mode,
   ...props
 }: FormFieldProps<T>) => {
   const colorScheme = useColorScheme();
   const [_, setPlainText] = useState("");
   return (
     <>
-      {!labelHidden && <LableText title={label} />}
+      <View className="flex-row items-center">
+        {!labelHidden && <LableText title={label} />}
+        {required && (
+          <Text style={{ color: "red" }} className="ml-1 mt-2">
+            *
+          </Text>
+        )}
+      </View>
+
       <Controller
         control={control}
         name={name}
         render={({ field: { onChange, onBlur, value } }) => {
           switch (component) {
-            case "input":
+            case "input": {
               return (
                 <Input
                   className={`mx-auto text-secondary ${className}`}
@@ -110,23 +129,20 @@ export const FormField = <T extends FieldValues>({
                   editable={editable}
                 />
               );
+            }
             case "dropdown":
-              if (data) {
-                return (
-                  <DropdownComponent
-                    value={value as string}
-                    className={className}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    data={data}
-                    dropdownPosition={dropdownPosition}
-                    placeholder={placeholder}
-                    disable={disable}
-                  />
-                );
-              } else {
-                return null;
-              }
+              return (
+                <DropdownComponent
+                  value={value as string}
+                  className={className}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  data={data}
+                  dropdownPosition={dropdownPosition}
+                  placeholder={placeholder}
+                  disable={disable}
+                />
+              );
 
             case "datepicker": {
               return (
@@ -134,10 +150,24 @@ export const FormField = <T extends FieldValues>({
                   value={value}
                   onChange={onChange}
                   onBlur={onBlur}
+                  mode={mode || "date"}
                 />
               );
             }
-            case "image":
+            case "image": {
+              let cloudinaryImage: any;
+              if (value && !value.startsWith("file:")) {
+                cloudinaryImage = cld
+                  .image(value)
+                  .resize(
+                    thumbnail()
+                      .width(150)
+                      .height(150)
+                      .gravity(focusOn(FocusOn.face())),
+                  )
+                  .roundCorners(byRadius(20));
+              }
+
               return (
                 <View className={`items-center w-30 h-30  ${className}`}>
                   <Pressable
@@ -151,14 +181,16 @@ export const FormField = <T extends FieldValues>({
                           text: "camera",
                           onPress: async () => {
                             const uri = await pickImage(true, fileSize);
-                            onChange(uri);
+
+                            onChange(uri?.imageUri);
                           },
                         },
                         {
                           text: "gallery",
                           onPress: async () => {
                             const uri = await pickImage(false, fileSize);
-                            onChange(uri);
+                            console.log("uri", uri);
+                            onChange(uri?.imageUri);
                           },
                         },
                       ]);
@@ -176,11 +208,36 @@ export const FormField = <T extends FieldValues>({
                     }}
                   >
                     {value ? (
-                      <Image
-                        source={{ uri: value }}
-                        className="w-full h-full rounded-xl border border-secondary"
-                        resizeMode="cover"
-                      />
+                      value.startsWith("file") ? (
+                        <Image
+                          source={{ uri: value }}
+                          className="w-full h-full rounded-xl border border-secondary"
+                          resizeMode="cover"
+                        />
+                      ) : cloudinaryImage ? (
+                        <View
+                          style={{
+                            width: 135,
+                            height: 135,
+                            borderColor:
+                              Colors[colorScheme ?? "light"]["secondary"],
+                          }}
+                        >
+                          <AdvancedImage
+                            cldImg={cloudinaryImage}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              resizeMode: "cover",
+                            }}
+                          />
+                        </View>
+                      ) : (
+                        <ActivityIndicator
+                          size="small"
+                          color={Colors[colorScheme ?? "light"]["secondary"]}
+                        />
+                      )
                     ) : (
                       <View className="justify-center items-center">
                         <Ionicons
@@ -194,19 +251,20 @@ export const FormField = <T extends FieldValues>({
                             color: Colors[colorScheme ?? "light"]["secondary"],
                           }}
                         >
-                          Select Image
+                          {placeholder}
                         </Text>
                       </View>
                     )}
                   </Pressable>
                 </View>
               );
-
+            }
             case "checkbox":
               return (
                 <View className="space-y-2">
                   {(data || []).map((item) => {
-                    const isChecked = (value || []).includes(item.value);
+                    if (!item.value) return null;
+                    const isChecked = (value || []).includes(item?.value);
                     return (
                       <Checkbox.Item
                         labelStyle={{

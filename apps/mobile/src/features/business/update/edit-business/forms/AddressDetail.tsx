@@ -12,9 +12,17 @@ import {
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import LocationAutoDetect from "@/components/ui/LocationAutoDetect";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
-import { trpc } from "@/lib/trpc";
+import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import type { FormReferenceDataType, UserBusinessListingType } from "..";
 
+type GetStateType = OutputTrpcType["businessrouter"]["add"]["getStates"];
+// type StateItem =
+//   | {
+//       label: string;
+//       value: number | string;
+//     }
+//   | null
+//   | undefined;
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({
   businessListing,
@@ -24,9 +32,12 @@ export default function AddressDetail({
   formReferenceData: FormReferenceDataType;
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
+  const nextPage = useBusinessFormStore((s) => s.nextPage);
+  const prevPage = useBusinessFormStore((s) => s.prevPage);
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
@@ -54,6 +65,7 @@ export default function AddressDetail({
       state: selectedStateId,
     }),
   );
+
   const onSubmit = (data: AddressDetailSchema) => {
     setFormValue("buildingName", data.buildingName ?? "");
     setFormValue("streetName", data.streetName ?? "");
@@ -64,6 +76,7 @@ export default function AddressDetail({
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state);
     setFormValue("cityId", data.cityId);
+    nextPage();
   };
 
   const formFields: FormFieldProps<AddressDetailSchema>[] = [
@@ -101,6 +114,7 @@ export default function AddressDetail({
       label: "Land Mark",
       placeholder: "Land Mark",
       component: "input",
+      required: false,
       className: "w-[90%] bg-base-200",
       error: errors.landmark?.message,
     },
@@ -165,58 +179,68 @@ export default function AddressDetail({
         keyboardShouldPersistTaps="handled"
       >
         <View className="mx-auto w-[90%]">
-          {/* <LocationAutoDetect
+          <LocationAutoDetect
             onResult={(data) => {
-              const lat = data.latitude.toString();
-              const lng = data.longitude.toString();
+              console.log("DATA", data);
+              const formatted = data.formattedAddress ?? "";
+              const parts = formatted.split(",").map((p) => p.trim());
+
+              const lat = data.latitude;
+              const lng = data.longitude;
               const pincode = data.postalCode || "";
               const cityName = data.city || "";
               const stateName = data.region || "";
-              const area = data.name || "";
-              const street_name = data?.street || "";
+              const area = parts.length > 1 ? parts[2] : "";
+              const street_name = parts.length > 1 ? parts[1] : "";
               const landmark = data.street || "";
-              const building_name = data.formattedAddress || "";
+              const building_name = parts[0].match(/[A-Za-z]/) ? parts[0] : "";
 
-              const matchedState = data?.getState?.find(
-                (item: any) =>
-                  item.name.toLowerCase() === stateName.toLowerCase(),
+              const matchedState = states?.find(
+                (item: any) => item?.label === stateName.toLocaleUpperCase(),
               );
 
               const matchedCity = cities?.find(
                 (item: any) =>
-                  item.city.toLowerCase() === cityName.toLowerCase() &&
-                  item.state_id === matchedState?.id,
+                  item?.city === cityName &&
+                  item.stateId === matchedState?.value,
               );
 
-              const state = matchedState?.id || "";
-              const city = matchedCity?.id || "";
+              const state = matchedState?.value || 0;
+              const city = matchedCity?.id ?? 0;
 
-              setValue("latitude", lat);
-              setValue("longitude", lng);
+              setValue("latitude", String(lat));
+              setValue("longitude", String(lng));
               setValue("pincode", pincode);
-              setValue("city", city);
+              setValue("cityId", city);
               setValue("state", state);
               setValue("area", area);
-              setValue("building_name", building_name);
-              setValue("street_name", street_name);
+              setValue("buildingName", building_name);
+              setValue("streetName", street_name);
               setValue("landmark", landmark);
 
               setFormValue("latitude", lat);
               setFormValue("longitude", lng);
               setFormValue("pincode", pincode);
-              setFormValue("city", city);
+              setFormValue("cityId", city);
               setFormValue("state", state);
               setFormValue("area", area);
-              setFormValue("building_name", building_name);
-              setFormValue("street_name", street_name);
+              setFormValue("buildingName", building_name);
+              setFormValue("streetName", street_name);
             }}
-          /> */}
+          />
           {formFields.map((field) => (
             <FormField {...field} key={field.name} />
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
+          <View className="w-[45%]">
+            <PrimaryButton
+              title="Previous"
+              variant="outline"
+              onPress={prevPage}
+            />
+          </View>
           <View className="w-[45%]">
             <PrimaryButton
               title="Next"

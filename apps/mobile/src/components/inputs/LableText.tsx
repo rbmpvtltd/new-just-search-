@@ -1,8 +1,8 @@
-import { StyleSheet, Text } from "react-native";
 import React from "react";
+import { StyleSheet, Text } from "react-native";
 
 type Props = {
-  title: string;
+  title: string | undefined;
   className?: string;
 };
 

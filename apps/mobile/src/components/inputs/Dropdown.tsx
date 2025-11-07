@@ -4,7 +4,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import Colors from "@/constants/Colors";
 
 export type Option = {
-  label: string | number;
+  label: string ;
   value: string | number;
 };
 
@@ -12,7 +12,7 @@ interface Props {
   value: string | null;
   onChange: (value: string) => void;
   onBlur?: () => void;
-  data: Option[];
+  data: Option[] | undefined;
   placeholder?: string;
   className?: string;
   dropdownPosition?: "bottom" | "auto" | "top";
@@ -72,7 +72,7 @@ export default function DropdownComponent({
         itemContainerStyle={{
           backgroundColor: theme["base-100"],
         }}
-        data={data}
+        data={data ?? []}
         labelField="label"
         valueField="value"
         placeholder={placeholder}

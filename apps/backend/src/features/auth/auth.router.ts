@@ -39,7 +39,6 @@ export const authRouter = router({
   login: publicProcedure
     .input(z.object({ username: z.string(), password: z.string().min(6) }))
     .mutation(async ({ input }) => {
-      console.log("input", input);
       const user = await checkPasswordGetUser(input.username, input.password);
 
       if (!user) {

@@ -2,13 +2,17 @@ import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/src/schema/auth.schema";
 import {
   businessInsertSchema,
-  businessUpdateSchema,
   businessListings,
   businessPhotos,
   businessReviews,
   businessSubcategories,
+  businessUpdateSchema,
   favourites,
 } from "@repo/db/src/schema/business.schema";
+import {
+  categories,
+  subcategories,
+} from "@repo/db/src/schema/not-related.schema";
 import {
   offerPhotos,
   offers,
@@ -28,17 +32,12 @@ import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   businessProcedure,
-  guestProcedure,
   protectedProcedure,
   publicProcedure,
   router,
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
-import {
-  categories,
-  subcategories,
-} from "@repo/db/src/schema/not-related.schema";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -158,7 +157,7 @@ export const businessrouter = router({
           photo: input.photo,
           specialities: input.specialities,
           description: input.description,
-          homeDelivery: input.homeDelivery === false,
+          homeDelivery: input.homeDelivery,
           latitude: input.latitude,
           longitude: input.longitude,
           buildingName: input.buildingName,
@@ -168,6 +167,9 @@ export const businessrouter = router({
           pincode: input.pincode,
           state: input.state,
           cityId: Number(input.cityId),
+          days: input.days,
+          fromHour: input.fromHour,
+          toHour: input.toHour,
           // schedules: input.schedules,
           email: input.email,
           phoneNumber: input.phoneNumber,
@@ -200,6 +202,23 @@ export const businessrouter = router({
           input.subcategoryId.map((subCategoryId) => ({
             businessId,
             subcategoryId: Number(subCategoryId),
+          })),
+        );
+      }
+
+      const allPhotos = [
+        input.image1,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(schemas.business.businessPhotos).values(
+          allPhotos.map((photo) => ({
+            businessId: businessId,
+            photo,
           })),
         );
       }
@@ -246,7 +265,7 @@ export const businessrouter = router({
           photo: input.photo,
           specialities: input.specialities,
           description: input.description,
-          homeDelivery: input.homeDelivery === false,
+          homeDelivery: input.homeDelivery,
           latitude: input.latitude,
           longitude: input.longitude,
           buildingName: input.buildingName,
@@ -257,6 +276,9 @@ export const businessrouter = router({
           state: input.state,
           cityId: Number(input.cityId),
           // schedules: input.schedules,
+          days: input.days,
+          fromHour: input.fromHour,
+          toHour: input.toHour,
           email: input.email,
           phoneNumber: input.phoneNumber,
           whatsappNo: input.whatsappNo,
@@ -283,6 +305,23 @@ export const businessrouter = router({
           ),
         );
 
+      const allPhotos = [
+        input.image1,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(schemas.business.businessPhotos).values(
+          allPhotos.map((photo) => ({
+            businessId: isBusinessExists.id,
+            photo,
+          })),
+        );
+      }
+
       await db.insert(schemas.business.businessSubcategories).values(
         input.subcategoryId.map((subCategoryId) => ({
           subcategoryId: subCategoryId,
@@ -305,7 +344,18 @@ export const businessrouter = router({
     const business = await db.query.businessListings.findFirst({
       where: (businessListings, { eq }) =>
         eq(businessListings.userId, ctx.userId),
+      with: {
+        businessPhotos: true,
+      },
     });
+
+    if (!business) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Business not found",
+      });
+    }
+    logger.info("business", { business: business });
 
     if (!business?.cityId) {
       throw new TRPCError({
@@ -436,241 +486,6 @@ export const businessrouter = router({
     };
   }),
 
-  addOffer: businessProcedure
-    .input(offersInsertSchema)
-    .mutation(async ({ ctx, input }) => {
-      const business = await db.query.businessListings.findFirst({
-        where: (businessListings, { eq }) =>
-          eq(businessListings.userId, ctx.userId),
-      });
-      if (!business) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Business not found",
-        });
-      }
-      const slugifyName = slugify(input.offerName, {
-        lower: true,
-        strict: true,
-      });
-
-      const startDate = new Date();
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 5);
-      const [offer] = await db
-        .insert(schemas.offer.offers)
-        .values({
-          businessId: business.id,
-          offerName: input.offerName,
-          offerSlug: slugifyName,
-          categoryId: input.categoryId,
-          rate: input.rate,
-          discountPercent: input.discountPercent,
-          finalPrice: input.finalPrice,
-          offerDescription: input.offerDescription,
-          offerStartDate: startDate,
-          offerEndDate: endDate,
-        })
-        .returning({
-          id: offers.id,
-        });
-
-      if (!offer) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Offer not created",
-        });
-      }
-      const offerId = offer.id;
-      if (input.subcategoryId.length > 0) {
-        await db.insert(schemas.offer.offerSubcategory).values(
-          input.subcategoryId.map((subCategoryId) => ({
-            offerId,
-            subcategoryId: Number(subCategoryId),
-          })),
-        );
-      }
-
-      const allPhotos = [
-        input.photo,
-        input.image2,
-        input.image3,
-        input.image4,
-        input.image5,
-      ].filter(Boolean); // removes empty or null values
-
-      if (allPhotos.length > 0) {
-        await db.insert(schemas.offer.offerPhotos).values(
-          allPhotos.map((photo) => ({
-            offerId,
-            photo,
-          })),
-        );
-      }
-
-      return {
-        success: true,
-        message: "Offer added successfully",
-      };
-    }),
-
-  showOffer: businessProcedure.query(async ({ ctx }) => {
-    if (!ctx.userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User not logged in",
-      });
-    }
-    const business = await db.query.businessListings.findFirst({
-      where: (businessListings, { eq }) =>
-        eq(businessListings.userId, ctx.userId),
-    });
-    if (!business) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Business not found",
-      });
-    }
-
-    const offers = await db.query.offers.findMany({
-      where: (offers, { eq }) => eq(offers.businessId, business.id),
-      with: {
-        offerPhotos: true,
-      },
-    });
-
-    return { offers };
-  }),
-  addProduct: businessProcedure
-    .input(productInsertSchema)
-    .mutation(async ({ ctx, input }) => {
-      const business = await db.query.businessListings.findFirst({
-        where: (businessListings, { eq }) =>
-          eq(businessListings.userId, ctx.userId),
-      });
-      if (!business) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Business not found",
-        });
-      }
-      const slugifyName = slugify(input.productName, {
-        lower: true,
-        strict: true,
-      });
-
-      const [product] = await db
-        .insert(schemas.product.products)
-        .values({
-          businessId: business.id,
-          productName: input.productName,
-          productSlug: slugifyName,
-          categoryId: input.categoryId,
-          rate: input.rate,
-          discountPercent: input.discountPercent,
-          finalPrice: input.finalPrice,
-          productDescription: input.productDescription,
-        })
-        .returning({
-          id: products.id,
-        });
-
-      if (!product) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Offer not created",
-        });
-      }
-      const productId = product.id;
-      if (input.subcategoryId.length > 0) {
-        await db.insert(schemas.product.productSubCategories).values(
-          input.subcategoryId.map((subCategoryId) => ({
-            productId,
-            subcategoryId: Number(subCategoryId),
-          })),
-        );
-      }
-
-      const allPhotos = [
-        input.photo,
-        input.image2,
-        input.image3,
-        input.image4,
-        input.image5,
-      ].filter(Boolean); // removes empty or null values
-
-      if (allPhotos.length > 0) {
-        await db.insert(schemas.product.productPhotos).values(
-          allPhotos.map((photo) => ({
-            productId,
-            photo,
-          })),
-        );
-      }
-
-      return {
-        success: true,
-        message: "Product added successfully",
-      };
-    }),
-
-  showProduct: businessProcedure.query(async ({ ctx }) => {
-    if (!ctx.userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User not looged in",
-      });
-    }
-
-    const business = await db.query.businessListings.findFirst({
-      where: (businessListings, { eq }) =>
-        eq(businessListings.userId, ctx.userId),
-    });
-
-    // return { business}
-    if (!business) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Business not found",
-      });
-    }
-
-    const products = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.businessId, business.id),
-      with: {
-        productPhotos: true,
-      },
-    });
-
-    return { products };
-  }),
-
-  deleteProduct: businessProcedure
-    .input(
-      z.object({
-        id: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      // return { success: true};
-      const allSeletedPhoto = await db.query.productPhotos.findMany({
-        where: (productPhotos, { eq }) => eq(productPhotos.productId, input.id),
-      });
-
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => String(item.photo)),
-      );
-      // await db
-      //   .delete(schemas.product.productSubCategories)
-      //   .where(eq(schemas.product.productSubCategories.productId, input.id));
-
-      await db
-        .delete(schemas.product.products)
-        .where(eq(schemas.product.products.id, input.id));
-
-      return { success: true };
-    }),
-
   singleShop: publicProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ input }) => {
@@ -697,7 +512,15 @@ export const businessrouter = router({
           description: businessListing.description,
           updatedAt: businessListing.updatedAt,
           specialities: businessListing.specialities,
-          rating: sql<{id:number,created_at:string,rating:number,message:string,user:string}[]>`COALESCE(
+          rating: sql<
+            {
+              id: number;
+              created_at: string;
+              rating: number;
+              message: string;
+              user: string;
+            }[]
+          >`COALESCE(
             JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
               'id', business_reviews.id,
               'created_at', business_reviews.created_at,
@@ -790,7 +613,6 @@ export const businessrouter = router({
         .groupBy(businessListing.id)
         .where(eq(businessListing.id, input.businessId));
 
-
       return shop[0];
     }),
 
@@ -812,7 +634,15 @@ export const businessrouter = router({
           shopName: sql<string | null>`COALESCE((
               SELECT name FROM business_listings LIMIT 1
           ), '')`,
-          rating: sql<{id:number,created_at:string,rating:number,message:string,user:string}[]>`COALESCE(
+          rating: sql<
+            {
+              id: number;
+              created_at: string;
+              rating: number;
+              message: string;
+              user: string;
+            }[]
+          >`COALESCE(
             JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
               'id', product_reviews.id,
               'created_at', product_reviews.created_at,
@@ -928,9 +758,7 @@ export const businessrouter = router({
           FILTER (WHERE business_listings.id IS NOT NULL),
           '[]'
         )`,
-        rating: sql<
-          string
-        >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
+        rating: sql<string>`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
         subcategories: sql<string[]>`
           COALESCE(
             ARRAY_AGG(DISTINCT subcategories.name) 
@@ -952,7 +780,10 @@ export const businessrouter = router({
           subcategories.id,
         ),
       )
-      .leftJoin(businessReviews,eq(favourites.businessId,businessReviews.businessId))
+      .leftJoin(
+        businessReviews,
+        eq(favourites.businessId, businessReviews.businessId),
+      )
       .leftJoin(categories, eq(subcategories.categoryId, categories.id))
       .leftJoin(
         businessListings,

@@ -19,6 +19,8 @@ function MyBusiness() {
   const { data, error, isLoading, isError } = useQuery(
     trpc.businessrouter.show.queryOptions(),
   );
+  console.log("Data", data);
+
   if (isLoading) return <ActivityIndicator />;
   if (!data) return <CreateBusinessListing />;
   return <MyBusinessCard data={data} />;

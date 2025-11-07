@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/src/schema/product.schema";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import {
   ActivityIndicator,
+  Alert,
   Keyboard,
   ScrollView,
   Text,
@@ -11,6 +12,7 @@ import {
   View,
 } from "react-native";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
@@ -30,12 +32,13 @@ export default function EditProduct({
   const { data, error, isLoading, isError } = useQuery(
     trpc.productrouter.add.queryOptions(),
   );
+  const { mutate } = useMutation(
+    trpc.productrouter.addProduct.mutationOptions(),
+  );
 
   const {
     control,
     handleSubmit,
-    setValue,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<EditProductSchema>({
     resolver: zodResolver(productInsertSchema),
@@ -101,7 +104,30 @@ export default function EditProduct({
     );
   }
 
-  const onSubmit = async (data: EditProductSchema) => {};
+  const onSubmit = async (data: EditProductSchema) => {
+    const file = await uploadToCloudinary(
+      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      "products",
+    );
+    mutate(
+      {
+        ...data,
+        photo: file[0] ?? "",
+        image2: file[1] ?? "",
+        image3: file[2] ?? "",
+        image4: file[3] ?? "",
+        image5: file[4] ?? "",
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success) {
+            Alert.alert(data.message);
+          }
+          // router.push("/");
+        },
+      },
+    );
+  };
 
   const formFields: FormFieldProps<EditProductSchema>[] = [
     {
@@ -164,50 +190,50 @@ export default function EditProduct({
       error: errors.productDescription?.message,
     },
   ];
-  //   const formFields2: FormFieldProps<AddOfferSchema>[] = [
-  //     {
-  //       control,
-  //       name: "image1",
-  //       label: "",
-  //       // placeholder: 'Enter Image 2',
-  //       component: "image",
-  //       className: "",
-  //       error: errors.image1?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image2",
-  //       label: "",
-  //       // placeholder: 'Enter Image 3',
-  //       component: "image",
-  //       className: "",
-  //       error: errors.image2?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image3",
-  //       label: "",
-  //       // placeholder: 'Enter Image 2',
-  //       component: "image",
-  //       error: errors.image3?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image4",
-  //       label: "",
-  //       // placeholder: 'Enter Image 3',
-  //       component: "image",
-  //       error: errors.image4?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image5",
-  //       label: "",
-  //       // placeholder: 'Enter Image 4',
-  //       component: "image",
-  //       error: errors.image5?.message?.toString(),
-  //     },
-  //   ];
+  const formFields2: FormFieldProps<EditProductSchema>[] = [
+    {
+      control,
+      name: "photo",
+      label: "",
+      placeholder: "Select Image 1",
+      component: "image",
+      className: "",
+      error: errors.photo?.message,
+    },
+    {
+      control,
+      name: "image2",
+      label: "",
+      placeholder: "Select Image 2",
+      component: "image",
+      className: "",
+      error: errors.image2?.message,
+    },
+    {
+      control,
+      name: "image3",
+      label: "",
+      placeholder: "Select Image 3",
+      component: "image",
+      error: errors.image3?.message,
+    },
+    {
+      control,
+      name: "image4",
+      label: "",
+      placeholder: "Select Image 4",
+      component: "image",
+      error: errors.image4?.message,
+    },
+    {
+      control,
+      name: "image5",
+      label: "",
+      placeholder: "Select Image 5",
+      component: "image",
+      error: errors.image5?.message,
+    },
+  ];
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView className="w-[100%] h-full">
@@ -216,11 +242,11 @@ export default function EditProduct({
             <FormField key={field.name} {...field} />
           ))}
         </View>
-        {/* <View className="mt-8 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
-          {formFields2.map((field, idx) => (
-            <FormField labelHidden key={idx} {...field} />
+        <View className="mt-8 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
+          {formFields2.map((field) => (
+            <FormField labelHidden key={field.name} {...field} />
           ))}
-        </View> */}
+        </View>
         <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
           <View className="w-[45%]">
             <PrimaryButton

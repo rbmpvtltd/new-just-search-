@@ -119,7 +119,7 @@ export default function UpdateBusinessListing() {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#fff" }} edges={["bottom"]}>
+    <>
       <View className="px-4 py-2">
         <View className="flex-row justify-between items-center relative">
           {steps.map((label, index) => {
@@ -193,6 +193,6 @@ export default function UpdateBusinessListing() {
           <View className="rounded-lg">{renderForm()}</View>
         </KeyboardAwareScrollView>
       </TouchableWithoutFeedback>
-    </SafeAreaView>
+    </>
   );
 }

@@ -1,16 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessDetailSchema } from "@repo/db/src/schema/business.schema";
-import { useForm } from "react-hook-form";
-import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { useForm, useWatch } from "react-hook-form";
+import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/forms/formComponent";
+import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
-import type { OutputTrpcType } from "@/lib/trpc";
+import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import type { FormReferenceDataType, UserBusinessListingType } from "..";
 
 type BusinessDetailSchema = z.infer<typeof businessDetailSchema>;
@@ -22,6 +25,8 @@ export default function BusinessDetail({
   formReferenceData: FormReferenceDataType;
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
+  const nextPage = useBusinessFormStore((s) => s.nextPage);
+  console.log("List", businessListing);
 
   const {
     control,
@@ -35,28 +40,58 @@ export default function BusinessDetail({
       categoryId: businessListing?.category.id ?? 0,
       subcategoryId: businessListing?.subcategory.map((s) => s.id) ?? [],
       specialities: businessListing?.specialities ?? "",
-      homeDelivery: businessListing?.homeDelivery ?? false,
+      homeDelivery: businessListing?.homeDelivery ?? "",
       description: businessListing?.description ?? "",
-      // image2: "",
-      // image3: "",
-      // image4: "",
-      // image5: "",
+      image1: businessListing?.businessPhotos[0].photo ?? "",
+      image2: businessListing?.businessPhotos[1].photo ?? "",
+      image3: businessListing?.businessPhotos[2].photo ?? "",
+      image4: businessListing?.businessPhotos[3].photo ?? "",
+      image5: businessListing?.businessPhotos[4].photo ?? "",
     },
   });
 
-  const onSubmit = (data: BusinessDetailSchema) => {
+  const categories = formReferenceData?.getBusinessCategories.map(
+    (item: any) => {
+      return {
+        label: item.title,
+        value: item.id,
+      };
+    },
+  );
+
+  const selectedCategoryId = useWatch({ control, name: "categoryId" });
+
+  const { data: subCategories, isLoading } = useQuery(
+    trpc.businessrouter.getSubCategories.queryOptions({
+      categoryId: selectedCategoryId,
+    }),
+  );
+
+  const onSubmit = async (data: BusinessDetailSchema) => {
+    const file = await uploadToCloudinary(
+      [
+        data.photo,
+        data.image1,
+        data.image2,
+        data.image3,
+        data.image4,
+        data.image5,
+      ],
+      "business",
+    );
     setFormValue("name", data.name ?? "");
-    setFormValue("photo", data.photo ?? "");
+    setFormValue("photo", file[0] ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
     setFormValue("subcategoryId", data.subcategoryId ?? "");
     setFormValue("specialities", data.specialities ?? "");
     setFormValue("homeDelivery", data.homeDelivery ?? "");
     setFormValue("description", data.description ?? "");
-    // setFormValue("image1", data.image1 ?? "");
-    // setFormValue("image2", data.image2 ?? "");
-    // setFormValue("image3", data.image3 ?? "");
-    // setFormValue("image4", data.image4 ?? "");
-    // setFormValue("image5", data.image5 ?? "");
+    setFormValue("image1", file[1] ?? "");
+    setFormValue("image2", file[2] ?? "");
+    setFormValue("image3", file[3] ?? "");
+    setFormValue("image4", file[4] ?? "");
+    setFormValue("image5", file[5] ?? "");
+    nextPage();
   };
 
   const formFields: FormFieldProps<BusinessDetailSchema>[] = [
@@ -67,6 +102,7 @@ export default function BusinessDetail({
       placeholder: "Enter your Business Name",
       component: "input",
       className: "w-[90%] bg-base-200",
+      editable: false,
       error: errors.name?.message,
     },
     {
@@ -83,9 +119,14 @@ export default function BusinessDetail({
       name: "categoryId",
       label: "Category",
       placeholder: "Select Category",
-      data: [{ label: "Hire", value: "1" }],
+      data: [
+        ...(categories ?? []).map((item, index) => ({
+          label: item.label,
+          value: item.value,
+        })),
+      ],
       component: "dropdown",
-      multiselect: 1,
+      disable: true,
       className: "w-[90%] bg-base-200",
       error: errors.categoryId?.message,
     },
@@ -94,7 +135,12 @@ export default function BusinessDetail({
       name: "subcategoryId",
       label: "Sub Category",
       placeholder: "Select Sub Category",
-      data: [{ label: "Hire", value: "1" }],
+      data: [
+        ...(subCategories ?? []).map((item, index) => ({
+          label: item.name,
+          value: item.id,
+        })),
+      ],
       component: "multiselectdropdown",
       className: "w-[90%] bg-base-200",
       error: errors.subcategoryId?.message,
@@ -130,71 +176,87 @@ export default function BusinessDetail({
     },
   ];
 
-  // const formFields2: FormFieldProps[] = [
-  //   {
-  //     control,
-  //     name: "image1",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image1?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image2",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image2?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image3",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.photo?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image4",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image4?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image5",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image3?.message?.toString(),
-  //   },
-  // ];
+  const formFields2: FormFieldProps<BusinessDetailSchema>[] = [
+    {
+      control,
+      name: "image1",
+      component: "image",
+      placeholder: "Select Shop Image 1",
+      required: false,
+      error: errors.image1?.message,
+    },
+    {
+      control,
+      name: "image2",
+      component: "image",
+      placeholder: "Select Shop Image 2",
+      required: false,
+      error: errors.image2?.message,
+    },
+    {
+      control,
+      name: "image3",
+      component: "image",
+      placeholder: "Select Shop Image 3",
+      required: false,
+      error: errors.photo?.message,
+    },
+    {
+      control,
+      name: "image4",
+      component: "image",
+      placeholder: "Select Shop Image 4",
+      required: false,
+      error: errors.image4?.message,
+    },
+    {
+      control,
+      name: "image5",
+      component: "image",
+      placeholder: "Select Shop Image 5",
+      required: false,
+      error: errors.image3?.message,
+    },
+  ];
 
   return (
     // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAwareScrollView
+    <>
+      {/* <KeyboardAwareScrollView
         enableOnAndroid
         extraScrollHeight={80}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1, paddingVertical: 16 }}
-      >
-        <View className="mx-auto w-[90%]">
-          {formFields.map((field) => (
-            <FormField key={field.name} {...field} />
-          ))}
-        </View>
+      > */}
+      <View className="mx-auto w-[90%]">
+        {formFields.map((field) => (
+          <FormField key={field.name} {...field} />
+        ))}
+      </View>
+      <View className="flex-row items-center">
+        <LableText title="Shop images" className="ml-11" />
+        <Text style={{ color: "red" }} className="ml-1 mt-2">
+          *
+        </Text>
+      </View>
+      <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2     ">
+        {formFields2.map((field) => (
+          <FormField labelHidden key={field.name} {...field} />
+        ))}
+      </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
-          <View className="w-[45%]">
-            <PrimaryButton
-              title="Next"
-              isLoading={isSubmitting}
-              onPress={handleSubmit(onSubmit)}
-            />
-          </View>
+      <View className="flex-row justify-between w-[90%] self-center mt-6">
+        <View className="w-[45%] mx-auto">
+          <PrimaryButton
+            title="Next"
+            isLoading={isSubmitting}
+            onPress={handleSubmit(onSubmit)}
+          />
         </View>
-      </KeyboardAwareScrollView>
-    </TouchableWithoutFeedback>
+      </View>
+      {/* </KeyboardAwareScrollView> */}
+    </>
     // </SafeAreaView>
   );
 }

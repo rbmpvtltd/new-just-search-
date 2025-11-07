@@ -57,7 +57,7 @@ export default function UserProfile({
   });
   const { mutate } = useMutation(trpc.userRouter.update.mutationOptions());
   const onSubmit = async (data: UserUpdateSchema) => {
-    const file = await uploadToCloudinary([data.profileImage], "user");
+    const file = await uploadToCloudinary([data.profileImage], "profile");
     const finalData = {
       ...data,
       profileImage: file[0] ?? "",

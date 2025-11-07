@@ -32,7 +32,7 @@ function Favourite({
           Alert.alert("Login Required", "Need To Login For Add In Favourite", [
             {
               text: "Cancel",
-              onPress: () => router.push("/(root)/profile/profile"),
+              onPress: () => router.push("/(root)/profile"),
               style: "cancel",
             },
             { text: "OK", onPress: () => console.log("OK Pressed") },

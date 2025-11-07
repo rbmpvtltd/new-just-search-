@@ -25,7 +25,7 @@ export default function AddProduct({
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
-    trpc.businessrouter.addProduct.mutationOptions(),
+    trpc.productrouter.addProduct.mutationOptions(),
   );
 
   const {

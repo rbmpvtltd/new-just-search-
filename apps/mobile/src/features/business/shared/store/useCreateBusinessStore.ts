@@ -18,6 +18,7 @@ export type CombinedBusinessForm = BusinessDetailSchema &
   ContactDetailSchema;
 type BusinessFormProps = {
   page: number;
+  setPage: (page: number) => void;
   prevPage: () => void;
   nextPage: () => void;
   formValue: CombinedBusinessForm;
@@ -34,8 +35,13 @@ const initialFormValue: CombinedBusinessForm = {
   categoryId: 0,
   subcategoryId: [],
   specialities: "",
-  homeDelivery: false,
+  homeDelivery: "",
   description: "",
+  image1: "",
+  image2: "",
+  image3: "",
+  image4: "",
+  image5: "",
 
   buildingName: "",
   streetName: "",
@@ -47,7 +53,9 @@ const initialFormValue: CombinedBusinessForm = {
   state: 0,
   cityId: 0,
 
-  alternativeMobileNumber: "",
+  days: [],
+  fromHour: "",
+  toHour: "",
 
   contactPerson: "",
   phoneNumber: "",
@@ -60,6 +68,7 @@ export const useBusinessFormStore = create<BusinessFormProps>((set) => ({
   page: 0,
   formValue: initialFormValue,
 
+  setPage: (page) => set({ page }),
   prevPage: () =>
     set((state) => ({
       page: Math.max(state.page - 1, 0),

@@ -310,7 +310,7 @@ export default function PersonalDetailsForm({
 
   const onSubmit = async (data: PersonalDetailsSchema) => {
     console.log("data is", data);
-    
+
     const files = await uploadToCloudinary([data.photo], "hire");
     setFormValue("photo", files[0] ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
@@ -407,12 +407,12 @@ export default function PersonalDetailsForm({
             )}
           </Button>
           <Button
-                      onClick={() => console.log(getValues())}
-                      type="button"
-                      className="bg-gray-500 hover:bg-gray-700 font-bold"
-                    >
-                      Get Values
-                    </Button>
+            onClick={() => console.log(getValues())}
+            type="button"
+            className="bg-gray-500 hover:bg-gray-700 font-bold"
+          >
+            Get Values
+          </Button>
         </div>
       </form>
     </div>

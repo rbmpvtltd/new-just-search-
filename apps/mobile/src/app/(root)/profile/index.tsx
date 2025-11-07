@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
+import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
-  Button,
   Pressable,
   ScrollView,
   Text,
@@ -13,36 +13,29 @@ import {
 import LoginComponent from "@/components/forms/login";
 import VisitorLoginForm from "@/components/forms/visitorLoginForm";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import { Loading } from "@/components/ui/Loading";
-import { PROFILE_URL } from "@/constants/apis";
 import Colors from "@/constants/Colors";
-import { apiUrl } from "@/constants/Variable";
-import { useSuspenceData } from "@/query/getAllSuspense";
-import { useAuthStore } from "@/store/authStore";
-import { useQuery } from "@tanstack/react-query";
+import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
+import { useAuthStore } from "@/store/authStore";
 
 export default function TabOneScreen() {
-  // const isAuthenticated = useAuthStore((state) => state.authenticated);
-  const isAuthenticated  = useQuery(trpc.auth.verifyauth.queryOptions());
+  const isAuthenticated = useQuery(trpc.auth.verifyauth.queryOptions());
 
   const colorScheme = useColorScheme();
   const [renderForm, setRenderForm] = useState<string>("");
   const role = useAuthStore((state) => state.role);
-  const { data, isLoading, refetch } = useSuspenceData(
-    PROFILE_URL.url,
-    PROFILE_URL.key,
-  );
+  const {
+    data: userData,
+    isLoading: userDataLoading,
+    isError: userDataIsError,
+    error: userDataError,
+  } = useQuery(trpc.userRouter.getUserProfile.queryOptions());
 
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-      setRenderForm("");
-    }, [refetch]),
-  );
-
-  if (isLoading) {
+  // if (userDataIsError) {
+  //   return <Text className="text-secondary">{userDataError.message + " Hiiii "}</Text>;
+  // }
+  if (userDataLoading) {
     return <Loading position="center" />;
   }
 
@@ -76,7 +69,6 @@ export default function TabOneScreen() {
                   </Pressable>
                 </View>
               )}
-
               {!!renderForm && (
                 <View className="w-full">
                   {renderForm === "visitor" && <VisitorLoginForm />}
@@ -93,47 +85,46 @@ export default function TabOneScreen() {
                   </Pressable>
                 </View>
               )}
-              {/* {!!renderForm && ( */}
-
-              {/* )} */}
             </>
           ) : (
-            <View className=" bg-base-200 py-8 w-[90%] rounded-lg">
+            <View className=" bg-base-100 py-8 w-[90%] rounded-lg">
               <View className="flex-row items-center relative justify-around w-[100%] gap-4 px-8">
                 <View className="relative">
-                  <AvatarWithFallback
-                    uri={`${apiUrl}/assets/images/${data?.user?.photo}`}
-                    imageClass="w-[80px] h-[80px] rounded-full border-2 border-secondary"
-                    iconClass="p-6 rounded-full border-2 border-secondary flex items-center justify-center"
-                  />
+                  <View className="w-28 h-28 rounded-lg">
+                    <AdvancedImage
+                      cldImg={cld.image(userData?.profileImage || "")}
+                      className="w-[100%] h-[100%] rounded-full border-2 border-secondary"
+                    />
+                  </View>
                 </View>
                 <View className="w-[80%] ">
-                  <View className=" w-[95%] flex-row items-center ">
+                  <View className=" w-[90%] flex-row items-center">
                     <View className="w-[80%]">
                       <Text className="text-secondary text-2xl p-2 font-semibold w-full">
-                        {data?.user?.name ? data?.user?.name : "Guest"}
+                        {userData?.firstName
+                          ? `${userData.firstName} ${userData.lastName}`
+                          : "Guest"}
                       </Text>
                     </View>
                     <View className="w-[20%]">
-                      {data?.verify && (
+                      {/* {data?.verify && (
                         <Ionicons
                           name="checkmark-circle"
                           size={36}
                           color="green"
                         />
-                      )}
+                      )} */}
                     </View>
                   </View>
+                  <View className="w-[80%]">
+                    <Text className="w-full mx-2 text-secondary-content text-[16px]  mt-2">
+                      {role}
+                    </Text>
 
-                  <Text className="w-full  text-secondary-content text-[12px]  mt-2">
-                    {role}
-                  </Text>
-
-                  <Text className="w-full text-secondary-content text-[12px]  mt-2">
-                    {data?.user?.email
-                      ? data?.user?.email
-                      : `+91 ${data?.user?.phone}`}
-                  </Text>
+                    <Text className="w-full mx-2 text-secondary-content text-[16px] ">
+                      {userData?.email ? userData.email : `+91 1234567890`}
+                    </Text>
+                  </View>
                 </View>
               </View>
 
@@ -149,9 +140,9 @@ export default function TabOneScreen() {
                     Address :
                   </Text>
                   <Text className="text-secondary break-words w-[200px]">
-                    {data?.user?.area
-                      ? data?.user?.area
-                      : "C74 abcd, city, state India"}
+                    {userData?.area
+                      ? userData.area
+                      : (userData?.address ?? "No Address")}
                   </Text>
                 </View>
                 <View className="flex-row gap-4 mb-6 w-[100%] items-center">
@@ -159,11 +150,13 @@ export default function TabOneScreen() {
                     Activated Plan :
                   </Text>
                   <Text className="text-secondary w-[80%] break-words ">
-                    {data?.plan?.title ?? "Free"}
+                    {/* {data?.plan?.title ?? "Free"} */}
                   </Text>
                 </View>
               </View>
-              <Pressable onPress={() => router.navigate("/user")}>
+              <Pressable
+                onPress={() => router.navigate("/(root)/profile/edit-profile")}
+              >
                 <View className="mx-10">
                   <View className="flex-row gap-4 bg-primary p-4 rounded-lg w-full items-center justify-center">
                     <Text className="text-secondary text-center">
