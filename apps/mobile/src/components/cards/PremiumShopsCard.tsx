@@ -19,61 +19,22 @@ import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import Review from "../forms/review";
+import { OutputTrpcType } from "@/lib/trpc";
 
-type PremiumShposCardProps = {
-  item: {
-    id: string;
-    name: string;
-    description: string;
-    categories: { title: string }[];
-    subcategories: { name: string }[];
-    specialities: string;
-    building_name: string;
-    street_name: string;
-    area: string;
-    landmark: string;
-    pincode: string;
-    city: {
-      id: number;
-      city: string;
-    };
-    state: {
-      id: number;
-      name: string;
-    };
-    email: string;
-    phone_number: string;
-    whatsapp_no: string;
-    home_delivery: boolean;
-    latitude: number;
-    longitude: number;
-    schedules: string;
-    user: {
-      verify: number;
-    };
-  };
-};
+type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] 
 
-const ShposCard = ({ item }: PremiumShposCardProps) => {
-  const colorScheme = useColorScheme();
+
+
+const ShposCard = ({ item }: {item : ShopCardType}) => {
 
   const router = useRouter();
-  const { mutate: startChat, isPending } = useStartChat();
+  const { mutate: startChat} = useStartChat();
   const latitude = Number(item?.latitude?.split(",").shift());
   const longitude = Number(item?.longitude?.split(",").pop());
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   const clearToken = useAuthStore((state) => state.clearToken);
   const { mutate: toggleWishlist } = useToggleWishlist();
-  const { data: wishlist = [] } = useWishlist();
 
-  const wishlistArray = Array.isArray(wishlist?.data) ? wishlist.data : [];
-
-  const isFavourite = useMemo(
-    () => wishlistArray.some((fav: any) => fav.listing_id === item.id),
-    [wishlistArray, item.id],
-  );
-
-  const schedules = JSON.parse(item?.schedules || "{}");
 
   return (
     <View className="w-[93%] mx-auto mt-6 p-4 rounded-2xl bg-base-200 shadow-lg gap-4">
@@ -83,9 +44,9 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
             {item?.name}
           </Text>
         </View>
-        {Number(item?.user?.verify) === 1 && (
+        {/* {Number(item?.user?.verify) === 1 && (
           <Ionicons name="checkmark-circle" size={28} color="green" />
-        )}
+        )} */}
         <View className="w-[10%] ">
           <Pressable
             onPress={() => {
@@ -94,7 +55,7 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
                   message: "Need to login to add to your wishlist",
                   onConfirm: () => {
                     clearToken();
-                    router.push("/user/bottomNav/profile");
+                    router.push("/(root)/profile/profile");
                   },
                 });
                 return;
@@ -113,13 +74,13 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
               );
             }}
           >
-            <Ionicons
+            {/* <Ionicons
               size={30}
               color={
                 isFavourite ? "red" : Colors[colorScheme ?? "light"].secondary
               }
               name={isFavourite ? "heart" : "heart-outline"}
-            />
+            /> TODO : ==> uncomment and set initial favourite when send from backend*/}
           </Pressable>
         </View>
       </View>
@@ -132,12 +93,10 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
         </Text>
         <Text className=" text-secondary flex-1 flex-wrap">
           {[
-            item?.building_name,
-            item?.street_name,
-            item?.landmark,
+            item?.buildingName,
+            item?.streetName,
+            item?.landMark,
             item?.area,
-            item?.city?.city,
-            item?.state?.name,
           ]
             .filter(Boolean)
             .join(", ")}
@@ -148,8 +107,8 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
         <Text className="text-primary text-sm ">
           <Ionicons name="call-outline" size={16} className="ml-1" />
         </Text>
-        <Pressable onPress={() => dialPhone(item?.phone_number)}>
-          <Text className=" text-secondary">{item?.phone_number}</Text>
+        <Pressable onPress={() => dialPhone(item?.phoneNumber ?? "")}>
+          <Text className=" text-secondary">{item?.phoneNumber}</Text>
         </Pressable>
       </View>
       <View className="mb-1 flex flex-row items-center gap-3">
@@ -157,7 +116,7 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
           <Ionicons name="logo-whatsapp" size={16} className="ml-1" />
         </Text>
         <Text className=" text-secondary">
-          {item?.whatsapp_no ? item?.whatsapp_no : "Not Available"}
+          {item?.whatsappNo ? item?.whatsappNo : "Not Available"}
         </Text>
       </View>
 
@@ -176,7 +135,7 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
         </Text>
         <Text className=" text-secondary font-bold">Home Delivery:</Text>
         <Text className=" text-secondary">
-          {!item?.home_delivery ? "Available" : "Not Available"}
+          {!item?.homeDelivery ? "Available" : "Not Available"}
         </Text>
       </View>
       <View className="mb-1 flex-row flex-wrap gap-2">
@@ -190,13 +149,13 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
             Categories:
           </Text>
         </View>
-        {item.categories?.[0]?.title && (
+       
           <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">
             <Text className="text-success font-semibold text-xs">
-              {item.categories[0].title}
+              {item?.category}
             </Text>
           </TouchableOpacity>
-        )}
+        
       </View>
 
       <View className="flex-row flex-wrap gap-2 ">
@@ -205,18 +164,18 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
             Sub Categories:
           </Text>
         </View>
-        {item.subcategories?.map((sub, index) => (
+        {item?.subcategories?.map((sub, index) => (
           <TouchableOpacity
             className="bg-error-content rounded-lg py-2 px-3 mb-1"
             key={index.toString()}
           >
             <Text className="text-pink-700 font-semibold text-xs">
-              {sub.name}
+              {sub}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
-      <View className="p-4">
+      {/* <View className="p-4">
         {Object.entries(schedules).map(([day, value]) => {
           const open = value?.opens_at;
           const close = value?.closes_at;
@@ -236,14 +195,14 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
             </View>
           );
         })}
-      </View>
+      </View>  TODO : ==> Set schedule when dbsync is complete */} 
 
       <View className="flex-row w-full justify-center gap-2">
         {/* Chat Now */}
         <View className="flex-1 bg-primary rounded-lg px-2 py-2">
           <Pressable
             onPress={() => {
-              startChat(item?.id, {
+              startChat(String(item?.id), {
                 onSuccess: (res) => {
                   if (res?.chat_session_id) {
                     router.push({
@@ -259,7 +218,7 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
                         {
                           text: "Sign In",
                           onPress: () => {
-                            router.navigate("/user/bottomNav/profile");
+                            router.navigate("/(root)/profile/profile");
                           },
                         },
                       ],
@@ -281,7 +240,7 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
 
         {/* Contact Now */}
         <View className="flex-1 bg-primary rounded-lg px-2 py-2">
-          <Pressable onPress={() => dialPhone(item?.phone_number)}>
+          <Pressable onPress={() => dialPhone(item?.phoneNumber ?? "")}>
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="call" color={"white"} />
               <Text className="text-secondary font-semibold text-sm">
@@ -293,7 +252,7 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
 
         {/* Get Direction */}
         <View className="flex-1 bg-primary rounded-lg px-2 py-2">
-          <Pressable onPress={() => openInGoogleMaps(latitude, longitude)}>
+          <Pressable onPress={() => openInGoogleMaps(String(latitude), String(longitude))}>
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="location" color={"white"} />
               <Text className="text-secondary font-semibold text-sm">
@@ -334,8 +293,11 @@ const ShposCard = ({ item }: PremiumShposCardProps) => {
         </Text>
       )}
 
+      <Text className="text-secondary text-3xl">
+        Review Submit Form Pending
+      </Text>
       <View>
-        <Review listingId={Number(item?.id)} />
+        <Review rating={item?.rating} />
       </View>
     </View>
   );

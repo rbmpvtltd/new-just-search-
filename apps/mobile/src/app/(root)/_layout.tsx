@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { Link, router, Tabs } from "expo-router";
+import { Link, router, Tabs, usePathname } from "expo-router";
 import { Alert, Image, Text, useColorScheme, View } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
 import Colors from "@/constants/Colors";
@@ -14,6 +14,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function TabLayout() {
   const { data: noticationcount, isLoading, isError } = useNotificationCount();
   const navigation = useNavigation();
+  const pathname = usePathname()
+
+   const isAboutBusiness = pathname.startsWith("/subcategory/aboutBusiness");
 
   const colorScheme = useColorScheme();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
@@ -30,7 +33,8 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].primary,
         headerShown: true,
-      }}
+        tabBarStyle: isAboutBusiness ? { display: "none" } : {},
+      }} 
     >
       <Tabs.Screen
         name="(home)"

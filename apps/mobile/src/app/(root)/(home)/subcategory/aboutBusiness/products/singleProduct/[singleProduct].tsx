@@ -8,13 +8,14 @@ import {
 import Carousel from "react-native-reanimated-carousel";
 import RenderHtml from "react-native-render-html";
 import Review from "@/components/forms/review";
-import { SINGLE_PRODUCT_URL } from "@/constants/apis";
-import { useSuspenceData } from "@/query/getAllSuspense";
 import { useStartChat } from "@/query/startChat";
 import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
+import { useQuery } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc";
+import { Loading } from "@/components/ui/Loading";
 
 const { width } = Dimensions.get("window");
 
@@ -28,28 +29,22 @@ export default function TabOneScreen() {
     ? singleProduct[0]
     : singleProduct;
 
-  const { data } = useSuspenceData(
-    SINGLE_PRODUCT_URL.url,
-    SINGLE_PRODUCT_URL.key,
-    productId,
-  );
+  const {data,isLoading} = useQuery(trpc.businessrouter.singleProduct.queryOptions({productId : Number(productId)}))
 
-  const latitude = Number(data?.listing?.latitude.split(",").shift());
-  const longitude = Number(data?.listing?.longitude.split(",").pop());
+  if(isLoading){
+    return <Loading position="center" size={"large"}/>
+  }
 
-  const caraouselImg = [
-    { image: data?.product?.image1 },
-    { image: data?.product?.image2 },
-    { image: data?.product?.image3 },
-    { image: data?.product?.image4 },
-    { image: data?.product?.image5 },
-  ].filter((item: { image: string }) => item?.image?.split(".").length > 1);
+  const latitude = Number(data?.latitude?.split(",").shift());
+  const longitude = Number(data?.longitude?.split(",").pop());
+
+  
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: data?.product?.product_name,
+          title: data?.name,
         }}
       />
       <ScrollView>
@@ -62,14 +57,14 @@ export default function TabOneScreen() {
                 height={400}
                 autoPlay={true}
                 autoPlayInterval={4000}
-                data={caraouselImg}
+                data={data?.photos}
                 scrollAnimationDuration={1000}
                 renderItem={({ item }) => (
-                  <View className="relative  h-[450px]  mx-auto bg-base-200 w-[100%] ">
+                  <View className="relative  h-[500px]  mx-auto bg-base-200 w-[100%] ">
                     <Image
-                      className="w-[80%] mx-auto rounded-lg aspect-[3/4]  self-end"
+                      className="w-[80%] mx-auto rounded-lg aspect-[3/4] mt-4 self-end"
                       source={{
-                        uri: `https://www.justsearch.net.in/assets/images/${item?.image}`,
+                        uri: `https://www.justsearch.net.in/assets/images/18109401431760422232.jpeg`, // TODO : change image when upload on cloudinary
                       }}
                       resizeMode="cover"
                       onError={(e) =>
@@ -82,27 +77,27 @@ export default function TabOneScreen() {
               <View className="p-8 bg-base-200">
                 <View>
                   <Text className="text-secondary text-lg mb-4">
-                    {data?.product?.listing?.name}
+                    {data?.shopName}
                   </Text>
                   <Text className="text-secondary text-[24px] font-semibold mb-4">
-                    {data?.product?.product_name}
+                    {data?.name}
                   </Text>
                   <RenderHtml
                     contentWidth={width}
-                    source={{ html: data?.product?.product_description || "" }}
+                    source={{ html: data?.description || "" }}
                     tagsStyles={{
                       body: { color: "#ff6600" }, // Orange text everywhere
                     }}
                   />
 
                   <Text className="text-center text-primary text-[24px]">
-                    ₹ {data?.product?.rate}
+                    ₹ {data?.rate}
                   </Text>
                 </View>
                 <View className="w-full items-center gap-4 my-4">
                   <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
                     <Pressable
-                      onPress={() => openInGoogleMaps(latitude, longitude)}
+                      onPress={() => openInGoogleMaps(String(latitude), String(longitude))}
                     >
                       <Text className="text-[#fff] font-semibold text-xl text-center ">
                         Get Direction To Shop
@@ -111,7 +106,7 @@ export default function TabOneScreen() {
                   </View>
                   <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
                     <Pressable
-                      onPress={() => dialPhone(data?.listing?.phone_number)}
+                      onPress={() => dialPhone(data?.phone ?? "")}
                     >
                       <Text className="text-[#fff] font-semibold text-xl text-center ">
                         Contact Now
@@ -126,11 +121,11 @@ export default function TabOneScreen() {
                             message: "Need to login to chat on your behalf",
                             onConfirm: () => {
                               clearToken();
-                              router.replace("/user/bottomNav/profile");
+                              router.replace("/(root)/profile/profile");
                             },
                           });
                         } else {
-                          startChat(data?.listing?.id, {
+                          startChat(String(data?.id), {
                             onSuccess: (res) => {
                               if (!res?.chat_session_id) {
                                 Alert.alert(
@@ -147,7 +142,7 @@ export default function TabOneScreen() {
                                       onPress: () => {
                                         clearToken();
                                         router.replace(
-                                          "/user/bottomNav/profile",
+                                          "/(root)/profile/profile",
                                         );
                                       },
                                     },
@@ -187,7 +182,7 @@ export default function TabOneScreen() {
               </View>
             </GestureHandlerRootView>
             <View className="mx-4 p-4 rounded-lg bg-base-200 mb-10 flex-shrink">
-              <Review listingId={data?.listing?.id} />
+              <Review rating={data?.rating}/>
             </View>
           </View>
         </View>

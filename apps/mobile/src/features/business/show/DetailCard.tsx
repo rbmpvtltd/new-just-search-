@@ -1,28 +1,24 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import {
   Alert,
   Dimensions,
   Image,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
 import StarRating from "react-native-star-rating-widget";
-import Colors from "@/constants/Colors";
 import { useToggleWishlist, useWishlist } from "@/query/favorite";
 import { useStartChat } from "@/query/startChat";
 import { useAuthStore } from "@/store/authStore";
 import { useShopIdStore } from "@/store/shopIdStore";
-import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import { OutputTrpcType, trpc } from "@/lib/trpc";
 import Favourite from "../shared/FaouritBtn";
-import { useQuery } from "@tanstack/react-query";
 
 type DetailCardType =
   OutputTrpcType["subcategoryRouter"]["businessesByCategoryInfinate"]["data"][number];
@@ -41,7 +37,6 @@ function DetailCard({
   subcategories: any;
 }) {
   const [aspectRatio, setAspectRatio] = useState(3 / 4);
-  const colorScheme = useColorScheme();
   const { setShopId } = useShopIdStore();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   const { mutate: toggleWishlist } = useToggleWishlist();
@@ -75,7 +70,7 @@ function DetailCard({
         onPress={() => {
           setShopId(String(item.id));
           router.navigate({
-            pathname: "/aboutBusiness/[premiumshops]",
+            pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
             params: { premiumshops: item.id.toString() },
           });
         }}

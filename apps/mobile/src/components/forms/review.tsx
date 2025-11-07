@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  Alert,
   Keyboard,
   Text,
   TouchableWithoutFeedback,
@@ -10,87 +9,67 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import StarRating from "react-native-star-rating-widget";
-import { queryClient } from "@/app/_layout";
-import {
-  MY_BUSINESS_LIST_URL,
-  MY_LISTING_URL,
-  PROFILE_URL,
-} from "@/constants/apis";
-import { useSuspenceData } from "@/query/getAllSuspense";
-import { reviewApi, useReviewMutation } from "@/query/review";
-import { reviewSchema, type reviewSchemaType } from "@/schemas/reviewSchema";
-import Input from "../inputs/Input";
-import LableText from "../inputs/LableText";
-import PrimaryButton from "../inputs/SubmitBtn";
-import TextAreaInput from "../inputs/TextAreaInput";
-import ErrorText from "../ui/ErrorText";
 
-const Review = ({ listingId }: { listingId: number }) => {
-  const { data: listingData } = useSuspenceData(
-    MY_LISTING_URL.url,
-    MY_LISTING_URL.key,
-    String(listingId),
-  );
 
-  const { data: userProfile, isLoading: profileLoading } = useSuspenceData(
-    PROFILE_URL.url,
-    PROFILE_URL.key,
-  );
 
-  const { mutate, isError, isPending } = useReviewMutation();
+const Review = ({ rating }: { rating: any }) => {
+  
 
-  const isOwner = listingData?.data?.listing?.user_id === userProfile?.user?.id;
+  // const { data: userProfile, isLoading: profileLoading } = useSuspenceData(
+  //   PROFILE_URL.url,
+  //   PROFILE_URL.key,
+  // );
 
-  const {
-    control,
-    reset,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<reviewSchemaType>({
-    resolver: zodResolver(reviewSchema),
-    defaultValues: {
-      listing_id: listingId,
-      name: "",
-      rate: 0,
-      message: "",
-      email: userProfile?.user?.email || "",
-    },
-  });
 
-  const allReviews = listingData.data.reviews;
 
-  const sortedReviews = [
-    ...allReviews.filter((r: any) => r.user_id === userProfile.user?.id),
-    ...allReviews.filter((r: any) => r.user_id !== userProfile.user?.id),
-  ];
+  // const {
+  //   control,
+  //   reset,
+  //   handleSubmit,
+  //   formState: { errors, isSubmitting },
+  // } = useForm<reviewSchemaType>({
+  //   resolver: zodResolver(reviewSchema),
+  //   defaultValues: {
+  //     listing_id: listingId,
+  //     name: "",
+  //     rate: 0,
+  //     message: "",
+  //     email: userProfile?.user?.email || "",
+  //   },
+  // });
 
-  const hasReviewed = sortedReviews.some(
-    (r: any) => r.user_id === userProfile.user?.id,
-  );
 
-  const onSubmit = (formData: reviewSchemaType) => {
-    if (!userProfile?.user?.id) {
-      Alert.alert("Please log in to submit a review");
-      return;
-    }
+  // const sortedReviews = [
+  //   ...allReviews.filter((r: any) => r.user_id === userProfile.user?.id),
+  //   ...allReviews.filter((r: any) => r.user_id !== userProfile.user?.id),
+  // ];
 
-    if (hasReviewed) {
-      Alert.alert("You have already reviewed this listing");
-      return;
-    }
-    mutate(
-      {
-        ...formData,
-      },
-      {
-        onSuccess: () => {
-          Alert.alert("Review submitted successfully");
-          reset();
-        },
-      },
-    );
-  };
+  // const hasReviewed = sortedReviews.some(
+  //   (r: any) => r.user_id === userProfile.user?.id,
+  // );
 
+  // const onSubmit = (formData: reviewSchemaType) => {
+  //   if (!userProfile?.user?.id) {
+  //     Alert.alert("Please log in to submit a review");
+  //     return;
+  //   }
+
+  //   if (hasReviewed) {
+  //     Alert.alert("You have already reviewed this listing");
+  //     return;
+  //   }
+  //   mutate(
+  //     {
+  //       ...formData,
+  //     },
+  //     {
+  //       onSuccess: () => {
+  //         Alert.alert("Review submitted successfully");
+  //         reset();
+  //       },
+  //     },
+  //   );
+  // };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
@@ -105,7 +84,7 @@ const Review = ({ listingId }: { listingId: number }) => {
           <Text className="text-2xl font-bold text-secondary">Review</Text>
         </View>
 
-        {/* Review Form */}
+        {/* Review Form
         {isOwner ? (
           <Text className="text-secondary text-lg font-medium mb-4">
             You cannot review your own listing.
@@ -180,49 +159,38 @@ const Review = ({ listingId }: { listingId: number }) => {
               {errors.message && <ErrorText title={errors.message.message} />}
             </View>
 
-            <View className="w-[45%] mx-auto m-4">
-              <PrimaryButton
-                isLoading={isSubmitting}
-                disabled={isPending}
-                title="Submit"
-                loadingText="Submitting..."
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  borderRadius: 8,
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                textClassName="text-[#ffffff] text-lg font-semibold"
-                onPress={handleSubmit(onSubmit)}
-              />
+            <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+              <View className="w-[45%]">
+                <PrimaryButton
+                  title="Submit"
+                  isLoading={isSubmitting}
+                  onPress={handleSubmit(onSubmit)}
+                />
+              </View>
             </View>
           </>
         ) : (
           <Text className="text-secondary text-lg font-medium mb-4">
             You have already submitted a review.
           </Text>
-        )}
+        )} * TODO : ==> submit review later /}
 
         {/* All Reviews */}
         <View className="mt-4">
           <Text className="text-xl font-semibold mb-4 text-secondary">
             All Reviews
           </Text>
-          {sortedReviews?.length === 0 ? (
+          {rating?.length === 0 ? (
             <Text className="text-secondary">No reviews yet.</Text>
           ) : (
-            sortedReviews.map((review: any) => (
+            rating?.map((review: any) => (
               <View
                 key={review.id}
                 className="mb-4 p-2 bg-success-content rounded-lg shadow-sm "
               >
-                <Text className="font-bold text-success">{review.name}</Text>
+                <Text className="font-bold text-success">{review.name ?? "Unknown"}</Text>
                 <StarRating
-                  rating={review.rate}
+                  rating={review.rate ?? 0}
                   onChange={() => {}}
                   starSize={18}
                   enableSwiping={false}

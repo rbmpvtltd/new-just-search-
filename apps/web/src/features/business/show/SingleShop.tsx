@@ -64,7 +64,7 @@ export function SingleShopTabBar({
         </Carousel>
       </div>
       <div className="flex w-[70%]  flex-col  mx-auto shadow-2xl mt-10">
-        <ShopTabBar singleShop={shop}/>
+        <ShopTabBar singleShop={shop} />
       </div>
     </div>
   );

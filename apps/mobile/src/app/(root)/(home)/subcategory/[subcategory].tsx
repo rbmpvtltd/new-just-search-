@@ -44,7 +44,6 @@ export default function SubCategory() {
   //   }),
   // );
   // console.log("data is", data);
-  console.log("data in subcategory screen ================>>>>",data?.pages.length)
 
   if (isLoading) {
     return <Loading position="center" />;

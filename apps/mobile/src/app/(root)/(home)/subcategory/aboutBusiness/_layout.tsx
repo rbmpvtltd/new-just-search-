@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import { useColorScheme } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Colors from "@/constants/Colors";
@@ -15,11 +15,26 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const pathname = usePathname()
+  const [showTabbar,setShowTabbar] = useState<boolean>(false)
+  useEffect(()=>{
+    const excludedTabRoute = ["/subcategory/aboutBusiness/products/singleProduct","/subcategory/aboutBusiness/offers/singleOffers"]
+    for(let val of excludedTabRoute){
+  
+      if(pathname.startsWith(val)){
+        setShowTabbar(true)
+        return
+      } else{
+        setShowTabbar(false)
+      }
+    }
+  },[pathname])
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].primary,
         headerShown: true,
+        tabBarStyle : showTabbar ? { display: "none" } : {}
       }}
     >
       <Tabs.Screen
