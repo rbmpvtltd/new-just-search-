@@ -24,20 +24,20 @@ export const businessSeed = async () => {
   await clearAllTablesBusiness();
   await addBusiness();
   // await seedFavourites();
-  await businessesSubcategory();
-  await businessesCategories();
+  // await businessesSubcategory();
+  // await businessesCategories();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
 export const clearAllTablesBusiness = async () => {
   // await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
-  );
-  await db.execute(
-    `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(
+  //   `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
+  // );
+  // await db.execute(
+  //   `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
+  // );
   // await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(
   //   `TRUNCATE TABLE recent_view_business RESTART IDENTITY CASCADE;`,
@@ -229,7 +229,7 @@ const addBusiness = async () => {
         console.log("mySqlUser", mySqlUser);
         // return
         try {
-          createUser = await db
+          [createUser] = await db
             .insert(users)
             .values({
               id: mySqlUser.id,
@@ -300,12 +300,18 @@ const addBusiness = async () => {
       if (!createUser) {
         console.log("User not found" + row.id);
       }
+      // {"Mon":{"opens_at":"11 AM","closes_at":"9 PM"},"Tue":{"opens_at":"11 AM","closes_at":"9 PM"},"Wed":{"opens_at":"11 AM","closes_at":"9 PM"},"Thu":{"opens_at":"11 AM","closes_at":"9 PM"},"Fri":{"opens_at":"11 AM","closes_at":"9 PM"},"Sat":{"opens_at":"11 AM","closes_at":"9 PM"},"Sun":{"closed":true}}
       const [newbusinessListing] = await db
         .insert(businessListings)
         .values({
-          id: row.id,
-          userId: createUser?.id,
+          // id: row.id,
+          userId: createUser!.id,
           name: row.name,
+          days : ["Mon","Tue","Wed","Thu","Fri","Sat"],
+          fromHour : "11 AM",
+          toHour : "9 PM",
+          contactPerson : row.contact_person,
+          ownerNumber : row.owner_no,
           slug,
           photo: row.photo,
           specialities: row.specialities,
@@ -320,7 +326,6 @@ const addBusiness = async () => {
           pincode: row.pincode,
           state: city!.stateId,
           cityId: city!.id,
-          schedules: row.schedules ? JSON.parse(row.schedules) : null,
           status: row.status,
           email: row.email,
           phoneNumber: row.phone_number,

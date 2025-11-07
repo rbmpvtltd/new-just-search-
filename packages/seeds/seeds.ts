@@ -21,7 +21,7 @@ dotenv.config();
     // await notRelated(); // NOTE: complete by clouadinaryFake = true on live db
     // await userSeed(); // NOTE: complete by clouadinaryFake = true on live db
     // await fakeSeed(); // NOTE: complete by clouadinaryFake = true on live db
-    // await businessSeed();
+    await businessSeed();
     // await hireSeed();
     // await productSeed();
     // await offerSeed();
