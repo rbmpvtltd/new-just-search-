@@ -23,6 +23,7 @@ export const fakeSeed = async () => {
     const business = await seedFakeBusiness(user!.id);
     logger.info("adding fake admin");
     await seedAdminUser();
+    await seedVisitorUser();
     logger.info("added fake admin");
     return { user };
   } catch (error) {
@@ -74,6 +75,45 @@ const seedAdminUser = async () => {
         email: "admin@gmail.com",
         password: hashPassword,
         role: "admin",
+        googleId: "fake",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    return insertedAdmin;
+  } catch (error) {
+    console.error("Error in seedFakeUser:", error);
+    throw error;
+  }
+};
+const seedVisitorUser = async () => {
+  try {
+    logger.info("....start");
+    // Pehle associated business listings delete karo
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, "visitor@gmail.com"))
+      .limit(1);
+
+    if (existingUser) {
+      logger.info(existingUser);
+
+      return;
+    }
+    const salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT));
+    const hashPassword = await bcrypt.hash("visitor@123", salt);
+
+    logger.info("....start ...");
+    const [insertedAdmin] = await db
+      .insert(users)
+      .values({
+        displayName: "admin",
+        phoneNumber: "fake",
+        email: "visitor@gmail.com",
+        password: hashPassword,
+        role: "visiter",
         googleId: "fake",
         createdAt: new Date(),
         updatedAt: new Date(),
