@@ -11,31 +11,32 @@ import { useStartProductChat } from "@/query/startProductChat";
 import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import DataNotFound from "./DataNotFound";
+import { useQuery } from "@tanstack/react-query";
+import { trpc ,OutputTrpcType} from "@/lib/trpc";
+
+type ProductType = OutputTrpcType["businessrouter"]["shopProducts"][0]
 
 function ListingProduct({ shopId }: { shopId: string }) {
-  const { data } = useSuspenceData(
-    LISTING_PRODUCT_LIST_URL.url,
-    LISTING_PRODUCT_LIST_URL.key,
-    shopId,
-  );
+  const {data} = useQuery(trpc.businessrouter.shopProducts.queryOptions({businessId : Number(shopId)}))
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   const { mutate: startChat } = useStartProductChat();
   const clearToken = useAuthStore((state) => state.clearToken);
-  if (data?.product?.length === 0) {
+  if (data?.length === 0) {
     return <DataNotFound />;
   }
   return (
+    // <Text className="text-secondary text-3xl">this is for testing in ListingProducts.tsx</Text>
     <FlatList
       keyExtractor={(_, i) => i.toString()}
-      data={data.product}
-      renderItem={(item: any) => {
+      data={data}
+      renderItem={(item: {item : ProductType}) => {
         return (
           <GestureHandlerRootView>
             <View className="bg-base-200 rounded-lg w-[90%] shadow-lg  m-4">
               <Pressable
                 onPress={() => {
-                  router.push({
-                    pathname: "/singleProduct/[singleProduct]",
+                  router.navigate({
+                    pathname: "/(root)/(home)/subcategory/aboutBusiness/products/singleProduct/[singleProduct]",
                     params: { singleProduct: item?.item?.id },
                   });
                 }}
@@ -46,17 +47,17 @@ function ListingProduct({ shopId }: { shopId: string }) {
                     <Image
                       className="w-full rounded-lg aspect-[3/4] "
                       source={{
-                        uri: `https://www.justsearch.net.in/assets/images/${item?.item?.image1}`,
+                        uri: `https://www.justsearch.net.in/assets/images/19992115541759217624.jpeg`, // TODO : change image with item.item.photo when upload on cloudinary
                       }}
                     />
                   </View>
                 </View>
                 <View>
                   <Text className="text-secondary-content my-4 mx-3 text-xl text-center">
-                    {item?.item?.product_name}
+                    {item?.item?.name}
                   </Text>
                   <Text className="text-primary font-semibold text-[24px] my-4 mx-3 text-xl text-center">
-                    ₹{item?.item?.rate}
+                    ₹{item?.item?.price}
                   </Text>
                 </View>
               </Pressable>
@@ -68,14 +69,14 @@ function ListingProduct({ shopId }: { shopId: string }) {
                         message: "Need to login to chat on your behalf",
                         onConfirm: () => {
                           clearToken();
-                          router.replace("/user/bottomNav/profile");
+                          router.replace("/(root)/profile/profile");
                         },
                       });
                     } else {
                       startChat(
                         {
-                          listingId: item?.item?.listing_id,
-                          productId: item?.item?.id,
+                          listingId: shopId,
+                          productId: String(item?.item?.id),
                         },
                         {
                           onSuccess: (res) => {

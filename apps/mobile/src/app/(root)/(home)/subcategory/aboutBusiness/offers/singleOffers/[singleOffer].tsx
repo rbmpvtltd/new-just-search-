@@ -40,7 +40,7 @@ export default function TabOneScreen() {
 
   return (
     <>
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{
           title: data?.offer?.product_name,
         }}
@@ -81,9 +81,9 @@ export default function TabOneScreen() {
                   <Text className="text-secondary text-[24px] font-semibold mb-2">
                     {data?.offer?.product_name}
                   </Text>
-                  {/* <Text className="text-secondary text-[14px] font-light mb-4">
+                   <Text className="text-secondary text-[14px] font-light mb-4">
                   {data?.product?.product_description.replace(/<\/?p>/g, '')}
-                </Text> */}
+                </Text> 
                   <View className="flex-row items-center gap-4">
                     <Text className="text-primary text-lg ">
                       ₹{data?.offer?.final_price}
@@ -98,7 +98,7 @@ export default function TabOneScreen() {
                     <Pressable
                       onPress={() => {
                         router.navigate({
-                          pathname: "/aboutBusiness/[premiumshops]",
+                          pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
                           params: { premiumshops: data?.offer?.listing_id },
                         });
                       }}
@@ -136,7 +136,7 @@ export default function TabOneScreen() {
                                         text: "Sign In",
                                         onPress: () => {
                                           router.navigate(
-                                            "/user/bottomNav/profile",
+                                            "/(root)/profile/profile",
                                           );
                                         },
                                       },
@@ -177,13 +177,13 @@ export default function TabOneScreen() {
                   </View>
                 </View>
                 <View className="">
-                  <Review listingId={data?.listing?.id} />
+                  <Review listingId={data?.listing?.id} /> 
                 </View>
               </View>
             </GestureHandlerRootView>
           </View>
         </View>
-      </ScrollView>
+      </ScrollView> */}
     </>
   );
 }

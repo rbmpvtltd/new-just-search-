@@ -28,7 +28,6 @@ import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   businessProcedure,
-  guestProcedure,
   protectedProcedure,
   publicProcedure,
   router,
@@ -44,7 +43,7 @@ const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
 
 export const businessrouter = router({
-  add: visitorProcedure.query(async ({ ctx }) => {
+  add: visitorProcedure.query(async () => {
     const getBusinessCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 1),
     });
@@ -62,7 +61,7 @@ export const businessrouter = router({
 
   getSubCategories: visitorProcedure
     .input(z.object({ categoryId: z.number() }))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       const businessSubCategories = await db.query.subcategories.findMany({
         where: (subcategories, { eq }) =>
           eq(subcategories.categoryId, input.categoryId),
@@ -72,7 +71,7 @@ export const businessrouter = router({
 
   getCities: visitorProcedure
     .input(z.object({ state: z.number() }))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       const cities = await db.query.cities.findMany({
         where: (cities, { eq }) => eq(cities.stateId, input.state),
       });
@@ -651,7 +650,7 @@ export const businessrouter = router({
         id: z.number(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       // return { success: true};
       const allSeletedPhoto = await db.query.productPhotos.findMany({
         where: (productPhotos, { eq }) => eq(productPhotos.productId, input.id),
@@ -708,43 +707,6 @@ export const businessrouter = router({
               FILTER (WHERE business_reviews.id IS NOT NULL),
             '[]'
           )`,
-
-          offers: sql<any[]>`
-          COALESCE(
-            JSON_AGG(
-              DISTINCT JSONB_BUILD_OBJECT(
-                'id', offers.id,
-                'price', offers.rate,
-                'discountPercent' , offers.discount_percent,
-                'final_price', offers.final_price,
-                'name', offers.product_name,
-                'photos', COALESCE((
-                  SELECT ARRAY_AGG(DISTINCT offer_photos.photo)
-                  FROM offer_photos
-                  WHERE offer_photos."offer_id" = offers.id
-                ), '{}')
-              )
-            ) FILTER (WHERE offers.id IS NOT NULL),
-            '[]'
-          )
-        `,
-          products: sql<any[]>`
-            COALESCE(
-              JSON_AGG(
-                DISTINCT JSONB_BUILD_OBJECT(
-                  'id', products.id,
-                  'price', products.rate,
-                  'name', products.product_name,
-                  'photos', COALESCE((
-                    SELECT ARRAY_AGG(DISTINCT product_photos.photo)
-                    FROM product_photos
-                    WHERE product_photos."product_id" = products.id
-                  ), '{}')
-                )
-              ) FILTER (WHERE products.id IS NOT NULL),
-              '[]'
-            )
-          `,
           subcategories: sql<string[]>`
             COALESCE(
               ARRAY_AGG(DISTINCT subcategories.name) 
@@ -768,8 +730,6 @@ export const businessrouter = router({
           businessSubcategories,
           eq(businessListing.id, businessSubcategories.businessId),
         )
-        .leftJoin(products, eq(businessListing.id, products.businessId))
-        .leftJoin(offers, eq(businessListing.id, offers.businessId))
         .leftJoin(
           subcategories,
           eq(
@@ -794,6 +754,55 @@ export const businessrouter = router({
       return shop[0];
     }),
 
+  shopOffers: publicProcedure
+  .input(z.object({ businessId: z.number() }))
+  .query(async ({ input }) => {
+    const offersData = await db
+      .select({
+        id: offers.id,
+        price: offers.rate,
+        discountPercent: offers.discountPercent,
+        finalPrice: offers.finalPrice,
+        name: offers.offerName,
+        photos: sql<string[]>`
+          COALESCE(
+            (SELECT ARRAY_AGG(offer_photos.photo)
+             FROM offer_photos
+             WHERE offer_photos.offer_id = offers.id),
+            '{}'
+          )
+        `,
+      })
+      .from(offers)
+      .where(eq(offers.businessId, input.businessId));
+
+    return offersData;
+  }),
+
+  shopProducts: publicProcedure
+  .input(z.object({ businessId: z.number() }))
+  .query(async ({ input }) => {
+    const productsData = await db
+      .select({
+        id: products.id,
+        name: products.productName,
+        price: products.rate,
+        photos: sql<string[]>`
+          COALESCE(
+            (SELECT ARRAY_AGG(product_photos.photo)
+             FROM product_photos
+             WHERE product_photos.product_id = products.id),
+            '{}'
+          )
+        `,
+      })
+      .from(products)
+      .where(eq(products.businessId, input.businessId));
+
+    return productsData;
+  }),
+
+
   singleProduct: publicProcedure
     .input(z.object({ productId: z.number() }))
     .query(async ({ input }) => {
@@ -804,6 +813,9 @@ export const businessrouter = router({
           rate: products.rate,
           businessId: products.businessId,
           description: products.productDescription,
+          latitude : businessListing.latitude,
+          longitude : businessListing.longitude,
+          phone : businessListing.phoneNumber,
           photos: sql<string[]>`COALESCE(
             ARRAY_AGG(DISTINCT product_photos.photo)
             FILTER (WHERE product_photos.id IS NOT NULL),
@@ -829,7 +841,7 @@ export const businessrouter = router({
         .leftJoin(productReviews, eq(products.id, productReviews.productId))
         .leftJoin(productPhotos, eq(products.id, productPhotos.productId))
         .leftJoin(users, eq(productReviews.userId, users.id))
-        .groupBy(products.id)
+        .groupBy(products.id,businessListing.latitude,businessListing.longitude,businessListing.phoneNumber)
         .where(eq(products.id, input.productId));
       return product[0];
     }),
