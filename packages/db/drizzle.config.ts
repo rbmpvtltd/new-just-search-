@@ -1,11 +1,4 @@
-import dotenv from "dotenv";
 import { defineConfig } from "drizzle-kit";
-
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config({
-    path: "../../.env",
-  });
-}
 
 export default defineConfig({
   schema: "./dist/schema/**/*.schema.js", // 👈 schema files ka path

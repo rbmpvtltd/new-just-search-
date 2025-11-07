@@ -1,13 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-import dotenv from "dotenv";
-
-
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config({
-    path: "../../.env",
-  });
-}
 const nextConfig = {
   images: {
     remotePatterns: [
