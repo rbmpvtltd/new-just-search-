@@ -17,6 +17,7 @@ export async function asyncHandler<T>(promise: Promise<T>): Promise<
   } catch (error) {
     if (error instanceof TRPCClientError) {
       console.log("yes it is trpc error");
+      console.log("message is ", error.message);
       return {
         data: null,
         error: { error, trpcError: true },
