@@ -15,6 +15,7 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/forms/formComponent";
+import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useAuthStore } from "@/store/authStore";
@@ -194,50 +195,48 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       error: errors.offerDescription?.message,
     },
   ];
-  //   const formFields2: FormFieldProps<AddOfferSchema>[] = [
-  //     {
-  //       control,
-  //       name: "image1",
-  //       label: "",
-  //       // placeholder: 'Enter Image 2',
-  //       component: "image",
-  //       className: "",
-  //       error: errors.image1?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image2",
-  //       label: "",
-  //       // placeholder: 'Enter Image 3',
-  //       component: "image",
-  //       className: "",
-  //       error: errors.image2?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image3",
-  //       label: "",
-  //       // placeholder: 'Enter Image 2',
-  //       component: "image",
-  //       error: errors.image3?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image4",
-  //       label: "",
-  //       // placeholder: 'Enter Image 3',
-  //       component: "image",
-  //       error: errors.image4?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image5",
-  //       label: "",
-  //       // placeholder: 'Enter Image 4',
-  //       component: "image",
-  //       error: errors.image5?.message?.toString(),
-  //     },
-  //   ];
+  const formFields2: FormFieldProps<EditOfferSchema>[] = [
+    {
+      control,
+      name: "photo",
+      placeholder: "Select Image 1",
+      component: "image",
+      required: false,
+      error: errors.photo?.message,
+    },
+    {
+      control,
+      name: "image2",
+      placeholder: "Select Image 2",
+      component: "image",
+      required: false,
+      error: errors.image2?.message,
+    },
+    {
+      control,
+      name: "image3",
+      placeholder: "Select Image 3",
+      component: "image",
+      required: false,
+      error: errors.image3?.message,
+    },
+    {
+      control,
+      name: "image4",
+      placeholder: "Select Image 4",
+      component: "image",
+      required: false,
+      error: errors.image4?.message,
+    },
+    {
+      control,
+      name: "image5",
+      placeholder: "Select Image 5",
+      component: "image",
+      required: false,
+      error: errors.image5?.message,
+    },
+  ];
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView className="w-[100%] h-full">
@@ -246,11 +245,17 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
             <FormField key={field.name} {...field} />
           ))}
         </View>
-        {/* <View className="mt-8 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
-          {formFields2.map((field, idx) => (
-            <FormField labelHidden key={idx} {...field} />
+        <View className="flex-row items-center">
+          <LableText title="Shop images" className="ml-11" />
+          <Text style={{ color: "red" }} className="ml-1 mt-2">
+            *
+          </Text>
+        </View>
+        <View className="mt-2 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
+          {formFields2.map((field) => (
+            <FormField labelHidden key={field.name} {...field} />
           ))}
-        </View> */}
+        </View>
         <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
           <View className="w-[45%]">
             <PrimaryButton

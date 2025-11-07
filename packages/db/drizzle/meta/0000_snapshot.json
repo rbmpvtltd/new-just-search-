@@ -1,5 +1,5 @@
 {
-  "id": "666e6357-2479-454d-99df-a1f2234cb5e0",
+  "id": "6f5e0463-f10f-4ed1-b493-fe090bd1bc6b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -180,10 +180,9 @@
         },
         "home_delivery": {
           "name": "home_delivery",
-          "type": "boolean",
+          "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false,
-          "default": false
+          "notNull": false
         },
         "latitude": {
           "name": "latitude",
@@ -239,9 +238,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "schedules": {
-          "name": "schedules",
-          "type": "json",
+        "days": {
+          "name": "days",
+          "type": "varchar(255)[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "from_hour": {
+          "name": "from_hour",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "to_hour": {
+          "name": "to_hour",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
@@ -2845,7 +2856,7 @@
         },
         "feedback_type": {
           "name": "feedback_type",
-          "type": "varchar(200)",
+          "type": "varchar(200)[]",
           "primaryKey": false,
           "notNull": true
         },

@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactDetailSchema } from "@repo/db/src/schema/business.schema";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -20,8 +21,13 @@ export default function ContactDetail({
 }: {
   businessListing: UserBusinessListingType;
 }) {
+  console.log("Contact ", businessListing);
+
+  const router = useRouter();
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const formValue = useBusinessFormStore((s) => s.formValue);
+  const prevPage = useBusinessFormStore((s) => s.prevPage);
+  const setPage = useBusinessFormStore((s) => s.setPage);
 
   const { mutate } = useMutation(trpc.businessrouter.update.mutationOptions());
   const {
@@ -52,6 +58,8 @@ export default function ContactDetail({
         onSuccess: async (data) => {
           if (data.success) {
             Alert.alert(data.message);
+            router.replace("/(root)/profile");
+            setPage(0);
           }
           console.log("Success", data);
         },
@@ -102,6 +110,7 @@ export default function ContactDetail({
       component: "input",
       keyboardType: "numeric",
       className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.whatsappNo?.message,
     },
     {
@@ -112,17 +121,18 @@ export default function ContactDetail({
       component: "input",
       keyboardType: "email-address",
       className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.email?.message,
     },
   ];
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
-        enableOnAndroid
+        // enableOnAndroid
         extraScrollHeight={80}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, paddingVertical: 16 }}
+        contentContainerStyle={{ flexGrow: 1, paddingVertical: 6 }}
       >
         <View className="mx-auto w-[90%]">
           {formFields.map((field) => (
@@ -130,10 +140,17 @@ export default function ContactDetail({
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6">
           <View className="w-[45%]">
             <PrimaryButton
-              title="Next"
+              title="Previous"
+              variant="outline"
+              onPress={prevPage}
+            />
+          </View>
+          <View className="w-[45%]">
+            <PrimaryButton
+              title="Submit"
               isLoading={isSubmitting}
               onPress={handleSubmit(onSubmit)}
             />

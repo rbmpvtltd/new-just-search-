@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { businessDetailSchema } from "@repo/db/src/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
-import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
+import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
 import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
@@ -10,6 +10,7 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/forms/formComponent";
+import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
@@ -23,6 +24,7 @@ export default function BusinessDetail({
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const formValue = useBusinessFormStore((s) => s.formValue);
+  const nextPage = useBusinessFormStore((s) => s.nextPage);
 
   const {
     control,
@@ -36,12 +38,13 @@ export default function BusinessDetail({
       categoryId: formValue?.categoryId ?? 0,
       subcategoryId: formValue?.subcategoryId ?? [],
       specialities: formValue?.specialities ?? "",
-      homeDelivery: formValue?.homeDelivery ?? false,
+      homeDelivery: formValue?.homeDelivery ?? "",
       description: formValue?.description ?? "",
-      // image2: "",
-      // image3: "",
-      // image4: "",
-      // image5: "",
+      image1: formValue?.image1 ?? "",
+      image2: formValue?.image2 ?? "",
+      image3: formValue?.image3 ?? "",
+      image4: formValue?.image4 ?? "",
+      image5: formValue?.image5 ?? "",
     },
   });
 
@@ -61,8 +64,19 @@ export default function BusinessDetail({
   );
 
   const onSubmit = async (data: BusinessDetailSchema) => {
-    const file = await uploadToCloudinary([data.photo], "business");
-    console.log(file[0]);
+    const file = await uploadToCloudinary(
+      [
+        data.photo,
+        data.image1,
+        data.image2,
+        data.image3,
+        data.image4,
+        data.image5,
+      ],
+      "business",
+    );
+    console.log("file", file);
+
     setFormValue("name", data.name ?? "");
     setFormValue("photo", file[0] ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
@@ -70,12 +84,12 @@ export default function BusinessDetail({
     setFormValue("specialities", data.specialities ?? "");
     setFormValue("homeDelivery", data.homeDelivery ?? "");
     setFormValue("description", data.description ?? "");
-
-    // setFormValue("image1", data.image1 ?? "");
-    // setFormValue("image2", data.image2 ?? "");
-    // setFormValue("image3", data.image3 ?? "");
-    // setFormValue("image4", data.image4 ?? "");
-    // setFormValue("image5", data.image5 ?? "");
+    setFormValue("image1", file[1] ?? "");
+    setFormValue("image2", file[2] ?? "");
+    setFormValue("image3", file[3] ?? "");
+    setFormValue("image4", file[4] ?? "");
+    setFormValue("image5", file[5] ?? "");
+    nextPage();
   };
 
   const formFields: FormFieldProps<BusinessDetailSchema>[] = [
@@ -135,6 +149,7 @@ export default function BusinessDetail({
       label: "Specialities",
       component: "input",
       className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.specialities?.message,
     },
     {
@@ -147,6 +162,7 @@ export default function BusinessDetail({
         { label: "Yes", value: "yes" },
       ],
       dropdownPosition: "top",
+      required: false,
       error: errors.homeDelivery?.message,
     },
     {
@@ -155,47 +171,53 @@ export default function BusinessDetail({
       label: "About Your Business",
       component: "input",
       className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.description?.message,
     },
   ];
 
-  // const formFields2: FormFieldProps[] = [
-  //   {
-  //     control,
-  //     name: "image1",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image1?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image2",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image2?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image3",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.photo?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image4",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image4?.message?.toString(),
-  //   },
-  //   {
-  //     control,
-  //     name: "image5",
-  //     label: "",
-  //     component: "image",
-  //     error: errors.image3?.message?.toString(),
-  //   },
-  // ];
+  const formFields2: FormFieldProps<BusinessDetailSchema>[] = [
+    {
+      control,
+      name: "image1",
+      component: "image",
+      placeholder: "Select Shop Image 1",
+      required: false,
+      error: errors.image1?.message,
+    },
+    {
+      control,
+      name: "image2",
+      component: "image",
+      placeholder: "Select Shop Image 2",
+      required: false,
+      error: errors.image2?.message,
+    },
+    {
+      control,
+      name: "image3",
+      component: "image",
+      placeholder: "Select Shop Image 3",
+      required: false,
+      error: errors.photo?.message,
+    },
+    {
+      control,
+      name: "image4",
+      component: "image",
+      placeholder: "Select Shop Image 4",
+      required: false,
+      error: errors.image4?.message,
+    },
+    {
+      control,
+      name: "image5",
+      component: "image",
+      placeholder: "Select Shop Image 5",
+      required: false,
+      error: errors.image3?.message,
+    },
+  ];
 
   return (
     // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
@@ -212,9 +234,20 @@ export default function BusinessDetail({
             <FormField key={field.name} {...field} />
           ))}
         </View>
+        <View className="flex-row items-center">
+          <LableText title="Shop images" className="ml-11" />
+          <Text style={{ color: "red" }} className="ml-1 mt-2">
+            *
+          </Text>
+        </View>
+        <View className="mt-8 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2     ">
+          {formFields2.map((field) => (
+            <FormField labelHidden key={field.name} {...field} />
+          ))}
+        </View>
 
         <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
-          <View className="w-[45%]">
+          <View className="w-[45%] mx-auto">
             <PrimaryButton
               title="Next"
               isLoading={isSubmitting}

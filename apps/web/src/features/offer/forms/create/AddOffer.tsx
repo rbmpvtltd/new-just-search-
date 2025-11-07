@@ -25,7 +25,7 @@ export default function AddOffer({
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
-    trpc.businessrouter.addOffer.mutationOptions(),
+    trpc.offerrouter.addOffer.mutationOptions(),
   );
 
   const {
@@ -208,9 +208,7 @@ export default function AddOffer({
         },
       },
     );
-    console.log("file is", file);
 
-    console.log("data is", data);
   };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

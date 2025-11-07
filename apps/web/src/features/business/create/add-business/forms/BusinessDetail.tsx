@@ -38,8 +38,13 @@ export default function BusinessDetail({
       categoryId: formValue.categoryId ?? "",
       subcategoryId: formValue.subcategoryId ?? "",
       specialities: formValue.specialities ?? "",
-      homeDelivery: formValue.homeDelivery ?? false,
+      homeDelivery: formValue.homeDelivery ?? "",
       description: formValue.description ?? "",
+      image1: formValue.image1 ?? "",
+      image2: formValue.image2 ?? "",
+      image3: formValue.image3 ?? "",
+      image4: formValue.image4 ?? "",
+      image5: formValue.image5 ?? "",
     },
   });
 
@@ -187,7 +192,7 @@ export default function BusinessDetail({
     setFormValue("specialities", data.specialities ?? "");
     setFormValue("homeDelivery", data.homeDelivery ?? "");
     setFormValue("description", data.description ?? "");
-    nextPage();
+    // nextPage();
   };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

@@ -39,8 +39,9 @@ export default function BusinessDetail({
       categoryId: businessListing?.category.id,
       subcategoryId: businessListing?.subcategory?.map((item) => item.id),
       specialities: businessListing?.specialities ?? "",
-      homeDelivery: businessListing?.homeDelivery ?? false,
+      homeDelivery: businessListing?.homeDelivery ?? "",
       description: businessListing?.description ?? "",
+      
     },
   });
 

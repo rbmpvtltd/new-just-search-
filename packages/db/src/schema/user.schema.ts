@@ -66,18 +66,29 @@ export const request_accounts = pgTable("request_accounts", {
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
 
+export const requestAccountsInsertSchema = createInsertSchema(
+  request_accounts,
+  {
+    reason: z
+      .string()
+      .min(10, "Message For Reason To Delete Account Must Be 10"),
+  },
+).omit({ userId: true });
 //  3.feedback
 export const feedbacks = pgTable("feedbacks", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
-  feedbackType: varchar("feedback_type", { length: 200 }).notNull(),
+  feedbackType: varchar("feedback_type", { length: 200 }).array().notNull(),
   additionalFeedback: text("additional_feedback"),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
 
+export const feedbackInsertSchema = createInsertSchema(feedbacks, {
+  feedbackType: z.array(z.string()).min(1, "Please select at least one option"),
+}).omit({ userId: true });
 // 4. franchises
 export const franchises = pgTable("franchises", {
   id: serial("id").primaryKey(),

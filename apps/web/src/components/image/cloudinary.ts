@@ -28,7 +28,10 @@ export const uploadToCloudinary = async (
   const uploadPromises: Promise<string | null>[] = [];
 
   for (let i = 0; i < files.length; i++) {
+    console.log("Files", files);
+
     const fileUrl = files[i];
+    console.log("FILE URL ------------", fileUrl);
     if (!fileUrl) {
       uploadPromises.push(Promise.resolve(null));
       continue;
@@ -46,7 +49,9 @@ export const uploadToCloudinary = async (
     const url = `https://api.cloudinary.com/v1_1/${signResponse.data.cloudname}/auto/upload`;
     // Fetch the blob from the blob URL
     const blobResponse = await fetch(fileUrl);
+    console.log("blobResponse", blobResponse);
     const blob = await blobResponse.blob();
+    console.log("blob", blob);
 
     // Determine type and extension from blob
     const type = blob.type || "image/jpeg";

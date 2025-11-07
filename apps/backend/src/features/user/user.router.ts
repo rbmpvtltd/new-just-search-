@@ -1,5 +1,9 @@
 import { db, schemas } from "@repo/db";
-import { userUpdateSchema } from "@repo/db/src/schema/user.schema";
+import {
+  feedbackInsertSchema,
+  requestAccountsInsertSchema,
+  userUpdateSchema,
+} from "@repo/db/src/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -115,4 +119,57 @@ export const userRouter = router({
     const role = ctx.role;
     return { ...profile, role };
   }),
+
+  accountDeleteRequest: protectedProcedure
+    .input(requestAccountsInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, ctx.userId),
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not found",
+        });
+      }
+
+      await db.insert(schemas.user.request_accounts).values({
+        reason: input.reason,
+        userId: ctx.userId,
+      });
+
+      return {
+        success: true,
+        message: "Request sent successfully",
+      };
+    }),
+
+  feedback: protectedProcedure
+    .input(feedbackInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, ctx.userId),
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not found",
+        });
+      }
+
+      await db.insert(schemas.user.feedbacks).values({
+        userId: user.id,
+        feedbackType: Array.isArray(input.feedbackType)
+          ? input.feedbackType
+          : JSON.parse(input.feedbackType || ""),
+        additionalFeedback: input.additionalFeedback,
+      });
+
+      return {
+        success: true,
+        message: "Feedback sent successfully",
+      };
+    }),
 });

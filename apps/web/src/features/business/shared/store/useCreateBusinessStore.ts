@@ -34,8 +34,13 @@ const initialFormValue: CombinedBusinessForm = {
   categoryId: 0,
   subcategoryId: [],
   specialities: "",
-  homeDelivery: false,
+  homeDelivery: "",
   description: "",
+  image1: "",
+  image2: "",
+  image3: "",
+  image4: "",
+  image5: "",
 
   buildingName: "",
   streetName: "",
@@ -59,7 +64,7 @@ const initialFormValue: CombinedBusinessForm = {
   // slug: "",
 };
 export const useBusinessFormStore = create<BusinessFormProps>((set) => ({
-  page: 2,
+  page: 0,
   formValue: initialFormValue,
 
   prevPage: () =>

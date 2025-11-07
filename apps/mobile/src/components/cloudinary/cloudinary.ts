@@ -1,3 +1,4 @@
+import { file } from "zod";
 import { trpcClient } from "@/lib/trpc";
 import { asyncHandler } from "@/utils/asyncHandler";
 
@@ -15,10 +16,16 @@ export const uploadToCloudinary = async (
     }),
   );
 
+  console.log("Get Sign Response", signResponse);
+
   const uploadPromises: Promise<string | null>[] = [];
 
   for (let i = 0; i < files.length; i++) {
+    console.log("File----------------------", files);
+
     const fileUrl = files[i];
+    console.log("FILE URL ------------", fileUrl);
+
     if (!fileUrl) {
       uploadPromises.push(Promise.resolve(null));
       continue;

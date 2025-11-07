@@ -31,7 +31,7 @@ CREATE TABLE "business_listings" (
 	"photo" text,
 	"specialities" text,
 	"description" text,
-	"home_delivery" boolean DEFAULT false,
+	"home_delivery" varchar(255),
 	"latitude" varchar(50),
 	"longitude" varchar(50),
 	"building_name" varchar(255),
@@ -41,7 +41,9 @@ CREATE TABLE "business_listings" (
 	"pincode" varchar,
 	"state" integer NOT NULL,
 	"city" integer NOT NULL,
-	"schedules" json,
+	"days" varchar(255)[],
+	"from_hour" varchar(255),
+	"to_hour" varchar(255),
 	"contact_person" varchar(255),
 	"status" boolean DEFAULT true,
 	"owner_number" varchar,
@@ -392,7 +394,7 @@ CREATE TABLE "recent_view_products" (
 CREATE TABLE "feedbacks" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
-	"feedback_type" varchar(200) NOT NULL,
+	"feedback_type" varchar(200)[] NOT NULL,
 	"additional_feedback" text,
 	"created_at" timestamp DEFAULT NOW(),
 	"updated_at" timestamp DEFAULT NOW()

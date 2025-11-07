@@ -6,4 +6,6 @@ const cld = new Cloudinary({
     }
 });
 
+// TODO: get this from env
+
 export {cld}

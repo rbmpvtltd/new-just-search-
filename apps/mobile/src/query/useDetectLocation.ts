@@ -63,5 +63,5 @@ export const useDetectLocation = (enabled = false) =>
     queryKey: ["location"],
     queryFn: fetchLocationData,
     enabled,
-    retry: 1, // one retry if it fails
+    // retry: 1, // one retry if it fails
   });

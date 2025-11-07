@@ -37,7 +37,7 @@ export default function MyHireCard({ data }: { data: MyHireType }) {
         <View className="flex-row justify-between">
           <Pressable
             onPress={() => {
-              router.push("/(root)/user/hire/edit");
+              router.push("/(root)/profile/hire/edit");
             }}
             style={{
               backgroundColor: Colors[colorScheme ?? "light"].success,

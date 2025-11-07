@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactDetailSchema } from "@repo/db/src/schema/business.schema";
 import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -15,10 +17,14 @@ import { trpc } from "@/lib/trpc";
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail() {
+  const router = useRouter();
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const formValue = useBusinessFormStore((s) => s.formValue);
+  const prevPage = useBusinessFormStore((s) => s.prevPage);
 
-  const { mutate } = useMutation(trpc.businessrouter.create.mutationOptions());
+  const { mutate, isError, error } = useMutation(
+    trpc.businessrouter.create.mutationOptions(),
+  );
   const {
     control,
     handleSubmit,
@@ -41,16 +47,24 @@ export default function ContactDetail() {
     setFormValue("whatsappNo", data.whatsappNo ?? "");
     setFormValue("email", data.email ?? "");
 
+    console.log("form Value", formValue);
+
     mutate(
       { ...formValue, pincode: formValue.pincode },
       {
         onSuccess: async (data) => {
           if (data.success) {
             Alert.alert(data.message);
+            router.replace("/(root)/profile");
           }
           console.log("Success", data);
         },
         onError: (error) => {
+          Alert.alert("On Error", error.message);
+
+          if (isTRPCClientError(error)) {
+            Alert.alert(error.message);
+          }
           console.error("Error", error.message);
         },
       },
@@ -75,7 +89,7 @@ export default function ContactDetail() {
       placeholder: "Contact Person Number",
       component: "input",
       keyboardType: "numeric",
-      editable: false,
+      // editable: false,
       className: "w-[90%] bg-base-200",
       error: errors.phoneNumber?.message,
     },
@@ -97,6 +111,7 @@ export default function ContactDetail() {
       component: "input",
       keyboardType: "numeric",
       className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.whatsappNo?.message,
     },
     {
@@ -107,6 +122,7 @@ export default function ContactDetail() {
       component: "input",
       keyboardType: "email-address",
       className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.email?.message,
     },
   ];
@@ -125,10 +141,17 @@ export default function ContactDetail() {
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-96">
           <View className="w-[45%]">
             <PrimaryButton
-              title="Next"
+              title="Previous"
+              variant="outline"
+              onPress={prevPage}
+            />
+          </View>
+          <View className="w-[45%]">
+            <PrimaryButton
+              title="Submit"
               isLoading={isSubmitting}
               onPress={handleSubmit(onSubmit)}
             />

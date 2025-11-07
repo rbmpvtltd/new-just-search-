@@ -13,7 +13,7 @@ import type { OutputTrpcType } from "@/trpc/type";
 export default function MyProduct() {
   const trpc = useTRPC();
   const { data: myProducts, isLoading } = useQuery(
-    trpc.businessrouter.showProduct.queryOptions(),
+    trpc.productrouter.showProduct.queryOptions(),
   );
 
   if (isLoading) {
@@ -34,15 +34,14 @@ export default function MyProduct() {
 }
 
 type ProductType = NonNullable<
-  OutputTrpcType["businessrouter"]["showProduct"]
+  OutputTrpcType["productrouter"]["showProduct"]
 >["products"][number];
 
 function ProductCard({ product }: { product: ProductType }) {
   const trpc = useTRPC();
   const { mutate: deleteProduct, isPending } = useMutation(
-    trpc.businessrouter.deleteProduct.mutationOptions(),
+    trpc.productrouter.deleteProduct.mutationOptions(),
   );
-
 
   return (
     <div className="bg-gray-100 rounded-2xl shadow-lg overflow-hidden flex sm:flex-row flex-col gap-4 p-4">

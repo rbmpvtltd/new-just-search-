@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
@@ -12,6 +13,7 @@ import {
 } from "react-native";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
+import { cld } from "@/lib/cloudinary";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 export default function MyOffersList() {
   const {
@@ -42,7 +44,7 @@ export default function MyOffersList() {
       <View className="px-4 mt-4">
         <Pressable
           className="bg-primary py-3 rounded-xl w-full flex-row items-center justify-center shadow-sm"
-          onPress={() => router.push("/(root)/user/offer/add-offer")}
+          onPress={() => router.push("/(root)/profile/offer/add-offer")}
         >
           <Ionicons name="add-circle-outline" size={20} color="#fff" />
           <Text className="text-secondary ml-2 font-semibold">
@@ -69,7 +71,7 @@ export default function MyOffersList() {
 }
 
 type OfferType = NonNullable<
-  OutputTrpcType["businessrouter"]["showOffer"]
+  OutputTrpcType["offerrouter"]["showOffer"]
 >["offers"][number];
 function OfferCard({ item }: { item: OfferType }) {
   const router = useRouter();
@@ -119,57 +121,61 @@ function OfferCard({ item }: { item: OfferType }) {
     ]);
   };
   return (
-    <View className="w-full h-full bg-base-100 flex-1">
-      <View className="bg-base-200 rounded-2xl shadow-md mx-4 my-6 p-4">
-        {/* <Text className="text-secondary text-xl font-semibold mb-2">
-          My {item.heading}
-        </Text>
-        <View className="border-b border-secondary mb-4" /> */}
-        <Image
-          source={{
-            uri: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
-          }}
-          className="h-56 aspect-[3/4] mx-auto rounded-xl mb-4"
-          resizeMode="cover"
-        />
-
-        <View className="flex-row justify-between items-start mb-2">
-          <Text className="text-secondary text-lg font-bold w-[50%]">
-            {item?.offerName}
-          </Text>
-          <View className="w-[50%] items-end">
-            <Text className="text-xs text-secondary">
-              Offer Start Date: {formattedStartDate}
+    <View className="w-[90%] mt-3 mx-auto bg-base-100">
+      <View className="flex-row bg-base-200 p-4 rounded-2xl shadow-sm">
+        <View className="w-28 h-28 rounded-lg">
+          <AdvancedImage
+            cldImg={cld.image(item?.offerPhotos[0].photo || "")}
+            className="w-[100%] h-[100%] rounded-lg"
+          />
+        </View>
+        <View className="flex-1 ml-4 justify-between">
+          <View>
+            <Text
+              className="text-secondary font-bold text-base"
+              numberOfLines={1}
+            >
+              {item?.offerName}
+            </Text>
+            <Text className="text-sm text-secondary mb-1">
+              🕒 {formattedStartDate} → {formattedEndDate}
             </Text>
 
-            <Text className="text-xs text-secondary">
-              Offer End Date: {formattedEndDate}
+            <Text className="text-secondary font-bold text-lg">
+              ₹{item.finalPrice}{" "}
+              {item.discountPercent && (
+                <Text className="text-error text-sm ml-1">
+                  🔖 {item.discountPercent}% OFF
+                </Text>
+              )}
             </Text>
           </View>
-        </View>
 
-        <View className="flex-row justify-between">
-          <View className="flex-row justify-between mt-2">
+          <View className="flex-row mt-3">
             <Pressable
+              className="bg-info flex-row items-center px-3 py-1.5 rounded-lg mr-2"
               onPress={() =>
                 router.navigate(
-                  `/(root)/user/offer/edit-offer/${item?.offerSlug}`,
+                  `/(root)/profile/offer/edit-offer/${item?.offerSlug}`,
                 )
               }
-              className="w-[48%] flex-row items-center justify-center rounded-xl bg-success py-3 px-4 shadow-sm shadow-black/10 active:opacity-80"
             >
-              <Ionicons name="create-outline" size={20} color="#fff" />
-              <Text className="ml-2 font-medium text-success-content">
-                Edit
-              </Text>
+              <Ionicons name="create-outline" size={14} color="#fff" />
+              <Text className="text-secondary text-sm ml-1">Edit</Text>
             </Pressable>
 
             <Pressable
+              className="bg-error flex-row items-center px-3 py-1.5 rounded-lg"
               onPress={handleDelete}
-              className="w-[48%] flex-row items-center justify-center rounded-xl bg-error py-3 px-4 shadow-sm shadow-black/10 active:opacity-80"
             >
-              <Ionicons name="trash-outline" size={20} color="#fff" />
-              <Text className="ml-2 font-medium text-secondary">Delete</Text>
+              {isPending ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <>
+                  <Ionicons name="trash-outline" size={14} color="#fff" />
+                  <Text className="text-secondary text-sm ml-1">Delete</Text>
+                </>
+              )}
             </Pressable>
           </View>
         </View>

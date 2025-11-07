@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { offersInsertSchema } from "@repo/db/src/schema/offer.schema";
-import { useQuery } from "@tanstack/react-query";
+import { productInsertSchema } from "@repo/db/src/schema/product.schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import {
   ActivityIndicator,
+  Alert,
   Keyboard,
   ScrollView,
   Text,
@@ -11,14 +12,15 @@ import {
   View,
 } from "react-native";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/forms/formComponent";
+import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { trpc } from "@/lib/trpc";
 import { useAuthStore } from "@/store/authStore";
-import { productInsertSchema } from "@repo/db/src/schema/product.schema";
 
 type AddProductSchema = z.infer<typeof productInsertSchema>;
 export default function AddProduct() {
@@ -26,12 +28,13 @@ export default function AddProduct() {
   const { data, error, isLoading, isError } = useQuery(
     trpc.productrouter.add.queryOptions(),
   );
+  const { mutate } = useMutation(
+    trpc.productrouter.addProduct.mutationOptions(),
+  );
 
   const {
     control,
     handleSubmit,
-    setValue,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<AddProductSchema>({
     resolver: zodResolver(productInsertSchema),
@@ -95,7 +98,30 @@ export default function AddProduct() {
     );
   }
 
-  const onSubmit = async (data: AddProductSchema) => {};
+  const onSubmit = async (data: AddProductSchema) => {
+    const file = await uploadToCloudinary(
+      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      "products",
+    );
+    mutate(
+      {
+        ...data,
+        photo: file[0] ?? "",
+        image2: file[1] ?? "",
+        image3: file[2] ?? "",
+        image4: file[3] ?? "",
+        image5: file[4] ?? "",
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success) {
+            Alert.alert(data.message);
+          }
+          // router.push("/");
+        },
+      },
+    );
+  };
 
   const formFields: FormFieldProps<AddProductSchema>[] = [
     {
@@ -117,7 +143,6 @@ export default function AddProduct() {
       placeholder: "Product Price",
       className: "w-[90%] bg-base-200",
       error: errors.rate?.message,
-  
     },
     {
       control,
@@ -159,50 +184,48 @@ export default function AddProduct() {
       error: errors.productDescription?.message,
     },
   ];
-  //   const formFields2: FormFieldProps<AddOfferSchema>[] = [
-  //     {
-  //       control,
-  //       name: "image1",
-  //       label: "",
-  //       // placeholder: 'Enter Image 2',
-  //       component: "image",
-  //       className: "",
-  //       error: errors.image1?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image2",
-  //       label: "",
-  //       // placeholder: 'Enter Image 3',
-  //       component: "image",
-  //       className: "",
-  //       error: errors.image2?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image3",
-  //       label: "",
-  //       // placeholder: 'Enter Image 2',
-  //       component: "image",
-  //       error: errors.image3?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image4",
-  //       label: "",
-  //       // placeholder: 'Enter Image 3',
-  //       component: "image",
-  //       error: errors.image4?.message?.toString(),
-  //     },
-  //     {
-  //       control,
-  //       name: "image5",
-  //       label: "",
-  //       // placeholder: 'Enter Image 4',
-  //       component: "image",
-  //       error: errors.image5?.message?.toString(),
-  //     },
-  //   ];
+  const formFields2: FormFieldProps<AddProductSchema>[] = [
+    {
+      control,
+      name: "photo",
+      placeholder: "Select Image 1",
+      component: "image",
+      required: false,
+      error: errors.photo?.message,
+    },
+    {
+      control,
+      name: "image2",
+      placeholder: "Select Image 2",
+      component: "image",
+      required: false,
+      error: errors.image2?.message,
+    },
+    {
+      control,
+      name: "image3",
+      placeholder: "Select Image 3",
+      component: "image",
+      required: false,
+      error: errors.image3?.message,
+    },
+    {
+      control,
+      name: "image4",
+      placeholder: "Select Image 4",
+      component: "image",
+      required: false,
+      error: errors.image4?.message,
+    },
+    {
+      control,
+      name: "image5",
+      placeholder: "Select Image 5",
+      component: "image",
+      required: false,
+      error: errors.image5?.message,
+    },
+  ];
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView className="w-[100%] h-full">
@@ -211,13 +234,19 @@ export default function AddProduct() {
             <FormField key={field.name} {...field} />
           ))}
         </View>
-        {/* <View className="mt-8 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
-          {formFields2.map((field, idx) => (
-            <FormField labelHidden key={idx} {...field} />
+        <View className="flex-row items-center">
+          <LableText title="Product images" className="ml-11" />
+          <Text style={{ color: "red" }} className="ml-1 mt-2">
+            *
+          </Text>
+        </View>
+        <View className="mt-2 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
+          {formFields2.map((field) => (
+            <FormField labelHidden key={field.name} {...field} />
           ))}
-        </View> */}
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
-          <View className="w-[45%]">
+        </View>
+        <View className="flex-row justify-between w-[90%] self-center  mt-6 mb-10">
+          <View className="w-[45%] mx-auto">
             <PrimaryButton
               title="Submit"
               isLoading={isSubmitting}
