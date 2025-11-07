@@ -3,10 +3,7 @@ import { uploadOnCloudinary } from "@repo/cloudinary";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
-import {
-  categories,
-  subcategories,
-} from "../db/src/schema/not-related.schema";
+import { categories, subcategories } from "../db/src/schema/not-related.schema";
 import { businessListings } from "../db/src/schema/business.schema";
 
 import {
@@ -23,7 +20,7 @@ dotenv.config();
 
 export const offerSeed = async () => {
   await clearOfferSeed();
-  await addOffer();
+  // await addOffer();
   // await addOfferReviews();
   // await addOfferSubcategories();
 };
@@ -33,7 +30,7 @@ const clearOfferSeed = async () => {
   // await db.execute(`TRUNCATE TABLE offer_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE offer_photos RESTART IDENTITY CASCADE;`);
   // await db.execute(`TRUNCATE TABLE offers RESTART IDENTITY CASCADE;`);
-  console.log("all tables cleared successfully")
+  console.log("all tables cleared successfully");
 };
 
 // 1. offer
@@ -70,9 +67,9 @@ export const addOffer = async () => {
         categoryId: category.id,
         offerName: row.product_name,
         offerSlug: row.product_slug,
-        rate: row.rate,
-        discountPercent: row.discount_percent,
-        finalPrice: row.final_price,
+        rate: Math.round(Number(row.rate)),
+        discountPercent: Math.round(Number(row.discount_percent)),
+        finalPrice: Math.round(Number(row.final_price)),
         offerDescription: row.product_description,
         offerStartDate: row.offer_start_date,
         offerEndDate: row.offer_end_date,
@@ -86,7 +83,11 @@ export const addOffer = async () => {
     for (const image of images) {
       if (row[image]) {
         const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-        const uploaded = await uploadOnCloudinary(liveOfferImageUrl, "offer",clouadinaryFake);
+        const uploaded = await uploadOnCloudinary(
+          liveOfferImageUrl,
+          "offer",
+          clouadinaryFake,
+        );
         const offerPhotoUrl = uploaded;
 
         await db.insert(offerPhotos).values({

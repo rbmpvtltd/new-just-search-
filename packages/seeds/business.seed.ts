@@ -22,7 +22,7 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  await addBusiness();
+  // await addBusiness();
   // await seedFavourites();
   // await businessesSubcategory();
   // await businessesCategories();
@@ -43,9 +43,9 @@ export const clearAllTablesBusiness = async () => {
   //   `TRUNCATE TABLE recent_view_business RESTART IDENTITY CASCADE;`,
   // );
   // await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(
+  //   `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
+  // );
   console.log(" All tables cleared successfully!");
 };
 
@@ -295,7 +295,7 @@ const addBusiness = async () => {
     if (skipSlug.includes(row.slug)) {
       slug = `${row.slug}${row.id}`;
     }
-
+    console.log("==========row is ===========",row)
     try {
       if (!createUser) {
         console.log("User not found" + row.id);
