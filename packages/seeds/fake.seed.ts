@@ -77,9 +77,9 @@ const seedRealUser = async (
     const [insertedAdmin] = await db
       .insert(users)
       .values({
-        displayName: "admin",
+        displayName: email,
         phoneNumber: "fake",
-        email: "admin@gmail.com",
+        email: email,
         password: hashPassword,
         role: role,
         googleId: "fake",
