@@ -4,11 +4,13 @@ import FirstCaraousel from "@/features/business/mainContent/BannerFistCaraousel"
 import Category from "@/features/business/mainContent/Category";
 import PopularaBanner from "@/features/business/mainContent/PopularaBanner";
 import PremiumShop from "@/features/business/mainContent/PremiumShop";
+import { getTrpcUrl } from "@/trpc/helper";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 import { ErrorComponent } from "@/utils/error/ErrorComponent";
 
 export default async function Page() {
+  console.log(getTrpcUrl());
   const { data: bannerFirst } = await asyncHandler(
     trpcServer.banners.getBannerData.query({ type: 1 }),
   );
@@ -39,7 +41,7 @@ export default async function Page() {
         popularCategories={popularCategories}
         allCategories={allCategory}
       />
-      <AddvertiseBanner addvertiseBanner={addvertiseBanner}/>
+      <AddvertiseBanner addvertiseBanner={addvertiseBanner} />
       <AddvertiseBanner2 addvertiseBanner={addvertiseBanner2} />
     </div>
   );
