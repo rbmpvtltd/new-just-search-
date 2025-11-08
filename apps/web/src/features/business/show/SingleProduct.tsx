@@ -5,9 +5,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import Image from "next/image";
-import React from "react";
-import type { OutputTrpcType } from "@/trpc/type";
+import Image from "next/image";import type { OutputTrpcType } from "@/trpc/type";
 import { Button } from "@/components/ui/button";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import Rating from "@/components/ui/Rating";
@@ -18,7 +16,6 @@ type SingleProductType =
   | OutputTrpcType["businessrouter"]["singleProduct"]
   | null;
 
-type ProductRatingType = OutputTrpcType["businessrouter"]["singleProduct"]
 
 function SingleProductComp({
   productPhotos,
@@ -30,8 +27,8 @@ function SingleProductComp({
   const content = parse(product?.description ?? "");
   return (
     <div>
-      <div className="flex gap-6 items-center">
-        <Carousel opts={{ loop: true }} className="w-[40%]">
+      <div className="flex flex-col sm:flex-row gap-6 items-center">
+        <Carousel opts={{ loop: true }} className="w-[90%] sm:w-[40%] ">
           <CarouselContent className="ml-5">
             {productPhotos?.map((item, index: number) => (
               <CarouselItem key={index.toString()} className="pl-1 basis-1/1">
@@ -52,7 +49,7 @@ function SingleProductComp({
             ))}
           </CarouselContent>
         </Carousel>
-        <div className="w-[50%] flex flex-col gap-2">
+        <div className="w-[90%] sm:w-[50%] flex flex-col gap-2">
           <h2 className="font-medium">{product?.shopName}</h2>
           <h1 className="text-2xl line-clamp-1 text-secondary font-semibold">
             {product?.name}

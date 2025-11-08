@@ -25,10 +25,10 @@ export function SingleShopTabBar({
 }) {
   return (
     <div>
-      <div className="flex w-[70%] flex-col  mx-auto shadow-2xl">
+      <div className="flex w-[95%] sm:w-[70%] flex-col  mx-auto shadow-2xl">
         <Carousel opts={{ loop: true }} className="w-full ">
           <CarouselContent className="ml-10">
-          <CarouselItem className="pl-1 basis-1/2">
+          <CarouselItem className="pl-1 basis-1/1 sm:basis-1/2 ">
                 <div className="py-1">
                   <Card>
                     <CardContent className="flex items-center justify-center">
@@ -44,7 +44,7 @@ export function SingleShopTabBar({
                 </div>
               </CarouselItem>
             {businessPhotos?.map((item, index: number) => (
-              <CarouselItem key={index.toString()} className="pl-1 basis-1/2">
+              <CarouselItem key={index.toString()} className="pl-1 basis-1/1 sm:basis-1/2">
                 <div className="py-1">
                   <Card>
                     <CardContent className="flex items-center justify-center">
@@ -63,7 +63,7 @@ export function SingleShopTabBar({
           </CarouselContent>
         </Carousel>
       </div>
-      <div className="flex w-[70%]  flex-col  mx-auto shadow-2xl mt-10">
+      <div className="flex w-[95%] sm:w-[70%] flex-col  mx-auto shadow-2xl mt-10">
         <ShopTabBar singleShop={shop} />
       </div>
     </div>

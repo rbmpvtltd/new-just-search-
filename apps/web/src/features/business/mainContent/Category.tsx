@@ -23,7 +23,7 @@ function Category({
   };
   return (
     <>
-      <div className="grid lg:grid-cols-8 md:grid-cols-4 grid-cols-2 mt-10  px-36 mx-auto gap-4 place-content-center">
+      <div className="grid lg:grid-cols-8 md:grid-cols-4 grid-cols-3 mt-10  md:px-36 px-2 mx-auto gap-4 place-content-center">
         {category?.map((item, index: number) => {
           return (
             <PopularCategoryCard

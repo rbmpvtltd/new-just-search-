@@ -27,7 +27,7 @@ export function PopularCategoryCard({
           src={photo ?? ""}
           className="mx-auto"
         />
-        <p className="w-[70%] text-center mx-auto text-[10px]">{title}</p>
+        <p className="w-full text-center mx-auto text-[10px] md:line-clamp-2 line-clamp-1">{title}</p>
       </Link>
     </div>
   );

@@ -28,19 +28,18 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
   };
 
   return (
-    <div className="flex w-full  flex-col gap-6 mb-12">
-      <Tabs defaultValue="about">
-        <TabsList>
+    <div className="flex  w-full  flex-col gap-16 mb-12">
+      <Tabs defaultValue="about" className=" mx-auto">
+        <TabsList className="flex-wrap">
           <TabsTrigger value="about">About Business</TabsTrigger>
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="offers">Offers</TabsTrigger>
           <TabsTrigger value="location">Location</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
         </TabsList>
-        <hr />
-        <TabsContent value="about">
+        <TabsContent value="about" className="mt-10 sm:mt-0">
           <div className="p-4 flex flex-col gap-4">
-            <h1 className="text-2xl font-semibold">{singleShop?.name}</h1>
+            <h1 className="text-2xl font-semibold line-clamp-1">{singleShop?.name}</h1>
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
               <p className="text-sm">
@@ -48,7 +47,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                 {singleShop?.buildingName}
               </p>
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <div className="flex gap-2 items-center">
                 <FaPhoneAlt />
                 <Badge variant="destructive">{singleShop?.phoneNumber}</Badge>
@@ -91,11 +90,11 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                 </Badge>
               ))}
             </div>
-            <div className="flex gap-4 w-[70%] justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 w-[70%] justify-between mx-auto sm:mx-0">
               <Button
                 onClick={handleClick}
                 type="button"
-                className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 hover:scale-105 transition-all transform duration-300"
+                className=" whitespace-nowrap flex items-center text-white font-semibold w-full sm:w-[30%] gap-2 hover:scale-105 transition-all transform duration-300"
               >
                 <MdLocationPin />
                 Get Direction
@@ -105,7 +104,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                   console.log("chatting with", singleShop?.id);
                 }}
                 type="button"
-                className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
+                className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 w-full sm:w-[30%] py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
               >
                 <IoChatbubbleEllipses />
                 Chat Now
@@ -116,7 +115,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                   console.log("calling on", singleShop?.phoneNumber);
                 }}
                 type="button"
-                className="flex whitespace-nowrap items-center text-white font-semibold gap-2 hover:scale-105 transition-all transform duration-300"
+                className="flex whitespace-nowrap items-center text-white font-semibold w-full sm:w-[30%] gap-2 hover:scale-105 transition-all transform duration-300"
               >
                 <FaPhoneAlt />
                 Contact Now
@@ -124,16 +123,16 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="products">
+        <TabsContent value="products" className="mt-10 sm:mt-0">
           <ShopProducts shopId={Number(singleShop?.id)} shopName={singleShop?.name ?? ""}/>
         </TabsContent>
-        <TabsContent value="offers">
+        <TabsContent value="offers" className="mt-10 sm:mt-0">
           <ShopOffers
             shopId={Number(singleShop?.id)}
             shopName={singleShop?.name ?? ""}
           />
         </TabsContent>
-        <TabsContent value="location">
+        <TabsContent value="location" className="mt-10 sm:mt-0">
           <div className="p-4 flex flex-wrap justify-between gap-4">
             <GoMap
               latitude={singleShop?.latitude}
@@ -162,7 +161,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
             </div> */}
           </div>
         </TabsContent>
-        <TabsContent value="reviews">
+        <TabsContent value="reviews" className="mt-10 sm:mt-0">
           <div className="p-4 flex flex-wrap justify-between gap-4 w-full">
             <div className="w-full">
               <h1 className="text-2xl font-semibold text-secondary">

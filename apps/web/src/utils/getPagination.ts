@@ -1,7 +1,7 @@
 function getPagination(
   currentPage: number | undefined,
   totalPages: number | undefined,
-  maxButtons = 10,
+  maxButtons = 7,
 ) {
   const pages = [];
 

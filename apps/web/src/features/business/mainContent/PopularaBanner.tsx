@@ -51,8 +51,8 @@ function PopularaBanner({
                 className="w-[70%] md:w-[46%] lg:w-[22%] border-2 border-primary rounded-md flex flex-col justify-between items-center py-2 h-[300px]"
               >
                 <CldImage
-                  height={200}
-                  width={200}
+                  height={270}
+                  width={270}
                   src={item.photo}
                   alt={`${item.title} category image`}
                   className="object-cover"
