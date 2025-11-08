@@ -41,7 +41,7 @@ export default function TabLayout() {
         name="[premiumshops]"
         options={{
           title: "About Business",
-          headerShown: false,
+          headerShown: true,
           tabBarLabel: "Business",
           tabBarIcon: ({ color }) => (
             <Ionicons

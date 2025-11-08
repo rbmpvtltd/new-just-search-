@@ -21,7 +21,7 @@ export default function ShopOffersList({ listingId }: { listingId: string }) {
   );
 
   if (data?.length === 0) {
-    return <DataNotFound />;
+    return <DataNotFound />
   }
 
   return (
@@ -62,9 +62,9 @@ export default function ShopOffersList({ listingId }: { listingId: string }) {
 
                 <View className="h-auto w-full mt-4 px-4 mb-6 text-center">
                   <Text className="text-primary text-lg ">
-                    ₹{item?.item?.finalPrice}
+                    ₹{String(item?.item?.finalPrice ?? "")}
                     <Text className="text-secondary line-through">
-                      ₹{item?.item?.price}
+                      ₹{String(item?.item?.price ?? "")}
                     </Text>
                   </Text>
                 </View>

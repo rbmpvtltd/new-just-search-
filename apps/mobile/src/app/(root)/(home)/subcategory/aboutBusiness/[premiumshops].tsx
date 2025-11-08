@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Dimensions, Image, ScrollView, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Carousel from "react-native-reanimated-carousel";
@@ -95,6 +95,11 @@ export default function TabOneScreen() {
   // if (!listing) return null;
   return (
     <ScrollView>
+      <Stack.Screen
+      options={{
+        title : data?.name
+      }} 
+      /> 
       <View className="flex-1 items-center">
         <View className="flex-1 justify-center">
           <GestureHandlerRootView>

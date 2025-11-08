@@ -15,6 +15,7 @@ import {
 } from "@repo/db/src/schema/not-related.schema";
 import {
   offerPhotos,
+  offerReviews,
   offers,
   offersInsertSchema,
 } from "@repo/db/src/schema/offer.schema";
@@ -692,6 +693,7 @@ export const businessrouter = router({
           description: offers.offerDescription,
           createdAt: offers.createdAt,
           businessId: offers.businessId,
+          phoneNo : businessListing.phoneNumber,
           shopName: sql<string | null>`COALESCE((
             SELECT name FROM business_listings LIMIT 1
           ), '')`,
@@ -700,11 +702,33 @@ export const businessrouter = router({
             FILTER (WHERE offer_photos.id IS NOT NULL),
             '{}'
           )`,
+           rating: sql<
+          {
+            id: number;
+            created_at: string;
+            rating: number;
+            message: string;
+            user: string;
+          }[]
+        >`COALESCE(
+          JSON_AGG(
+            DISTINCT JSONB_BUILD_OBJECT(
+              'id', offer_reviews.id,
+              'created_at', offer_reviews.created_at,
+              'rating', offer_reviews.rate,
+              'message', offer_reviews.message,
+              'user', users.display_name
+            )
+          ) FILTER (WHERE offer_reviews.id IS NOT NULL),
+          '[]'
+        )`,
         })
         .from(offers)
         .leftJoin(offerPhotos, eq(offerPhotos.offerId, offers.id))
+        .leftJoin(offerReviews, eq(offers.id, offerReviews.offerId))
+        .leftJoin(users, eq(users.id, offerReviews.userId))
         .leftJoin(businessListing, eq(businessListing.id, offers.businessId))
-        .groupBy(offers.id)
+        .groupBy(offers.id,businessListing.phoneNumber)
         .where(eq(offers.id, input.offerId));
 
       return offer[0];

@@ -69,7 +69,7 @@ function ListingProduct({ shopId }: { shopId: string }) {
                         message: "Need to login to chat on your behalf",
                         onConfirm: () => {
                           clearToken();
-                          router.replace("/(root)/profile/profile");
+                          router.replace("/(root)/profile");
                         },
                       });
                     } else {
