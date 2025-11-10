@@ -72,8 +72,8 @@ export const authRouter = router({
       const session = await createSession(user.id);
       return session?.token;
     }),
-  verifyauth: protectedProcedure.query(async ({ctx}) => {
-    return { success: true,role : ctx.role };
+  verifyauth: protectedProcedure.query(async ({ ctx }) => {
+    return { success: true, role: ctx.role };
   }),
   logout: protectedProcedure.mutation(async ({ ctx }) => {
     await deleteSession(ctx.sessionId);
@@ -84,8 +84,9 @@ export const authRouter = router({
       ctx.role === "salesman" ||
       ctx.role === "franchises" ||
       ctx.role === "admin"
-    )
+    ) {
       return { success: true };
+    }
     return { success: false };
   }),
 });

@@ -1,5 +1,3 @@
-console.log(process.env);
-
 import fs from "node:fs";
 import { db, schemas } from "@repo/db";
 import { UserRole } from "@repo/db/src/schema/auth.schema";

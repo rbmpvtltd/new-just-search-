@@ -1,5 +1,5 @@
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
@@ -13,7 +13,8 @@ export default async function DashboardLayout({
   const verityDashboardUser = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );
-  if (verityDashboardUser.data?.success)
+  console.log("verityDashboardUser is ", verityDashboardUser);
+  if (verityDashboardUser.data?.success) {
     return (
       <SidebarProvider
         style={
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
         </SidebarInset>
       </SidebarProvider>
     );
+  }
 
   redirect("/login");
 }
