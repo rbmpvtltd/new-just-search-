@@ -13,7 +13,7 @@ export default async function DashboardLayout({
   const verityDashboardUser = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );
-  console.log("verityDashboardUser is ", verityDashboardUser);
+  console.log("verityDashboardUser", verityDashboardUser);
   if (verityDashboardUser.data?.success) {
     return (
       <SidebarProvider
@@ -33,5 +33,5 @@ export default async function DashboardLayout({
     );
   }
 
-  redirect("/login");
+  return redirect("/login");
 }
