@@ -4,12 +4,14 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 import { redirect } from "next/navigation";
+import { getToken } from "@/utils/session";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  console.log(getToken());
   const verityDashboardUser = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );

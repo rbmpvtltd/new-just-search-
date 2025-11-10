@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { getToken } from "@/utils/session";
 import { LoginForm } from "./login-form";
 export default async function Login() {
   const dashboardverify = await asyncHandler(
@@ -10,6 +11,7 @@ export default async function Login() {
   );
 
   console.log("dashboardverify", dashboardverify);
+  console.log("token is ", getToken());
   if (dashboardverify?.data?.success) {
     redirect("/");
   }
