@@ -9,6 +9,7 @@ export default async function Login() {
     trpcServer.auth.dashboardverify.query(),
   );
 
+  console.log("dashboardverify", dashboardverify);
   if (dashboardverify?.data?.success) {
     redirect("/");
   }
