@@ -6,12 +6,12 @@ import { asyncHandler } from "@/utils/error/asyncHandler";
 import { getToken } from "@/utils/session";
 import { LoginForm } from "./login-form";
 export default async function Login() {
+  console.log("token is ", await getToken());
   const dashboardverify = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );
-
   console.log("dashboardverify", dashboardverify);
-  console.log("token is ", getToken());
+
   if (dashboardverify?.data?.success) {
     redirect("/");
   }

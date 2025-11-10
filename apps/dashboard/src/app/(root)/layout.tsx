@@ -11,7 +11,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log(getToken());
+  console.log("main layout token is ", await getToken());
   const verityDashboardUser = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );
