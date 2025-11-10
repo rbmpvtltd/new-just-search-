@@ -7,6 +7,7 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
@@ -19,6 +20,9 @@ import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import { OutputTrpcType, trpc } from "@/lib/trpc";
 import Favourite from "../shared/FaouritBtn";
+import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
+import Colors from "@/constants/Colors";
+import { showLoginAlert } from "@/utils/alert";
 
 type DetailCardType =
   OutputTrpcType["subcategoryRouter"]["businessesByCategoryInfinate"]["data"][number];
@@ -38,6 +42,7 @@ function DetailCard({
 }) {
   const [aspectRatio, setAspectRatio] = useState(3 / 4);
   const { setShopId } = useShopIdStore();
+  const colorScheme = useColorScheme()
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   const { mutate: toggleWishlist } = useToggleWishlist();
   const clearToken = useAuthStore((state) => state.clearToken);
@@ -64,148 +69,225 @@ function DetailCard({
   }
 
   return (
-    <View className="bg-base-200 h-auto rounded-lg w-[90%] shadow-lg  m-4">
-      {/* Image Section */}
-      <Pressable
-        onPress={() => {
-          setShopId(String(item.id));
-          router.navigate({
-            pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-            params: { premiumshops: item.id.toString() },
-          });
+     <Pressable
+      onPress={() => {
+        setShopId(String(item.id));
+        router.navigate({
+          pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+          params: { premiumshops: item.id.toString() },
+        });
+      }}
+    >
+      <View
+        className="bg-base-100 dark:bg-base-200 h-auto rounded-lg shadow-lg m-4"
+        style={{
+          backgroundColor: Colors[colorScheme ?? "light"]["base-200"],
         }}
       >
-        <View
-          className="w-full mx-auto justify-center items-center rounded-2xl overflow-hidden mb-4 m-4"
-          style={{
-            height: screenWidth * 0.6 * (1 / aspectRatio),
-            aspectRatio,
-          }}
-        >
-          <Image
-            className="h-full w-full"
-            source={{
-              uri: "https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png", // TODO : change image when upload on cloudinary
-            }}
-            resizeMode="contain"
-          />
+        <View className="flex-row p-3 ">
+          <View>
+            <AvatarWithFallback
+              uri={"https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png"} // TODO : change image when upload on cloudinary
+              imageClass="w-[150px] h-[180px] rounded-lg"
+              iconClass="items-center justify-center"
+              imageStyle={{ resizeMode: "stretch" }}
+            />
+          </View>
+          <View className="flex-1 my-1 mx-2">
+            <View className="flex-row items-center justify-between">
+              {/* {Number(item?.user?.verify) === 1 && (
+                <View className="bg-info py-2 px-3 rounded-lg ">
+                  <Text className="text-[#fff] text-sm font-medium">
+                    Verified
+                  </Text>
+                </View>
+              )} */}
+              {Number(type) === 1 && (
+                <Pressable
+                  className=""
+                  onPress={() => {
+                    if (!isAuthenticated) {
+                      showLoginAlert({
+                        message: "Need to login to add to your wishlist",
+                        onConfirm: () => {
+                          clearToken();
+                          router.push("/(root)/profile");
+                        },
+                      });
+                      return;
+                    }
+                    toggleWishlist(
+                      { listing_id: item?.id?.toString() },
+                      {
+                        onSuccess: () => {
+                          console.log("Wishlist added successfully");
+                        },
+                        onError: (error) => {
+                          console.log("error", error);
+                          Alert.alert(
+                            "Error toggling wishlist",
+                            error?.message,
+                          );
+                        },
+                      },
+                    );
+                  }}
+                >
+                  <Ionicons
+                    size={26}
+                    color={
+                      isFavourite
+                        ? "red"
+                        : Colors[colorScheme ?? "light"].secondary
+                    }
+                    name={isFavourite ? "heart" : "heart-outline"}
+                  />
+                </Pressable>
+              )}
+            </View>
+            <View className="my-2">
+              <StarRating
+                rating={rating}
+                onChange={() => {}}
+                starSize={18}
+                enableSwiping={false}
+              />
+              {/* <View className="flex-row items-center gap-1">
+                <Ionicons name="star" size={16} color="#fbbf24" />
+                <Text className="text-secondary text-sm font-medium">
+                  {rating}
+                </Text>
+              </View> */}
+            </View>
+            <View className="mx-2">
+              <Text className="text-secondary text-lg font-semibold">
+                {item.name}
+              </Text>
+            </View>
+            <View className="flex-row gap-2 mt-2 flex-wrap">
+              <TouchableOpacity
+                className="bg-success-content rounded-lg py-2 px-1"
+                onPress={() => {
+                  setShopId(String(item.id));
+                  router.navigate({
+                    pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                    params: { premiumshops: item.id.toString() },
+                  });
+                }}
+              >
+                <Text className="text-success font-semibold text-xs">
+                  {category}
+                </Text>
+              </TouchableOpacity>
+              {subcategories
+                ?.slice(0, 2)
+                .map((sub: any, index: number) => (
+                  <TouchableOpacity
+                    key={index.toString()}
+                    className="bg-error-content rounded-lg py-2 px-2 mb-1"
+                    onPress={() => {
+                      setShopId(String(item.id));
+                      router.navigate({
+                        pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                        params: { premiumshops: item.id.toString() },
+                      });
+                    }}
+                  >
+                    <Text className="text-pink-700 font-semibold text-xs">
+                      {sub}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              {item.subcategories?.length > 2 && (
+                <TouchableOpacity
+                  className="bg-base-100 rounded-lg py-2 px-4 mb-1"
+                  onPress={() => {
+                    setShopId(String(item.id));
+                    router.navigate({
+                      pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                      params: { premiumshops: item.id.toString() },
+                    });
+                  }}
+                >
+                  <Text className="text-secondary font-semibold text-xs">
+                    + More
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
         </View>
-      </Pressable>
-      <View className="mx-auto">
-        <StarRating
-          rating={rating}
-          onChange={() => {}}
-          starSize={24}
-          enableSwiping={false}
-        />
-      </View>
-      <View className="h-auto w-full flex-row justify-between mt-2 px-4 mx-2 ">
-        <Text className="text-secondary text-2xl font-semibold w-[65%] ">
+        {/* <View className="w-full mx-4">
+        <Text className="text-secondary text-lg font-semibold ">
           {item.name}
         </Text>
-        {/* {Number(item?.user?.verify) === 1 && (
-          <Ionicons name="checkmark-circle" size={28} color="green" />
-        )} */}
-        {Number(type) === 1 && (
-          <Pressable className="w-[10%]">
-              <Favourite initialFav={item.isFavourite} businessId={item.id} />
-          </Pressable>
-        )}
-      </View>
+      </View> */}
+        <View className="w-[80%] mx-4 flex-row items-center gap-2 ">
+          <Text className="text-secondary-content flex items-center justify-center">
+            <Ionicons
+              name="location"
+              size={22}
+              color={colorScheme === "dark" ? "#F87171" : "#DC2626"}
+            />
+          </Text>
+          <Text className="text-secondary text-lg font-semibold ">
+            {item.buildingName} {item.streetName}
+            {item.area}
+          </Text>
+        </View>
 
-      {/* Buttons Section */}
-      <View className="flex-row gap-2 mt-4 mx-6 flex-wrap">
-        <TouchableOpacity className="bg-success-content rounded-lg py-2 px-4">
-          <Text className="text-success font-semibold text-xs">{category}</Text>
-        </TouchableOpacity>
-        {subcategories?.map((item: any, i: number) => (
-          <TouchableOpacity
-            className="bg-error-content rounded-lg py-2 px-4"
-            key={i.toString()}
-          >
-            <Text className="text-pink-700 font-semibold text-xs">{item}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Location Section */}
-      <Text className="text-secondary-content my-4 mx-3">
-        <Ionicons name="location" /> {item.buildingName} {item.streetName}
-        {item.area}
-      </Text>
-
-      <View className="w-full items-center gap-4 my-4">
-        {Number(type) === 1 && (
-          <View className="w-[90%] bg-primary rounded-lg py-2 px-4">
+        <View className="w-full mx-4 gap-6 m-4 flex-row items-center ">
+          <View className="rounded-lg bg-primary p-1">
             <Pressable
-              onPress={() =>
-                openInGoogleMaps(String(latitude), String(longitude))
-              }
+              onPress={() => {
+                setShopId(String(item.id));
+                router.navigate({
+                  pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                  params: { premiumshops: item.id.toString() },
+                });
+              }}
             >
-              <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
-                <Ionicons size={20} name="location" color={"white"} />
-                <Text className="text-[#ffffff] font-semibold">
-                  Get Direction
-                </Text>
+              <View className=" text-xl text-center flex-row py-1 gap-2 px-3 justify-center">
+                <Ionicons size={20} name="chatbox-ellipses" color={"white"} />
               </View>
             </Pressable>
           </View>
-        )}
-        <View className="w-[90%] bg-primary rounded-lg py-2 px-4">
-          <Pressable onPress={() => dialPhone(item?.phoneNumber || "")}>
-            <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
-              <Ionicons size={20} name="call" color={"white"} />
-              <Text className="text-[#ffffff] font-semibold">Contact Now</Text>
+
+          <View className="rounded-lg bg-primary p-1">
+            <Pressable
+              onPress={() => {
+                setShopId(String(item.id));
+                router.navigate({
+                  pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                  params: { premiumshops: item.id.toString() },
+                });
+              }}
+            >
+              <View className=" text-xl text-center flex-row py-1 gap-2 px-3 justify-center">
+                <Ionicons size={20} name="call" color={"white"} />
+              </View>
+            </Pressable>
+          </View>
+          {Number(type) === 1 && (
+            <View className="rounded-lg bg-primary p-1">
+              <Pressable
+                onPress={() => {
+                  setShopId(String(item.id));
+                  router.navigate({
+                    pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                    params: { premiumshops: item.id.toString() },
+                  });
+                }}
+              >
+                <View className=" text-xl text-center flex-row py-1 gap-2 px-3 justify-center">
+                  <Ionicons size={20} name="location" color={"white"} />
+                </View>
+              </Pressable>
             </View>
-          </Pressable>
-        </View>
-        <View className="w-[90%] bg-primary rounded-lg py-2 px-4">
-          <Pressable
-            onPress={() => {
-              startChat(String(item?.id), {
-                onSuccess: (res) => {
-                  if (!res?.chat_session_id) {
-                    Alert.alert(
-                      "Login Required ",
-                      "Need to login for start chatting on your behalf",
-                      [
-                        {
-                          text: "No Thanks",
-                          style: "cancel",
-                        },
-                        {
-                          text: "Login Now",
-                          style: "destructive",
-                          onPress: () => {
-                            clearToken();
-                            router.replace("/(root)/profile/profile");
-                          },
-                        },
-                      ],
-                      { cancelable: false },
-                    );
-                  } else {
-                    router.push({
-                      pathname: "/chat/[chat]",
-                      params: { chat: res?.chat_session_id.toString() },
-                    });
-                  }
-                },
-                onError: (err) => {
-                  Alert.alert("Something Went Wrong");
-                  console.error("Failed to start chat:", err);
-                },
-              });
-            }}
-          >
-            <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
-              <Ionicons size={20} name="chatbox-ellipses" color={"white"} />
-              <Text className="text-[#ffffff] font-semibold">Chat Now</Text>
-            </View>
-          </Pressable>
+          )}
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

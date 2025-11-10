@@ -8,6 +8,8 @@ const config = {
   api_secret: process.env.CLOUDINARY_API_SECRET,
 };
 
+console.log("config =====================>",config)
+
 cloudinary.config(config);
 
 export default cloudinary;
@@ -19,13 +21,14 @@ const uploadOnCloudinary = async (
   folderName = "",
   test = false,
 ) => {
-  if (!localFilePath) return null;
+  // if (!localFilePath) return null;
   try {
     if (test) {
-      const customName = `Banner/od5jlaui25sb8djl3mfc`;
+      const customName = `Banner/qqnai91zwck6df4mn8zs`;
       const result = {
         public_id: customName,
       };
+      
       return result.public_id;
     }
 
@@ -33,6 +36,8 @@ const uploadOnCloudinary = async (
       resource_type: "auto",
       folder: folderName,
     });
+
+    console.log("result id in cloudinary.ts",result)
 
     return result.public_id;
 

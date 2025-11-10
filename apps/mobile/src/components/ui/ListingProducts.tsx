@@ -31,8 +31,8 @@ function ListingProduct({ shopId }: { shopId: string }) {
       data={data}
       renderItem={(item: {item : ProductType}) => {
         return (
-          <GestureHandlerRootView>
-            <View className="bg-base-200 rounded-lg w-[90%] shadow-lg  m-4">
+          <GestureHandlerRootView className="">
+            <View className="bg-base-200 rounded-lg w-[90%] shadow-lg  m-4 ">
               <Pressable
                 onPress={() => {
                   router.navigate({
