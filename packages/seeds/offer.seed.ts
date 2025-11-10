@@ -22,7 +22,7 @@ export const offerSeed = async () => {
   await clearOfferSeed();
   // await addOffer();
   // await addOfferReviews();
-  // await addOfferSubcategories();
+  await addOfferSubcategories();
 };
 
 const clearOfferSeed = async () => {

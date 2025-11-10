@@ -27,6 +27,8 @@ export const fakeSeed = async () => {
     await seedRealUser("ritik@gmail.com", "admin@123", "admin");
     await seedRealUser("meekail@gmail.com", "admin@123", "admin");
     await seedRealUser("salonimam@gmail.com", "admin@123", "visiter");
+    await seedRealUser("visitor@gmail.com", "visitor@123", "visiter");
+
     logger.info("added fake admin");
     return { user };
   } catch (error) {

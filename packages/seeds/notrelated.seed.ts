@@ -15,20 +15,20 @@ import { clouadinaryFake } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  await state();
-  await citie();
-  await bannerSeed();
-  await seedCategories();
-  await seedSubcategories();
+  // await state();
+  // await citie();
+  // await bannerSeed();
+  // await seedCategories();
+  // await seedSubcategories();
 };
 
 export const clearAllTablesNotRelated = async () => {
   // logger.info("================== execution comes here ====================");
-  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };
@@ -77,7 +77,6 @@ export const bannerSeed = async () => {
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
 
     let bannerPhotoPublicId: string | null = null;
-
     if (row.photo) {
       bannerPhotoPublicId = await uploadOnCloudinary(
         liveProfileImageUrl,
@@ -85,12 +84,11 @@ export const bannerSeed = async () => {
         clouadinaryFake,
       );
     }
-    console.log("Banner photo public id", bannerPhotoPublicId);
 
     await db.insert(banners).values({
       mysqlId: row.id,
       route: row.route ?? null,
-      photo: bannerPhotoPublicId,
+      photo: bannerPhotoPublicId ?? "",
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,
