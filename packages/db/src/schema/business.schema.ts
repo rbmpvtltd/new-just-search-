@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
-  json,
   pgTable,
   serial,
   text,
@@ -76,7 +75,7 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
     z.string().refine(
       (val) => {
         const num = parseFloat(val);
-        return !isNaN(num) && num >= -90 && num <= 90;
+        return !Number.isNaN(num) && num >= -90 && num <= 90;
       },
       { message: "Latitude must be a number between -90 and 90" },
     ),
@@ -84,7 +83,7 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
     z.string().refine(
       (val) => {
         const num = parseFloat(val);
-        return !isNaN(num) && num >= -180 && num <= 180;
+        return !Number.isNaN(num) && num >= -180 && num <= 180;
       },
       { message: "Longitude must be a number between -180 and 180" },
     ),

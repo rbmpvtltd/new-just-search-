@@ -22,10 +22,10 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  // await addBusiness();
+  await addBusiness();
   // await seedFavourites();
-  // await businessesSubcategory();
-  // await businessesCategories();
+  await businessesSubcategory();
+  await businessesCategories();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
@@ -250,8 +250,7 @@ const addBusiness = async () => {
       }
     }
 
-    if (!createUser){
-
+    if (!createUser) {
       console.log("User not found" + row.id);
     }
 
@@ -295,7 +294,7 @@ const addBusiness = async () => {
     if (skipSlug.includes(row.slug)) {
       slug = `${row.slug}${row.id}`;
     }
-    console.log("==========row is ===========",row)
+    console.log("==========row is ===========", row);
     try {
       if (!createUser) {
         console.log("User not found" + row.id);
@@ -307,11 +306,11 @@ const addBusiness = async () => {
           // id: row.id,
           userId: createUser!.id,
           name: row.name,
-          days : ["Mon","Tue","Wed","Thu","Fri","Sat"],
-          fromHour : "11 AM",
-          toHour : "9 PM",
-          contactPerson : row.contact_person,
-          ownerNumber : row.owner_no,
+          days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          fromHour: "11 AM",
+          toHour: "9 PM",
+          contactPerson: row.contact_person,
+          ownerNumber: row.owner_no,
           slug,
           photo: row.photo,
           specialities: row.specialities,
@@ -325,7 +324,7 @@ const addBusiness = async () => {
           landmark: row.landmark,
           pincode: row.pincode,
           state: city!.stateId,
-          cityId: city!.id,
+          city: city!.id,
           status: row.status,
           email: row.email,
           phoneNumber: row.phone_number,

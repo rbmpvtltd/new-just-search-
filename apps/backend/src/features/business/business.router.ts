@@ -136,7 +136,7 @@ export const businessrouter = router({
       }
 
       const isCityExists = await db.query.cities.findFirst({
-        where: (cities, { eq }) => eq(cities.id, input.cityId),
+        where: (cities, { eq }) => eq(cities.id, input.city),
       });
       if (!isCityExists) {
         throw new TRPCError({
@@ -167,7 +167,7 @@ export const businessrouter = router({
           landmark: input.landmark,
           pincode: input.pincode,
           state: input.state,
-          cityId: Number(input.cityId),
+          city: Number(input.city),
           days: input.days,
           fromHour: input.fromHour,
           toHour: input.toHour,
@@ -275,7 +275,7 @@ export const businessrouter = router({
           landmark: input.landmark,
           pincode: input.pincode,
           state: input.state,
-          cityId: Number(input.cityId),
+          city: Number(input.city),
           // schedules: input.schedules,
           days: input.days,
           fromHour: input.fromHour,
@@ -358,7 +358,7 @@ export const businessrouter = router({
     }
     logger.info("business", { business: business });
 
-    if (!business?.cityId) {
+    if (!business?.city) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "City not found",
@@ -366,7 +366,7 @@ export const businessrouter = router({
     }
 
     const cityRecord = await db.query.cities.findFirst({
-      where: (cities, { eq }) => eq(cities.id, business.cityId),
+      where: (cities, { eq }) => eq(cities.id, business.city),
       columns: { id: true, city: true },
     });
 
@@ -579,16 +579,16 @@ export const businessrouter = router({
     }),
 
   shopOffers: publicProcedure
-  .input(z.object({ businessId: z.number() }))
-  .query(async ({ input }) => {
-    const offersData = await db
-      .select({
-        id: offers.id,
-        price: offers.rate,
-        discountPercent: offers.discountPercent,
-        finalPrice: offers.finalPrice,
-        name: offers.offerName,
-        photos: sql<string[]>`
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ input }) => {
+      const offersData = await db
+        .select({
+          id: offers.id,
+          price: offers.rate,
+          discountPercent: offers.discountPercent,
+          finalPrice: offers.finalPrice,
+          name: offers.offerName,
+          photos: sql<string[]>`
           COALESCE(
             (SELECT ARRAY_AGG(offer_photos.photo)
              FROM offer_photos
@@ -596,22 +596,22 @@ export const businessrouter = router({
             '{}'
           )
         `,
-      })
-      .from(offers)
-      .where(eq(offers.businessId, input.businessId));
+        })
+        .from(offers)
+        .where(eq(offers.businessId, input.businessId));
 
-    return offersData;
-  }),
+      return offersData;
+    }),
 
   shopProducts: publicProcedure
-  .input(z.object({ businessId: z.number() }))
-  .query(async ({ input }) => {
-    const productsData = await db
-      .select({
-        id: products.id,
-        name: products.productName,
-        price: products.rate,
-        photos: sql<string[]>`
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ input }) => {
+      const productsData = await db
+        .select({
+          id: products.id,
+          name: products.productName,
+          price: products.rate,
+          photos: sql<string[]>`
           COALESCE(
             (SELECT ARRAY_AGG(product_photos.photo)
              FROM product_photos
@@ -619,13 +619,12 @@ export const businessrouter = router({
             '{}'
           )
         `,
-      })
-      .from(products)
-      .where(eq(products.businessId, input.businessId));
+        })
+        .from(products)
+        .where(eq(products.businessId, input.businessId));
 
-    return productsData;
-  }),
-
+      return productsData;
+    }),
 
   singleProduct: publicProcedure
     .input(z.object({ productId: z.number() }))
@@ -637,9 +636,9 @@ export const businessrouter = router({
           rate: products.rate,
           businessId: products.businessId,
           description: products.productDescription,
-          latitude : businessListing.latitude,
-          longitude : businessListing.longitude,
-          phone : businessListing.phoneNumber,
+          latitude: businessListing.latitude,
+          longitude: businessListing.longitude,
+          phone: businessListing.phoneNumber,
           photos: sql<string[]>`COALESCE(
             ARRAY_AGG(DISTINCT product_photos.photo)
             FILTER (WHERE product_photos.id IS NOT NULL),
@@ -673,7 +672,12 @@ export const businessrouter = router({
         .leftJoin(productReviews, eq(products.id, productReviews.productId))
         .leftJoin(productPhotos, eq(products.id, productPhotos.productId))
         .leftJoin(users, eq(productReviews.userId, users.id))
-        .groupBy(products.id,businessListing.latitude,businessListing.longitude,businessListing.phoneNumber)
+        .groupBy(
+          products.id,
+          businessListing.latitude,
+          businessListing.longitude,
+          businessListing.phoneNumber,
+        )
         .where(eq(products.id, input.productId));
       return product[0];
     }),
@@ -693,7 +697,7 @@ export const businessrouter = router({
           description: offers.offerDescription,
           createdAt: offers.createdAt,
           businessId: offers.businessId,
-          phoneNo : businessListing.phoneNumber,
+          phoneNo: businessListing.phoneNumber,
           shopName: sql<string | null>`COALESCE((
             SELECT name FROM business_listings LIMIT 1
           ), '')`,
@@ -702,15 +706,15 @@ export const businessrouter = router({
             FILTER (WHERE offer_photos.id IS NOT NULL),
             '{}'
           )`,
-           rating: sql<
-          {
-            id: number;
-            created_at: string;
-            rating: number;
-            message: string;
-            user: string;
-          }[]
-        >`COALESCE(
+          rating: sql<
+            {
+              id: number;
+              created_at: string;
+              rating: number;
+              message: string;
+              user: string;
+            }[]
+          >`COALESCE(
           JSON_AGG(
             DISTINCT JSONB_BUILD_OBJECT(
               'id', offer_reviews.id,
@@ -728,7 +732,7 @@ export const businessrouter = router({
         .leftJoin(offerReviews, eq(offers.id, offerReviews.offerId))
         .leftJoin(users, eq(users.id, offerReviews.userId))
         .leftJoin(businessListing, eq(businessListing.id, offers.businessId))
-        .groupBy(offers.id,businessListing.phoneNumber)
+        .groupBy(offers.id, businessListing.phoneNumber)
         .where(eq(offers.id, input.offerId));
 
       return offer[0];

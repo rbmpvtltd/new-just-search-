@@ -19,9 +19,9 @@ dotenv.config();
   try {
     // Postgres seeding
     await notRelated(); // NOTE: complete by clouadinaryFake = true on live db
-    // await userSeed(); // NOTE: complete by clouadinaryFake = true on live db
-    // await fakeSeed(); // NOTE: complete by clouadinaryFake = true on live db
-    // await businessSeed();
+    await userSeed(); // NOTE: complete by clouadinaryFake = true on live db
+    await fakeSeed(); // NOTE: complete by clouadinaryFake = true on live db
+    await businessSeed();
     // await hireSeed();
     // await productSeed();
     // await offerSeed();

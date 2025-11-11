@@ -13,6 +13,7 @@ import {
   cities,
   subcategories,
 } from "@repo/db/src/schema/not-related.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";
@@ -52,6 +53,30 @@ export const adminBusinessRouter = router({
 
     const offset = input.pagination.pageIndex * input.pagination.pageSize;
 
+    const newData = await db
+      .select()
+      .from(businessListings)
+      // .where(where)
+      // .orderBy(orderBy)
+      .limit(10)
+      .leftJoin(users, eq(businessListings.userId, users.id))
+      // .leftJoin(cities, eq(businessListings.cityId, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
+      .leftJoin(
+        businessSubcategories,
+        eq(businessListings.id, businessSubcategories.businessId),
+      )
+      .leftJoin(
+        subcategories,
+        eq(businessSubcategories.subcategoryId, subcategories.id),
+      )
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(categories, eq(businessCategories.categoryId, categories.id))
+      .offset(0);
+
+    console.log(newData);
     const data = await db
       .select({
         id: businessListings.id,
@@ -75,7 +100,7 @@ export const adminBusinessRouter = router({
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
       .leftJoin(users, eq(businessListings.userId, users.id))
-      .leftJoin(cities, eq(businessListings.cityId, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
+      .leftJoin(cities, eq(businessListings.city, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
       .leftJoin(
         businessSubcategories,
         eq(businessListings.id, businessSubcategories.businessId),
@@ -104,7 +129,7 @@ export const adminBusinessRouter = router({
       .select({ count: sql<number>`count(*)::int` }) // 👈 cast to int
       .from(businessListings)
       .leftJoin(users, eq(businessListings.userId, users.id))
-      .leftJoin(cities, eq(businessListings.cityId, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
+      .leftJoin(cities, eq(businessListings.city, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
       .leftJoin(
         businessSubcategories,
         eq(businessListings.id, businessSubcategories.businessId),
