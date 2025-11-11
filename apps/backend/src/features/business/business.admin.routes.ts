@@ -1,9 +1,16 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
+import { users } from "@repo/db/src/schema/auth.schema";
+import {
+  businessCategories,
+  businessListings,
+  businessSubcategories,
+} from "@repo/db/src/schema/business.schema";
 import {
   categories,
   categoryInsertSchema,
   categoryUpdateSchema,
+  cities,
   subcategories,
 } from "@repo/db/src/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
@@ -21,23 +28,23 @@ import {
 } from "@/lib/tableUtils";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
-  subCategoryColumns,
-  subcategoryAllowedSortColumns,
-  subcategoryGlobalFilterColumns,
-} from "./subcategory.admin.service";
+  businessAllowedSortColumns,
+  businessColumns,
+  businessGlobalFilterColumns,
+} from "./business.admin.service";
 
-export const adminSubcategoryRouter = router({
+export const adminBusinessRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
       input.globalFilter,
-      subCategoryColumns,
-      subcategoryGlobalFilterColumns,
+      businessColumns,
+      businessGlobalFilterColumns,
     );
 
     const orderBy = buildOrderByClause(
       input.sorting,
-      subcategoryAllowedSortColumns,
+      businessAllowedSortColumns,
       sql`created_at DESC`,
     );
 
@@ -47,24 +54,70 @@ export const adminSubcategoryRouter = router({
 
     const data = await db
       .select({
-        id: subcategories.id,
-        name: subcategories.name,
-        status: subcategories.status,
-        title: categories.title,
-        created_at: subcategories.createdAt,
+        id: businessListings.id,
+        photo: businessListings.photo,
+        name: businessListings.name,
+        phone: users.phoneNumber,
+        city: cities.city,
+        category:
+          sql<string>`string_agg(DISTINCT ${categories.title}, ', ' ORDER BY ${categories.title})`.as(
+            "category",
+          ),
+        subcategories:
+          sql<string>`string_agg(DISTINCT ${subcategories.name}, ', ' ORDER BY ${subcategories.name})`.as(
+            "subcategories",
+          ),
+        status: businessListings.status,
+        created_at: businessListings.createdAt,
       })
-      .from(subcategories)
+      .from(businessListings)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
-      .leftJoin(categories, eq(subcategories.categoryId, categories.id))
-      .offset(offset);
+      .leftJoin(users, eq(businessListings.userId, users.id))
+      .leftJoin(cities, eq(businessListings.cityId, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
+      .leftJoin(
+        businessSubcategories,
+        eq(businessListings.id, businessSubcategories.businessId),
+      )
+      .leftJoin(
+        subcategories,
+        eq(businessSubcategories.subcategoryId, subcategories.id),
+      )
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(categories, eq(businessCategories.categoryId, categories.id))
+      .offset(offset)
+      .groupBy(
+        businessListings.id,
+        businessListings.photo,
+        businessListings.name,
+        users.phoneNumber,
+        businessListings.status,
+        businessListings.createdAt,
+      );
 
     // PostgreSQL returns `bigint` for count → cast to number
     const totalResult = await db
       .select({ count: sql<number>`count(*)::int` }) // 👈 cast to int
-      .from(subcategories)
-      .leftJoin(categories, eq(subcategories.categoryId, categories.id))
+      .from(businessListings)
+      .leftJoin(users, eq(businessListings.userId, users.id))
+      .leftJoin(cities, eq(businessListings.cityId, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
+      .leftJoin(
+        businessSubcategories,
+        eq(businessListings.id, businessSubcategories.businessId),
+      )
+      .leftJoin(
+        subcategories,
+        eq(businessSubcategories.subcategoryId, subcategories.id),
+      )
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(categories, eq(businessCategories.categoryId, categories.id))
       .where(where);
 
     const total = totalResult[0]?.count ?? 0;

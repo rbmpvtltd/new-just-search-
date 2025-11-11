@@ -1,16 +1,12 @@
-// import { FormField } from "@/components/form-component";
-
 import { redirect } from "next/navigation";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
-import { getToken } from "@/utils/session";
 import { LoginForm } from "./login-form";
+
 export default async function Login() {
-  console.log("token is ", await getToken());
   const dashboardverify = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );
-  console.log("dashboardverify", dashboardverify);
 
   if (dashboardverify?.data?.success) {
     redirect("/");

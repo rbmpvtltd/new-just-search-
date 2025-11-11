@@ -8,14 +8,14 @@ import { DataTableToolbar } from "./table/toolbar";
 export default function Page() {
   const trpc = useTRPC();
   const queryConfig = {
-    queryKey: trpc.adminCategoryRouter.list.queryKey(),
+    queryKey: trpc.adminSubcategoryRouter.list.queryKey(),
     queryFn: async ({
       pagination,
       sorting,
       filters,
       globalFilter,
     }: QueryFnContext) => {
-      const result = await trpcServer.adminCategoryRouter.list.query({
+      const result = await trpcServer.adminSubcategoryRouter.list.query({
         sorting,
         pagination: {
           pageIndex: pagination?.pageIndex || 0,
@@ -25,10 +25,11 @@ export default function Page() {
         globalFilter,
       });
 
-      filters.map((item) => {
-        item.id;
-        item.value;
-      });
+      // TODO: delete this comment if I didnot find any errors;
+      // filters.map((item) => {
+      //   item.id;
+      //   item.value;
+      // });
 
       return {
         data: result?.data || [],

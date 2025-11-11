@@ -6,7 +6,7 @@ export const bannerColumns = {
   id: banners.id,
   route: banners.route,
   photo: banners.photo,
-  is_active: banners.isActive, // JS key maps to DB column
+  is_active: banners.isActive,
   type: banners.type,
 };
 

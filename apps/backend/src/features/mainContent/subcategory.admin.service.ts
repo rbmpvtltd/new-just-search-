@@ -1,18 +1,26 @@
 import {
   categories,
+  // categories,
   subcategories,
 } from "@repo/db/src/schema/not-related.schema";
 
-export const categoryColumns = {
-  id: subcategories.id,
-  category: categories.title,
-  subcategory_name: subcategories.name,
-  slug: subcategories.slug,
+export const subCategoryColumns = {
   status: subcategories.status,
+  // id: subcategories.id,
+  // category: categories.title,
+  // subcategory_name: subcategories.name,
+  // slug: subcategories.slug,
+  // status: subcategories.status,
 };
 
 export const subcategoryGlobalFilterColumns = [
-  categories.title,
   subcategories.name,
+  categories.title,
 ];
-export const subcategoryAllowedSortColumns = ["id", "title", "slug", "status"];
+export const subcategoryAllowedSortColumns = [
+  "title",
+  "name",
+  "id",
+  "status",
+  "created_at",
+];

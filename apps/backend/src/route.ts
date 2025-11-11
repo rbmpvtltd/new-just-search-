@@ -1,6 +1,7 @@
 import { authRouter } from "./features/auth/auth.router";
 import { adminBannerRouter } from "./features/banners/banners.admin.routes";
 import { bannerRouter } from "./features/banners/banners.routes";
+import { adminBusinessRouter } from "./features/business/business.admin.routes";
 import { businessrouter } from "./features/business/business.router";
 import { chatRouter } from "./features/chats/test.routes";
 import { cloudinarySignature } from "./features/cloudinary/cloudinary.route";
@@ -32,6 +33,7 @@ export const appRouter = router({
   offerrouter,
   productrouter,
   adminSubcategoryRouter,
+  adminBusinessRouter,
   // cloudinary: cloudinaryRouter,
   // test: testRouter,
   // test : chatRouter,

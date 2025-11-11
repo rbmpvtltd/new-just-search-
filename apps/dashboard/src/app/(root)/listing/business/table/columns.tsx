@@ -1,29 +1,12 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+import { CldImage } from "next-cloudinary";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { useTableStore } from "../store";
 import { EditBanner } from "../form/edit.form";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
-
-// id: number;
-// name: string;
-// slug: string;
-// status: boolean | null;
-// categoryId: number;
-// createdAt: Date | null;
-// updatedAt: Date | null;
-
-// export interface Subcategory {
-//   id: number;
-//   name: string;
-//   slug: string;
-//   status: boolean | null;
-//   category_id: number;
-//   createdAt: Date | null;
-//   updatedAt: Date | null;
-// }
 
 function SelectCell({ id }: { id: number }) {
   const select = useTableStore((state) => state.select);
@@ -98,8 +81,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type SubcategoryArray =
-  OutputTrpcType["adminSubcategoryRouter"]["list"]["data"];
+type SubcategoryArray = OutputTrpcType["adminBusinessRouter"]["list"]["data"];
 type Subcategory = UnwrapArray<SubcategoryArray>;
 
 export const columns: ColumnDef<Subcategory>[] = [
@@ -124,6 +106,24 @@ export const columns: ColumnDef<Subcategory>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "photo",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Photo" />
+    ),
+    cell: ({ row }) =>
+      row.original.photo ? (
+        <CldImage
+          width="100"
+          height="100"
+          className="border rounded "
+          src={row.original.photo}
+          alt="cloudinary image not loaded"
+        />
+      ) : (
+        "no photo"
+      ),
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
@@ -135,6 +135,49 @@ export const columns: ColumnDef<Subcategory>[] = [
     ),
   },
   {
+    accessorKey: "phone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phone Number" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-[200px] truncate">
+        {row.original.phone || "No Name"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "city",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="city name" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-[200px] truncate">
+        {row.original.city || "No Name"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Category Name" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-40 whitespace-normal">{row.original.category}</div>
+    ),
+  },
+  {
+    accessorKey: "subcategories",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Subcategories Name" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-40 whitespace-normal">
+        {row.original.subcategories}
+      </div>
+    ),
+  },
+
+  {
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Active" />
@@ -145,13 +188,6 @@ export const columns: ColumnDef<Subcategory>[] = [
         isActive={row.original.status ?? false}
       />
     ),
-  },
-  {
-    accessorKey: "title",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category Name" />
-    ),
-    cell: ({ row }) => <div>{row.original.title}</div>,
   },
   {
     accessorKey: "created_at",

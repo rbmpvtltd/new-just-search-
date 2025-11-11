@@ -135,6 +135,12 @@ export function buildOrderByClause(
   if (sorting.length === 0) return defaultOrder;
 
   const orderExpressions = sorting
+    // NOTE: If I uncomment this will then it will conflict with other column
+    // .map((sort) =>
+    //   sort.id.includes("_")
+    //     ? { id: sort.id.split("_").join("."), desc: sort.desc }
+    //     : sort,
+    // )
     .filter((sort) => allowedColumns.includes(sort.id))
     .map((sort) => {
       // PostgreSQL requires quoted identifiers if they are reserved or camelCase

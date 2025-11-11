@@ -25,10 +25,10 @@ export default function Page() {
         globalFilter,
       });
 
-      filters.map((item) => {
-        item.id;
-        item.value;
-      });
+      // filters.map((item) => {
+      //   item.id;
+      //   item.value;
+      // });
 
       return {
         data: result?.data || [],

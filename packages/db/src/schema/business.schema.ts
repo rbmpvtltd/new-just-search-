@@ -42,7 +42,7 @@ export const businessListings = pgTable("business_listings", {
   landmark: varchar("landmark", { length: 255 }),
   pincode: varchar("pincode"),
   state: integer("state").notNull(),
-  cityId: integer("city")
+  city: integer("city")
     .notNull()
     .references(() => cities.id, { onDelete: "cascade" }),
   days: varchar("days", { length: 255 }).array(),
@@ -90,7 +90,7 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
     ),
   pincode: () =>
     z.string().min(6, "Pincode should be minimum 6 characters long"),
-  cityId: () => z.number().min(1, "City is required"),
+  city: () => z.number().min(1, "City is required"),
   state: () => z.number().min(1, "State is required"),
   contactPerson: () =>
     z.string().min(3, "Contact person should be minimum 3 characters long"),
