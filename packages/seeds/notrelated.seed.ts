@@ -15,11 +15,11 @@ import { clouadinaryFake } from "./seeds";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  // await state();
-  // await citie();
-  // await bannerSeed();
-  // await seedCategories();
-  // await seedSubcategories();
+  await state();
+  await citie();
+  await bannerSeed();
+  await seedCategories();
+  await seedSubcategories();
 };
 
 export const clearAllTablesNotRelated = async () => {
