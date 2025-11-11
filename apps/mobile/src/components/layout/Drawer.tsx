@@ -44,7 +44,7 @@ const drawerFields: DrawerField[] = [
   },
   {
     name: "Add Product",
-    route: "/(root)/profile/product/add-product",
+    route: "/(root)/profile/product/add",
   },
   {
     name: "My Products",

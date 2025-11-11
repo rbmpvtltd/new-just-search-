@@ -181,7 +181,6 @@ export default function AddressDetail({
         <View className="mx-auto w-[90%]">
           <LocationAutoDetect
             onResult={(data) => {
-              console.log("DATA", data);
               const formatted = data.formattedAddress ?? "";
               const parts = formatted.split(",").map((p) => p.trim());
 

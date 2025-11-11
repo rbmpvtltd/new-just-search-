@@ -15,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
 import type { AddBusinessPageType } from "..";
+import LocationAutoDetect from "@/components/LocationAutoDetect";
 
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
@@ -144,7 +145,6 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
   ];
 
   const onSubmit = (data: AddressDetailSchema) => {
-    console.log("Address Data", data);
     setFormValue("buildingName", data.buildingName ?? "");
     setFormValue("streetName", data.streetName ?? "");
     setFormValue("area", data.area ?? "");
@@ -172,14 +172,15 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
               location-based services and will remain confidential. This
               information will not be shared publicly.
             </p>
-            <div className="flex items-end justify-between mb-4">
-              <Button
-                type="button"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow"
-              >
-                Auto Detect Location
-              </Button>
+            <div className="flex items-end justify-between mb-4 ">
+              <LocationAutoDetect
+                onResult={(data) => {
+                  console.log("Detected:", data);
+                  // set form values or call setValue("city", data.city)
+                }}
+              />
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {formFields.map((field, index) => (
                 <FormField key={field.name} {...field} />

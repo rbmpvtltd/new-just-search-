@@ -110,22 +110,17 @@ export const FormField = <T extends FieldValues>({
             case "input": {
               return (
                 <Input
-                  className={`mx-auto text-secondary ${className}`}
                   placeholder={placeholder}
                   keyboardType={keyboardType}
                   onBlur={() => {
                     onBlur();
-                    if (props.onBlurEvent) {
-                      props.onBlurEvent(value);
-                    }
+                    if (props.onBlurEvent) props.onBlurEvent(value);
                   }}
-                  onChangeText={(value) => {
-                    if (onValueChange) {
-                      onValueChange(value);
-                    }
-                    onChange(value);
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (onValueChange) onValueChange(text);
                   }}
-                  value={value}
+                  value={value?.toString() ?? ""}
                   editable={editable}
                 />
               );
@@ -169,7 +164,7 @@ export const FormField = <T extends FieldValues>({
               }
 
               return (
-                <View className={`items-center w-30 h-30  ${className}`}>
+                <View className={`items-center w-30 h-30   ${className}`}>
                   <Pressable
                     onPress={async () => {
                       Alert.alert("Pick File From", "  ", [
@@ -239,7 +234,7 @@ export const FormField = <T extends FieldValues>({
                         />
                       )
                     ) : (
-                      <View className="justify-center items-center">
+                      <View className="justify-center items-center ">
                         <Ionicons
                           name="image-outline"
                           size={32}

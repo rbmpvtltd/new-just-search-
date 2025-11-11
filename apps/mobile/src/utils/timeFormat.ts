@@ -1,16 +1,3 @@
-// export function formatTime(
-//   time: string | undefined | null,
-// ): string | undefined | null {
-//   const formattedTime = time ?? "";
-//   const [hour, minute] = formattedTime.split(":");
-//   const h = parseInt(String(hour), 10);
-//   const period = h >= 12 ? "PM" : "AM";
-//   const hour12 = h % 12 || 12;
-//   return `${hour12}:${minute} ${period}`;
-// }
-
-
-
 
 export const toISOStringTime = (time: string | Date): string => {
   if (typeof time !== "string") {

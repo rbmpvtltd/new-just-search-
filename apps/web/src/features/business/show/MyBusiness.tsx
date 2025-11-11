@@ -45,7 +45,7 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+    <div className="min-h-screen w-full bg-linear-to-br from-gray-100 to-gray-200 p-4">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-4 border-b border-gray-100">
           <h1 className="text-2xl font-bold text-gray-800">
@@ -56,27 +56,30 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
           </p>
         </div>
 
-        <div className="flex sm:flex-row flex-col gap-4 p-2">
-          <div className=" pl-4 flex justify-center">
-            {data.photo ? (
-              <CldImage
-                width="640"
-                height="640"
-                className="border rounded "
-                src={data.photo}
-                alt="cloudinary image not loaded"
-              />
-            ) : (
-              <Image
-                src="/images/no-image.png"
-                width={100}
-                height={100}
-                alt="no image"
-              />
-            )}
+        <div className="flex flex-col sm:flex-row gap-6 p-4 sm:p-6">
+          <div className="flex justify-center sm:justify-start sm:w-1/4">
+            <div className="w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-lg overflow-hidden border shadow-sm bg-gray-50">
+              {data.photo ? (
+                <CldImage
+                  width="640"
+                  height="640"
+                  className="w-full h-full object-cover"
+                  src={data.photo}
+                  alt="Business image"
+                />
+              ) : (
+                <Image
+                  src="/images/no-image.png"
+                  alt="No image"
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-contain bg-gray-100"
+                />
+              )}
+            </div>
           </div>
 
-          <div className="flex-1 flex flex-col justify-start pl-4">
+          <div className="">
             <div>
               <h2 className="text-xl font-semibold text-gray-800">
                 {data.name}
@@ -86,26 +89,29 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
               </p>
             </div>
 
-            <div className="mt-6 flex gap-2">
+            <div className="mt-6 flex flex-wrap gap-3">
+              {/* We make a shared class for all */}
               <Link
-                href={`/user/business/edit/${data.slug}`}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center justify-center gap-2"
+                href={`/profile/business/edit/${data.slug}`}
+                className="inline-flex items-center justify-center gap-2 rounded-lg shadow-sm font-medium px-4 py-2 text-white bg-emerald-500 hover:bg-emerald-600 transition-colors h-10"
               >
                 <Pencil className="w-4 h-4" />
                 Edit
               </Link>
+
               <Button
                 type="button"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm"
+                className="inline-flex items-center justify-center gap-2 rounded-lg shadow-sm font-medium px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 transition-colors h-10"
               >
                 <Eye className="w-4 h-4" />
                 View
               </Button>
+
               <Button
                 onClick={handleDelete}
                 disabled={isPending}
-                type="submit"
-                className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm"
+                type="button"
+                className="inline-flex items-center justify-center gap-2 rounded-lg shadow-sm font-medium px-4 py-2 text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-70 h-10"
               >
                 {isPending ? (
                   <>

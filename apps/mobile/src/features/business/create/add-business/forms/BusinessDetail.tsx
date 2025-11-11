@@ -107,7 +107,8 @@ export default function BusinessDetail({
       name: "photo",
       label: "Business Image",
       component: "image",
-      className: "mx-auto w-[90%]",
+      placeholder: "Business Image",
+      // className: "mx-auto w-[90%]",
       error: errors.photo?.message,
     },
 
@@ -124,7 +125,7 @@ export default function BusinessDetail({
       ],
       component: "dropdown",
       multiselect: 1,
-      className: "w-[90%] bg-base-200",
+      className: "w-[90%] bg-base-200 rounded-lg",
       error: errors.categoryId?.message,
     },
     {
@@ -199,7 +200,7 @@ export default function BusinessDetail({
       component: "image",
       placeholder: "Select Shop Image 3",
       required: false,
-      error: errors.photo?.message,
+      error: errors.image3?.message,
     },
     {
       control,
@@ -215,7 +216,7 @@ export default function BusinessDetail({
       component: "image",
       placeholder: "Select Shop Image 5",
       required: false,
-      error: errors.image3?.message,
+      error: errors.image5?.message,
     },
   ];
 

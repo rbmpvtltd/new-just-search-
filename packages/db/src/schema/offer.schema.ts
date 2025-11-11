@@ -54,14 +54,14 @@ export const offersInsertSchema = createInsertSchema(offers, {
     subcategoryId: z
       .array(z.number())
       .min(1, "Select at least one subcategory"),
-    photo: z.string().min(1, "Photo is required"),
+    photo: z.string().min(1, "Image 1 is required"),
     image2: z.string().optional(),
     image3: z.string().optional(),
     image4: z.string().optional(),
     image5: z.string().optional(),
   });
 export const offersUpdateSchema = offersInsertSchema.extend({
-  offerSlug: z.string().optional(), 
+  offerSlug: z.string().optional(),
 });
 
 // 2 OfferPhoto

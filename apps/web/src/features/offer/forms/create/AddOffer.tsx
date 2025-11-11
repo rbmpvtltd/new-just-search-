@@ -11,25 +11,25 @@ import {
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 type AddOfferSchema = z.infer<typeof offersInsertSchema>;
 
-type FormReferenceDataType = OutputTrpcType["businessrouter"]["add"] | null;
+type FormReferenceDataType = OutputTrpcType["offerrouter"]["add"] | null;
 export default function AddOffer({
   formReferenceData,
 }: {
   formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
-  const { mutate } = useMutation(
-    trpc.offerrouter.addOffer.mutationOptions(),
-  );
-
+  const { mutate } = useMutation(trpc.offerrouter.addOffer.mutationOptions());
+  const categories = formReferenceData?.categoryRecord;
   const {
     control,
+    setValue,
     handleSubmit,
     getValues,
     formState: { errors, isSubmitting },
@@ -46,19 +46,11 @@ export default function AddOffer({
       image3: "",
       image4: "",
       image5: "",
-      categoryId: 0,
+      categoryId: categories?.id ?? 0,
       subcategoryId: [],
     },
   });
 
-  const categories = formReferenceData?.getBusinessCategories.map(
-    (item: any) => {
-      return {
-        label: item.title,
-        value: item.id,
-      };
-    },
-  );
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
   const { data: subCategories, isLoading } = useQuery(
     trpc.businessrouter.getSubCategories.queryOptions({
@@ -82,6 +74,10 @@ export default function AddOffer({
       placeholder: "Rate",
       type: "number",
       component: "input",
+      onChangeValue: (value) => {
+        if (!value) return;
+        setValue("finalPrice", Number(value));
+      },
       error: errors.rate?.message,
     },
     {
@@ -91,6 +87,15 @@ export default function AddOffer({
       placeholder: "Discount Percent",
       component: "input",
       type: "number",
+      onChangeValue: (value) => {
+        if (!value) return;
+        const discount = parseFloat(String(value));
+        const price = parseFloat((getValues("rate") || 0).toString());
+        const final = (price * (100 - discount)) / 100;
+
+        setValue("discountPercent", discount);
+        setValue("finalPrice", parseFloat(final.toFixed(2)));
+      },
       error: errors.discountPercent?.message,
     },
     {
@@ -108,9 +113,10 @@ export default function AddOffer({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
-      options:
-        categories?.map((item) => ({ label: item.label, value: item.value })) ??
-        [],
+      options: categories
+        ? [{ label: categories?.title, value: categories?.id }]
+        : [],
+      disabled: true,
       error: errors.categoryId?.message,
     },
     {
@@ -133,20 +139,21 @@ export default function AddOffer({
       label: "Description",
       name: "offerDescription",
       placeholder: "Description",
-      component: "textarea",
+      component: "editor",
       error: errors.offerDescription?.message,
     },
+  ];
+  const formFields2: FormFieldProps<AddOfferSchema>[] = [
     {
       control,
-      label: "Product Image",
       name: "photo",
       component: "image",
+      required: false,
       error: errors.photo?.message,
     },
     {
       control,
       type: "",
-      label: "",
       name: "image2",
       component: "image",
       className: "mt-5",
@@ -156,7 +163,6 @@ export default function AddOffer({
     {
       control,
       type: "",
-      label: "",
       name: "image3",
       component: "image",
       required: false,
@@ -165,7 +171,6 @@ export default function AddOffer({
     {
       control,
       type: "",
-      label: "",
       name: "image4",
       component: "image",
       required: false,
@@ -174,14 +179,12 @@ export default function AddOffer({
     {
       control,
       type: "",
-      label: "",
       name: "image5",
       component: "image",
       required: false,
       error: errors.image5?.message,
     },
   ];
-
   const onSubmit = async (data: any) => {
     const file = await uploadToCloudinary(
       [data.photo, data.image2, data.image3, data.image4, data.image5],
@@ -208,7 +211,6 @@ export default function AddOffer({
         },
       },
     );
-
   };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -219,11 +221,27 @@ export default function AddOffer({
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Business Contact
+              Add Offer
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
-              {formFields.map((field, index) => (
+              {formFields.map((field) => (
+                <div
+                  key={field.name}
+                  className={
+                    field.name === "offerDescription" ? "col-span-full" : ""
+                  }
+                >
+                  <FormField {...field} />
+                </div>
+              ))}
+            </div>
+            <Label className="mt-3 gap-0 ">
+              Offer Images
+              <span className="text-red-500 ">*</span>
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mt-3">
+              {formFields2.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>

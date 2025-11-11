@@ -11,7 +11,7 @@ export default async function page({
 
   const slug = Array.isArray(productSlug) ? productSlug[0] : productSlug;
   const { data: referenceData, error } = await asyncHandler(
-    trpcServer.businessrouter.add.query(),
+    trpcServer.productrouter.add.query(),
   );
 
   const { data: myProduct, error: myBusinessError } = await asyncHandler(

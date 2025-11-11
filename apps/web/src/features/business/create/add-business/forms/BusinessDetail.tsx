@@ -10,6 +10,7 @@ import {
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
@@ -86,6 +87,7 @@ export default function BusinessDetail({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
+      disabled: true,
       options:
         categories?.map((item) => ({ label: item.label, value: item.value })) ??
         [],
@@ -97,6 +99,7 @@ export default function BusinessDetail({
       name: "subcategoryId",
       placeholder: "Sub Category",
       component: "multiselect",
+      loading: isLoading,
       options:
         subCategories?.map((item) => ({
           label: item.name,
@@ -131,60 +134,68 @@ export default function BusinessDetail({
       label: "About Business",
       name: "description",
       placeholder: "About Business",
-      component: "textarea",
+      component: "editor",
       required: false,
       error: errors.description?.message,
     },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "Shop Images",
-    //   name: "",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage2",
-    //   component: "input",
-    //   className: "mt-5",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage3",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage4",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage5",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
+  ];
+
+  const formFields2: FormFieldProps<BusinessDetailSchema>[] = [
+    {
+      control,
+      type: "",
+      name: "image1",
+      component: "image",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      name: "image2",
+      component: "image",
+      className: "mt-5",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      name: "image3",
+      component: "image",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      name: "image4",
+      component: "image",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      name: "image5",
+      component: "image",
+      required: false,
+      error: "",
+    },
   ];
 
   const onSubmit = async (data: BusinessDetailSchema) => {
-    const file = await uploadToCloudinary([data.photo], "business");
+    const file = await uploadToCloudinary(
+      [
+        data.photo,
+        data.image1,
+        data.image2,
+        data.image3,
+        data.image4,
+        data.image5,
+      ],
+      "business",
+    );
     setFormValue("photo", file[0] ?? "");
     setFormValue("name", data.name ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
@@ -192,7 +203,12 @@ export default function BusinessDetail({
     setFormValue("specialities", data.specialities ?? "");
     setFormValue("homeDelivery", data.homeDelivery ?? "");
     setFormValue("description", data.description ?? "");
-    // nextPage();
+    setFormValue("image1", file[1] ?? "");
+    setFormValue("image2", file[2] ?? "");
+    setFormValue("image3", file[3] ?? "");
+    setFormValue("image4", file[4] ?? "");
+    setFormValue("image5", file[5] ?? "");
+    nextPage();
   };
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -203,12 +219,28 @@ export default function BusinessDetail({
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Business Contact
+              Business Details
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
-              {formFields.map((field, index) => (
-                <FormField key={field.name} {...field} />
+              {formFields.map((field) => (
+                <div
+                  key={field.name}
+                  className={
+                    field.name === "description" ? "col-span-full" : ""
+                  }
+                >
+                  <FormField {...field} />
+                </div>
+              ))}
+            </div>
+            <Label className="mt-3 gap-0 ">
+              Shop Images
+              {/* <span className="text-red-500 ">*</span> */}
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
+              {formFields2.map((field) => (
+                <FormField labelHidden key={field.name} {...field} />
               ))}
             </div>
           </div>

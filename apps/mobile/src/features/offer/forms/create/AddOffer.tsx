@@ -12,7 +12,6 @@ import {
   View,
 } from "react-native";
 import type z from "zod";
-import { da } from "zod/v4/locales";
 import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
@@ -146,6 +145,7 @@ export default function AddOffer() {
       className: "w-[90%] bg-base-200",
       error: errors.rate?.message,
       onValueChange: (value) => {
+        console.log("Rate Value", value);
         if (!value) return;
         setValue("finalPrice", Number(value));
       },
@@ -161,10 +161,14 @@ export default function AddOffer() {
       error: errors.discountPercent?.message,
       required: false,
       onValueChange: (value) => {
+        console.log("Value", value);
+
         if (!value) return;
         const discount = parseFloat(String(value));
         const price = parseFloat((getValues("rate") || 0).toString());
         const final = (price * (100 - discount)) / 100;
+        console.log("Final value", final);
+
         setValue("discountPercent", Number(value));
         setValue("finalPrice", parseFloat(final.toFixed(2)));
       },
@@ -274,7 +278,7 @@ export default function AddOffer() {
           ))}
         </View>
         <View className="flex-row items-center">
-          <LableText title="Offer images" className="ml-11" />
+          <LableText title="Offer images" className="ml-8" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>

@@ -6,6 +6,7 @@ import type z from "zod";
 import { FormField } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
+import { toISOStringTime } from "@/utils/timeFormat";
 
 type BusinessTimingSchema = z.infer<typeof businessTimingSchema>;
 export default function BusinessTiming() {
@@ -27,9 +28,12 @@ export default function BusinessTiming() {
   });
 
   const onSubmit = (data: BusinessTimingSchema) => {
+    const formatFromHour = toISOStringTime(data?.fromHour ?? "");
+    const formatToHour = toISOStringTime(data?.toHour ?? "");
+    
     setFormValue("days", data.days ?? []);
-    setFormValue("fromHour", data.fromHour ?? "");
-    setFormValue("toHour", data.toHour ?? "");
+    setFormValue("fromHour", formatFromHour ?? "");
+    setFormValue("toHour", formatToHour ?? "");
     nextPage();
   };
 

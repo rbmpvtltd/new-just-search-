@@ -40,7 +40,6 @@ export default function Feedback() {
   });
 
   const onSubmit = (data: FeedbackSchema) => {
-    console.log("DATA", data);
     mutate(data, {
       onSuccess: (data) => {
         if (data.success) {

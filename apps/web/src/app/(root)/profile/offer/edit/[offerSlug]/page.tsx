@@ -14,7 +14,7 @@ export default async function page({
   console.log("param", offerSlug);
 
   const { data: referenceData, error } = await asyncHandler(
-    trpcServer.businessrouter.add.query(),
+    trpcServer.offerrouter.add.query(),
   );
 
   const { data: myOffer, error: myBusinessError } = await asyncHandler(

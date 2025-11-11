@@ -11,13 +11,14 @@ import {
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 type AddProductSchema = z.infer<typeof productInsertSchema>;
 
-type FormReferenceDataType = OutputTrpcType["businessrouter"]["add"] | null;
+type FormReferenceDataType = OutputTrpcType["productrouter"]["add"] | null;
 export default function AddProduct({
   formReferenceData,
 }: {
@@ -27,7 +28,7 @@ export default function AddProduct({
   const { mutate } = useMutation(
     trpc.productrouter.addProduct.mutationOptions(),
   );
-
+  const categories = formReferenceData?.categoryRecord;
   const {
     control,
     handleSubmit,
@@ -44,19 +45,11 @@ export default function AddProduct({
       image3: "",
       image4: "",
       image5: "",
-      categoryId: 0,
+      categoryId: categories?.id ?? 0,
       subcategoryId: [],
     },
   });
 
-  const categories = formReferenceData?.getBusinessCategories.map(
-    (item: any) => {
-      return {
-        label: item.title,
-        value: item.id,
-      };
-    },
-  );
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
   const { data: subCategories, isLoading } = useQuery(
     trpc.businessrouter.getSubCategories.queryOptions({
@@ -88,9 +81,10 @@ export default function AddProduct({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
-      options:
-        categories?.map((item) => ({ label: item.label, value: item.value })) ??
-        [],
+      options: categories
+        ? [{ label: categories?.title, value: categories?.id }]
+        : [],
+      disabled: true,
       error: errors.categoryId?.message,
     },
     {
@@ -113,30 +107,35 @@ export default function AddProduct({
       label: "Description",
       name: "productDescription",
       placeholder: "Description",
-      component: "textarea",
+      component: "editor",
       error: errors.productDescription?.message,
     },
+  ];
+
+  const formFields2: FormFieldProps<AddProductSchema>[] = [
     {
       control,
-      label: "Product Image",
+      // label: "Product Image",
       name: "photo",
+      required: false,
       component: "image",
       error: errors.photo?.message,
     },
     {
       control,
       type: "",
-      label: "",
+      label: "dadasdad",
       name: "image2",
       component: "image",
-      className: "mt-5",
+      className: "mt-10",
       required: false,
+      labelHidden: true,
       error: errors.image2?.message,
     },
     {
       control,
       type: "",
-      label: "",
+      // label: "",
       name: "image3",
       component: "image",
       required: false,
@@ -145,7 +144,7 @@ export default function AddProduct({
     {
       control,
       type: "",
-      label: "",
+      // label: "",
       name: "image4",
       component: "image",
       required: false,
@@ -154,18 +153,21 @@ export default function AddProduct({
     {
       control,
       type: "",
-      label: "",
+      // label: "",
       name: "image5",
       component: "image",
       required: false,
+
       error: errors.image5?.message,
     },
   ];
 
   const onSubmit = async (data: any) => {
+    console.log("Data", data);
+
     const file = await uploadToCloudinary(
       [data.photo, data.image2, data.image3, data.image4, data.image5],
-      "offers",
+      "products",
     );
     mutate(
       {
@@ -198,11 +200,27 @@ export default function AddProduct({
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Business Contact
+              Add Product
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
-              {formFields.map((field, index) => (
+              {formFields.map((field) => (
+                <div
+                  key={field.name}
+                  className={
+                    field.name === "productDescription" ? "col-span-full" : ""
+                  }
+                >
+                  <FormField {...field} />
+                </div>
+              ))}
+            </div>
+            <Label className="mt-3 gap-0 ">
+              Product Images
+              <span className="text-red-500 ">*</span>
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mt-3">
+              {formFields2.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>
@@ -220,13 +238,6 @@ export default function AddProduct({
             ) : (
               "SUBMIT"
             )}
-          </Button>
-          <Button
-            onClick={() => console.log(getValues())}
-            type="button"
-            className="bg-gray-500 hover:bg-gray-700 font-bold"
-          >
-            Get Values
           </Button>
         </div>
       </form>

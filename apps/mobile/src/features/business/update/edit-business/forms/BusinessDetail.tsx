@@ -26,7 +26,6 @@ export default function BusinessDetail({
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const nextPage = useBusinessFormStore((s) => s.nextPage);
-  console.log("List", businessListing);
 
   const {
     control,
@@ -42,11 +41,11 @@ export default function BusinessDetail({
       specialities: businessListing?.specialities ?? "",
       homeDelivery: businessListing?.homeDelivery ?? "",
       description: businessListing?.description ?? "",
-      image1: businessListing?.businessPhotos[0].photo ?? "",
-      image2: businessListing?.businessPhotos[1].photo ?? "",
-      image3: businessListing?.businessPhotos[2].photo ?? "",
-      image4: businessListing?.businessPhotos[3].photo ?? "",
-      image5: businessListing?.businessPhotos[4].photo ?? "",
+      image1: businessListing?.businessPhotos[0]?.photo ?? "",
+      image2: businessListing?.businessPhotos[1]?.photo ?? "",
+      image3: businessListing?.businessPhotos[2]?.photo ?? "",
+      image4: businessListing?.businessPhotos[3]?.photo ?? "",
+      image5: businessListing?.businessPhotos[4]?.photo ?? "",
     },
   });
 
@@ -68,29 +67,40 @@ export default function BusinessDetail({
   );
 
   const onSubmit = async (data: BusinessDetailSchema) => {
-    const file = await uploadToCloudinary(
-      [
-        data.photo,
-        data.image1,
-        data.image2,
-        data.image3,
-        data.image4,
-        data.image5,
-      ],
+    const imagesToUpload = [
+      data.photo,
+      data.image1,
+      data.image2,
+      data.image3,
+      data.image4,
+      data.image5,
+    ];
+
+    const uploadable = imagesToUpload.map((img) =>
+      img?.startsWith("file://") ? img : null,
+    );
+    const uploadedFiles = await uploadToCloudinary(
+      uploadable.filter(Boolean),
       "business",
     );
+    const finalImages = imagesToUpload.map((img) =>
+      img?.startsWith("file://")
+        ? uploadedFiles.shift() // replace with uploaded URL
+        : img,
+    );
+
     setFormValue("name", data.name ?? "");
-    setFormValue("photo", file[0] ?? "");
+    setFormValue("photo", finalImages[0] ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
     setFormValue("subcategoryId", data.subcategoryId ?? "");
     setFormValue("specialities", data.specialities ?? "");
     setFormValue("homeDelivery", data.homeDelivery ?? "");
     setFormValue("description", data.description ?? "");
-    setFormValue("image1", file[1] ?? "");
-    setFormValue("image2", file[2] ?? "");
-    setFormValue("image3", file[3] ?? "");
-    setFormValue("image4", file[4] ?? "");
-    setFormValue("image5", file[5] ?? "");
+    setFormValue("image1", finalImages[1] ?? "");
+    setFormValue("image2", finalImages[2] ?? "");
+    setFormValue("image3", finalImages[3] ?? "");
+    setFormValue("image4", finalImages[4] ?? "");
+    setFormValue("image5", finalImages[5] ?? "");
     nextPage();
   };
 

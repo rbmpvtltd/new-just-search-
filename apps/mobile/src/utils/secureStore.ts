@@ -39,7 +39,7 @@ export const setTokenRole = async (
     ]);
   }
 
-  console.log( "token in secureStore seted ",await getToken())
+  // console.log( "token in secureStore seted ",await getToken())
 };
 
 export const deleteTokenRole = async (): Promise<void> => {

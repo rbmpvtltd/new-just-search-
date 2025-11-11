@@ -3,13 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addressDetailSchema } from "@repo/db/src/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import LocationAutoDetect from "@/components/LocationAutoDetect";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
@@ -29,10 +30,14 @@ export default function AddressDetail({
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
+  const [detectedCityName, setDetectedCityName] = React.useState<null | string>(
+    null,
+  );
 
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
@@ -56,11 +61,27 @@ export default function AddressDetail({
     };
   });
   const selectedStateId = useWatch({ control, name: "state" });
-  const { data: cities, isLoading } = useQuery(
+  const {
+    data: cities,
+    isLoading,
+    isError,
+  } = useQuery(
     trpc.businessrouter.getCities.queryOptions({
       state: selectedStateId,
     }),
   );
+
+  if (cities && cities.length > 0 && detectedCityName) {
+    const matchedCity = cities.find(
+      (c) => c.city.toLowerCase() === detectedCityName.toLowerCase(),
+    );
+    if (matchedCity && matchedCity.id !== control._formValues.cityId) {
+      // Check if cityId is already set to prevent infinite loop
+      setValue("cityId", matchedCity.id, { shouldValidate: true });
+      // Optional: Clear detectedCityName after setting the value
+      // setDetectedCityName(null);
+    }
+  }
 
   const formFields: FormFieldProps<AddressDetailSchema>[] = [
     {
@@ -147,7 +168,6 @@ export default function AddressDetail({
   ];
 
   const onSubmit = (data: AddressDetailSchema) => {
-    console.log("Address Data", data);
     setFormValue("buildingName", data.buildingName ?? "");
     setFormValue("streetName", data.streetName ?? "");
     setFormValue("area", data.area ?? "");
@@ -175,13 +195,42 @@ export default function AddressDetail({
               location-based services and will remain confidential. This
               information will not be shared publicly.
             </p>
-            <div className="flex items-end justify-between mb-4">
-              <Button
-                type="button"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow"
-              >
-                Auto Detect Location
-              </Button>
+            <div className="flex items-end justify-between mb-4 w-fit">
+              <LocationAutoDetect
+                onResult={(data) => {
+                  console.log("Detected:", data);
+                  const formatted = data.formattedAddress ?? "";
+                  const parts = formatted.split(",").map((p) => p.trim());
+                  const lat = data.latitude;
+                  const long = data.longitude;
+                  const pincode = data.postalCode || "";
+                  const cityName = data.city || "";
+                  const stateName = data.region || "";
+                  const area = data.name || "";
+                  const street_name = data.street || "";
+                  const landmark = data.street || "";
+                  const building_name = parts[0]?.match(/[A-Za-z]/)
+                    ? parts[0]
+                    : "";
+
+                  const matchedState = states?.find(
+                    (item: any) => item.label === stateName.toLocaleUpperCase(),
+                  );
+
+                  console.log("matchedState", cityName);
+
+                  setDetectedCityName(cityName);
+
+                  setValue("buildingName", building_name ?? "");
+                  setValue("streetName", street_name ?? "");
+                  setValue("area", area ?? "");
+                  setValue("landmark", landmark ?? "");
+                  setValue("latitude", String(lat));
+                  setValue("longitude", String(long));
+                  setValue("pincode", pincode ?? "");
+                  setValue("state", matchedState?.value ?? 0);
+                }}
+              />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {formFields.map((field, index) => (
