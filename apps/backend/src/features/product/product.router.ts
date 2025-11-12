@@ -3,6 +3,7 @@ import {
   productInsertSchema,
   products,
 } from "@repo/db/src/schema/product.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import slugify from "slugify";
@@ -41,8 +42,22 @@ export const productrouter = router({
       columns: { id: true, title: true },
     });
 
+    if (!categoryRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category not found",
+      });
+    }
+    const subcategoryRecord = await db.query.subcategories.findMany({
+      where: (subcategories, { eq }) =>
+        eq(subcategories.categoryId, categoryRecord?.id),
+      columns: { id: true, name: true },
+    });
+
+    logger.info("Subcategory Record", subcategoryRecord);
     return {
       categoryRecord,
+      subcategoryRecord,
     };
   }),
 

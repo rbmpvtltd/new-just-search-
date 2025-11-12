@@ -31,6 +31,8 @@ export default function AddProduct() {
     trpc.productrouter.addProduct.mutationOptions(),
   );
   const categories = data?.categoryRecord;
+  const subCategories = data?.subcategoryRecord;
+
   const {
     control,
     handleSubmit,
@@ -50,13 +52,6 @@ export default function AddProduct() {
       image5: "",
     },
   });
-
-  const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
-      categoryId: selectedCategoryId,
-    }),
-  );
 
   if (!data) {
     return (
@@ -126,7 +121,6 @@ export default function AddProduct() {
       multiselect: 1,
       className: "w-[90%] bg-base-100",
       disable: true,
-
       error: errors.categoryId?.message,
     },
     {

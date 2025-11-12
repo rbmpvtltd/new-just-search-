@@ -41,21 +41,24 @@ export const offerrouter = router({
         eq(categories.id, getBusinessCategories?.categoryId),
       columns: { id: true, title: true },
     });
-  
+
+    if (!categoryRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category not found",
+      });
+    }
+    const subcategoryRecord = await db.query.subcategories.findMany({
+      where: (subcategories, { eq }) =>
+        eq(subcategories.categoryId, categoryRecord?.id),
+      columns: { id: true, name: true },
+    });
+
     return {
       categoryRecord,
+      subcategoryRecord,
     };
   }),
-
-  getSubCategories: visitorProcedure
-    .input(z.object({ categoryId: z.number() }))
-    .query(async ({ ctx, input }) => {
-      const businessSubCategories = await db.query.subcategories.findMany({
-        where: (subcategories, { eq }) =>
-          eq(subcategories.categoryId, input.categoryId),
-      });
-      return businessSubCategories;
-    }),
 
   addOffer: businessProcedure
     .input(offersInsertSchema)

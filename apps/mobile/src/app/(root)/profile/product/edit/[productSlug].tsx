@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import EditProduct from "@/features/product/forms/update/EditProduct";
 import { trpc } from "@/lib/trpc";
 
@@ -18,7 +19,9 @@ export default function CreateProduct() {
   }
   return (
     <View>
-      <EditProduct myProduct={data} />
+      <BoundaryWrapper>
+        <EditProduct myProduct={data} />
+      </BoundaryWrapper>
     </View>
   );
 }

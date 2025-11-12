@@ -132,7 +132,7 @@ export const businessrouter = router({
       }
 
       const isCityExists = await db.query.cities.findFirst({
-        where: (cities, { eq }) => eq(cities.id, input.cityId),
+        where: (cities, { eq }) => eq(cities.id, input.city),
       });
       if (!isCityExists) {
         throw new TRPCError({
@@ -163,7 +163,7 @@ export const businessrouter = router({
           landmark: input.landmark,
           pincode: input.pincode,
           state: input.state,
-          cityId: Number(input.cityId),
+          cityId: Number(input.city),
           days: input.days,
           fromHour: input.fromHour,
           toHour: input.toHour,
@@ -278,7 +278,7 @@ export const businessrouter = router({
           landmark: input.landmark,
           pincode: input.pincode,
           state: input.state,
-          cityId: Number(input.cityId),
+          cityId: Number(input.city),
           // schedules: input.schedules,
           days: input.days,
           fromHour: input.fromHour,
