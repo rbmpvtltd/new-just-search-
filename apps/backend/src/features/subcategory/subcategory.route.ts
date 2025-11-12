@@ -258,7 +258,6 @@ export const subcategoryRouter = router({
 
       const nextCursor = data[data.length - 1]?.id;
 
-
       return {
         data,
         nextCursor,

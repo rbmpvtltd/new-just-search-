@@ -2,10 +2,10 @@
 import { db } from "@repo/db";
 import { users } from "@repo/db/src/schema/auth.schema";
 import {
-  businessCategories,
-  businessListings,
-  businessSubcategories,
-} from "@repo/db/src/schema/business.schema";
+  hireCategories,
+  hireListing,
+  hireSubcategories,
+} from "@repo/db/src/schema/hire.schema";
 import {
   categories,
   categoryInsertSchema,
@@ -28,23 +28,23 @@ import {
 } from "@/lib/tableUtils";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
-  businessAllowedSortColumns,
-  businessColumns,
-  businessGlobalFilterColumns,
-} from "./business.admin.service";
+  hireAllowedSortColumns,
+  hireColumns,
+  hireGlobalFilterColumns,
+} from "./hire.admin.service";
 
-export const adminBusinessRouter = router({
+export const adminHireRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
       input.globalFilter,
-      businessColumns,
-      businessGlobalFilterColumns,
+      hireColumns,
+      hireGlobalFilterColumns,
     );
 
     const orderBy = buildOrderByClause(
       input.sorting,
-      businessAllowedSortColumns,
+      hireAllowedSortColumns,
       sql`created_at DESC`,
     );
 
@@ -52,9 +52,9 @@ export const adminBusinessRouter = router({
 
     const data = await db
       .select({
-        id: businessListings.id,
-        photo: businessListings.photo,
-        name: businessListings.name,
+        id: hireListing.id,
+        photo: hireListing.photo,
+        name: hireListing.name,
         phone: users.phoneNumber,
         city: cities.city,
         category:
@@ -65,59 +65,47 @@ export const adminBusinessRouter = router({
           sql<string>`string_agg(DISTINCT ${subcategories.name}, ', ' ORDER BY ${subcategories.name})`.as(
             "subcategories",
           ),
-        status: businessListings.status,
-        created_at: businessListings.createdAt,
+        status: hireListing.status,
+        created_at: hireListing.createdAt,
       })
-      .from(businessListings)
+      .from(hireListing)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
-      .leftJoin(users, eq(businessListings.userId, users.id))
-      .leftJoin(cities, eq(businessListings.city, cities.id))
-      .leftJoin(
-        businessSubcategories,
-        eq(businessListings.id, businessSubcategories.businessId),
-      )
+      .leftJoin(users, eq(hireListing.userId, users.id))
+      .leftJoin(cities, eq(hireListing.city, cities.id))
+      .leftJoin(hireSubcategories, eq(hireListing.id, hireSubcategories.hireId))
       .leftJoin(
         subcategories,
-        eq(businessSubcategories.subcategoryId, subcategories.id),
+        eq(hireSubcategories.subcategoryId, subcategories.id),
       )
-      .leftJoin(
-        businessCategories,
-        eq(businessListings.id, businessCategories.businessId),
-      )
-      .leftJoin(categories, eq(businessCategories.categoryId, categories.id))
+      .leftJoin(hireCategories, eq(hireListing.id, hireCategories.hireId))
+      .leftJoin(categories, eq(hireCategories.categoryId, categories.id))
       .offset(offset)
       .groupBy(
-        businessListings.id,
-        businessListings.photo,
-        businessListings.name,
+        hireListing.id,
+        hireListing.photo,
+        hireListing.name,
         users.phoneNumber,
         cities.id,
-        businessListings.status,
-        businessListings.createdAt,
+        hireListing.status,
+        hireListing.createdAt,
       );
 
     const totalResult = await db
       .select({
-        count: sql<number>`count(distinct ${businessListings.id})::int`,
+        count: sql<number>`count(distinct ${hireListing.id})::int`,
       })
-      .from(businessListings)
+      .from(hireListing)
       .where(where)
-      .leftJoin(
-        businessSubcategories,
-        eq(businessListings.id, businessSubcategories.businessId),
-      )
+      .leftJoin(hireSubcategories, eq(hireListing.id, hireSubcategories.hireId))
       .leftJoin(
         subcategories,
-        eq(businessSubcategories.subcategoryId, subcategories.id),
+        eq(hireSubcategories.subcategoryId, subcategories.id),
       )
-      .leftJoin(
-        businessCategories,
-        eq(businessListings.id, businessCategories.businessId),
-      )
-      .leftJoin(categories, eq(businessCategories.categoryId, categories.id))
-      .leftJoin(users, eq(businessListings.userId, users.id));
+      .leftJoin(hireCategories, eq(hireListing.id, hireCategories.hireId))
+      .leftJoin(categories, eq(hireCategories.categoryId, categories.id))
+      .leftJoin(users, eq(hireListing.userId, users.id));
     // .groupBy(businessListings.id);
 
     const total = totalResult[0]?.count ?? 0;

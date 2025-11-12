@@ -1,30 +1,30 @@
 import { users } from "@repo/db/src/schema/auth.schema";
-import { businessListings } from "@repo/db/src/schema/business.schema";
+import { hireListing } from "@repo/db/src/schema/hire.schema";
 import {
   categories,
   cities,
   subcategories,
 } from "@repo/db/src/schema/not-related.schema";
 
-export const businessColumns = {
-  id: businessListings.id,
-  photo: businessListings.photo,
-  name: businessListings.name,
+export const hireColumns = {
+  id: hireListing.id,
+  photo: hireListing.photo,
+  name: hireListing.name,
   phone: users.phoneNumber,
   city: cities.city,
   category: categories.title,
   subcategories: subcategories.name,
-  status: businessListings.status,
-  created_at: businessListings.createdAt,
+  status: hireListing.status,
+  created_at: hireListing.createdAt,
 };
 
-export const businessGlobalFilterColumns = [
-  businessListings.name,
+export const hireGlobalFilterColumns = [
+  hireListing.name,
   subcategories.name,
   categories.title,
   users.phoneNumber,
 ];
-export const businessAllowedSortColumns = [
+export const hireAllowedSortColumns = [
   "id",
   "photo",
   "name",

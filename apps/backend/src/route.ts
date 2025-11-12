@@ -5,6 +5,7 @@ import { adminBusinessRouter } from "./features/business/business.admin.routes";
 import { businessrouter } from "./features/business/business.router";
 import { chatRouter } from "./features/chats/test.routes";
 import { cloudinarySignature } from "./features/cloudinary/cloudinary.route";
+import { adminHireRouter } from "./features/hire/hire.admin.routes";
 import { hirerouter } from "./features/hire/hire.router";
 import { adminCategoryRouter } from "./features/mainContent/category.admin.routes";
 import { categoryRouter } from "./features/mainContent/category.route";
@@ -34,6 +35,7 @@ export const appRouter = router({
   productrouter,
   adminSubcategoryRouter,
   adminBusinessRouter,
+  adminHireRouter,
   // cloudinary: cloudinaryRouter,
   // test: testRouter,
   // test : chatRouter,
