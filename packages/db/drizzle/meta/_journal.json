@@ -8,6 +8,13 @@
       "when": 1762945307212,
       "tag": "0000_worried_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763026970175,
+      "tag": "0001_pale_turbo",
+      "breakpoints": true
     }
   ]
 }

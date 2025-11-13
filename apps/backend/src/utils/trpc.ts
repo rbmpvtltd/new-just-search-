@@ -106,6 +106,7 @@ export const businessProcedure = protectedProcedure.use(async (opts) => {
   throw new TRPCError({
     code: "UNAUTHORIZED",
     message: "please verify",
+    cause : 401
   });
 });
 

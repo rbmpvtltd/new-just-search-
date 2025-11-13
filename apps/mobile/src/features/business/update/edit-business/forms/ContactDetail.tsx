@@ -46,11 +46,9 @@ export default function ContactDetail({
   });
 
   const onSubmit = async (data: ContactDetailSchema) => {
-    setFormValue("contactPerson", data.contactPerson ?? "");
-    setFormValue("phoneNumber", data.phoneNumber ?? "");
-    setFormValue("ownerNumber", data.ownerNumber ?? "");
-    setFormValue("whatsappNo", data.whatsappNo ?? "");
-    setFormValue("email", data.email ?? "");
+    useBusinessFormStore.setState((state) => ({
+      formValue: { ...state.formValue, ...data },
+    }));
 
     mutate(
       { ...formValue, pincode: formValue.pincode },

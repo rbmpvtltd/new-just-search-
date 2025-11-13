@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   type Control,
   Controller,
@@ -5,6 +6,7 @@ import {
   type Path,
 } from "react-hook-form";
 import { denormalizeDate, normalizeDate } from "@/utils/normalizeDate";
+import Editor from "../dom-components/hello-dom";
 import CropperComponent from "../image/upload-image";
 import { Checkbox } from "../ui/checkbox";
 import { DatePicker } from "../ui/date-picker";
@@ -17,7 +19,7 @@ import { Textarea } from "../ui/textarea";
 export interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
   type?: string;
-  label: string;
+  label?: string;
   name: Path<T>;
   placeholder?: string;
   loading?: boolean;
@@ -25,6 +27,7 @@ export interface FormFieldProps<T extends FieldValues> {
   required?: boolean;
   disabled?: boolean;
   section?: string;
+  labelHidden?: boolean;
   error?: string;
   onChangeValue?: (value: string | undefined | null) => void;
   options?: Option[] | undefined;
@@ -35,7 +38,8 @@ export interface FormFieldProps<T extends FieldValues> {
     | "checkbox"
     | "textarea"
     | "calendar"
-    | "image";
+    | "image"
+    | "editor";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -48,6 +52,7 @@ export const FormField = <T extends FieldValues>({
   required = true,
   disabled = false,
   section,
+  labelHidden = false,
   loading = false,
   error,
   options,
@@ -55,10 +60,11 @@ export const FormField = <T extends FieldValues>({
   onChangeValue,
   ...props
 }: FormFieldProps<T>) => {
+  const [_, setPlainText] = useState("");
   return (
     <div>
-      <Label htmlFor={name} className="mb-2 gap-0">
-        {label}
+      <Label htmlFor={name} className="mb-2 gap-0 ">
+        {!labelHidden && label}
         {required && <span className="text-red-500 ">*</span>}
       </Label>
       <Controller
@@ -74,13 +80,14 @@ export const FormField = <T extends FieldValues>({
                   name={name}
                   className={`h-[41px] ${className}`}
                   placeholder={placeholder}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     onChange(
                       type === "number"
                         ? Number(e.target.value)
                         : e.target.value,
-                    )
-                  }
+                    );
+                    if (onChangeValue) onChangeValue(e.target.value);
+                  }}
                   onBlur={onBlur}
                   value={value}
                   {...props}
@@ -187,6 +194,18 @@ export const FormField = <T extends FieldValues>({
               );
             case "image":
               return <CropperComponent onChange={onChange} value={value} />;
+            case "editor":
+              return (
+                <Editor
+                  value={value}
+                  onChange={(text: string) => {
+                    onChange(text); // ✅ send to react-hook-form
+                    // if (onValueChange) onValueChange(text);
+                  }}
+                  setPlainText={setPlainText}
+                  // setEditorState={setEditorState}
+                />
+              );
             default:
               return <div>no component</div>;
           }

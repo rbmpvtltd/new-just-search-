@@ -1,8 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  offersUpdateSchema,
-} from "@repo/db/src/schema/offer.schema";
+import { offersUpdateSchema } from "@repo/db/src/schema/offer.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
@@ -13,13 +11,14 @@ import {
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
 
-type FormReferenceDataType = OutputTrpcType["businessrouter"]["add"] | null;
+type FormReferenceDataType = OutputTrpcType["offerrouter"]["add"] | null;
 type OfferTypeSchema = OutputTrpcType["offerrouter"]["edit"] | null;
 export default function EditOffer({
   myOffer,
@@ -30,7 +29,8 @@ export default function EditOffer({
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.offerrouter.update.mutationOptions());
-
+  const categories = formReferenceData?.categoryRecord;
+  const subCategories = formReferenceData?.subcategoryRecord;
   const {
     control,
     handleSubmit,
@@ -55,21 +55,6 @@ export default function EditOffer({
       ),
     },
   });
-
-  const categories = formReferenceData?.getBusinessCategories.map(
-    (item: any) => {
-      return {
-        label: item.title,
-        value: item.id,
-      };
-    },
-  );
-  const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories, isLoading } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
-      categoryId: selectedCategoryId,
-    }),
-  );
 
   const formFields: FormFieldProps<EditOfferSchema>[] = [
     {
@@ -114,10 +99,10 @@ export default function EditOffer({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
+      options: categories
+        ? [{ label: categories?.title, value: categories?.id }]
+        : [],
       disabled: true,
-      options:
-        categories?.map((item) => ({ label: item.label, value: item.value })) ??
-        [],
       error: errors.categoryId?.message,
     },
     {
@@ -126,7 +111,6 @@ export default function EditOffer({
       name: "subcategoryId",
       placeholder: "Sub Category",
       component: "multiselect",
-      loading: isLoading,
       options:
         subCategories?.map((item) => ({
           label: item.name,
@@ -140,12 +124,14 @@ export default function EditOffer({
       label: "Description",
       name: "offerDescription",
       placeholder: "Description",
-      component: "textarea",
+      component: "editor",
       error: errors.offerDescription?.message,
     },
+  ];
+
+  const formFields2: FormFieldProps<EditOfferSchema>[] = [
     {
       control,
-      label: "Product Image",
       name: "photo",
       component: "image",
       error: errors.photo?.message,
@@ -153,7 +139,6 @@ export default function EditOffer({
     {
       control,
       type: "",
-      label: "",
       name: "image2",
       component: "image",
       className: "mt-5",
@@ -163,7 +148,6 @@ export default function EditOffer({
     {
       control,
       type: "",
-      label: "",
       name: "image3",
       component: "image",
       required: false,
@@ -172,7 +156,6 @@ export default function EditOffer({
     {
       control,
       type: "",
-      label: "",
       name: "image4",
       component: "image",
       required: false,
@@ -181,14 +164,12 @@ export default function EditOffer({
     {
       control,
       type: "",
-      label: "",
       name: "image5",
       component: "image",
       required: false,
       error: errors.image5?.message,
     },
   ];
-
   const onSubmit = async (data: any) => {
     const file = await uploadToCloudinary(
       [data.photo, data.image2, data.image3, data.image4, data.image5],
@@ -230,7 +211,23 @@ export default function EditOffer({
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
-              {formFields.map((field, index) => (
+              {formFields.map((field) => (
+                <div
+                  key={field.name}
+                  className={
+                    field.name === "offerDescription" ? "col-span-full" : ""
+                  }
+                >
+                  <FormField {...field} />
+                </div>
+              ))}
+            </div>
+            <Label className="mt-3 gap-0 ">
+              Offer Images
+              <span className="text-red-500 ">*</span>
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mt-3">
+              {formFields2.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>

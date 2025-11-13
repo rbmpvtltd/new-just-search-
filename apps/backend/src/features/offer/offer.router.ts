@@ -12,27 +12,53 @@ import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
 
 export const offerrouter = router({
-  add: visitorProcedure.query(async ({ ctx }) => {
-    const getBusinessCategories = await db.query.categories.findMany({
-      where: (categories, { eq }) => eq(categories.type, 1),
+  add: businessProcedure.query(async ({ ctx }) => {
+    const business = await db.query.businessListings.findFirst({
+      where: (businessListings, { eq }) =>
+        eq(businessListings.userId, ctx.userId),
     });
-    const getStates = await db.query.states.findMany();
+    if (!business) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Business not found",
+      });
+    }
+    const getBusinessCategories = await db.query.businessCategories.findFirst({
+      where: (businessCategories, { eq }) =>
+        eq(businessCategories.businessId, business?.id),
+      columns: { categoryId: true, id: true },
+    });
+
+    if (!getBusinessCategories?.categoryId) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category not found",
+      });
+    }
+
+    const categoryRecord = await db.query.categories.findFirst({
+      where: (categories, { eq }) =>
+        eq(categories.id, getBusinessCategories?.categoryId),
+      columns: { id: true, title: true },
+    });
+
+    if (!categoryRecord) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Category not found",
+      });
+    }
+    const subcategoryRecord = await db.query.subcategories.findMany({
+      where: (subcategories, { eq }) =>
+        eq(subcategories.categoryId, categoryRecord?.id),
+      columns: { id: true, name: true },
+    });
 
     return {
-      getBusinessCategories,
-      getStates,
+      categoryRecord,
+      subcategoryRecord,
     };
   }),
-
-  getSubCategories: visitorProcedure
-    .input(z.object({ categoryId: z.number() }))
-    .query(async ({ ctx, input }) => {
-      const businessSubCategories = await db.query.subcategories.findMany({
-        where: (subcategories, { eq }) =>
-          eq(subcategories.categoryId, input.categoryId),
-      });
-      return businessSubCategories;
-    }),
 
   addOffer: businessProcedure
     .input(offersInsertSchema)

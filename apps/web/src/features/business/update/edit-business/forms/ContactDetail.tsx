@@ -28,9 +28,7 @@ export default function ContactDetail({
   const router = useRouter();
   const { mutate } = useMutation(trpc.businessrouter.update.mutationOptions());
   const formValue = useBusinessFormStore((state) => state.formValue);
-  const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
-  const clearPage = useBusinessFormStore((state) => state.clearPage);
 
   const {
     control,
@@ -53,6 +51,7 @@ export default function ContactDetail({
       label: "Contact Person Name",
       name: "contactPerson",
       component: "input",
+      placeholder: "Contact Person Name",
       error: errors.contactPerson?.message,
     },
     {
@@ -60,6 +59,7 @@ export default function ContactDetail({
       label: "Contact Person Number",
       name: "phoneNumber",
       component: "input",
+      placeholder: "Contact Person Number",
       disabled: true,
       error: errors.phoneNumber?.message,
     },
@@ -67,6 +67,7 @@ export default function ContactDetail({
       control,
       label: "Owner Number",
       name: "ownerNumber",
+      placeholder: "Owner Number",
       component: "input",
       error: errors.ownerNumber?.message,
     },
@@ -75,6 +76,7 @@ export default function ContactDetail({
       label: "Whatsapp Number",
       name: "whatsappNo",
       component: "input",
+      placeholder: "Whatsapp Number",
       required: false,
       error: errors.whatsappNo?.message,
     },
@@ -83,6 +85,7 @@ export default function ContactDetail({
       label: "Email Id",
       name: "email",
       component: "input",
+      placeholder: "Email Id",
       required: false,
       error: errors.email?.message,
     },
@@ -96,13 +99,16 @@ export default function ContactDetail({
   ];
 
   const onSubmit = (data: ContactDetailSchema) => {
-    console.log("Contact data", data);
-    setFormValue("contactPerson", data.contactPerson ?? "");
-    setFormValue("phoneNumber", data.phoneNumber ?? "");
-    setFormValue("ownerNumber", data.ownerNumber ?? "");
-    setFormValue("whatsappNo", data.whatsappNo ?? "");
-    setFormValue("email", data.email ?? "");
-    console.log("formValue", formValue);
+    //Store data in Zustand (merge with previous steps)
+    useBusinessFormStore.setState((state) => ({
+      formValue: { ...state.formValue, ...data },
+    }));
+
+    // Optional: verify merged data immediately
+    // console.log(
+    //   "Final merged Zustand data:",
+    //   useBusinessFormStore.getState().formValue,
+    // );
 
     mutate(
       { ...formValue, pincode: formValue.pincode },
@@ -115,7 +121,7 @@ export default function ContactDetail({
               icon: "success",
               draggable: true,
             });
-            clearPage();
+            // clearPage();
             router.push("/");
           }
           console.log("Success", data);
@@ -156,13 +162,13 @@ export default function ContactDetail({
           <Button
             type="submit"
             onClick={prevPage}
-            className="bg-orange-500 hover:bg-orange-700 font-bold"
+            className="bg-orange-500 hover:bg-orange-700 font-bold cursor-pointer"
           >
             PREVIOUS
           </Button>
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-700 font-bold"
+            className="bg-orange-500 hover:bg-orange-700 font-bold cursor-pointer"
           >
             {isSubmitting ? (
               <>

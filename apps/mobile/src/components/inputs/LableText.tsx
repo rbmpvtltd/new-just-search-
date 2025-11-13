@@ -9,7 +9,7 @@ type Props = {
 export default function LableText({ title, className }: Props) {
   return (
     <Text
-      className={`text-lg font-medium text-secondary mb-2 ml-6 mt-4 ${className}`}
+      className={`text-lg font-medium text-secondary mb-2 ml-2 mt-4 ${className}`}
     >
       {title}
     </Text>

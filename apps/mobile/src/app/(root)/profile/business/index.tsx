@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import CreateBusinessListing from "@/features/business/create/add-business";
 import MyBusinessCard from "@/features/business/show/MyBusiness";
 import { trpc } from "@/lib/trpc";
@@ -19,7 +19,12 @@ function MyBusiness() {
   const { data, error, isLoading, isError } = useQuery(
     trpc.businessrouter.show.queryOptions(),
   );
-  console.log("Data", data);
+
+  if (isError) {
+    if (error.shape?.data.httpStatus === 401) {
+      return <CreateBusinessListing />;
+    }
+  }
 
   if (isLoading) return <ActivityIndicator />;
   if (!data) return <CreateBusinessListing />;

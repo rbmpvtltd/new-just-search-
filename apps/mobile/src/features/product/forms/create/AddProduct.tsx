@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/src/schema/product.schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -25,12 +26,12 @@ import { useAuthStore } from "@/store/authStore";
 type AddProductSchema = z.infer<typeof productInsertSchema>;
 export default function AddProduct() {
   const token = useAuthStore((state) => state.token);
-  const { data, error, isLoading, isError } = useQuery(
-    trpc.productrouter.add.queryOptions(),
-  );
+  const { data } = useSuspenseQuery(trpc.productrouter.add.queryOptions());
   const { mutate } = useMutation(
     trpc.productrouter.addProduct.mutationOptions(),
   );
+  const categories = data?.categoryRecord;
+  const subCategories = data?.subcategoryRecord;
 
   const {
     control,
@@ -41,7 +42,7 @@ export default function AddProduct() {
     defaultValues: {
       productName: "",
       rate: 0,
-      categoryId: 0,
+      categoryId: categories?.id ?? 0,
       subcategoryId: [],
       productDescription: "",
       photo: "",
@@ -51,42 +52,6 @@ export default function AddProduct() {
       image5: "",
     },
   });
-
-  const categories = data?.getBusinessCategories.map((item: any) => {
-    return {
-      label: item.title,
-      value: item.id,
-    };
-  });
-  const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
-      categoryId: selectedCategoryId,
-    }),
-  );
-
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text className="text-gray-600 mt-3">Preparing form...</Text>
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View className="flex-1 items-center justify-center py-10 px-6">
-        <Text className="text-red-600 text-center font-semibold mb-2">
-          Something went wrong
-        </Text>
-        <Text className="text-gray-500 text-sm text-center">
-          {error.message ||
-            "Unable to load product form. Please try again later."}
-        </Text>
-      </View>
-    );
-  }
 
   if (!data) {
     return (
@@ -149,12 +114,12 @@ export default function AddProduct() {
       name: "categoryId",
       label: "Category",
       placeholder: "Select Category",
-      data:
-        categories?.map((item) => ({ label: item.label, value: item.value })) ??
-        [],
+      data: categories
+        ? [{ label: categories?.title, value: categories?.id }]
+        : [],
       component: "dropdown",
       multiselect: 1,
-      className: "w-[90%] bg-base-200",
+      className: "w-[90%] bg-base-100",
       disable: true,
       error: errors.categoryId?.message,
     },
@@ -178,7 +143,6 @@ export default function AddProduct() {
       name: "productDescription",
       label: "Product Description",
       component: "editor",
-      keyboardType: "default",
       placeholder: "Offer Description",
       className: "w-[90%] bg-base-200",
       error: errors.productDescription?.message,

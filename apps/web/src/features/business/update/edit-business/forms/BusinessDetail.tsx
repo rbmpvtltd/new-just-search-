@@ -14,6 +14,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
 import type { FormReferenceDataType, UserBusinessListingType } from "..";
+import { Label } from "@/components/ui/label";
 
 type BusinessDetailSchema = z.infer<typeof businessDetailSchema>;
 export default function BusinessDetail({
@@ -41,7 +42,11 @@ export default function BusinessDetail({
       specialities: businessListing?.specialities ?? "",
       homeDelivery: businessListing?.homeDelivery ?? "",
       description: businessListing?.description ?? "",
-      
+      image1: businessListing?.businessPhotos[0]?.photo ?? "",
+      image2: businessListing?.businessPhotos[1]?.photo ?? "",
+      image3: businessListing?.businessPhotos[2]?.photo ?? "",
+      image4: businessListing?.businessPhotos[3]?.photo ?? "",
+      image5: businessListing?.businessPhotos[4]?.photo ?? "",
     },
   });
 
@@ -130,67 +135,86 @@ export default function BusinessDetail({
       label: "About Business",
       name: "description",
       placeholder: "About Business",
-      component: "textarea",
+      component: "editor",
       required: false,
       error: errors.description?.message,
     },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "Shop Images",
-    //   name: "",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage2",
-    //   component: "input",
-    //   className: "mt-5",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage3",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage4",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
-    // {
-    //   control,
-    //   type: "",
-    //   label: "",
-    //   name: "shopImage5",
-    //   component: "input",
-    //   required: false,
-    //   error: "",
-    // },
+  ];
+
+  const formFields2: FormFieldProps<BusinessDetailSchema>[] = [
+    {
+      control,
+      type: "",
+      label: "Shop Images",
+      name: "image1",
+      component: "image",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      label: "",
+      name: "image2",
+      component: "image",
+      className: "mt-5",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      label: "",
+      name: "image3",
+      component: "image",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      label: "",
+      name: "image4",
+      component: "image",
+      required: false,
+      error: "",
+    },
+    {
+      control,
+      type: "",
+      label: "",
+      name: "image5",
+      component: "image",
+      required: false,
+      error: "",
+    },
   ];
 
   const onSubmit = async (data: BusinessDetailSchema) => {
-    const file = await uploadToCloudinary([data.photo], "business");
-    setFormValue("photo", file[0] ?? "");
+    const files = await uploadToCloudinary(
+      [
+        data.photo,
+        data.image1,
+        data.image2,
+        data.image3,
+        data.image4,
+        data.image5,
+      ],
+      "business",
+    );
+
+    setFormValue("photo", files[0] ?? "");
     setFormValue("name", data.name ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
     setFormValue("subcategoryId", data.subcategoryId ?? []);
     setFormValue("specialities", data.specialities ?? "");
     setFormValue("homeDelivery", data.homeDelivery ?? "");
     setFormValue("description", data.description ?? "");
+    setFormValue("image1", files[1] ?? "");
+    setFormValue("image2", files[2] ?? "");
+    setFormValue("image3", files[3] ?? "");
+    setFormValue("image4", files[4] ?? "");
+    setFormValue("image5", files[5] ?? "");
     nextPage();
   };
   return (
@@ -202,12 +226,28 @@ export default function BusinessDetail({
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Business Contact
+              Business Details
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
-              {formFields.map((field, index) => (
-                <FormField key={field.name} {...field} />
+              {formFields.map((field) => (
+                <div
+                  key={field.name}
+                  className={
+                    field.name === "description" ? "col-span-full" : ""
+                  }
+                >
+                  <FormField {...field} />
+                </div>
+              ))}
+            </div>
+            <Label className="mt-3 gap-0 ">
+              Shop Images
+              {/* <span className="text-red-500 ">*</span> */}
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
+              {formFields2.map((field) => (
+                <FormField labelHidden key={field.name} {...field} />
               ))}
             </div>
           </div>

@@ -12,7 +12,6 @@ import {
   View,
 } from "react-native";
 import type z from "zod";
-import { da } from "zod/v4/locales";
 import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
@@ -26,10 +25,10 @@ import { useAuthStore } from "@/store/authStore";
 type AddOfferSchema = z.infer<typeof offersInsertSchema>;
 export default function AddOffer() {
   const token = useAuthStore((state) => state.token);
-  const { data, error, isLoading, isError } = useQuery(
-    trpc.businessrouter.add.queryOptions(),
-  );
+  const { data } = useQuery(trpc.offerrouter.add.queryOptions());
   const { mutate } = useMutation(trpc.offerrouter.addOffer.mutationOptions());
+  const categories = data?.categoryRecord;
+  const subCategories = data?.subcategoryRecord;
   const {
     control,
     handleSubmit,
@@ -43,7 +42,7 @@ export default function AddOffer() {
       rate: 0,
       discountPercent: 0,
       finalPrice: 0,
-      categoryId: 0,
+      categoryId: categories?.id ?? 0,
       subcategoryId: [],
       offerDescription: "",
       photo: "",
@@ -53,42 +52,6 @@ export default function AddOffer() {
       image5: "",
     },
   });
-
-  const categories = data?.getBusinessCategories.map((item: any) => {
-    return {
-      label: item.title,
-      value: item.id,
-    };
-  });
-  const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
-      categoryId: selectedCategoryId,
-    }),
-  );
-
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text className="text-gray-600 mt-3">Preparing form...</Text>
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View className="flex-1 items-center justify-center py-10 px-6">
-        <Text className="text-red-600 text-center font-semibold mb-2">
-          Something went wrong
-        </Text>
-        <Text className="text-gray-500 text-sm text-center">
-          {error.message ||
-            "Unable to load offer form. Please try again later."}
-        </Text>
-      </View>
-    );
-  }
 
   if (!data) {
     return (
@@ -146,6 +109,7 @@ export default function AddOffer() {
       className: "w-[90%] bg-base-200",
       error: errors.rate?.message,
       onValueChange: (value) => {
+        console.log("Rate Value", value);
         if (!value) return;
         setValue("finalPrice", Number(value));
       },
@@ -161,10 +125,14 @@ export default function AddOffer() {
       error: errors.discountPercent?.message,
       required: false,
       onValueChange: (value) => {
+        console.log("Value", value);
+
         if (!value) return;
         const discount = parseFloat(String(value));
         const price = parseFloat((getValues("rate") || 0).toString());
         const final = (price * (100 - discount)) / 100;
+        console.log("Final value", final);
+
         setValue("discountPercent", Number(value));
         setValue("finalPrice", parseFloat(final.toFixed(2)));
       },
@@ -184,9 +152,9 @@ export default function AddOffer() {
       name: "categoryId",
       label: "Category",
       placeholder: "Select Category",
-      data:
-        categories?.map((item) => ({ label: item.label, value: item.value })) ??
-        [],
+      data: categories
+        ? [{ label: categories.title, value: categories.id }]
+        : [],
       component: "dropdown",
       multiselect: 1,
       className: "w-[90%] bg-base-200",
@@ -274,7 +242,7 @@ export default function AddOffer() {
           ))}
         </View>
         <View className="flex-row items-center">
-          <LableText title="Offer images" className="ml-11" />
+          <LableText title="Offer images" className="ml-8" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>

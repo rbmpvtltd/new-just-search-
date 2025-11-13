@@ -71,7 +71,7 @@ function ProductCard({ product }: { product: ProductType }) {
 
         <div className="mt-4 flex gap-2">
           <Link
-            href={`/user/product/edit/${product.productSlug}`}
+            href={`/profile/product/edit/${product.productSlug}`}
             className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center gap-2"
           >
             <Pencil className="w-4 h-4" />

@@ -13,15 +13,9 @@ import {
   categories,
   subcategories,
 } from "@repo/db/src/schema/not-related.schema";
-import {
-  offerPhotos,
-  offerReviews,
-  offers,
-  offersInsertSchema,
-} from "@repo/db/src/schema/offer.schema";
+import { offerPhotos, offerReviews, offers } from "@repo/db/src/schema/offer.schema";
 import {
   productInsertSchema,
-  productPhotos,
   productReviews,
   products,
 } from "@repo/db/src/schema/product.schema";
@@ -30,7 +24,10 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
-import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
+import {
+  cloudinaryDeleteImageByPublicId,
+  cloudinaryDeleteImagesByPublicIds,
+} from "@/lib/cloudinary";
 import {
   businessProcedure,
   protectedProcedure,
@@ -44,12 +41,11 @@ const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
 
 export const businessrouter = router({
-  add: visitorProcedure.query(async () => {
+  add: visitorProcedure.query(async ({ ctx }) => {
     const getBusinessCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 1),
     });
     const getStates = await db.query.states.findMany();
-
     return {
       getBusinessCategories,
       getStates,
@@ -247,17 +243,24 @@ export const businessrouter = router({
   update: businessProcedure
     .input(businessUpdateSchema)
     .mutation(async ({ ctx, input }) => {
+      logger.info("ctx.userId", { input: input });
       const isBusinessExists = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.userId, ctx.userId),
+        with: {
+          businessPhotos: true,
+        },
       });
 
+      logger.info("INPUT", { input: input });
       if (!isBusinessExists) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Business listing not found",
         });
       }
+
+      await cloudinaryDeleteImageByPublicId(isBusinessExists?.photo ?? "");
 
       const updateBusiness = await db
         .update(schemas.business.businessListings)
@@ -297,6 +300,22 @@ export const businessrouter = router({
         });
       }
 
+      if (isBusinessExists?.businessPhotos.length > 0) {
+        const publicIds = isBusinessExists.businessPhotos
+          .map((photo) => photo.photo)
+          .filter((id): id is string => Boolean(id));
+
+        if (publicIds.length > 0) {
+          await cloudinaryDeleteImagesByPublicIds(publicIds);
+        }
+      }
+
+      await db
+        .delete(schemas.business.businessPhotos)
+        .where(
+          eq(schemas.business.businessPhotos.businessId, isBusinessExists.id),
+        );
+
       await db
         .delete(schemas.business.businessSubcategories)
         .where(
@@ -312,7 +331,7 @@ export const businessrouter = router({
         input.image3,
         input.image4,
         input.image5,
-      ].filter(Boolean); // removes empty or null values
+      ].filter(Boolean);
 
       if (allPhotos.length > 0) {
         await db.insert(schemas.business.businessPhotos).values(
@@ -681,6 +700,62 @@ export const businessrouter = router({
         .where(eq(products.id, input.productId));
       return product[0];
     }),
+
+  // singleProduct: publicProcedure
+  //   .input(z.object({ productId: z.number() }))
+  //   .query(async ({ input }) => {
+  //     const product = await db
+  //       .select({
+  //         id: products.id,
+  //         name: products.productName,
+  //         rate: products.rate,
+  //         businessId: products.businessId,
+  //         description: products.productDescription,
+  //         latitude: businessListing.latitude,
+  //         longitude: businessListing.longitude,
+  //         phone: businessListing.phoneNumber,
+  //         photos: sql<string[]>`COALESCE(
+  //           ARRAY_AGG(DISTINCT product_photos.photo)
+  //           FILTER (WHERE product_photos.id IS NOT NULL),
+  //           '{}'
+  //         )`,
+  //         shopName: sql<string | null>`COALESCE((
+  //             SELECT name FROM business_listings LIMIT 1
+  //         ), '')`,
+  //         rating: sql<
+  //           {
+  //             id: number;
+  //             created_at: string;
+  //             rating: number;
+  //             message: string;
+  //             user: string;
+  //           }[]
+  //         >`COALESCE(
+  //           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
+  //             'id', product_reviews.id,
+  //             'created_at', product_reviews.created_at,
+  //             'rating', product_reviews.rate,
+  //             'message', product_reviews.message,
+  //             'user', users.display_name
+  //           ))
+  //             FILTER (WHERE product_reviews.id IS NOT NULL),
+  //           '[]'
+  //         )`,
+  //       })
+  //       .from(products)
+  //       .leftJoin(businessListing, eq(businessListing.id, products.businessId))
+  //       .leftJoin(productReviews, eq(products.id, productReviews.productId))
+  //       .leftJoin(productPhotos, eq(products.id, productPhotos.productId))
+  //       .leftJoin(users, eq(productReviews.userId, users.id))
+  //       .groupBy(
+  //         products.id,
+  //         businessListing.latitude,
+  //         businessListing.longitude,
+  //         businessListing.phoneNumber,
+  //       )
+  //       .where(eq(products.id, input.productId));
+  //     return product[0];
+  //   }),
 
   singleOffer: publicProcedure
     .input(z.object({ offerId: z.number() }))
