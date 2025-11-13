@@ -1,10 +1,10 @@
-import { db } from "@repo/db";
 import { uploadOnCloudinary } from "@repo/cloudinary";
+import { db } from "@repo/db";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
-import { categories, subcategories } from "../db/src/schema/not-related.schema";
 import { businessListings } from "../db/src/schema/business.schema";
+import { categories, subcategories } from "../db/src/schema/not-related.schema";
 
 import {
   offerPhotos,
@@ -20,16 +20,18 @@ dotenv.config();
 
 export const offerSeed = async () => {
   await clearOfferSeed();
-  // await addOffer();
-  // await addOfferReviews();
+  await addOffer();
+  await addOfferReviews();
   await addOfferSubcategories();
 };
 
 const clearOfferSeed = async () => {
-  // await db.execute(`TRUNCATE TABLE offer_subcagtegorys RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE offer_reviews RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE offer_photos RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE offers RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE TABLE offer_subcagtegorys RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(`TRUNCATE TABLE offer_reviews RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE offer_photos RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE offers RESTART IDENTITY CASCADE;`);
   console.log("all tables cleared successfully");
 };
 

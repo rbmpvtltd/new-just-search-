@@ -56,7 +56,7 @@ export const userUpdateSchema = createUpdateSchema(profiles).extend({
 });
 
 // 2. request_delete_accounts
-export const request_accounts = pgTable("request_accounts", {
+export const account_delete_request = pgTable("account_delete_request", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
@@ -67,7 +67,7 @@ export const request_accounts = pgTable("request_accounts", {
 });
 
 export const requestAccountsInsertSchema = createInsertSchema(
-  request_accounts,
+  account_delete_request,
   {
     reason: z
       .string()

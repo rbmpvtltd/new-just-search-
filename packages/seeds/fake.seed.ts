@@ -8,14 +8,11 @@ import {
 import { productReviews } from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
 import { eq, inArray } from "drizzle-orm";
 
 const users = schemas.auth.users;
 const businessListings = schemas.business.businessListings;
 const cities = schemas.not_related.cities;
-
-dotenv.config();
 
 export const fakeSeed = async () => {
   try {
@@ -41,7 +38,7 @@ export const fakeUserSeed = async () => {
   const [fakeUser] = await db
     .select()
     .from(users)
-    .where(eq(users.email, "fake"));
+    .where(eq(users.phoneNumber, "fake"));
   return fakeUser;
 };
 

@@ -1,5 +1,6 @@
 import { db, schemas } from "@repo/db";
 import {
+  account_delete_request,
   feedbackInsertSchema,
   requestAccountsInsertSchema,
   userUpdateSchema,
@@ -134,7 +135,7 @@ export const userRouter = router({
         });
       }
 
-      await db.insert(schemas.user.request_accounts).values({
+      await db.insert(account_delete_request).values({
         reason: input.reason,
         userId: ctx.userId,
       });

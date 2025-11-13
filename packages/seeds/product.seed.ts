@@ -1,22 +1,21 @@
-import { db } from "@repo/db";
 import { uploadOnCloudinary } from "@repo/cloudinary";
-
+import { db } from "@repo/db";
+import { recentViewProducts } from "@repo/db/dist/schema/product.schema";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
-
+import { businessListings } from "../db/src/schema/business.schema";
+import {
+  categories,
+  cities,
+  subcategories,
+} from "../db/src/schema/not-related.schema";
 import {
   productPhotos,
   productReviews,
   productSubCategories,
   products,
 } from "../db/src/schema/product.schema";
-import {
-  categories,
-  cities,
-  subcategories,
-} from "../db/src/schema/not-related.schema";
-import { businessListings } from "../db/src/schema/business.schema";
 import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
@@ -24,18 +23,18 @@ import { clouadinaryFake } from "./seeds";
 dotenv.config();
 export const productSeed = async () => {
   await clearAllTablesBusiness();
-  // await addProduct();
-  // await addProductReviews();
-  // await addRecentViewProduct();
-  // await addProductSubCategroy();
+  await addProduct();
+  await addProductReviews();
+  await addRecentViewProduct();
+  await addProductSubCategroy();
 };
 
 export const clearAllTablesBusiness = async () => {
-  // await db.execute(
-  //   `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
-  // );
-  // await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
 
@@ -88,7 +87,7 @@ export const addProduct = async () => {
         const uploaded = await uploadOnCloudinary(
           liveProductsImageUrl,
           "Products",
-          clouadinaryFake
+          clouadinaryFake,
         );
         const photoUrl = uploaded;
 
@@ -189,28 +188,30 @@ const addProductSubCategroy = async () => {
   console.log("succcessfully seed of product_subcategory");
 };
 
-//  NOTE: recent_views_listings TABLE NOT FOUND
-// // 5. recent_views_product
-// const addRecentViewProduct = async () => {
-//   const [recentViews]: any[] = await sql.execute(
-//     "SELECT * FROM recent_views_listings",
-//   );
-//   for (const row of recentViews) {
-//     const [Product] = await db.select().from(products).where(eq(products.id, row.listing_id))
-//     if (!Product) {
-//       console.log("Product not found", row.id);
-//       continue;
-//     }
+// NOTE: recent_views_listings TABLE NOT FOUND
+// 5. recent_views_product
+const addRecentViewProduct = async () => {
+  const [recentViews]: any[] = await sql.execute(
+    "SELECT * FROM recent_views_listings",
+  );
+  for (const row of recentViews) {
+    const [Product] = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, row.listing_id));
+    if (!Product) {
+      console.log("Product not found", row.id);
+      continue;
+    }
 
-//     await db.insert(recentViewProducts).values({
-//       productId: Product.id,
-//       device: row.device,
-//       browser: row.browser,
-//       operatingSystem: row.operating_system,
-//       createdAt: row.created_at,
-//       updatedAt: row.updated_at,
-//     }
-//     )
-//   }
-//   console.log("succcessfully seed of recent_views_listings")
-// };
+    await db.insert(recentViewProducts).values({
+      productId: Product.id,
+      device: row.device,
+      browser: row.browser,
+      operatingSystem: row.operating_system,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    });
+  }
+  console.log("succcessfully seed of recent_views_listings");
+};

@@ -8,13 +8,11 @@ const config = {
   api_secret: process.env.CLOUDINARY_API_SECRET,
 };
 
-console.log("config =====================>",config)
-
 cloudinary.config(config);
 
 export default cloudinary;
 
-import fs, { unlinkSync } from "fs";
+// import fs, { unlinkSync } from "fs";
 
 const uploadOnCloudinary = async (
   localFilePath: string,
@@ -24,11 +22,11 @@ const uploadOnCloudinary = async (
   // if (!localFilePath) return null;
   try {
     if (test) {
-      const customName = `Banner/qqnai91zwck6df4mn8zs`;
+      const customName = `Banner/cbycmehjeetyxbuxc6ie`;
       const result = {
         public_id: customName,
       };
-      
+
       return result.public_id;
     }
 
@@ -37,7 +35,7 @@ const uploadOnCloudinary = async (
       folder: folderName,
     });
 
-    console.log("result id in cloudinary.ts",result)
+    console.log("result id in cloudinary.ts", result);
 
     return result.public_id;
 
@@ -46,7 +44,8 @@ const uploadOnCloudinary = async (
   } catch (err) {
     console.log("errr", err);
 
-    fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
+    // Uncomment if you are using localFilePath not url
+    // fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
     throw new Error(`Cloudinary upload failed: ${err}`);
   }
 };

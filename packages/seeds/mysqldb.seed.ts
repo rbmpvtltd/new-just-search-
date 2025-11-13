@@ -9,5 +9,4 @@ const connect = {
   connectionLimit: 10,
   queueLimit: 0,
 };
-console.log("data is", connect);
 export const sql = mysql.createPool(connect);

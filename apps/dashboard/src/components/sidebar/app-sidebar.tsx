@@ -53,26 +53,11 @@ const data = {
       items: [
         {
           title: "Hire Listing",
-          url: "/listing/hire",
+          url: "/hire",
         },
         {
           title: "Business Listing",
-          url: "/listing/business",
-        },
-      ],
-    },
-    {
-      title: "Manage Customer",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "Listing",
-          url: "/customer/listing",
-        },
-        {
-          title: "Visitor",
-          url: "/customer/visitor",
+          url: "/business",
         },
       ],
     },
@@ -85,8 +70,18 @@ const data = {
       icon: IconDatabase,
     },
     {
+      name: "Manage Customer",
+      url: "/users",
+      icon: IconDatabase,
+    },
+    {
       name: "Offer",
       url: "/offer",
+      icon: IconDatabase,
+    },
+    {
+      name: "Product",
+      url: "/product",
       icon: IconDatabase,
     },
     {

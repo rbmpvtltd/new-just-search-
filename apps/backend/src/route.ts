@@ -1,27 +1,29 @@
+import { adminBannerRouter } from "./dashboard-features/(banners-plan)/banners/banners.admin.routes";
+import { adminBusinessRouter } from "./dashboard-features/(business-hire)/business.admin.routes";
+import { adminHireRouter } from "./dashboard-features/(business-hire)/hire.admin.routes";
+import { adminCategoryRouter } from "./dashboard-features/(category)/category.admin.routes";
+import { adminSubcategoryRouter } from "./dashboard-features/(category)/subcategory.admin.routes";
+import { adminDeleteRequestRouter } from "./dashboard-features/(users)/deleteRequest.admin.routes";
+import { adminFeedbackRouter } from "./dashboard-features/(users)/feedback.admin.routes";
+import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
 import { authRouter } from "./features/auth/auth.router";
-import { adminBannerRouter } from "./features/banners/banners.admin.routes";
 import { bannerRouter } from "./features/banners/banners.routes";
-import { adminBusinessRouter } from "./features/business/business.admin.routes";
 import { businessrouter } from "./features/business/business.router";
 import { chatRouter } from "./features/chats/test.routes";
 import { cloudinarySignature } from "./features/cloudinary/cloudinary.route";
-import { adminHireRouter } from "./features/hire/hire.admin.routes";
 import { hirerouter } from "./features/hire/hire.router";
-import { adminCategoryRouter } from "./features/mainContent/category.admin.routes";
 import { categoryRouter } from "./features/mainContent/category.route";
-import { adminSubcategoryRouter } from "./features/mainContent/subcategory.admin.routes";
 import { offerrouter } from "./features/offer/offer.router";
 import { productrouter } from "./features/product/product.router";
 import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
 // import { cloudinaryRouter } from "./lib/cloudinary";
-import { router } from "./utils/trpc";
+import { mergeRouters, router } from "./utils/trpc";
 
-export const appRouter = router({
+const usersRouter = router({
   auth: authRouter,
   banners: bannerRouter,
-  adminBanner: adminBannerRouter,
   cloudinarySignature,
   chatRouter,
   hirerouter,
@@ -29,16 +31,22 @@ export const appRouter = router({
   userRouter: userRouter,
   businessrouter,
   categoryRouter,
-  adminCategoryRouter,
   subcategoryRouter,
   offerrouter,
   productrouter,
+});
+
+const adminRouter = router({
+  adminBannerRouter,
+  adminCategoryRouter,
   adminSubcategoryRouter,
   adminBusinessRouter,
   adminHireRouter,
-  // cloudinary: cloudinaryRouter,
-  // test: testRouter,
-  // test : chatRouter,
+  adminUsersRouter,
+  adminDeleteRequestRouter,
+  adminFeedbackRouter,
 });
+
+export const appRouter = mergeRouters(usersRouter, adminRouter);
 
 export type AppRouter = typeof appRouter;
