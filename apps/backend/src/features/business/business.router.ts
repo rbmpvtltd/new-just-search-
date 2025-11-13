@@ -13,7 +13,7 @@ import {
   categories,
   subcategories,
 } from "@repo/db/src/schema/not-related.schema";
-import { offerPhotos, offers } from "@repo/db/src/schema/offer.schema";
+import { offerPhotos, offerReviews, offers } from "@repo/db/src/schema/offer.schema";
 import {
   productInsertSchema,
   productReviews,
@@ -163,7 +163,7 @@ export const businessrouter = router({
           landmark: input.landmark,
           pincode: input.pincode,
           state: input.state,
-          cityId: Number(input.city),
+          city: Number(input.city),
           days: input.days,
           fromHour: input.fromHour,
           toHour: input.toHour,
@@ -278,7 +278,7 @@ export const businessrouter = router({
           landmark: input.landmark,
           pincode: input.pincode,
           state: input.state,
-          cityId: Number(input.city),
+          city: Number(input.city),
           // schedules: input.schedules,
           days: input.days,
           fromHour: input.fromHour,
@@ -375,7 +375,7 @@ export const businessrouter = router({
         message: "Business not found",
       });
     }
-    if (!business?.cityId) {
+    if (!business?.city) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "City not found",
@@ -383,7 +383,7 @@ export const businessrouter = router({
     }
 
     const cityRecord = await db.query.cities.findFirst({
-      where: (cities, { eq }) => eq(cities.id, business.cityId),
+      where: (cities, { eq }) => eq(cities.id, business.city),
       columns: { id: true, city: true },
     });
 

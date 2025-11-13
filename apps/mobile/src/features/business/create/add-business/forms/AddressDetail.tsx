@@ -39,7 +39,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
       longitude: formValue?.longitude ?? "",
       pincode: formValue?.pincode ?? "",
       state: formValue.state ?? 0,
-      cityId: formValue?.cityId ?? 0,
+      city: formValue?.city ?? 0,
     },
   });
   const states = data?.getStates.map((item) => {
@@ -58,7 +58,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
 
   if (!cities || cities?.length <= 0) {
     const cityId = locationCityName.current;
-    setValue("cityId", cityId);
+    setValue("city", Number(cityId));
   }
 
   const onSubmit = (data: AddressDetailSchema) => {
@@ -70,7 +70,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
     setFormValue("longitude", data.longitude ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state);
-    setFormValue("cityId", data.cityId);
+    setFormValue("city", data.city);
     nextPage();
   };
 
@@ -156,13 +156,13 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
     },
     {
       control,
-      name: "cityId",
+      name: "city",
       label: "City",
       placeholder: "Enter your City",
       component: "dropdown",
       className: "w-[90%] bg-base-200",
       data: cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: errors.cityId?.message,
+      error: errors.city?.message,
     },
   ];
   return (
@@ -207,7 +207,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
               setValue("latitude", String(lat));
               setValue("longitude", String(lng));
               setValue("pincode", pincode);
-              // setValue("cityId", city);
+              // setValue("city", city);
               setValue("state", state);
               setValue("area", area);
               setValue("buildingName", building_name);

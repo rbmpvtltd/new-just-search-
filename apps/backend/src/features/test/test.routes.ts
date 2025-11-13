@@ -1,147 +1,91 @@
+import { EventEmitter, on } from "node:events";
+import { db, schemas } from "@repo/db";
+import { conversations, messages } from "@repo/db/dist/schema/chat.schema";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
-import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
+import { publicProcedure, router, visitorProcedure } from "@/utils/trpc";
 
+const ee = new EventEmitter();
 export const testRouter = router({
-  test: publicProcedure
+  onMessage: visitorProcedure
+    .input(z.object({ userId: z.string() }))
+    .subscription(async function* ({ input }) {
+      for await (const [msg] of on(ee, `message${input.userId}`)) {
+        yield msg;
+      }
+    }),
+
+  sendMessage: visitorProcedure
     .input(
       z.object({
-        error: z.boolean(),
+        userId: z.string(),
+        message: z.string(),
       }),
     )
-    .query(async ({ input }) => {
-      console.log("--- backing is running ---", input.error);
-      if (input.error) {
+    .mutation(async ({ ctx, input }) => {
+      const user = await db.query.users.findFirst({
+        where: (user, { eq }) => eq(user.id, ctx.userId),
+      });
+
+      if (!user) {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "you don't have token",
+          code: "UNAUTHORIZED",
+          message: "User not found",
         });
       }
+      // check if conversation aleary exists
 
-      console.log("--- backing return hi ---");
-      return "hi";
+      let conversation = await db.query.conversations.findFirst({
+        where: (conversations, { or, and, eq }) =>
+          or(
+            and(
+              eq(conversations.participantOneId, ctx.userId),
+              eq(conversations.participantTwoId, Number(input.userId)),
+            ),
+            and(
+              eq(conversations.participantOneId, Number(input.userId)),
+              eq(conversations.participantTwoId, ctx.userId),
+            ),
+          ),
+      });
+      if (!conversation) {
+        const inserted = await db
+          .insert(schemas.chat.conversations)
+          .values({
+            participantOneId: user.id ?? 1,
+            participantTwoId: Number(input.userId) ?? 1,
+          })
+          .returning({ id: schemas.chat.conversations.id });
+
+        conversation = inserted[0];
+      }
+      const [newMessage] = await db
+        .insert(schemas.chat.messages)
+        .values({
+          conversationId: conversation?.id,
+          senderId: ctx.userId,
+          message: input.message,
+        })
+        .returning();
+      ee.emit(`message${input.userId}`, { text: newMessage }); //receiver
+      ee.emit(`message${user.id}`, { text: newMessage }); //sender
+      return {
+        success: true,
+        message: "Message sent successfully",
+        data: conversation,
+      };
     }),
-  addImage: protectedProcedure.query(async ({ ctx }) => {
-    return;
+
+  conversationList: visitorProcedure.query(async ({ ctx }) => {
+    const conversations = await db.query.conversations.findMany({
+      where: (conversation, { eq }) =>
+        eq(conversation.participantOneId, ctx.userId) ||
+        eq(conversation.participantTwoId, ctx.userId),
+    });
+    return conversations;
   }),
-  table: publicProcedure
-    .input(
-      z.object({
-        pagination: z.object({
-          pageIndex: z.number(),
-          pageSize: z.number(),
-        }),
-      }),
-    )
-    .query(async ({ input }) => {
-      if (input.pagination.pageSize === 20) {
-        return {
-          pageCount: 1,
-          data: [...data1, ...data2],
-          totalCount: 20,
-          totalPages: 1,
-        };
-      }
-      if (input.pagination.pageIndex === 1) {
-        return {
-          pageCount: 2,
-          data: data2,
-          totalCount: 20,
-          totalPages: 2,
-        };
-      }
-      if (input.pagination.pageIndex === 0) {
-        return {
-          pageCount: 1,
-          data: data1,
-          totalCount: 20,
-          totalPages: 2,
-        };
-      }
-    }),
-});
 
-const data2 = [
-  {
-    id: "11",
-    title: "Hello-World",
-  },
-  {
-    id: "12",
-    title: "World-Acot",
-  },
-  {
-    id: "13",
-    title: "Goodbye-10",
-  },
-  {
-    id: "14",
-    title: "World-Store",
-  },
-  {
-    id: "15",
-    title: "Goodbye2",
-  },
-  {
-    id: "16",
-    title: "Goodbye1",
-  },
-  {
-    id: "17",
-    title: "Hello10",
-  },
-  {
-    id: "18",
-    title: "Mera12",
-  },
-  {
-    id: "19",
-    title: "Naasdfm",
-  },
-  {
-    id: "20",
-    title: "Ranjeet1",
-  },
-];
-const data1 = [
-  {
-    id: "1",
-    title: "Hello",
-  },
-  {
-    id: "2",
-    title: "World",
-  },
-  {
-    id: "3",
-    title: "Goodbye",
-  },
-  {
-    id: "4",
-    title: "World",
-  },
-  {
-    id: "5",
-    title: "Goodbye",
-  },
-  {
-    id: "6",
-    title: "Goodbye",
-  },
-  {
-    id: "7",
-    title: "Hello",
-  },
-  {
-    id: "8",
-    title: "Mera",
-  },
-  {
-    id: "9",
-    title: "Naam",
-  },
-  {
-    id: "10",
-    title: "Ranjeet",
-  },
-];
+  getMessageList: visitorProcedure.query(async({ctx, input})=>{
+    
+  })
+});

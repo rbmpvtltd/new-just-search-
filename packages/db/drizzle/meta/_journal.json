@@ -8,6 +8,13 @@
       "when": 1762502736075,
       "tag": "0000_sour_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763026970175,
+      "tag": "0001_pale_turbo",
+      "breakpoints": true
     }
   ]
 }

@@ -29,10 +29,10 @@ export default function AddProduct({
     trpc.productrouter.addProduct.mutationOptions(),
   );
   const categories = formReferenceData?.categoryRecord;
+  const subCategories = formReferenceData?.subcategoryRecord;
   const {
     control,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<AddProductSchema>({
     resolver: zodResolver(productInsertSchema),
@@ -49,13 +49,6 @@ export default function AddProduct({
       subcategoryId: [],
     },
   });
-
-  const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories, isLoading } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
-      categoryId: selectedCategoryId,
-    }),
-  );
 
   const formFields: FormFieldProps<AddProductSchema>[] = [
     {
@@ -93,7 +86,6 @@ export default function AddProduct({
       name: "subcategoryId",
       placeholder: "Sub Category",
       component: "multiselect",
-      loading: isLoading,
       options:
         subCategories?.map((item) => ({
           label: item.name,

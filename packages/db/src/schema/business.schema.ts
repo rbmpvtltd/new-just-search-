@@ -143,7 +143,7 @@ export const addressDetailSchema = businessInsertSchema.pick({
   longitude: true,
   pincode: true,
   state: true,
-  cityId: true,
+  city: true,
 });
 
 export const businessTimingSchema = businessInsertSchema.pick({

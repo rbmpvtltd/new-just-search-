@@ -30,6 +30,7 @@ export default function EditOffer({
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.offerrouter.update.mutationOptions());
   const categories = formReferenceData?.categoryRecord;
+  const subCategories = formReferenceData?.subcategoryRecord;
   const {
     control,
     handleSubmit,
@@ -54,13 +55,6 @@ export default function EditOffer({
       ),
     },
   });
-
-  const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories, isLoading } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
-      categoryId: selectedCategoryId,
-    }),
-  );
 
   const formFields: FormFieldProps<EditOfferSchema>[] = [
     {
@@ -117,7 +111,6 @@ export default function EditOffer({
       name: "subcategoryId",
       placeholder: "Sub Category",
       component: "multiselect",
-      loading: isLoading,
       options:
         subCategories?.map((item) => ({
           label: item.name,

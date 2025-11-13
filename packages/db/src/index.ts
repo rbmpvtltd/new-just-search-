@@ -12,6 +12,7 @@ const pool = new Pool({
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as auth from "./schema/auth.schema";
 import * as business from "./schema/business.schema";
+import * as chat from "./schema/chat.schema";
 import * as hire from "./schema/hire.schema";
 import * as not_related from "./schema/not-related.schema";
 import * as offer from "./schema/offer.schema";
@@ -37,6 +38,7 @@ export const schemas = {
   plan,
   product,
   user,
+  chat,
 };
 
 export const db = drizzle({
@@ -50,6 +52,7 @@ export const db = drizzle({
     ...plan,
     ...product,
     ...user,
+    ...chat,
   },
 });
 
