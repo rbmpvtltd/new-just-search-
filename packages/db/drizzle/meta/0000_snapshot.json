@@ -1,5 +1,5 @@
 {
-  "id": "ad17bf4c-2248-420e-a754-3a8a504d368d",
+  "id": "61edf2c6-247c-421b-8756-e5be395d0185",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -264,10 +264,10 @@
         },
         "status": {
           "name": "status",
-          "type": "boolean",
+          "type": "status",
           "primaryKey": false,
           "notNull": false,
-          "default": true
+          "default": "'Pending'"
         },
         "owner_number": {
           "name": "owner_number",
@@ -2533,10 +2533,10 @@
         },
         "status": {
           "name": "status",
-          "type": "boolean",
+          "type": "status",
           "primaryKey": false,
-          "notNull": true,
-          "default": true
+          "notNull": false,
+          "default": "'Pending'"
         },
         "created_at": {
           "name": "created_at",
@@ -3305,6 +3305,15 @@
         "salesman",
         "franchises",
         "admin"
+      ]
+    },
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "Pending",
+        "Approved",
+        "Rejected"
       ]
     },
     "public.hire_gender": {
