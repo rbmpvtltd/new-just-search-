@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
+  pgEnum,
   pgTable,
   serial,
   text,
@@ -13,6 +14,10 @@ import z from "zod";
 import { users } from "./auth.schema";
 import { businessListings } from "./business.schema";
 import { categories, subcategories } from "./not-related.schema";
+import { Status } from "./business.schema";
+
+export const productStatus = pgEnum("status", Status);
+
 
 // 1.products
 export const products = pgTable("products", {
@@ -85,7 +90,7 @@ export const productReviews = pgTable("product_reviews", {
 
   rate: integer("rate"),
   view: boolean("view").default(false).notNull(),
-  status: boolean("status").default(true).notNull(),
+  status: productStatus("status").default("Pending"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -6,12 +6,13 @@ import {
   businessSubcategories,
 } from "@repo/db/dist/schema/business.schema";
 import { productReviews } from "@repo/db/dist/schema/product.schema";
+import { businessListings, listingStatus } from "@repo/db/src/schema/business.schema";
 import { logger } from "@repo/logger";
 import bcrypt from "bcryptjs";
 import { eq, inArray } from "drizzle-orm";
 
 const users = schemas.auth.users;
-const businessListings = schemas.business.businessListings;
+// const businessListings = schemas.business.businessListings;
 const cities = schemas.not_related.cities;
 
 export const fakeSeed = async () => {
@@ -241,9 +242,9 @@ const seedFakeBusiness = async (userId: number) => {
         landmark: "fake",
         pincode: "342001",
         state: city.stateId,
-        city: city.id,
-        schedules: {},
-        status: true,
+        cityId: city.id,
+        // schedules: {},
+        status: "Approved",
         email: "fake@example.com",
         contactPerson: "fake",
         ownerNumber: "1234567890",

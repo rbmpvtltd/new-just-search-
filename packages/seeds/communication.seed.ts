@@ -1,7 +1,7 @@
 // import dotenv from "dotenv";
 // import { eq } from "drizzle-orm";
-// import { db } from "../index";
-// import { users } from "../schema/auth.schema";
+// import { db } from "@repo/db";
+// import { users } from "@repo/db/src/schema/auth.schema";
 // import { sql } from "./mysqldb.seed";
 
 // dotenv.config();
@@ -25,11 +25,12 @@
 //       continue;
 //     }
 
-//     const userReceiver = await 
+//     const userReceiver = await sql.execute("SELECT * FROM user_subscriptions")
 //     if (!userReceiver) {
 //       console.log("userReceiver not found", row.id);
 //       continue;
 //     }
+//     console.log(userReceiver)
 
 //     const chatMessage = {
 //       mysql_id: row.id,

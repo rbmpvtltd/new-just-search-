@@ -14,15 +14,15 @@ dotenv.config();
 
 export const planSeed = async () => {
   await clearAllTablesBusiness();
-  // await addplans();
+  await addplans();
   await addtransactions();
   await addUserSubscriptions();
 };
 
 export const clearAllTablesBusiness = async () => {
   await db.execute(`TRUNCATE  TABLE transactions RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE plan_attributes RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE plans RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE plan_attributes RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE plans RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };

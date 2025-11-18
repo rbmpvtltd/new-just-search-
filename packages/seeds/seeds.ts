@@ -1,24 +1,24 @@
 import { seedRequestAccounts } from "./account_delete_request.seed";
 import { businessSeed } from "./business.seed";
-// import { communicationSeed } from "./communication.seed";
 import { fakeSeed } from "./fake.seed";
-import { feedbackseed } from "./feedback.seed";
 import { hireSeed } from "./hires.seeds";
 // import { sql } from "./mysqldb.seed";
 import { notRelated } from "./notrelated.seed";
 import { offerSeed } from "./offer.seed";
-// import { planSeed } from "./plan.seed";
+import { planSeed } from "./plan.seed";
 import { productSeed } from "./product.seed";
+import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
+import { feedbackseed } from "./feedback.seed";
 
 export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
 (async () => {
   try {
     // Postgres seeding
-    // await notRelated();
-    // await userSeed();
-    // await fakeSeed();
+    // await notRelated(); // NOTE: complete by clouadinaryFake = true on live db
+    // await userSeed(); // NOTE: complete by clouadinaryFake = true on live db
+    // await fakeSeed(); // NOTE: complete by clouadinaryFake = true on live db
     // await businessSeed();
     // await hireSeed();
     // await productSeed();
@@ -26,8 +26,6 @@ export const dummyImageUrl = "dummyImageUrl";
     // await feedbackseed();
     // await seedRequestAccounts();
     // await planSeed();
-    // await communicationSeed();
-    // await referSeed();
 
     console.log("✅ All seeds inserted successfully");
 

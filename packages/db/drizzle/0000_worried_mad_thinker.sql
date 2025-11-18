@@ -1,4 +1,5 @@
 CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin');--> statement-breakpoint
+CREATE TYPE "public"."status" AS ENUM('Pending', 'Approved', 'Rejected');--> statement-breakpoint
 CREATE TYPE "public"."hire_gender" AS ENUM('Male', 'Female', 'Others');--> statement-breakpoint
 CREATE TYPE "public"."hire_job_duration" AS ENUM('Day', 'Week', 'Month', 'Year');--> statement-breakpoint
 CREATE TYPE "public"."hire_job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
@@ -45,7 +46,7 @@ CREATE TABLE "business_listings" (
 	"from_hour" varchar(255),
 	"to_hour" varchar(255),
 	"contact_person" varchar(255),
-	"status" boolean DEFAULT true,
+	"status" "status" DEFAULT 'Pending',
 	"owner_number" varchar,
 	"phone_number" varchar,
 	"whatsapp_no" varchar,
@@ -382,7 +383,7 @@ CREATE TABLE "product_reviews" (
 	"message" text NOT NULL,
 	"rate" integer,
 	"view" boolean DEFAULT false NOT NULL,
-	"status" boolean DEFAULT true NOT NULL,
+	"status" "status" DEFAULT 'Pending',
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );

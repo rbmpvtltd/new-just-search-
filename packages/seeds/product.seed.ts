@@ -148,7 +148,7 @@ const addProductReviews = async () => {
       message: row.message,
       rate: row.rate,
       view: row.view,
-      status: Boolean(row.status),
+      status: "Pending",
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });

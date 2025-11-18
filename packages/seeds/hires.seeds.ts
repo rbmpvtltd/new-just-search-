@@ -33,7 +33,7 @@ const cleardataofhire = async () => {
   //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
   // );
   // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
-  console.log("all tables clear successfully")
+  // console.log("all tables clear successfully")
 };
 
 export const addHire = async () => {
@@ -124,11 +124,15 @@ export const addHire = async () => {
     }
 
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
-    const uploaded =
-      row.photo &&
-      (await uploadOnCloudinary(liveHireImageUrl, "Hire", clouadinaryFake));
-
-    const profilePhotoUrl = uploaded?.secure_url;
+    let hireListingPhoto: string | null = null;
+    if (row.photo) {
+      hireListingPhoto = await uploadOnCloudinary(
+        liveHireImageUrl,
+        "Banner",
+        clouadinaryFake,
+      );
+    }
+     
 
     // console.log("=====");
     console.log("createUser-------------------", createUser);
@@ -171,7 +175,7 @@ export const addHire = async () => {
         state: row.state,
         // city: city!.id,
         schedules: JSON.stringify(row.schedules),
-        photo: profilePhotoUrl,
+        photo: hireListingPhoto ?? "",
         isFeature: row.is_feature === 1,
         status: true,
         website: row.website,
@@ -203,9 +207,9 @@ export const addHire = async () => {
         relocate: row.relocate,
         availability: row.availability,
         idProof: row.id_proof,
-        idProofPhoto: profilePhotoUrl,
+        idProofPhoto: hireListingPhoto,
         coverLetter: row.cover_letter,
-        resumePhoto: profilePhotoUrl,
+        resumePhoto: hireListingPhoto,
         aboutYourself: row.about_yourself,
       });
 
