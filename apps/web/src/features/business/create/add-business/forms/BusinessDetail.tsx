@@ -56,13 +56,11 @@ export default function BusinessDetail({
     };
   });
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories, isLoading } = useQuery({
-    ...trpc.businessrouter.getSubCategories.queryOptions({
+  const { data: subCategories, isLoading } = useQuery(
+    trpc.businessrouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
-    enabled: !!selectedCategoryId,
-    placeholderData: (prev) => prev,
-  });
+  );
 
   const formFields: FormFieldProps<BusinessDetailSchema>[] = [
     {

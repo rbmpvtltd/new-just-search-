@@ -1,91 +1,56 @@
-import { EventEmitter, on } from "node:events";
-import { db, schemas } from "@repo/db";
-import { conversations, messages } from "@repo/db/dist/schema/chat.schema";
-import { TRPCError } from "@trpc/server";
+import { tracked } from "@trpc/server";
+import { EventEmitter, on } from "events";
 import z from "zod";
-import { publicProcedure, router, visitorProcedure } from "@/utils/trpc";
+import { publicProcedure, router } from "@/utils/trpc";
 
 const ee = new EventEmitter();
-export const testRouter = router({
-  onMessage: visitorProcedure
-    .input(z.object({ userId: z.string() }))
-    .subscription(async function* ({ input }) {
-      for await (const [msg] of on(ee, `message${input.userId}`)) {
-        yield msg;
-      }
-    }),
 
-  sendMessage: visitorProcedure
+export const testRouter = router({
+  onPostAdd: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
-        message: z.string(),
+        // lastEventId is the last event id that the client has received
+        // On the first call, it will be whatever was passed in the initial setup
+        // If the client reconnects, it will be the last event id that the client received
+        // from : z.string(),
+        // to:z.string(),
+        lastEventId: z.string().nullish().optional(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
-      const user = await db.query.users.findFirst({
-        where: (user, { eq }) => eq(user.id, ctx.userId),
-      });
-
-      if (!user) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not found",
-        });
+    .subscription(async function* (opts) {
+      if (opts?.input?.lastEventId) {
+        // [...] get the posts since the last event id and yield them
       }
-      // check if conversation aleary exists
-
-      let conversation = await db.query.conversations.findFirst({
-        where: (conversations, { or, and, eq }) =>
-          or(
-            and(
-              eq(conversations.participantOneId, ctx.userId),
-              eq(conversations.participantTwoId, Number(input.userId)),
-            ),
-            and(
-              eq(conversations.participantOneId, Number(input.userId)),
-              eq(conversations.participantTwoId, ctx.userId),
-            ),
-          ),
-      });
-      if (!conversation) {
-        const inserted = await db
-          .insert(schemas.chat.conversations)
-          .values({
-            participantOneId: user.id ?? 1,
-            participantTwoId: Number(input.userId) ?? 1,
-          })
-          .returning({ id: schemas.chat.conversations.id });
-
-        conversation = inserted[0];
+      for await (const [data] of on(ee, "send", { signal: opts.signal })) {
+        const payload = data;
+        console.log("data in server from websocket is ==========>", data);
+        // tracking the post id ensures the client can reconnect at any time and get the latest events this id
+        yield tracked(payload.id, payload);
       }
-      const [newMessage] = await db
-        .insert(schemas.chat.messages)
-        .values({
-          conversationId: conversation?.id,
-          senderId: ctx.userId,
-          message: input.message,
-        })
-        .returning();
-      ee.emit(`message${input.userId}`, { text: newMessage }); //receiver
-      ee.emit(`message${user.id}`, { text: newMessage }); //sender
-      return {
-        success: true,
-        message: "Message sent successfully",
-        data: conversation,
-      };
     }),
+  sendPost: publicProcedure
+    .input(
+      z.object({
+        content: z.string(),
+        author: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const newPost = {
+        id: Date.now().toString(),
+        author: input.author,
+        content: input.content,
+      };
 
-  conversationList: visitorProcedure.query(async ({ ctx }) => {
-    const conversations = await db.query.conversations.findMany({
-      where: (conversation, { eq }) =>
-        eq(conversation.participantOneId, ctx.userId) ||
-        eq(conversation.participantTwoId, ctx.userId),
-    });
-    return conversations;
-  }),
+      ee.emit("send", {
+        id: newPost.id,
+        author: newPost.author,
+        content: newPost.content,
+        timestamp: new Date().toISOString(),
+      });
 
-  getMessageList: visitorProcedure.query(async({ctx, input})=>{
-    
-  })
+      console.log("Post sent ============>", newPost);
+
+      return newPost;
+    }),
 });

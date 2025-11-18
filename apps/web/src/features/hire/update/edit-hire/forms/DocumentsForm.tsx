@@ -102,7 +102,7 @@ export default function DocumentsForm({
     {
       control,
       type: "",
-      label: "",
+      label: "Id Proof Photo",
       name: "idProofPhoto",
       placeholder: "Upload your photo",
       component: "image",

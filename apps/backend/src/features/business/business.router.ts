@@ -16,6 +16,7 @@ import {
 import { offerPhotos, offerReviews, offers } from "@repo/db/src/schema/offer.schema";
 import {
   productInsertSchema,
+  productPhotos,
   productReviews,
   products,
 } from "@repo/db/src/schema/product.schema";

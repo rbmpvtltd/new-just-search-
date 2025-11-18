@@ -1,30 +1,45 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { OutputTrpcType } from "@/trpc/type";
-import { FaPhoneAlt } from "react-icons/fa";
-import { MdLocationPin } from "react-icons/md";
-import { FaWhatsappSquare } from "react-icons/fa";
-import { IoChatbubbleEllipses, IoMail } from "react-icons/io5";
-import { Button } from "@/components/ui/button";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FaPhoneAlt, FaRegCalendarAlt, FaWhatsappSquare } from "react-icons/fa";
+import { IoChatbubbleEllipses, IoMail } from "react-icons/io5";
+import { MdLocationPin } from "react-icons/md";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import GoMap from "@/components/ui/Map";
 import Rating from "@/components/ui/Rating";
-import { FaRegCalendarAlt } from "react-icons/fa";
-import Link from "next/link";
+import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
+import type { OutputTrpcType } from "@/trpc/type";
 
 type SingleShopType = OutputTrpcType["businessrouter"]["singleShop"] | null;
 
 export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
-  // const schedule = Object.entries(singleShop?.schedule ?? {});
+  const trpc = useTRPC();
   const latitude = Number(singleShop?.latitude?.split(",").shift());
   const longitude = Number(singleShop?.longitude?.split(",").pop());
 
   const handleClick = () => {
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
     window.open(googleMapsUrl, "_blank"); // opens in new tab
+  };
+
+  const router = useRouter();
+  const { mutateAsync: createConversation, isPending } = useMutation(
+    trpc.chat.createConversation.mutationOptions(),
+  );
+  console.log("single sho[", singleShop);
+
+  const handleChat = async () => {
+    const conv = await createConversation({
+      receiverId: Number(singleShop?.id),
+    });
+    // setTimeout(() => {
+    router.push(`/chat/${conv?.id}`);
+    // }, 5000);
   };
 
   return (
@@ -39,7 +54,9 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
         </TabsList>
         <TabsContent value="about" className="mt-10 sm:mt-0">
           <div className="p-4 flex flex-col gap-4">
-            <h1 className="text-2xl font-semibold line-clamp-1">{singleShop?.name}</h1>
+            <h1 className="text-2xl font-semibold line-clamp-1">
+              {singleShop?.name}
+            </h1>
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
               <p className="text-sm">
@@ -100,15 +117,14 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                 Get Direction
               </Button>
               <Button
-                onClick={() => {
-                  console.log("chatting with", singleShop?.id);
-                }}
-                type="button"
-                className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 w-full sm:w-[30%] py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
+                disabled={isPending}
+                onClick={handleChat}
+                className="whitespace-nowrap flex items-center text-white font-semibold w-full sm:w-[30%] gap-2 hover:scale-105 transition-all transform duration-300"
               >
                 <IoChatbubbleEllipses />
-                Chat Now
+                {isPending ? <Spinner /> : "Chat Now"}
               </Button>
+
               {/* </div> */}
               <Button
                 onClick={() => {
@@ -124,7 +140,10 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
           </div>
         </TabsContent>
         <TabsContent value="products" className="mt-10 sm:mt-0">
-          <ShopProducts shopId={Number(singleShop?.id)} shopName={singleShop?.name ?? ""}/>
+          <ShopProducts
+            shopId={Number(singleShop?.id)}
+            shopName={singleShop?.name ?? ""}
+          />
         </TabsContent>
         <TabsContent value="offers" className="mt-10 sm:mt-0">
           <ShopOffers
@@ -261,43 +280,51 @@ function ShopOffers({
   );
 }
 
-function ShopProducts({shopId,shopName} : {shopId:number,shopName:string}){
-    const trpc = useTRPC();
-    const {data} = useQuery(trpc.businessrouter.shopProducts.queryOptions({businessId : shopId}))
+function ShopProducts({
+  shopId,
+  shopName,
+}: {
+  shopId: number;
+  shopName: string;
+}) {
+  const trpc = useTRPC();
+  const { data } = useQuery(
+    trpc.businessrouter.shopProducts.queryOptions({ businessId: shopId }),
+  );
 
-    return (
-      <div className="p-4 flex flex-wrap justify-between gap-4">
-            {data?.length === 0 && (
-              <div className="mx-auto bg-primary-accent px-6 py-4 rounded-lg">
-                <h1 className="text-secondary">
-                  No Product Founds On {shopName} Shop
-                </h1>
-              </div>
-            )}
-            {data?.map((item, index) => (
-              <div
-                key={index.toString()}
-                className="shadow-[0_4px_12px_rgba(0,0,0,0.650)] py-4 rounded-md hover:scale-101 transform transition-all duration-300 flex flex-col justify-between items-center lg:w-[30%] md:w-[45%] w-[95%]"
-              >
-                <Link
-                  href={{
-                    pathname: `/business/singleProduct/${item.id}`,
-                  }}
-                >
-                  <Image
-                    width={200}
-                    height={400}
-                    className="rounded-md"
-                    src="https://www.justsearch.net.in/assets/images/10922718251737465572.JPEG" // TODO : change image when upload on cloudinary
-                    alt="product image"
-                  />
-                </Link>
-                <h2 className="text-center font-medium p-2">{item.name}</h2>
-                <h2 className="font-medium">
-                  ₹ <span className="text-primary">{item.price}</span>
-                </h2>
-              </div>
-            ))}
-          </div>
-    )
+  return (
+    <div className="p-4 flex flex-wrap justify-between gap-4">
+      {data?.length === 0 && (
+        <div className="mx-auto bg-primary-accent px-6 py-4 rounded-lg">
+          <h1 className="text-secondary">
+            No Product Founds On {shopName} Shop
+          </h1>
+        </div>
+      )}
+      {data?.map((item, index) => (
+        <div
+          key={index.toString()}
+          className="shadow-[0_4px_12px_rgba(0,0,0,0.650)] py-4 rounded-md hover:scale-101 transform transition-all duration-300 flex flex-col justify-between items-center lg:w-[30%] md:w-[45%] w-[95%]"
+        >
+          <Link
+            href={{
+              pathname: `/business/singleProduct/${item.id}`,
+            }}
+          >
+            <Image
+              width={200}
+              height={400}
+              className="rounded-md"
+              src="https://www.justsearch.net.in/assets/images/10922718251737465572.JPEG" // TODO : change image when upload on cloudinary
+              alt="product image"
+            />
+          </Link>
+          <h2 className="text-center font-medium p-2">{item.name}</h2>
+          <h2 className="font-medium">
+            ₹ <span className="text-primary">{item.price}</span>
+          </h2>
+        </div>
+      ))}
+    </div>
+  );
 }

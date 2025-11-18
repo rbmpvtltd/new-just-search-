@@ -81,7 +81,7 @@ export default function MyHire({ data }: { data: MyHireType }) {
 
             <div className="mt-6 flex gap-2">
               <Link
-                href={`/user/hire/edit/${data.slug}`}
+                href={`/profile/hire/edit/${data.slug}`}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center justify-center gap-2"
               >
                 <Pencil className="w-4 h-4" />

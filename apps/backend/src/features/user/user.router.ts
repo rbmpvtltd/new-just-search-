@@ -113,8 +113,8 @@ export const userRouter = router({
     }),
 
   getUserProfile: protectedProcedure.query(async ({ ctx }) => {
-    const profile = await db.query.profiles.findFirst({
-      where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
+    const profile = await db.query.users.findFirst({
+      where: (userProfiles, { eq }) => eq(userProfiles.id, ctx.userId),
     });
 
     const role = ctx.role;
