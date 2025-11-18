@@ -21,7 +21,7 @@ import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 export const hireSeed = async () => {
   await cleardataofhire();
-  await addHire();
+  // await addHire();
   // await seedRecentViewsHire();
   // await seedHireSubcategories();
   // await seedHireCategories();
@@ -32,8 +32,8 @@ const cleardataofhire = async () => {
   // await db.execute(
   //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
   // );
-  await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
-  console.log("all tables clear successfully")
+  // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  // console.log("all tables clear successfully")
 };
 
 export const addHire = async () => {

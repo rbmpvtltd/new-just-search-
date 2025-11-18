@@ -1,16 +1,15 @@
 import dotenv from "dotenv";
 import { businessSeed } from "./business.seed";
-// import { communicationSeed } from "./communication.seed";
 import { fakeSeed } from "./fake.seed";
-// import { feedbackseed } from "./feedback.seed";
 import { hireSeed } from "./hires.seeds";
 // import { sql } from "./mysqldb.seed";
 import { notRelated } from "./notrelated.seed";
 import { offerSeed } from "./offer.seed";
-// import { planSeed } from "./plan.seed";
+import { planSeed } from "./plan.seed";
 import { productSeed } from "./product.seed";
-// import { seedRequestAccounts } from "./requestacount.seed";
+import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
+import { feedbackseed } from "./feedback.seed";
 
 export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
@@ -18,7 +17,7 @@ dotenv.config();
 (async () => {
   try {
     // Postgres seeding
-    await notRelated(); // NOTE: complete by clouadinaryFake = true on live db
+    // await notRelated(); // NOTE: complete by clouadinaryFake = true on live db
     // await userSeed(); // NOTE: complete by clouadinaryFake = true on live db
     // await fakeSeed(); // NOTE: complete by clouadinaryFake = true on live db
     // await businessSeed();
@@ -28,8 +27,6 @@ dotenv.config();
     // await feedbackseed();
     // await seedRequestAccounts();
     // await planSeed();
-    // await communicationSeed();
-    // await referSeed();
 
     console.log("✅ All seeds inserted successfully");
 

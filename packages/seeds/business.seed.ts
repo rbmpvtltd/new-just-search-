@@ -22,10 +22,10 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  await addBusiness();
-  await seedFavourites();
-  await businessesCategories();
-  await businessesSubcategory();
+  // await addBusiness();
+  // await seedFavourites();
+  // await businessesCategories();
+  // await businessesSubcategory();
   await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
@@ -295,11 +295,12 @@ const addBusiness = async () => {
     if (skipSlug.includes(row.slug)) {
       slug = `${row.slug}${row.id}`;
     }
-    console.log("==========row is ===========",row)
+    // console.log("==========row is ===========",createUser)
     try {
       if (!createUser) {
         console.log("User not found" + row.id);
       }
+
       // {"Mon":{"opens_at":"11 AM","closes_at":"9 PM"},"Tue":{"opens_at":"11 AM","closes_at":"9 PM"},"Wed":{"opens_at":"11 AM","closes_at":"9 PM"},"Thu":{"opens_at":"11 AM","closes_at":"9 PM"},"Fri":{"opens_at":"11 AM","closes_at":"9 PM"},"Sat":{"opens_at":"11 AM","closes_at":"9 PM"},"Sun":{"closed":true}}
       const [newbusinessListing] = await db
         .insert(businessListings)
@@ -326,7 +327,7 @@ const addBusiness = async () => {
           pincode: row.pincode,
           state: city!.stateId,
           cityId: city!.id,
-          status: row.status,
+          status: "Approved",
           email: row.email,
           phoneNumber: row.phone_number,
           whatsappNo: row.whatsapp_no,
@@ -340,7 +341,7 @@ const addBusiness = async () => {
           updatedAt: row.updated_at,
         })
         .returning();
-
+      
       // images handle
       if (newbusinessListing) {
         const images = ["image1", "image2", "image3", "image4", "image5"];

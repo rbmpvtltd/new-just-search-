@@ -25,7 +25,7 @@ dotenv.config();
 export const productSeed = async () => {
   await clearAllTablesBusiness();
   // await addProduct();
-  await addProductReviews();
+  // await addProductReviews();
   // await addRecentViewProduct();
   // await addProductSubCategroy();
 };
@@ -149,7 +149,7 @@ const addProductReviews = async () => {
       message: row.message,
       rate: row.rate,
       view: row.view,
-      status: true,
+      status: "Pending",
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });
