@@ -91,6 +91,8 @@ export const HeroHeader = () => {
                 >
                   <Link href="/chat">
                     <IoMdChatboxes size={18} />
+                  <Link href="/login">
+                    <span>Login</span>
                   </Link>
                 </Button>
 

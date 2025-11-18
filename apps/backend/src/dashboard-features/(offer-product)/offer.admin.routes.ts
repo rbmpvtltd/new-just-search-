@@ -26,87 +26,87 @@ import {
 import { offers } from "@repo/db/src/schema/offer.schema";
 
 export const adminOfferRouter = router({
-  list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
-    const where = buildWhereClause(
-      input.filters,
-      input.globalFilter,
-      offerColumns,
-      offerGlobalFilterColumns,
-    );
+  // list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
+  //   const where = buildWhereClause(
+  //     input.filters,
+  //     input.globalFilter,
+  //     offerColumns,
+  //     offerGlobalFilterColumns,
+  //   );
 
-    const orderBy = buildOrderByClause(
-      input.sorting,
-      offerAllowedSortColumns,
-      sql`created_at DESC`,
-    );
+  //   const orderBy = buildOrderByClause(
+  //     input.sorting,
+  //     offerAllowedSortColumns,
+  //     sql`created_at DESC`,
+  //   );
 
-    const offset = input.pagination.pageIndex * input.pagination.pageSize;
+  //   const offset = input.pagination.pageIndex * input.pagination.pageSize;
 
-    const data = await db
-      .select({
-        id: offers.id,
-        photo: offers.businessId,
-        name: offers.categoryId,
-        phone: users.phoneNumber,
-        city: cities.city,
-        category:
-          sql<string>`string_agg(DISTINCT ${categories.title}, ', ' ORDER BY ${categories.title})`.as(
-            "category",
-          ),
-        subcategories:
-          sql<string>`string_agg(DISTINCT ${subcategories.name}, ', ' ORDER BY ${subcategories.name})`.as(
-            "subcategories",
-          ),
-        status: offers.status,
-        created_at: offers.createdAt,
-      })
-      .from(offers)
-      .where(where)
-      .orderBy(orderBy)
-      .limit(input.pagination.pageSize)
-      .leftJoin(users, eq(offers.userId, users.id))
-      .leftJoin(cities, eq(offers.city, cities.id))
-      .leftJoin(offers, eq(offers.id, offers.offerId))
-      .leftJoin(subcategories, eq(offers.subcategoryId, subcategories.id))
-      .leftJoin(offers, eq(offers.id, offers.offerId))
-      .leftJoin(categories, eq(offers.categoryId, categories.id))
-      .offset(offset)
-      .groupBy(
-        offers.id,
-        offers.photo,
-        offers.name,
-        users.phoneNumber,
-        cities.id,
-        offers.status,
-        offers.createdAt,
-      );
+  //   const data = await db
+  //     .select({
+  //       id: offers.id,
+  //       photo: offers.businessId,
+  //       name: offers.categoryId,
+  //       phone: users.phoneNumber,
+  //       city: cities.city,
+  //       category:
+  //         sql<string>`string_agg(DISTINCT ${categories.title}, ', ' ORDER BY ${categories.title})`.as(
+  //           "category",
+  //         ),
+  //       subcategories:
+  //         sql<string>`string_agg(DISTINCT ${subcategories.name}, ', ' ORDER BY ${subcategories.name})`.as(
+  //           "subcategories",
+  //         ),
+  //       status: offers.status,
+  //       created_at: offers.createdAt,
+  //     })
+  //     .from(offers)
+  //     .where(where)
+  //     .orderBy(orderBy)
+  //     .limit(input.pagination.pageSize)
+  //     .leftJoin(users, eq(offers.userId, users.id))
+  //     .leftJoin(cities, eq(offers.city, cities.id))
+  //     .leftJoin(offers, eq(offers.id, offers.offerId))
+  //     .leftJoin(subcategories, eq(offers.subcategoryId, subcategories.id))
+  //     .leftJoin(offers, eq(offers.id, offers.offerId))
+  //     .leftJoin(categories, eq(offers.categoryId, categories.id))
+  //     .offset(offset)
+  //     .groupBy(
+  //       offers.id,
+  //       offers.photo,
+  //       offers.name,
+  //       users.phoneNumber,
+  //       cities.id,
+  //       offers.status,
+  //       offers.createdAt,
+  //     );
 
-    const totalResult = await db
-      .select({
-        count: sql<number>`count(distinct ${offers.id})::int`,
-      })
-      .from(offers)
-      .where(where)
-      .leftJoin(offerSubcategories, eq(offers.id, offerSubcategories.offerId))
-      .leftJoin(
-        subcategories,
-        eq(offerSubcategories.subcategoryId, subcategories.id),
-      )
-      .leftJoin(offerCategories, eq(offers.id, offerCategories.offerId))
-      .leftJoin(categories, eq(offerCategories.categoryId, categories.id))
-      .leftJoin(users, eq(offers.userId, users.id));
-    // .groupBy(offers.id);
+  //   const totalResult = await db
+  //     .select({
+  //       count: sql<number>`count(distinct ${offers.id})::int`,
+  //     })
+  //     .from(offers)
+  //     .where(where)
+  //     .leftJoin(offerSubcategories, eq(offers.id, offerSubcategories.offerId))
+  //     .leftJoin(
+  //       subcategories,
+  //       eq(offerSubcategories.subcategoryId, subcategories.id),
+  //     )
+  //     .leftJoin(offerCategories, eq(offers.id, offerCategories.offerId))
+  //     .leftJoin(categories, eq(offerCategories.categoryId, categories.id))
+  //     .leftJoin(users, eq(offers.userId, users.id));
+  //   // .groupBy(offers.id);
 
-    const total = totalResult[0]?.count ?? 0;
-    const totalPages = Math.ceil(total / input.pagination.pageSize);
+  //   const total = totalResult[0]?.count ?? 0;
+  //   const totalPages = Math.ceil(total / input.pagination.pageSize);
 
-    return {
-      data,
-      totalCount: total,
-      totalPages,
-      pageCount: totalPages,
-    };
-  }),
+  //   return {
+  //     data,
+  //     totalCount: total,
+  //     totalPages,
+  //     pageCount: totalPages,
+  //   };
+  // }),
   // add: adminProcedure.query(async () => {
   //   return;
   // }),

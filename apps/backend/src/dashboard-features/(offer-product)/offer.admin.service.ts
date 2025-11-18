@@ -8,18 +8,18 @@ import { offers } from "@repo/db/src/schema/offer.schema";
 
 export const offerColumns = {
   id: offers.id,
-  photo: offers.,
-  name: offers.name,
+  // photo: offers.,
+  // name: offers.name,
   phone: users.phoneNumber,
   city: cities.city,
   category: categories.title,
   subcategories: subcategories.name,
-  status: offers.status,
+  // status: offers.status,
   created_at: offers.createdAt,
 };
 
 export const offerGlobalFilterColumns = [
-  offers.name,
+  // offers.name,
   subcategories.name,
   categories.title,
   users.phoneNumber,
