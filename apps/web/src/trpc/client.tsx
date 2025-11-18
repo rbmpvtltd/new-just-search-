@@ -49,12 +49,15 @@ export function TRPCReactProvider(
           true: httpSubscriptionLink({
             transformer: superjson,
             url: getTrpcUrl(),
-            // async connectionParams() {
-            //   const token = await getToken();
-            //   return {
-            //     authorization: token ? `Bearer ${token.value}` : "",
-            //   };
-            // },
+            async connectionParams() {
+              const token = await getToken();
+              console.log("Client token", token);
+
+              return {
+                authorization: token ? `Bearer ${token.value}` : "",
+              };
+            },
+            
           }),
           false: httpBatchLink({
             transformer: superjson,

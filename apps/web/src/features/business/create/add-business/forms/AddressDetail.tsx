@@ -40,7 +40,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
       longitude: formValue.longitude ?? "",
       pincode: formValue.pincode ?? "",
       state: formValue.state ?? "",
-      cityId: formValue.cityId ?? "",
+      city: formValue.city ?? "",
     },
   });
 
@@ -135,12 +135,12 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     {
       control,
       label: "City",
-      name: "cityId",
+      name: "city",
       placeholder: "City",
       component: "select",
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: errors.cityId?.message,
+      error: errors.city?.message,
     },
   ];
 
@@ -153,7 +153,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     setFormValue("longitude", data.longitude ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", Number(data.state) ?? "");
-    setFormValue("cityId", Number(data.cityId) ?? "");
+    setFormValue("city", Number(data.city) ?? "");
     nextPage();
   };
   return (

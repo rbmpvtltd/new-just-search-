@@ -24,3 +24,14 @@ export const messages = pgTable("messages", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const productChat = pgTable("product_chat", {
+  id: serial("id").primaryKey(),
+  route: varchar("route", { length: 255 }).notNull(),
+  imageLink: varchar("image_link", { length: 255 }),
+  messageId: serial("message_id")
+    .notNull()
+    .references(() => messages.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});

@@ -6,6 +6,7 @@ import {
   personalDetailsHireSchema,
 } from "@repo/db/src/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
+import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
@@ -13,6 +14,7 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
+import LocationAutoDetect from "@/components/LocationAutoDetect";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
@@ -31,9 +33,13 @@ export default function PersonalDetailsForm({
   const trpc = useTRPC();
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const nextPage = useHireFormStore((state) => state.nextPage);
+  const [detectedCityName, setDetectedCityName] = React.useState<null | string>(
+    null,
+  );
 
   const {
     control,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<PersonalDetailsSchema>({
@@ -362,12 +368,35 @@ export default function PersonalDetailsForm({
                   Location Details
                 </h3>
 
-                <Button
-                  type="button"
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow"
-                >
-                  Auto Detect Location
-                </Button>
+                <div className="flex items-end justify-between mb-4 ">
+                  <LocationAutoDetect
+                    onResult={(data) => {
+                      const formatted = data.formattedAddress ?? "";
+                      const parts = formatted
+                        .split(",")
+                        .map((part) => part.trim());
+                      const lat = data.latitude;
+                      const long = data.longitude;
+                      const pincode = data.postalCode || "";
+                      const cityName = data.city || "";
+                      const stateName = data.region || "";
+                      const area = parts[0]?.match(/[A-Za-z]/)
+                        ? parts[0]
+                        : formatted;
+                      const matchedState = states?.find(
+                        (state) =>
+                          state.label === stateName.toLocaleUpperCase(),
+                      );
+                      setDetectedCityName(cityName);
+
+                      setValue("latitude", String(lat));
+                      setValue("longitude", String(long));
+                      setValue("area", area);
+                      setValue("pincode", pincode);
+                      setValue("state", matchedState?.value ?? 0);
+                    }}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

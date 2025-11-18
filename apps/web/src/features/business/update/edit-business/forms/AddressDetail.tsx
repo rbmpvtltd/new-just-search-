@@ -50,7 +50,7 @@ export default function AddressDetail({
       longitude: businessListing?.longitude ?? "",
       pincode: businessListing?.pincode,
       state: businessListing?.state.id,
-      cityId: businessListing?.cityId,
+      city: businessListing?.city.id,
     },
   });
 
@@ -72,12 +72,12 @@ export default function AddressDetail({
   );
 
   if (cities && cities.length > 0 && detectedCityName) {
-    const matchedCity = cities.find(
+    const matchedCity = cities?.find(
       (c) => c.city.toLowerCase() === detectedCityName.toLowerCase(),
     );
     if (matchedCity && matchedCity.id !== control._formValues.cityId) {
       // Check if cityId is already set to prevent infinite loop
-      setValue("cityId", matchedCity.id, { shouldValidate: true });
+      setValue("city", matchedCity.id, { shouldValidate: true });
       // Optional: Clear detectedCityName after setting the value
       // setDetectedCityName(null);
     }
@@ -157,13 +157,13 @@ export default function AddressDetail({
     {
       control,
       label: "City",
-      name: "cityId",
+      name: "city",
       placeholder: "City",
       component: "select",
       loading: isLoading,
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: errors.cityId?.message,
+      error: errors.city?.message,
     },
   ];
 
@@ -176,7 +176,7 @@ export default function AddressDetail({
     setFormValue("longitude", data.longitude ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", Number(data.state) ?? "");
-    setFormValue("cityId", Number(data.cityId) ?? "");
+    setFormValue("city", Number(data.city) ?? "");
     nextPage();
   };
   return (

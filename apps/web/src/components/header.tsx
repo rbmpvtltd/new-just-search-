@@ -3,8 +3,9 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { IoMdChatboxes } from "react-icons/io";
 import { object } from "zod";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { name: "Home", href: "/" },
@@ -34,7 +35,7 @@ export const HeroHeader = () => {
                   alt="logo image"
                   width={100}
                   height={100}
-                  style={{objectFit: "contain"}}
+                  style={{ objectFit: "contain" }}
                 />
               </Link>
 
@@ -81,21 +82,29 @@ export const HeroHeader = () => {
                   ))}
                 </ul>
               </div>
-              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 md:w-fit">
                 <Button
                   asChild
                   variant="outline"
-                  className=" text-primary"
                   size="sm"
+                  className="text-primary flex items-center justify-center"
                 >
-                  <Link href="#">
-                    <span>Login</span>
+                  <Link href="/chat">
+                    <IoMdChatboxes size={18} />
                   </Link>
                 </Button>
-                <Button asChild className="bg-primary text-white" size="sm">
-                  <Link href="#">
-                    <span>Sign Up</span>
-                  </Link>
+
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="text-primary"
+                >
+                  <Link href="#">Login</Link>
+                </Button>
+
+                <Button asChild size="sm" className="bg-primary text-white">
+                  <Link href="#">Sign Up</Link>
                 </Button>
               </div>
             </div>

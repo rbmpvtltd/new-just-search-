@@ -1,21 +1,36 @@
 "use client";
+import { useMutation } from "@tanstack/react-query";
+import { useSubscription } from "@trpc/tanstack-react-query";
+import parse from "html-react-parser";
+import Image from "next/image";
+import { useState } from "react";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import Image from "next/image";import type { OutputTrpcType } from "@/trpc/type";
-import { Button } from "@/components/ui/button";
-import { FaRegCalendarAlt } from "react-icons/fa";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import Rating from "@/components/ui/Rating";
-import parse from "html-react-parser";
-
+import { Textarea } from "@/components/ui/textarea";
+import { useTRPC } from "@/trpc/client";
+import type { OutputTrpcType } from "@/trpc/type";
 
 type SingleProductType =
   | OutputTrpcType["businessrouter"]["singleProduct"]
   | null;
-
 
 function SingleProductComp({
   productPhotos,
@@ -24,7 +39,33 @@ function SingleProductComp({
   productPhotos: string[];
   product: SingleProductType;
 }) {
+  const [message, setMessage] = useState("");
+  const [conversation, setConversation] = useState<any>(null);
   const content = parse(product?.description ?? "");
+  const trpc = useTRPC();
+  const { mutateAsync: createConversation } = useMutation(
+    trpc.chat.createConversation.mutationOptions(),
+  );
+
+  async function handleChat() {
+    const conv = await createConversation({
+      receiverId: Number(product?.businessId),
+    });
+    setConversation(conv);
+  }
+  const { data, error } = useSubscription(
+    trpc.chat.onMessage.subscriptionOptions({
+      conversationId: conversation?.id,
+      // messageId: String(allMessages[allMessages.length -1]?.id),
+    }),
+  );
+
+  const { mutate, isPending } = useMutation(
+    trpc.chat.sendMessage.mutationOptions(),
+  );
+
+  console.log("Product", product);
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row gap-6 items-center">
@@ -69,11 +110,53 @@ function SingleProductComp({
             >
               View Shop Detail
             </Button>
-            <Button
-              onClick={() => console.log(`clicked on enquire now button`)}
-            >
-              Enquire Now
-            </Button>
+            <Dialog>
+              {/* <form> */}
+              <DialogTrigger asChild>
+                <Button onClick={handleChat}>Chat Now</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>
+                    Write your message below and click Send. The shop owner will
+                    receive it instantly.
+                  </DialogTitle>
+                  {/* <DialogDescription>
+                      Write your message and send it to the shop.
+                    </DialogDescription> */}
+                </DialogHeader>
+                <div className="grid gap-4">
+                  <div className="grid gap-3">
+                    <Label htmlFor="name-1">Your Message</Label>
+                    <Textarea
+                      name="name"
+                      placeholder="Type your message..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button
+                    onClick={() => {
+                      mutate({
+                        message: message,
+                        conversationId: conversation?.id,
+                        image: product?.photos[0],
+                        route: `http://localhost:9000/business/singleProduct/${product?.id}`,
+                      });
+                      setMessage("");
+                    }}
+                  >
+                    {isPending ? "Sending..." : "Send"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+              {/* </form> */}
+            </Dialog>
           </div>
         </div>
       </div>

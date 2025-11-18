@@ -101,7 +101,7 @@ export default function DocumentsForm() {
     {
       control,
       type: "",
-      label: "",
+      label: "Id Proof Photo",
       name: "idProofPhoto",
       placeholder: "Upload your photo",
       component: "image",
@@ -135,14 +135,7 @@ export default function DocumentsForm() {
       required: false,
       error: errors.aboutYourself?.message,
     },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   placeholder: "Refer Code",
-    //   component: "input",
-    //   error: errors.referCode?.message,
-    // },
+   
   ];
   return (
     <div className="min-h-screen p-4">
@@ -155,7 +148,7 @@ export default function DocumentsForm() {
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Documents
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {formFields.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
