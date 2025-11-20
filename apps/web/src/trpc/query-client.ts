@@ -2,6 +2,7 @@ import {
   defaultShouldDehydrateQuery,
   QueryClient,
 } from "@tanstack/react-query";
+import { cache } from "react";
 // import superjson from "superjson";
 export function makeQueryClient() {
   return new QueryClient({
