@@ -5,7 +5,7 @@ import { da } from "date-fns/locale";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,6 @@ export function LoginForm({
       onSuccess: (data) => {
         setToken(data?.session || "", false);
         setRole(data?.role || "", false);
-        router.push("/");
       },
     });
   }
@@ -103,7 +102,7 @@ export function LoginForm({
                       <div className="flex items-center">
                         <FormLabel>Password</FormLabel>
                         <Link
-                          href="#"
+                          href="/forgetPasswor"
                           className="ml-auto text-sm underline-offset-2 hover:underline"
                         >
                           Forgot your password?

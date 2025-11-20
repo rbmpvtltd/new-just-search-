@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuthStore } from "../authStore";
+import { useMutation } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+import { setRole, setToken } from "@/utils/session";
 
 const formSchema = z
   .object({
@@ -36,13 +41,35 @@ const formSchema = z
     message: "Password and confirm password do not match",
   });
 
-export function RegisterForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  const setAuthData = useAuthStore((state) => state.setAuthData);
-  const authData = useAuthStore((state) => state.authData);
+const otpSchema = z.object({
+  otp: z
+    .string()
+    .length(6, "OTP must be 6 digits")
+    .regex(/^\d+$/, "OTP must be digits only"),
+});
 
+export function RegisterForm({ className }: React.ComponentProps<"div">) {
+  const trpc = useTRPC();
+  const [step, setStep] = useState<"register" | "verify">("register");
+  const [otp, setOTP] = useState<string>("");
+  const [tempFormData, setTempFormData] = useState<any>(null);
+  const router = useRouter();
+  const { mutate, isPending } = useMutation(
+    trpc.auth.sendOTP.mutationOptions(),
+  );
+  const { mutate: verifyOTP } = useMutation(
+    trpc.auth.verifyOTP.mutationOptions(),
+  );
+  const [resendTimer, setResendTimer] = useState(0);
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+
+    const timer = setInterval(() => {
+      setResendTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [resendTimer]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,9 +81,211 @@ export function RegisterForm({
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    setAuthData(data);
+  const otpForm = useForm<z.infer<typeof otpSchema>>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: {
+      otp: "",
+    },
+  });
+
+  const sendOTP = async (identifier: string) => {
+    try {
+      mutate(
+        { identifier, },
+        {
+          onSuccess: async () => {
+            console.log("otp sended successfully");
+          },
+          onError: async () => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+            console.log("oops error while seding otp");
+          },
+        },
+      );
+
+      // Start resend timer (60 seconds)
+      setResendTimer(60);
+      const interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return true;
+    } catch (err) {
+      return false;
+    }
   };
+
+  // Handle registration form submission
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setTempFormData(data);
+    if(data.email){
+      const success = await sendOTP(data.email);
+      if (success) {
+        setStep("verify");
+      }
+    }else{
+      const success = await sendOTP(String(data.mobileNumber));
+      if (success) {
+        setStep("verify");
+      }
+    }
+  };
+
+  // Handle OTP verification
+  const onVerifyOTP = async (data: z.infer<typeof otpSchema>) => {
+    if (data.otp.length !== 6) {
+      Swal.fire({
+        icon: "info",
+        title: "Invalid OTP",
+        text: "OTP Must Be A Six Digits",
+      });
+      return;
+    }
+    console.log("====================> execution comes here");
+    try {
+      console.log("verifying otp");
+      verifyOTP(
+        {
+          phoneNumber: tempFormData.mobileNumber,
+          displayName: tempFormData.displayName,
+          password: tempFormData.password,
+          otp: data.otp,
+          email: tempFormData.email,
+        },
+        {
+          onSuccess: async (data) => {
+            Swal.fire({
+              icon: "success",
+              title: "Success!",
+              text: "Account created successfully!",
+            });
+            setToken(data?.session || "", false);
+            setRole(data?.role || "", false);
+            console.log("registration sucessfully");
+            router.push("/");
+          },
+          onError: async (err) => {
+            console.error("OTP verification failed:", err);
+            Swal.fire({
+              icon: "error",
+              title: "Something Wents Wrong",
+              text: err?.message || "Please check the code and try again.",
+            });
+          },
+        },
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Handle resend OTP
+  const handleResendOTP = async () => {
+    if (resendTimer > 0) return;
+    if(tempFormData.email){
+      await sendOTP(tempFormData.email)
+    }
+    await sendOTP(tempFormData.mobileNumber);
+  };
+
+  // Handle back to registration
+  const handleBack = () => {
+    setStep("register");
+    otpForm.reset();
+  };
+
+  if (step === "verify") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-muted/30 to-background px-4">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Verify Your Phone
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              We've sent a 6-digit code to{" "}
+              <span className="font-semibold">
+                *******
+                {tempFormData?.mobileNumber.slice(7, 10)}
+              </span>
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-card shadow-sm border p-6 sm:p-8">
+            <Form {...otpForm}>
+              <form
+                onSubmit={otpForm.handleSubmit(onVerifyOTP)}
+                className="space-y-5"
+              >
+                <FormField
+                  control={otpForm.control}
+                  name="otp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Enter OTP
+                      </FormLabel>
+                      <FormControl>
+                        <input
+                          placeholder="000000"
+                          maxLength={6}
+                          className="rounded-xl text-center text-2xl tracking-widest"
+                          onChange={(e) => setOTP(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  className="w-full rounded-xl py-5 font-semibold"
+                  onClick={() => {
+                    onVerifyOTP({ otp });
+                  }}
+                >
+                  {isPending ? "Verifying..." : "Verify OTP"}
+                </Button>
+              </form>
+            </Form>
+
+            <div className="mt-6 space-y-3 text-center text-sm">
+              <button
+                type="button"
+                onClick={handleResendOTP}
+                disabled={resendTimer > 0 || isPending}
+                className={`text-primary hover:underline disabled:text-muted-foreground disabled:no-underline ${resendTimer > 0 ? "cursor-not-allowed" : ""}`}
+              >
+                {resendTimer > 0
+                  ? `Resend OTP in ${resendTimer}s`
+                  : "Resend OTP"}
+              </button>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="text-muted-foreground hover:text-primary hover:underline"
+                >
+                  ← Back to registration
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-muted/30 to-background px-4">
@@ -178,8 +407,9 @@ export function RegisterForm({
               <Button
                 type="submit"
                 className="w-full rounded-xl py-5 font-semibold"
+                disabled={isPending}
               >
-                Create Account
+                {isPending ? "Sending OTP..." : "Continue"}
               </Button>
             </form>
           </Form>
@@ -205,7 +435,7 @@ export function RegisterForm({
                 viewBox="0 0 488 512"
                 className="h-5 w-5"
               >
-                <title>Google</title>{" "}
+                <title>Google</title>
                 <path
                   fill="currentColor"
                   d="M488 261.8c0-17.8-1.6-35.2-4.7-52H249v98.6h134.1c-5.8 31.4-23.2 57.9-49.5 75.8v62.7h79.8c46.7-43 74-106.4 74-185.1zM249 492c67 0 123.1-22.1 164.1-60.1l-79.8-62.7c-22.1 14.9-50.4 23.6-84.3 23.6-64.9 0-119.9-43.8-139.6-102.7H27.2v64.5C68.7 429.3 152.1 492 249 492zM109.4 289.1c-4.7-14.1-7.3-29.1-7.3-44.6s2.6-30.5 7.3-44.6v-64.5H27.2C9.8 169.5 0 207.2 0 244.5s9.8 75 27.2 108.9l82.2-64.3zM249 97.9c36.4 0 69.1 12.6 94.9 37.4l71.1-71.1C372.1 24.8 316 2 249 2 152.1 2 68.7 64.7 27.2 161.5l82.2 64.5C129.1 141.7 184.1 97.9 249 97.9z"
@@ -219,14 +449,14 @@ export function RegisterForm({
         <p className="text-center text-xs text-muted-foreground">
           By continuing, you agree to our{" "}
           <a
-            href="#"
+            href="/"
             className="underline underline-offset-4 hover:text-primary"
           >
             Terms of Service
           </a>{" "}
           and{" "}
           <a
-            href="#"
+            href="/"
             className="underline underline-offset-4 hover:text-primary"
           >
             Privacy Policy

@@ -2,7 +2,13 @@ import { TRPCClientError } from "@trpc/client";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/features/auth/login/login-form";
 import { trpcServer } from "@/trpc/trpc-server";
+import { asyncHandler } from "@/utils/error/asyncHandler";
+import UpdateDisplayNameForm from "@/features/auth/login/display-update";
 export default async function Login() {
+   const { data: userData } = await asyncHandler(
+      trpcServer.userRouter.getUserProfile.query(),
+    );
+  
   let session = null;
 
   try {
@@ -23,9 +29,17 @@ export default async function Login() {
     throw error;
   }
 
+  
   // only redirect after successful TRPC call
   if (session?.success) {
-    redirect("/"); // never wrap this in try/catch
+    if(userData?.displayName === null || userData?.displayName === "null"){
+        return <div className="w-full">
+          <UpdateDisplayNameForm userId={Number(userData?.id)}/>
+        </div>
+    }else{
+      
+      redirect("/"); // never wrap this in try/catch
+    }
   }
 
   // fallback UI (optional, if session is null or false)

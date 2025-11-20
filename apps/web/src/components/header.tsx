@@ -87,22 +87,9 @@ export const HeroHeader = () => {
                   asChild
                   variant="outline"
                   size="sm"
-                  className="text-primary flex items-center justify-center"
-                >
-                  <Link href="/chat">
-                    <IoMdChatboxes size={18} />
-                  <Link href="/login">
-                    <span>Login</span>
-                  </Link>
-                </Button>
-
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
                   className="text-primary"
                 >
-                  <Link href="#">Login</Link>
+                  <Link href="/login">Login</Link>
                 </Button>
 
                 <Button asChild size="sm" className="bg-primary text-white">
