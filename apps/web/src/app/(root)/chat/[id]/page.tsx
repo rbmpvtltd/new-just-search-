@@ -3,10 +3,13 @@ import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 export default async function Page({
   params,
+  searchParams,
 }: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;
+
   // const { data: } = await asyncHandler(trpcServer.chat.conversationList.query({conversationId: Number(id)}))
 
   // const { data: conversation } = await asyncHandler(
@@ -24,11 +27,19 @@ export default async function Page({
     trpcServer.userRouter.getUserProfile.query(),
   );
 
+  const { data } = await asyncHandler(
+    trpcServer.chat.getDisplayNameAndImage.query({
+      conversationId: Number(id),
+    }),
+  );
+  console.log("Data, display name", data);
+
   return (
     <StoreChat
       conversationId={Number(id)}
       messageList={messageList}
       userData={userData}
+      displayName={data}
     />
   );
 }

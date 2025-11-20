@@ -1,4 +1,3 @@
-
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import type { AppRouter } from "backend/route";
 

@@ -21,7 +21,7 @@ export const dummyImageUrl = "dummyImageUrl";
     // await fakeSeed(); // NOTE: complete by clouadinaryFake = true on live db
     // await businessSeed();
     // await hireSeed();
-    // await productSeed();
+    await productSeed();
     await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();

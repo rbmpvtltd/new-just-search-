@@ -104,28 +104,30 @@ CREATE TABLE "recent_view_business" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "conversations" (
+CREATE TABLE "chat_images" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"participant_one_id" integer NOT NULL,
-	"participant_two_id" integer NOT NULL,
+	"route" varchar(255) NOT NULL,
+	"image" varchar(255),
+	"message_id" serial NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "messages" (
+CREATE TABLE "chat_messages" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"conversation_id" serial NOT NULL,
+	"chat_session_id" serial NOT NULL,
 	"sender_id" integer NOT NULL,
 	"message" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now(),
+	"is_read" boolean DEFAULT false NOT NULL,
+	"reply_to_message_id" integer,
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "product_chat" (
+CREATE TABLE "chat_sessions" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"route" varchar(255) NOT NULL,
-	"image_link" varchar(255),
-	"message_id" serial NOT NULL,
+	"participant_one_id" integer NOT NULL,
+	"participant_two_id" integer NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -492,8 +494,8 @@ ALTER TABLE "favourites" ADD CONSTRAINT "favourites_business_id_business_listing
 ALTER TABLE "favourites" ADD CONSTRAINT "favourites_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recent_view_business" ADD CONSTRAINT "recent_view_business_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recent_view_business" ADD CONSTRAINT "recent_view_business_business_id_business_listings_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."business_listings"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "messages" ADD CONSTRAINT "messages_conversation_id_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."conversations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "product_chat" ADD CONSTRAINT "product_chat_message_id_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."messages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "chat_images" ADD CONSTRAINT "chat_images_message_id_chat_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."chat_messages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_chat_session_id_chat_sessions_id_fk" FOREIGN KEY ("chat_session_id") REFERENCES "public"."chat_sessions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_categories" ADD CONSTRAINT "hire_categories_hire_id_hire_listing_id_fk" FOREIGN KEY ("hire_id") REFERENCES "public"."hire_listing"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_categories" ADD CONSTRAINT "hire_categories_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

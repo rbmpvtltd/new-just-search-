@@ -1,15 +1,19 @@
+import { log, profile } from "node:console";
 import { EventEmitter, on } from "node:events";
 import { db, schemas } from "@repo/db";
-import { conversations, productChat } from "@repo/db/dist/schema/chat.schema";
+import { chatImages, chatSessions } from "@repo/db/dist/schema/chat.schema";
 import { users } from "@repo/db/src/schema/auth.schema";
 import { profiles } from "@repo/db/src/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError, tracked } from "@trpc/server";
 import { secrets } from "bun";
-import { and, eq, ne, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import z from "zod";
+import { id } from "zod/v4/locales";
 import { protectedProcedure, router } from "@/utils/trpc";
+
+const chatMessages = schemas.chat.chatMessages;
 
 const ee = new EventEmitter();
 export const chatRouter = router({
@@ -56,9 +60,9 @@ export const chatRouter = router({
       }
 
       const [newMessage] = await db
-        .insert(schemas.chat.messages)
+        .insert(schemas.chat.chatMessages)
         .values({
-          conversationId: Number(input.conversationId),
+          chatSessionId: Number(input.conversationId),
           senderId: ctx.userId,
           message: input.message,
         })
@@ -66,10 +70,10 @@ export const chatRouter = router({
       logger.info("newMessage is", { newMessage: newMessage });
       if ((input.route || input.image) && newMessage) {
         const [newProduct] = await db
-          .insert(schemas.chat.productChat)
+          .insert(schemas.chat.chatImages)
           .values({
-            imageLink: input.image || "",
-            messageId: newMessage.id,
+            image: input.image || "",
+            chatMessageId: newMessage.id,
             route: input.route || "",
           })
           .returning();
@@ -110,16 +114,16 @@ export const chatRouter = router({
           message: "User not found",
         });
       }
-      const isConversationExists = await db.query.conversations.findFirst({
-        where: (conversations, { or, eq, and }) =>
+      const isConversationExists = await db.query.chatSessions.findFirst({
+        where: (chatSessions, { or, eq, and }) =>
           or(
             and(
-              eq(conversations.participantOneId, ctx.userId),
-              eq(conversations.participantTwoId, business?.userId),
+              eq(chatSessions.participantOneId, ctx.userId),
+              eq(chatSessions.participantTwoId, business?.userId),
             ),
             and(
-              eq(conversations.participantOneId, business?.userId),
-              eq(conversations.participantTwoId, ctx.userId),
+              eq(chatSessions.participantOneId, business?.userId),
+              eq(chatSessions.participantTwoId, ctx.userId),
             ),
           ),
       });
@@ -131,7 +135,7 @@ export const chatRouter = router({
       }
 
       const newConversation = await db
-        .insert(schemas.chat.conversations)
+        .insert(schemas.chat.chatSessions)
         .values({
           participantOneId: ctx.userId,
           participantTwoId: user.id,
@@ -141,56 +145,75 @@ export const chatRouter = router({
     }),
 
   conversationList: protectedProcedure.query(async ({ ctx, input }) => {
+    const subQuery = db
+      .select({})
+      .from(chatMessages)
+      .where(eq(chatMessages.senderId, ctx.userId));
+
     const conversation = await db
       .selectDistinct({
-        id: conversations.id,
-        participantOneId: conversations.participantOneId,
-        participantTwoId: conversations.participantTwoId,
-        createdAt: conversations.createdAt,
-        updatedAt: conversations.updatedAt,
+        id: chatSessions.id,
+        participantOneId: chatSessions.participantOneId,
+        participantTwoId: chatSessions.participantTwoId,
+        createdAt: chatSessions.createdAt,
+        updatedAt: chatSessions.updatedAt,
         displayName: users.displayName,
         profileImage: profiles.profileImage,
+        // isRead: chatMessages.isRead,
+        // lastMessage: sql<string>`MAX(${chatMessages.message})`.as(
+        //   "lastMessage",
+        // ),
+        // ... (rest of the code before lastMessage)
+
+        lastMessage: sql<string>`(${db
+          .select({ msg: chatMessages.message })
+          .from(chatMessages)
+          .where(eq(chatMessages.chatSessionId, chatSessions.id))
+          .orderBy(desc(chatMessages.createdAt))
+          .limit(1)})`.as("lastMessage"),
+
+        unreadCount: sql<number>`COUNT(${chatMessages.id})`.as("unreadCount"),
+        // ... (rest of the code after lastMessage)
       })
-      .from(conversations)
+      .from(chatSessions)
       .where(
         or(
-          eq(conversations.participantOneId, ctx.userId),
-          eq(conversations.participantTwoId, ctx.userId),
+          eq(chatSessions.participantOneId, ctx.userId),
+          eq(chatSessions.participantTwoId, ctx.userId),
         ),
       )
       .leftJoin(
         users,
         or(
           and(
-            eq(conversations.participantTwoId, users.id),
+            eq(chatSessions.participantTwoId, users.id),
             ne(users.id, ctx.userId),
           ),
           and(
-            eq(conversations.participantOneId, users.id),
+            eq(chatSessions.participantOneId, users.id),
             ne(users.id, ctx.userId),
           ),
         ),
       )
+      .leftJoin(profiles, and(eq(users.id, profiles.userId)))
       .leftJoin(
-        profiles,
-        or(
-          and(
-            eq(conversations.participantTwoId, profiles.userId),
-            ne(profiles.userId, ctx.userId),
-          ),
-          and(
-            eq(conversations.participantOneId, profiles.userId),
-            ne(profiles.userId, ctx.userId),
-          ),
+        chatMessages,
+        and(
+          eq(chatSessions.id, chatMessages.chatSessionId),
+          eq(chatMessages.isRead, false),
+          ne(chatMessages.senderId, ctx.userId),
         ),
-      );
-    // .findMany({
-    //   where: (conversation, { eq, or }) =>
-    //     or(
-    //       eq(conversation.participantOneId, ctx.userId),
-    //       eq(conversation.participantTwoId, ctx.userId),
-    //     ),
-    // });
+      )
+      .groupBy(
+        chatSessions.id,
+        chatSessions.participantOneId,
+        chatSessions.participantTwoId,
+        chatSessions.createdAt,
+        chatSessions.updatedAt,
+        users.displayName,
+        profiles.profileImage,
+      )
+      .orderBy(chatSessions.id);
 
     logger.info("conversation is", conversation);
     return conversation;
@@ -199,10 +222,121 @@ export const chatRouter = router({
   getMessageList: protectedProcedure
     .input(z.object({ conversationId: z.number() }))
     .query(async ({ ctx, input }) => {
-      const messageList = await db.query.messages.findMany({
-        where: (messages, { eq }) =>
-          eq(messages.conversationId, input.conversationId),
-      });
+      // const messageList = await db.query.chatMessages.findMany({
+      //   where: (messages, { eq }) =>
+      //     eq(messages.chatSessionId, input.conversationId),
+      //   orderBy: (messages) => [messages.createdAt],
+      // });
+
+      const messageList = await db
+        .select({
+          id: chatMessages.id,
+          chatSessionId: chatMessages.chatSessionId,
+          senderId: chatMessages.senderId,
+          message: chatMessages.message,
+          isRead: chatMessages.isRead,
+          replyToMessageId: chatMessages.replyToMessageId,
+          createdAt: chatMessages.createdAt,
+          updatedAt: chatMessages.updatedAt,
+          image: chatImages.image,
+          route: chatImages.route,
+        })
+        .from(chatMessages)
+        .where(eq(chatMessages.chatSessionId, input.conversationId))
+        .leftJoin(chatImages, eq(chatMessages.id, chatImages.chatMessageId))
+        .orderBy(chatMessages.id);
+
       return messageList;
+    }),
+
+  getDisplayNameAndImage: protectedProcedure
+    .input(z.object({ conversationId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const session = await db.query.chatSessions.findFirst({
+        where: (chat, { eq, or }) => eq(chat.id, input.conversationId),
+
+        columns: {
+          participantOneId: true,
+          participantTwoId: true,
+        },
+      });
+
+      logger.info("session is", { session: session });
+
+      const otherUserId =
+        session?.participantOneId === ctx.userId
+          ? session.participantTwoId
+          : session?.participantOneId;
+
+      // const displayName = await db.query.users.findFirst({
+      //   where: (users, { eq }) => eq(users.id, Number(otherUserId)),
+      //   columns: {
+      //     displayName: true,
+      //     // profileImage: true,
+      //   },
+      //   with: {
+      //     profiles: {
+      //       columns: {
+      //         profileImage: true,
+      //       },
+      //     },
+      //   },
+      // });
+
+      const displayName = await db
+        .select({
+          displayName: users.displayName,
+          profileImage: profiles.profileImage,
+        })
+        .from(users)
+        .where(eq(users.id, Number(otherUserId)))
+        .leftJoin(profiles, eq(profiles.userId, users.id));
+
+      // const displayName = await db
+      //   .select({
+      //     displayName: users.displayName,
+      //     // profileImage: profiles.profileImage,
+      //   })
+      //   .from(users)
+      //   .where(
+      //     or(
+      //       and(
+      //         eq(users.id, schemas.chat.chatSessions.participantOneId),
+      //         ne(users.id, ctx.userId),
+      //       ),
+      //       and(
+      //         eq(users.id, schemas.chat.chatSessions.participantTwoId),
+      //         ne(users.id, ctx.userId),
+      //       ),
+      //     ),
+      //   )
+      //   .leftJoin(
+      //     chatSessions,
+      //     and(
+      //       eq(users.id, chatSessions.participantOneId),
+      //       ne(users.id, ctx.userId),
+      //     ),
+      //   );
+
+      return displayName;
+    }),
+  markAsRead: protectedProcedure
+    .input(z.object({ messageId: z.array(z.number()) }))
+    .mutation(async ({ ctx, input }) => {
+      logger.info("input is", input);
+
+      if (input.messageId.length > 0) {
+        await db
+          .update(schemas.chat.chatMessages)
+          .set({
+            isRead: true,
+          })
+          .where(inArray(schemas.chat.chatMessages.id, input.messageId));
+      }
+
+      return {
+        success: true,
+        message: "Message marked as read successfully",
+      };
     }),
 });
