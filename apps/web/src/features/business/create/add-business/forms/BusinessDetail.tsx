@@ -85,7 +85,6 @@ export default function BusinessDetail({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
-      disabled: true,
       options:
         categories?.map((item) => ({ label: item.label, value: item.value })) ??
         [],
@@ -121,8 +120,8 @@ export default function BusinessDetail({
       placeholder: "Home Delivery",
       component: "select",
       options: [
-        { label: "Yes", value: true },
-        { label: "No", value: false },
+        { label: "Yes", value: "yes" },
+        { label: "No", value: "no" },
       ],
       required: false,
       error: errors.homeDelivery?.message,

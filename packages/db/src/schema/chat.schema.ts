@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgTable,
   serial,
@@ -6,7 +7,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const conversations = pgTable("conversations", {
+export const chatSessions = pgTable("chat_sessions", {
   id: serial("id").primaryKey(),
   participantOneId: integer("participant_one_id").notNull(),
   participantTwoId: integer("participant_two_id").notNull(),
@@ -14,24 +15,26 @@ export const conversations = pgTable("conversations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const messages = pgTable("messages", {
+export const chatMessages = pgTable("chat_messages", {
   id: serial("id").primaryKey(),
-  conversationId: serial("conversation_id")
+  chatSessionId: serial("chat_session_id")
     .notNull()
-    .references(() => conversations.id),
+    .references(() => chatSessions.id),
   senderId: integer("sender_id").notNull(),
   message: varchar("message", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
+  isRead: boolean("is_read").notNull().default(false),
+  replyToMessageId: integer("reply_to_message_id"),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const productChat = pgTable("product_chat", {
+export const chatImages = pgTable("chat_images", {
   id: serial("id").primaryKey(),
   route: varchar("route", { length: 255 }).notNull(),
-  imageLink: varchar("image_link", { length: 255 }),
-  messageId: serial("message_id")
+  image: varchar("image", { length: 255 }),
+  chatMessageId: serial("message_id")
     .notNull()
-    .references(() => messages.id),
+    .references(() => chatMessages.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
