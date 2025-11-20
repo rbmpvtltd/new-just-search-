@@ -21,7 +21,7 @@ app.use(
   "/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext,
+    createContext, // TODO: add rate limiter
     middleware: cors({ origin: "*" }),
     onError: (opts) => {
       logger.error(opts.error.code);
