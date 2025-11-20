@@ -1,10 +1,41 @@
+import { redis } from "@/lib/redis";
 import { logger } from "@repo/logger";
+import { isEmail } from "./identifier";
+import { sendEmailOTP, sendSMSViaFast2SMS } from "./sendOtp";
+import { success } from "zod";
 
-export const sendSMSOTP = (phoneNumber: string) => {
-  // WARN: add real otp generator
-  const otp = Math.floor(Math.random() * 1000000)
+function otpGenerator() {
+  return Math.floor(Math.random() * 1000000)
     .toString()
     .padStart(6, "0");
+}
 
-  logger.info("otp is", otp, "phoneNumber is ", phoneNumber);
+export const sendSMSOTP = async (identifier: string)=> {
+  const otp = otpGenerator();
+
+  logger.info("otp is", {
+    otp,
+    "phoneNumber is ": identifier,
+  });
+
+  redis.set(`otpsession:${identifier}`, otp, "EX", 60 * 20); // TODO: set short life time for expiry otp
+
+  if(isEmail(identifier)){
+    await sendEmailOTP(identifier,otp)
+    return {success :true,method : "email"}
+  }else{
+    // TODO: implement fast to sms when identifier is number
+    await sendSMSViaFast2SMS(identifier,otp)
+    return {success:true,method:"sms"}
+  }
 };
+
+// export const sendEmailOTP = (email: string) => {
+//   const otp = otpGenerator();
+
+//   logger.info("otp is", {
+//     otp,
+//     "email is ": email,
+//   });
+//   redis.set(`otpsession:${email}`, otp, "EX", 60 * 20); // TODO: set short life time for expiry otp
+// };

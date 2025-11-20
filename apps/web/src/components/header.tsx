@@ -110,7 +110,7 @@ export const HeroHeader = () => {
                   size="sm"
                   className="text-primary"
                 >
-                  <Link href="#">Login</Link>
+                  <Link href="/login">Login</Link>
                 </Button>
 
                 <Button asChild size="sm" className="bg-primary text-white">
