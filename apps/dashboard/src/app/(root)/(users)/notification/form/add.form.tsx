@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
 import { notificationInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
@@ -10,7 +9,6 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
-import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,7 +24,7 @@ import { getQueryClient } from "@/trpc/query-client";
 
 const extendedInsertSchema = notificationInsertSchema;
 
-type CategorySelectSchema = z.infer<typeof extendedInsertSchema>;
+type SelectSchema = z.infer<typeof extendedInsertSchema>;
 
 export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
@@ -52,56 +50,45 @@ function AddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
   const { mutate: create } = useMutation(
-    trpc.adminCategoryRouter.create.mutationOptions(),
+    trpc.adminNotificationRouter.create.mutationOptions(),
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CategorySelectSchema>({
+  } = useForm<SelectSchema>({
     resolver: zodResolver(extendedInsertSchema),
     defaultValues: {
-      status: false,
       description: "",
       title: "",
       city: null,
       state: null,
-      role: "",
+      role: null,
+      status: true,
     },
   });
 
-  const onSubmit = async (data: CategorySelectSchema) => {
-    const files = await uploadToCloudinary([data.photo], "banner");
-    if (!files || !files[0]) {
-      console.error("file uploading to cloudinary failed");
-      return;
-    }
-    create(
-      {
-        ...data,
-        photo: files[0],
+  const onSubmit = async (data: SelectSchema) => {
+    create(data, {
+      onSuccess: () => {
+        const queryClient = getQueryClient();
+        queryClient.invalidateQueries({
+          queryKey: trpc.adminCategoryRouter.list.queryKey(),
+        });
+        setOpen(false);
       },
-      {
-        onSuccess: () => {
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.adminCategoryRouter.list.queryKey(),
-          });
-          setOpen(false);
-        },
-        onError: (e) => {
-          console.error(e);
-        },
+      onError: (e) => {
+        console.error(e);
       },
-    );
+    });
   };
 
-  const formFields: FormFieldProps<CategorySelectSchema>[] = [
+  const formFields: FormFieldProps<SelectSchema>[] = [
     {
       control,
       label: "Type",
-      name: "type",
+      name: "",
       placeholder: "Select Type of category",
       component: "select",
       options: [

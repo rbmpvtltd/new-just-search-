@@ -124,7 +124,7 @@ export const salesmen = pgTable("salesmen", {
 
 export const notification = pgTable("notification", {
   id: serial("id").primaryKey(),
-  role: userRoleEnum("notification_role").default(UserRole.guest).notNull(),
+  role: userRoleEnum("notification_role").default(UserRole.guest),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   state: integer("state").references(() => states.id, {
@@ -145,7 +145,7 @@ export const notification = pgTable("notification", {
 });
 
 export const notificationInsertSchema = createInsertSchema(notification, {
-  role: () => z.array(z.enum(UserRole)).min(1, "user role is required"),
+  role: () => z.enum(UserRole),
 });
 export const notificationUpdateSchema = createUpdateSchema(notification);
 export const notificationSelectSchema = createSelectSchema(notification);

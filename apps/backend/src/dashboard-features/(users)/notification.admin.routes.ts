@@ -6,7 +6,10 @@ import {
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
-import { notification } from "@repo/db/dist/schema/user.schema";
+import {
+  notification,
+  notificationInsertSchema,
+} from "@repo/db/dist/schema/user.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";
@@ -76,14 +79,9 @@ export const adminNotificationRouter = router({
     return;
   }),
   create: adminProcedure
-    .input(
-      categoryInsertSchema.omit({
-        slug: true,
-      }),
-    )
+    .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
-      const slug = slugify(input.title);
-      await db.insert(categories).values({ ...input, slug });
+      await db.insert(notification).values(input);
       return { success: true };
     }),
   edit: adminProcedure
