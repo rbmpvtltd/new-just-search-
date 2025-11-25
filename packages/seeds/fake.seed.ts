@@ -1,12 +1,12 @@
 import { db, schemas, type UserRole } from "@repo/db";
 import {
   businessCategories,
+  businessListings,
   businessPhotos,
   businessReviews,
   businessSubcategories,
 } from "@repo/db/dist/schema/business.schema";
 import { productReviews } from "@repo/db/dist/schema/product.schema";
-import { businessListings, listingStatus } from "@repo/db/src/schema/business.schema";
 import { logger } from "@repo/logger";
 import bcrypt from "bcryptjs";
 import { eq, inArray } from "drizzle-orm";
@@ -18,7 +18,11 @@ const cities = schemas.not_related.cities;
 export const fakeSeed = async () => {
   try {
     const user = await seedFakeUser();
-    const business = await seedFakeBusiness(user!.id);
+    if (!user) {
+      logger.error("fake user is not find");
+      return;
+    }
+    const business = await seedFakeBusiness(user.id);
     logger.info("adding fake admin");
     await seedRealUser("admin@gmail.com", "admin@123", "admin");
     await seedRealUser("ranjeet@gmail.com", "admin@123", "admin");

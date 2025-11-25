@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { educationSchema } from "@repo/db/src/schema/hire.schema";
+import { educationSchema } from "@repo/db/dist/schema/hire.schema";
 import { useForm } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";

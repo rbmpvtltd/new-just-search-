@@ -12,7 +12,6 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
-import z from "zod";
 
 const states = pgTable("states", {
   id: serial("id").primaryKey(),

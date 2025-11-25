@@ -5,6 +5,7 @@ import { adminCategoryRouter } from "./dashboard-features/(category)/category.ad
 import { adminSubcategoryRouter } from "./dashboard-features/(category)/subcategory.admin.routes";
 import { adminDeleteRequestRouter } from "./dashboard-features/(users)/deleteRequest.admin.routes";
 import { adminFeedbackRouter } from "./dashboard-features/(users)/feedback.admin.routes";
+import { adminNotificationRouter } from "./dashboard-features/(users)/notification.admin.routes";
 import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
 import { authRouter } from "./features/auth/auth.router";
 import { bannerRouter } from "./features/banners/banners.routes";
@@ -43,6 +44,7 @@ const adminRouter = router({
   adminUsersRouter,
   adminDeleteRequestRouter,
   adminFeedbackRouter,
+  adminNotificationRouter,
 });
 
 export const appRouter = mergeRouters(usersRouter, adminRouter);

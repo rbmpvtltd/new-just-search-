@@ -3,10 +3,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   JobDuration,
   JobType,
-  preferredPositionSchema,
   WorkShift,
-} from "@repo/db/src/schema/hire.schema";
-import React from "react";
+} from "@repo/db/dist/enum/allEnum.enum";
+import { preferredPositionSchema } from "@repo/db/dist/schema/hire.schema";
 import { useForm } from "react-hook-form";
 import type z from "zod";
 import { FormField } from "@/components/form/form-component";

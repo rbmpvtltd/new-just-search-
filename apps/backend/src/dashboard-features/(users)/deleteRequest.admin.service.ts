@@ -1,5 +1,5 @@
-import { users } from "@repo/db/src/schema/auth.schema";
-import { account_delete_request } from "@repo/db/src/schema/user.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import { account_delete_request } from "@repo/db/dist/schema/user.schema";
 
 export const deleteRequestColumns = {
   id: account_delete_request.id,

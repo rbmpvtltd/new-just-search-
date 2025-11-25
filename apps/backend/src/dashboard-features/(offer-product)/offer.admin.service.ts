@@ -1,10 +1,10 @@
-import { users } from "@repo/db/src/schema/auth.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
   cities,
   subcategories,
-} from "@repo/db/src/schema/not-related.schema";
-import { offers } from "@repo/db/src/schema/offer.schema";
+} from "@repo/db/dist/schema/not-related.schema";
+import { offers } from "@repo/db/dist/schema/offer.schema";
 
 export const offerColumns = {
   id: offers.id,

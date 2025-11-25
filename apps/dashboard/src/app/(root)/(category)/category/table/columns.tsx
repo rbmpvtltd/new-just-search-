@@ -1,11 +1,11 @@
 "use client";
 
-import { CldImage } from "next-cloudinary";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CldImage } from "next-cloudinary";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { useTableStore } from "../store";
+import { Checkbox } from "@/components/ui/checkbox";
 import { EditBanner } from "../form/edit.form";
+import { useTableStore } from "../store";
 
 export interface Category {
   id: number;
@@ -28,7 +28,7 @@ function SelectCell({ id }: { id: number }) {
       checked={select.includes(id)}
       onCheckedChange={() => toggleSelect(id)}
       aria-label="Select row"
-      className="translate-y-[2px]"
+      className="translate-y-0.5"
     />
   );
 }
@@ -54,7 +54,7 @@ function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
       checked={active}
       onCheckedChange={handleToggle}
       aria-label="Select all"
-      className="translate-y-[2px]"
+      className="translate-y-0.5"
     />
   );
 }
@@ -73,7 +73,7 @@ function PopularCell({ isActive, id }: { isActive: boolean; id: number }) {
       checked={active}
       onCheckedChange={handleToggle}
       aria-label="Select all"
-      className="translate-y-[2px]"
+      className="translate-y-0.5"
     />
   );
 }
@@ -106,7 +106,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
       checked={allSelected || (someSelected && "indeterminate")}
       onCheckedChange={handleToggleAll}
       aria-label="Select all"
-      className="translate-y-[2px]"
+      className="translate-y-0.5"
     />
   );
 }
@@ -129,7 +129,7 @@ export const columns: ColumnDef<Category>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.original.id}</div>,
+    cell: ({ row }) => <div className="w-20">{row.original.id}</div>,
     enableHiding: false,
   },
   {
@@ -155,11 +155,7 @@ export const columns: ColumnDef<Category>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
-    cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">
-        {row.original.title || "No title"}
-      </div>
-    ),
+    cell: ({ row }) => row.original.title || "No title",
   },
   {
     accessorKey: "status",

@@ -1,11 +1,11 @@
 import { db, schemas } from "@repo/db";
-import { users } from "@repo/db/src/schema/auth.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   hireInsertSchema,
   hireListing,
   hireUpdateSchema,
-} from "@repo/db/src/schema/hire.schema";
-import { cities, states } from "@repo/db/src/schema/not-related.schema";
+} from "@repo/db/dist/schema/hire.schema";
+import { cities, states } from "@repo/db/dist/schema/not-related.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { count, eq, gt, sql } from "drizzle-orm";

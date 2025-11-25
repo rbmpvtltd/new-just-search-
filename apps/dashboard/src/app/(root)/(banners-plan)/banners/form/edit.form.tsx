@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
+import { bannerInsertSchema } from "@repo/db/dist/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -23,7 +23,7 @@ import {
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
-// import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
+// import { bannerSelectSchema } from "@repo/db/dist/schema/not-related.schema";
 
 const extendedBannerSelectSchema = bannerInsertSchema
   .pick({
@@ -65,11 +65,11 @@ function BannerEditForm({ id, setOpen }: EditForm) {
   const trpc = useTRPC();
 
   const { data, refetch } = useSuspenseQuery(
-    trpc.adminBanner.edit.queryOptions({ id }),
+    trpc.adminBannerRouter.edit.queryOptions({ id }),
   );
 
   const { mutate: updateBanner } = useMutation(
-    trpc.adminBanner.update.mutationOptions(),
+    trpc.adminBannerRouter.update.mutationOptions(),
   );
 
   console.log("data is", data);
@@ -108,7 +108,7 @@ function BannerEditForm({ id, setOpen }: EditForm) {
         onSuccess: () => {
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.adminBanner.list.queryKey(),
+            queryKey: trpc.adminBannerRouter.list.queryKey(),
           });
           refetch();
           setOpen(false);

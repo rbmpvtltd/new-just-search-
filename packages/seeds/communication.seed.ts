@@ -1,7 +1,7 @@
 // import dotenv from "dotenv";
 // import { eq } from "drizzle-orm";
 // import { db } from "@repo/db";
-// import { users } from "@repo/db/src/schema/auth.schema";
+// import { users } from "@repo/db/dist/schema/auth.schema";
 // import { sql } from "./mysqldb.seed";
 
 // dotenv.config();

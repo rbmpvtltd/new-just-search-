@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { preferredPositionSchema } from "@repo/db/dist/schema/hire.schema";
 import {
   JobDuration,
   JobType,
-  preferredPositionSchema,
   WorkShift,
-} from "@repo/db/src/schema/hire.schema";
+} from "@repo/db/dist/enum/allEnum.enum";
 import { useForm } from "react-hook-form";
 import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";

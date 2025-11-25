@@ -1,5 +1,5 @@
 import { db, schemas } from "@repo/db";
-import { favourites } from "@repo/db/src/schema/business.schema";
+import { favourites } from "@repo/db/dist/schema/business.schema";
 import { and, count, eq, gt, sql } from "drizzle-orm";
 import z from "zod";
 import {

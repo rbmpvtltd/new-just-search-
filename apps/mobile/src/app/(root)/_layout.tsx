@@ -1,9 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { Link, router, Tabs, usePathname } from "expo-router";
-import { Alert, Image, Text, useColorScheme, View } from "react-native";
+import { router, Tabs, usePathname } from "expo-router";
+import { Alert, Text, useColorScheme, View } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import Colors from "@/constants/Colors";
@@ -17,7 +15,6 @@ export default function TabLayout() {
     isLoading,
     isError,
   } = useNotificationCount();
-  const navigation = useNavigation();
   const pathname = usePathname();
   const colorScheme = useColorScheme();
 
@@ -50,10 +47,7 @@ export default function TabLayout() {
             <Ionicons name="home-outline" size={24} color={color} />
           ),
           headerShown: false,
-          headerLeft: () => (
-            <View className="flex-row items-center">
-            </View>
-          ),
+          headerLeft: () => <View className="flex-row items-center"></View>,
           headerRight: () => (
             <View className="flex-row gap-4 mr-4">
               <Pressable

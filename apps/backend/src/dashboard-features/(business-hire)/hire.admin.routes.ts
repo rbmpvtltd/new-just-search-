@@ -1,18 +1,18 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { users } from "@repo/db/src/schema/auth.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   hireCategories,
   hireListing,
   hireSubcategories,
-} from "@repo/db/src/schema/hire.schema";
+} from "@repo/db/dist/schema/hire.schema";
 import {
   categories,
   categoryInsertSchema,
   categoryUpdateSchema,
   cities,
   subcategories,
-} from "@repo/db/src/schema/not-related.schema";
+} from "@repo/db/dist/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";

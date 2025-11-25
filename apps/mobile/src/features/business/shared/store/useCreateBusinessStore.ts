@@ -3,7 +3,7 @@ import type {
   businessDetailSchema,
   businessTimingSchema,
   contactDetailSchema,
-} from "@repo/db/src/schema/business.schema";
+} from "@repo/db/dist/schema/business.schema";
 import type z from "zod";
 import { create } from "zustand";
 

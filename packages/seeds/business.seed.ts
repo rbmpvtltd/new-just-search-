@@ -1,7 +1,7 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
 import { eq } from "drizzle-orm";
-import { UserRole, users } from "../db/src/schema/auth.schema";
+import { users } from "../db/src/schema/auth.schema";
 import {
   businessCategories,
   businessListings,
@@ -340,7 +340,7 @@ const addBusiness = async () => {
           updatedAt: row.updated_at,
         })
         .returning();
-      
+
       // images handle
       if (newbusinessListing) {
         const images = ["image1", "image2", "image3", "image4", "image5"];

@@ -1,7 +1,7 @@
 // import DrawerLayout from "@/components/layout/Drawer";
 // import { useLoadToken } from "@/hooks/useLoadToken";
 // import { useAuthStore } from "@/store/authStore";
-// import { UserRole } from "@repo/db/src/schema/auth.schema";
+// import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 // export default function HomeLayout() {
 //   const { token, role } = useLoadToken();
@@ -11,11 +11,11 @@
 //   return <DrawerLayout />;
 // }
 
+import { UserRole } from "@repo/db/dist/enum/userRole.enum";
+import { useEffect } from "react";
 import DrawerLayout from "@/components/layout/Drawer";
 import { useLoadToken } from "@/hooks/useLoadToken";
 import { useAuthStore } from "@/store/authStore";
-import { UserRole } from "@repo/db/src/schema/auth.schema";
-import { useEffect } from "react";
 
 export default function HomeLayout() {
   const { token, role, isLoading } = useLoadToken();
@@ -26,7 +26,6 @@ export default function HomeLayout() {
       setAuthStoreToken(token, UserRole.admin);
     }
   }, [token, role, setAuthStoreToken]);
-
 
   return <DrawerLayout />;
 }

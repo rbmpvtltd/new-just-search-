@@ -1,6 +1,6 @@
 import { db } from "@repo/db";
 import { account_delete_request } from "@repo/db/dist/schema/user.schema.js";
-import { users } from "@repo/db/src/schema/auth.schema.js";
+import { users } from "@repo/db/dist/schema/auth.schema.js";
 import { eq } from "drizzle-orm";
 import { fakeUserSeed } from "./fake.seed.js";
 import { sql } from "./mysqldb.seed.js";
