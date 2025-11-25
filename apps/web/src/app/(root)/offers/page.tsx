@@ -184,13 +184,13 @@ function Hit({ hit }: { hit: any }) {
           {hit.name}
         </h2>
         <div className="flex flex-col items-center gap-1">
-          {hit.discountPercent && (
+          {hit.discountPercent > 0 && (
             <p className="text-gray-500 text-sm">
               ₹ <span className="line-through">{hit.price}</span>
             </p>
           )}
           <p className="font-bold text-primary text-lg">
-            ₹ {hit.finalPrice ?? hit.price}
+            ₹ {hit.finalPrice > 0 ? hit.finalPrice : hit.price}
           </p>
         </div>
       </div>
@@ -310,7 +310,7 @@ export default function AlgoliaSearch() {
               hitComponent={Hit}
               classNames={{
                 root: "w-full",
-                list: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4",
+                list: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
                 item: "w-full",
               }}
 
