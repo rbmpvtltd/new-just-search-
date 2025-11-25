@@ -1,21 +1,20 @@
+import { db } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import { TRPCError } from "@trpc/server";
+import bcrypt from "bcryptjs";
+import { eq, or } from "drizzle-orm";
 import z from "zod";
+import { isEmail, isMobileNumber, normalizeMobile } from "@/utils/identifier";
+import { sendSMSOTP } from "@/utils/optGenerator";
 import {
   protectedProcedure,
   publicProcedure,
   router,
   visitorProcedure,
 } from "@/utils/trpc";
+import { verifyOTP } from "@/utils/varifyOTP";
 import { checkPasswordGetUser } from "./auth.service";
 import { createSession, deleteSession } from "./lib/session";
-import { sendSMSOTP } from "@/utils/optGenerator";
-import { db } from "@repo/db";
-import { userRoleEnum, users } from "@repo/db/dist/schema/auth.schema";
-import { and, eq, or } from "drizzle-orm";
-import { redis } from "@/lib/redis";
-import bcrypt from "bcryptjs";
-import { isEmail, isMobileNumber, normalizeMobile } from "@/utils/identifier";
-import { verifyOTP } from "@/utils/varifyOTP";
 
 export const authRouter = router({
   googleLogin: publicProcedure.query(async ({ ctx }) => {
@@ -66,7 +65,11 @@ export const authRouter = router({
     .mutation(async ({ input }) => {
       //TODO: add rate limiter for send otp in one minute
       const result = await sendSMSOTP(input.identifier);
-      return {method : result?.method, success: true, message: `OTP send on ${input.identifier}` };
+      return {
+        method: result?.method,
+        success: true,
+        message: `OTP send on ${input.identifier}`,
+      };
     }),
   verifyauth: protectedProcedure.query(async ({ ctx }) => {
     return { success: true, role: ctx.role };
@@ -112,7 +115,7 @@ export const authRouter = router({
     .mutation(async ({ input }) => {
       const { phoneNumber, otp, displayName, email, password } = input;
 
-      const isValid = await verifyOTP(String(email),otp);
+      const isValid = await verifyOTP(String(email), otp);
       if (!isValid) {
         throw new TRPCError({
           code: "UNAUTHORIZED",

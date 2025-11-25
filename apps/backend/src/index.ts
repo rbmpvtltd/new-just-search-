@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { db, schemas } from "@repo/db";
-import { UserRole } from "@repo/db/dist/enum/userRole.enum";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { logger } from "@repo/logger";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import axios from "axios";
