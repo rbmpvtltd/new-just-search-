@@ -1,10 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
+import { notificationInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -23,21 +24,9 @@ import {
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
-// import { bannerSelectSchema } from "@repo/db/dist/schema/not-related.schema";
+const extendedInsertSchema = notificationInsertSchema;
 
-const extendedCategoryInsertSchema = categoryInsertSchema
-  .pick({
-    photo: true,
-    isPopular: true,
-    type: true,
-    title: true,
-    status: true,
-  })
-  .extend({
-    photo: z.any(),
-  });
-
-type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
+type CategorySelectSchema = z.infer<typeof extendedInsertSchema>;
 
 export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
@@ -71,12 +60,14 @@ function AddForm({ setOpen }: AddForm) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CategorySelectSchema>({
-    resolver: zodResolver(extendedCategoryInsertSchema),
+    resolver: zodResolver(extendedInsertSchema),
     defaultValues: {
-      photo: "",
-      type: 1,
       status: false,
-      isPopular: false,
+      description: "",
+      title: "",
+      city: null,
+      state: null,
+      role: "",
     },
   });
 

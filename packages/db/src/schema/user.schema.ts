@@ -9,7 +9,11 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 import z from "zod";
 import {
   MaritalStatus,
@@ -139,3 +143,9 @@ export const notification = pgTable("notification", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const notificationInsertSchema = createInsertSchema(notification, {
+  role: () => z.array(z.enum(UserRole)).min(1, "user role is required"),
+});
+export const notificationUpdateSchema = createUpdateSchema(notification);
+export const notificationSelectSchema = createSelectSchema(notification);
