@@ -65,11 +65,11 @@ function BannerEditForm({ id, setOpen }: EditForm) {
   const trpc = useTRPC();
 
   const { data, refetch } = useSuspenseQuery(
-    trpc.adminBanner.edit.queryOptions({ id }),
+    trpc.adminBannerRouter.edit.queryOptions({ id }),
   );
 
   const { mutate: updateBanner } = useMutation(
-    trpc.adminBanner.update.mutationOptions(),
+    trpc.adminBannerRouter.update.mutationOptions(),
   );
 
   console.log("data is", data);
@@ -108,7 +108,7 @@ function BannerEditForm({ id, setOpen }: EditForm) {
         onSuccess: () => {
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.adminBanner.list.queryKey(),
+            queryKey: trpc.adminBannerRouter.list.queryKey(),
           });
           refetch();
           setOpen(false);

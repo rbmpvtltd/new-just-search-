@@ -2,11 +2,11 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { CldImage } from "next-cloudinary";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { useTableStore } from "../store";
-import { EditBanner } from "../form/edit.form";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
+import { EditBanner } from "../form/edit.form";
+import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {
   const select = useTableStore((state) => state.select);
@@ -128,53 +128,35 @@ export const columns: ColumnDef<Subcategory>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">
-        {row.original.name || "No Name"}
-      </div>
-    ),
+    cell: ({ row }) => row.original.name || "No Name",
   },
   {
     accessorKey: "phone",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Phone Number" />
     ),
-    cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">
-        {row.original.phone || "No Name"}
-      </div>
-    ),
+    cell: ({ row }) => row.original.phone || "No Name",
   },
   {
     accessorKey: "city",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="city name" />
     ),
-    cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">
-        {row.original.city || "No Name"}
-      </div>
-    ),
+    cell: ({ row }) => row.original.city || "No Name",
   },
   {
     accessorKey: "category",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category Name" />
     ),
-    cell: ({ row }) => (
-      <div className="max-w-40 whitespace-normal">{row.original.category}</div>
-    ),
+    cell: ({ row }) => row.original.category,
   },
   {
     accessorKey: "subcategories",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Subcategories Name" />
     ),
-    cell: ({ row }) => (
-      <div className="max-w-40 whitespace-normal">
-        {row.original.subcategories}
-      </div>
-    ),
+    cell: ({ row }) => row.original.subcategories,
   },
 
   {
@@ -183,10 +165,7 @@ export const columns: ColumnDef<Subcategory>[] = [
       <DataTableColumnHeader column={column} title="Active" />
     ),
     cell: ({ row }) => (
-      <ActiveCell
-        id={row.original.id}
-        isActive={row.original.status ?? false}
-      />
+      <ActiveCell id={row.original.id} isActive={row.original.status} />
     ),
   },
   {
@@ -194,9 +173,8 @@ export const columns: ColumnDef<Subcategory>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
-    cell: ({ row }) => (
-      <div>{row?.original?.created_at?.toLocaleDateString() ?? "null"}</div>
-    ),
+    cell: ({ row }) =>
+      row?.original?.created_at?.toLocaleDateString() ?? "null",
   },
   {
     id: "action",

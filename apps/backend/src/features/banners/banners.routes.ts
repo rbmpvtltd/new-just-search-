@@ -1,9 +1,9 @@
+import { db, schemas } from "@repo/db";
+import { favourites } from "@repo/db/src/schema/business.schema";
+import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
 import { publicProcedure, router, visitorProcedure } from "@/utils/trpc";
 import { getBannerData } from "./banners.service";
-import { db, schemas } from "@repo/db";
-import { and, eq, sql } from "drizzle-orm";
-import { favourites } from "@repo/db/src/schema/business.schema";
 
 const business = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -13,11 +13,10 @@ export const bannerRouter = router({
     .input(z.object({ type: z.number() }))
     .query(async ({ input }) => {
       const data = getBannerData(input.type);
-      console.log("caraousel data in backend===============>",data)
       return data;
     }),
 
-  premiumShops: visitorProcedure.query(async ({ctx}) => {
+  premiumShops: visitorProcedure.query(async ({ ctx }) => {
     const data = await db
       .select({
         photo: business.photo,
@@ -62,11 +61,11 @@ export const bannerRouter = router({
         favourites,
         and(
           eq(favourites.businessId, business.id),
-          eq(favourites.userId, ctx.userId)
-        )
+          eq(favourites.userId, ctx.userId),
+        ),
       )
       .leftJoin(business_reviews, eq(business.id, business_reviews.businessId))
-      .groupBy(business.id,favourites.id)
+      .groupBy(business.id, favourites.id)
       .limit(8);
     return data;
   }),

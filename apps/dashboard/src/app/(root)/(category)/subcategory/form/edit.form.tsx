@@ -1,5 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { categoryInsertSchema } from "@repo/db/src/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,6 +10,7 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,8 +23,6 @@ import {
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
-import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import { categoryInsertSchema } from "@repo/db/src/schema/not-related.schema";
 
 const extendedCategoryInsertSchema = categoryInsertSchema
   .pick({
