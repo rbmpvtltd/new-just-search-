@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
-import { statusEnum } from "@/enum/allEnum.enum";
+import { statusEnum } from "../enum/allEnum.enum";
 import { users } from "./auth.schema";
 import { businessListings } from "./business.schema";
 import { categories, subcategories } from "./not-related.schema";

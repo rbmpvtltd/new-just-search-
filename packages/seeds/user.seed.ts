@@ -1,6 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db, schemas } from "@repo/db";
-import { UserRole } from "@repo/db/dist/enum/userRole.enum";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";

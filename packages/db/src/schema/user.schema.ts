@@ -20,7 +20,7 @@ import {
   maritalStatusEnum,
   UserRole,
   userRoleEnum,
-} from "@/enum/allEnum.enum";
+} from "../enum/allEnum.enum";
 import { users } from "./auth.schema";
 import {
   categories,
