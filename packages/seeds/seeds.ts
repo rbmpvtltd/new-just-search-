@@ -7,9 +7,10 @@ import { notRelated } from "./notrelated.seed";
 import { offerSeed } from "./offer.seed";
 import { planSeed } from "./plan.seed";
 import { productSeed } from "./product.seed";
-import { seedRequestAccounts } from "./requestacount.seed";
+// import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 import { feedbackseed } from "./feedback.seed";
+import { algoliaSeed } from "./algolia.seed";
 
 export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
@@ -21,11 +22,12 @@ export const dummyImageUrl = "dummyImageUrl";
     // await fakeSeed(); // NOTE: complete by clouadinaryFake = true on live db
     // await businessSeed();
     // await hireSeed();
-    await productSeed();
-    await offerSeed();
+    // await productSeed();
+    // await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();
     // await planSeed();
+    await algoliaSeed()
 
     console.log("✅ All seeds inserted successfully");
 
