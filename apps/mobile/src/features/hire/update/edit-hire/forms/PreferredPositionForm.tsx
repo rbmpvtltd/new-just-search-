@@ -4,7 +4,7 @@ import {
   JobType,
   preferredPositionSchema,
   WorkShift,
-} from "@repo/db/src/schema/hire.schema";
+} from "@repo/db/dist/schema/hire.schema";
 import { useForm } from "react-hook-form";
 import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";

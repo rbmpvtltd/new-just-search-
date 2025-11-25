@@ -2,79 +2,32 @@ import {
   boolean,
   date,
   integer,
-  pgEnum,
   pgTable,
   serial,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import {
-  createInsertSchema,
-  createSelectSchema,
-  createUpdateSchema,
-} from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
+import {
+  Gender,
+  genderEnum,
+  JobDuration,
+  JobType,
+  jobDurationEnum,
+  jobTypeEnum,
+  MaritalStatus,
+  maritalStatusEnum,
+  WorkShift,
+  workShiftEnum,
+} from "@/enum/allEnum.enum";
 import {
   categories,
   cities,
   subcategories,
 } from "../schema/not-related.schema";
 import { users } from "./auth.schema";
-
-// ✅ Enums
-export const Gender = {
-  Male: "Male",
-  Female: "Female",
-  Others: "Others",
-} as const;
-
-export const MaritalStatus = {
-  Married: "Married",
-  Unmarried: "Unmarried",
-  Widowed: "Widowed",
-  Divorced: "Divorced",
-  Others: "Others",
-} as const;
-
-export const JobType = {
-  FullTime: "FullTime",
-  PartTime: "PartTime",
-  Both: "Both",
-} as const;
-
-export const WorkShift = {
-  Morning: "Morning",
-  Evening: "Evening",
-  Night: "Night",
-} as const;
-
-export const JobDuration = {
-  Day: "Day",
-  Week: "Week",
-  Month: "Month",
-  Year: "Year",
-} as const;
-
-// export const Languages = {
-//   Hindi: "Hindi",
-//   English: "English",
-//   Punjabi: "Punjabi",
-//   Gujarati: "Gujarati",
-//   Bengali: "Bengali",
-//   Malayalam: "Malayalam",
-//   Kannada: "Kannada",
-//   Tamil: "Tamil",
-//   Other: "Other",
-// } as const;
-
-export const genderEnum = pgEnum("hire_gender", Gender);
-export const maritalStatusEnum = pgEnum("hire_marital_status", MaritalStatus);
-
-export const jobTypeEnum = pgEnum("hire_job_type", JobType);
-export const workShiftEnum = pgEnum("hire_work_shift", WorkShift);
-export const jobDurationEnum = pgEnum("hire_job_duration", JobDuration);
-// export const languagesEnum = pgEnum("hire_languages", Languages);
 
 export const hireListing = pgTable("hire_listing", {
   id: serial("id").primaryKey(),
@@ -157,7 +110,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
     z.string().refine(
       (val) => {
         const num = parseFloat(val);
-        return !isNaN(num) && num >= -90 && num <= 90;
+        return !Number.isNaN(num) && num >= -90 && num <= 90;
       },
       { message: "Latitude must be a number between -90 and 90" },
     ),
@@ -165,7 +118,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
     z.string().refine(
       (val) => {
         const num = parseFloat(val);
-        return !isNaN(num) && num >= -180 && num <= 180;
+        return !Number.isNaN(num) && num >= -180 && num <= 180;
       },
       { message: "Longitude must be a number between -180 and 180" },
     ),

@@ -1,10 +1,10 @@
-import { users } from "@repo/db/src/schema/auth.schema";
-import { hireListing } from "@repo/db/src/schema/hire.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import { hireListing } from "@repo/db/dist/schema/hire.schema";
 import {
   categories,
   cities,
   subcategories,
-} from "@repo/db/src/schema/not-related.schema";
+} from "@repo/db/dist/schema/not-related.schema";
 
 export const hireColumns = {
   id: hireListing.id,

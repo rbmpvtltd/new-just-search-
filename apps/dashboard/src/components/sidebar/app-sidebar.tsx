@@ -9,7 +9,7 @@ import {
   IconSearch,
   IconSettings,
 } from "@tabler/icons-react";
-import { BookOpen, Bot, Settings2, SquareTerminal } from "lucide-react";
+import { BookOpen, Bot } from "lucide-react";
 import Link from "next/link";
 import { NavDocuments } from "@/components/sidebar/nav-documents";
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -110,6 +110,11 @@ const data = {
       icon: IconFileWord,
     },
     {
+      name: "Notification",
+      url: "/notification",
+      icon: IconFileWord,
+    },
+    {
       name: "Account Delete Request",
       url: "/delete-request",
       icon: IconFileWord,
@@ -143,11 +148,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <Link href="/">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <IconInnerShadowTop className="size-5!" />
+                <span className="text-base font-semibold">Just Search</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

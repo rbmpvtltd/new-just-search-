@@ -1,5 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
+import { UserRole } from "@repo/db/dist/enum/userRole.enum";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
@@ -17,7 +18,6 @@ import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { safeArray } from "./utils";
-import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 export const hireSeed = async () => {
   await cleardataofhire();
@@ -132,7 +132,6 @@ export const addHire = async () => {
         clouadinaryFake,
       );
     }
-     
 
     // console.log("=====");
     console.log("createUser-------------------", createUser);

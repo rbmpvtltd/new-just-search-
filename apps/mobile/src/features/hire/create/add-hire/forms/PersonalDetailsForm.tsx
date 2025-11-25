@@ -4,7 +4,7 @@ import {
   Gender,
   MaritalStatus,
   personalDetailsHireSchema,
-} from "@repo/db/src/schema/hire.schema";
+} from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";

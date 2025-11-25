@@ -3,7 +3,7 @@ import {
   offers,
   offersInsertSchema,
   offersUpdateSchema,
-} from "@repo/db/src/schema/offer.schema";
+} from "@repo/db/dist/schema/offer.schema";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import slugify from "slugify";

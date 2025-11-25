@@ -1,16 +1,16 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { users } from "@repo/db/src/schema/auth.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
 // import {
 //   offerCategories,
 //   offers,
 //   offerSubcategories,
-// } from "@repo/db/src/schema/offer.schema";
+// } from "@repo/db/dist/schema/offer.schema";
 import {
   categories,
   cities,
   subcategories,
-} from "@repo/db/src/schema/not-related.schema";
+} from "@repo/db/dist/schema/not-related.schema";
 import { eq, sql } from "drizzle-orm";
 import {
   buildOrderByClause,
@@ -23,7 +23,7 @@ import {
   offerColumns,
   offerGlobalFilterColumns,
 } from "./offer.admin.service";
-import { offers } from "@repo/db/src/schema/offer.schema";
+import { offers } from "@repo/db/dist/schema/offer.schema";
 
 export const adminOfferRouter = router({
   // list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {

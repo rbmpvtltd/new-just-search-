@@ -10,7 +10,7 @@ import { checkPasswordGetUser } from "./auth.service";
 import { createSession, deleteSession } from "./lib/session";
 import { sendSMSOTP } from "@/utils/optGenerator";
 import { db } from "@repo/db";
-import { userRoleEnum, users } from "@repo/db/src/schema/auth.schema";
+import { userRoleEnum, users } from "@repo/db/dist/schema/auth.schema";
 import { and, eq, or } from "drizzle-orm";
 import { redis } from "@/lib/redis";
 import bcrypt from "bcryptjs";

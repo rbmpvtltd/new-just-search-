@@ -1,5 +1,5 @@
 import { db, schemas } from "@repo/db";
-import { users } from "@repo/db/src/schema/auth.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   businessInsertSchema,
   businessListings,
@@ -8,18 +8,18 @@ import {
   businessSubcategories,
   businessUpdateSchema,
   favourites,
-} from "@repo/db/src/schema/business.schema";
+} from "@repo/db/dist/schema/business.schema";
 import {
   categories,
   subcategories,
-} from "@repo/db/src/schema/not-related.schema";
-import { offerPhotos, offerReviews, offers } from "@repo/db/src/schema/offer.schema";
+} from "@repo/db/dist/schema/not-related.schema";
+import { offerPhotos, offerReviews, offers } from "@repo/db/dist/schema/offer.schema";
 import {
   productInsertSchema,
   productPhotos,
   productReviews,
   products,
-} from "@repo/db/src/schema/product.schema";
+} from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";

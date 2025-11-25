@@ -1,4 +1,4 @@
-import { feedbacks } from "@repo/db/src/schema/user.schema";
+import { feedbacks } from "@repo/db/dist/schema/user.schema";
 
 export const feedbackColumns = {
   id: feedbacks.id,

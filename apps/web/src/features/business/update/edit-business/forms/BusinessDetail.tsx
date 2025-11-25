@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { businessDetailSchema } from "@repo/db/src/schema/business.schema";
+import { businessDetailSchema } from "@repo/db/dist/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";

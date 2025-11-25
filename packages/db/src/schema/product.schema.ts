@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
-  pgEnum,
   pgTable,
   serial,
   text,
@@ -11,13 +10,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
+import { statusEnum } from "@/enum/allEnum.enum";
 import { users } from "./auth.schema";
 import { businessListings } from "./business.schema";
 import { categories, subcategories } from "./not-related.schema";
-import { Status } from "./business.schema";
-
-export const productStatus = pgEnum("status", Status);
-
 
 // 1.products
 export const products = pgTable("products", {
@@ -70,7 +66,6 @@ export const productPhotos = pgTable("product_photos", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-
 // 3.products_reviews
 export const productReviews = pgTable("product_reviews", {
   id: serial("id").primaryKey(),
@@ -90,7 +85,7 @@ export const productReviews = pgTable("product_reviews", {
 
   rate: integer("rate"),
   view: boolean("view").default(false).notNull(),
-  status: productStatus("status").default("Pending"),
+  status: statusEnum("status").default("Pending"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -122,9 +117,6 @@ export const productSubCategories = pgTable("product_subcategories", {
     .notNull()
     .references(() => subcategories.id, { onDelete: "cascade" }),
 });
-
-
-
 
 export const productsRelations = relations(products, ({ many }) => ({
   // Define a one-to-many relationship.

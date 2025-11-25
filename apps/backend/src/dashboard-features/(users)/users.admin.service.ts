@@ -1,4 +1,4 @@
-import { users } from "@repo/db/src/schema/auth.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
 
 export const usersColumns = {
   // status: subcategories.status,

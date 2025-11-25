@@ -3,7 +3,7 @@ import type {
   educationSchema,
   personalDetailsHireSchema,
   preferredPositionSchema,
-} from "@repo/db/src/schema/hire.schema";
+} from "@repo/db/dist/schema/hire.schema";
 import type z from "zod";
 import { create } from "zustand";
 
@@ -108,9 +108,6 @@ export const useHireFormStore = create<HireFormProps>((set) => ({
 
   clearPage: () => set(() => ({ page: 0, formValue: initialFormValue })),
 }));
-
-
-
 
 // import { create } from "zustand";
 

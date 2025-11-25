@@ -7,31 +7,16 @@ import {
   text,
   timestamp,
   varchar,
-  pgEnum
 } from "drizzle-orm/pg-core";
-import {
-  createInsertSchema,
-  createSelectSchema,
-  createUpdateSchema,
-} from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
+import { statusEnum } from "@/enum/allEnum.enum";
 import {
   categories,
   cities,
   subcategories,
 } from "../schema/not-related.schema";
 import { users } from "./auth.schema";
-
-export const Status = {
-  Pending: "Pending",
-  Approved: "Approved",
-  Rejected: "Rejected",
-} as const;
-
-
-
-export const listingStatus = pgEnum("status", Status);
-
 
 // 1. Business Listing Interface
 export const businessListings = pgTable("business_listings", {
@@ -60,7 +45,7 @@ export const businessListings = pgTable("business_listings", {
   fromHour: varchar("from_hour", { length: 255 }),
   toHour: varchar("to_hour", { length: 255 }),
   contactPerson: varchar("contact_person", { length: 255 }),
-  status: listingStatus("status").default("Pending"),
+  status: statusEnum("status").default("Pending"),
   ownerNumber: varchar("owner_number"),
   phoneNumber: varchar("phone_number"),
   whatsappNo: varchar("whatsapp_no"),

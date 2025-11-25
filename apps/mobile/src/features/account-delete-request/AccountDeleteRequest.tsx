@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { requestAccountsInsertSchema } from "@repo/db/src/schema/user.schema";
+import { requestAccountsInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Text, View } from "react-native";

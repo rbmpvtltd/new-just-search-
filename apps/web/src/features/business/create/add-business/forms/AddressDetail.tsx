@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addressDetailSchema } from "@repo/db/src/schema/business.schema";
+import { addressDetailSchema } from "@repo/db/dist/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";

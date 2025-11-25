@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { productInsertSchema } from "@repo/db/src/schema/product.schema";
+import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";

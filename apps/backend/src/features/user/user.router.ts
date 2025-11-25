@@ -4,7 +4,7 @@ import {
   feedbackInsertSchema,
   requestAccountsInsertSchema,
   userUpdateSchema,
-} from "@repo/db/src/schema/user.schema";
+} from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";

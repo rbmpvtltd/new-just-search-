@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { businessTimingSchema } from "@repo/db/src/schema/business.schema";
+import { businessTimingSchema } from "@repo/db/dist/schema/business.schema";
 import { useForm } from "react-hook-form";
 import type z from "zod";
 import {
