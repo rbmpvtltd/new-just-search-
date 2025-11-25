@@ -22,7 +22,7 @@ export const toISOStringTime = (time: string | Date): string => {
   const [hours, mintues] = time.split(":").map(Number);
   const now = new Date();
 
-  now.setHours(hours, mintues, 0, 0);
+  now.setHours(Number(hours), mintues, 0, 0);
   return now.toISOString();
 };
 

@@ -21,7 +21,7 @@ import {
   maritalStatusEnum,
   WorkShift,
   workShiftEnum,
-} from "@/enum/allEnum.enum";
+} from "../enum/allEnum.enum";
 import {
   categories,
   cities,
