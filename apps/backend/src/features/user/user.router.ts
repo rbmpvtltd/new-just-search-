@@ -113,12 +113,20 @@ export const userRouter = router({
     }),
 
   getUserProfile: protectedProcedure.query(async ({ ctx }) => {
-    const profile = await db.query.users.findFirst({
+    const profile = await db.query.profiles.findFirst({
       where: (userProfiles, { eq }) => eq(userProfiles.id, ctx.userId),
     });
 
     const role = ctx.role;
     return { ...profile, role };
+  }),
+   getUserDetail: protectedProcedure.query(async ({ ctx }) => {
+    const user = await db.query.users.findFirst({
+      where: (userDetail, { eq }) => eq(userDetail.id, ctx.userId),
+    });
+
+    // const role = ctx.role;
+    return user ;
   }),
 
   accountDeleteRequest: protectedProcedure

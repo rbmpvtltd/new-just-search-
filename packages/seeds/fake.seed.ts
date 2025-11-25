@@ -242,7 +242,7 @@ const seedFakeBusiness = async (userId: number) => {
         landmark: "fake",
         pincode: "342001",
         state: city.stateId,
-        cityId: city.id,
+        city: city.id,
         // schedules: {},
         status: "Approved",
         email: "fake@example.com",

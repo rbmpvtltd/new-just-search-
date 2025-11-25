@@ -42,7 +42,6 @@ async function page() {
             rating={item.rating}
             category={item.category ?? ""}
             subcategory={item.subcategories}
-            initialFav={true}
           />
         </div>
       ))}

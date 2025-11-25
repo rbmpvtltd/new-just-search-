@@ -1,5 +1,5 @@
 {
-  "id": "c0447aa7-cbbf-4576-8ed3-fef7bcb22a8e",
+  "id": "69501efd-b720-45b4-8c78-26ada8e2732c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -264,10 +264,10 @@
         },
         "status": {
           "name": "status",
-          "type": "boolean",
+          "type": "status",
           "primaryKey": false,
           "notNull": false,
-          "default": true
+          "default": "'Pending'"
         },
         "owner_number": {
           "name": "owner_number",
@@ -919,6 +919,43 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.chat_token_sessions": {
+      "name": "chat_token_sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_number": {
+          "name": "token_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject": {
+          "name": "subject",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -2721,10 +2758,10 @@
         },
         "status": {
           "name": "status",
-          "type": "boolean",
+          "type": "status",
           "primaryKey": false,
-          "notNull": true,
-          "default": true
+          "notNull": false,
+          "default": "'Pending'"
         },
         "created_at": {
           "name": "created_at",
@@ -3493,6 +3530,15 @@
         "salesman",
         "franchises",
         "admin"
+      ]
+    },
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "Pending",
+        "Approved",
+        "Rejected"
       ]
     },
     "public.hire_gender": {

@@ -5,7 +5,7 @@ import { asyncHandler } from "@/utils/error/asyncHandler";
 
 export default async function page() {
   const { data: userData } = await asyncHandler(
-    trpcServer.userRouter.getUserProfile.query(),
+    trpcServer.userRouter.getUserDetail.query(),
   );
 
   const { data: referenceData } = await asyncHandler(

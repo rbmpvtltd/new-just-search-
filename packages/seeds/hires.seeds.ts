@@ -21,10 +21,10 @@ import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 export const hireSeed = async () => {
   await cleardataofhire();
-  // await addHire();
+  await addHire();
   // await seedRecentViewsHire();
-  // await seedHireSubcategories();
-  // await seedHireCategories();
+  await seedHireCategories();
+  await seedHireSubcategories();
 };
 
 const cleardataofhire = async () => {

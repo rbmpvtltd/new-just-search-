@@ -132,6 +132,13 @@ CREATE TABLE "chat_sessions" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "chat_token_sessions" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"token_number" varchar NOT NULL,
+	"subject" varchar NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "hire_categories" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"hire_id" integer NOT NULL,

@@ -35,8 +35,9 @@ type BusinessListing = {
     lng: number;
   };
 };
+type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
-export const BussinessListingCard = ({ item }: { item: BusinessListing,category?:string,subcategory?:string[],rating?:string|undefined}) => {
+export const BussinessListingCard = ({ item }: { item: BusinessListing|businesses,category?:string,subcategory?:string[],rating?:string|undefined}) => {
   const router = useRouter()
   return (
     <div className="mx-auto p-4">
@@ -71,7 +72,7 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing,category?
             <div className="flex gap-2 flex-wrap">
               <Badge variant="default">{item.category}</Badge>
 
-              {item.subcategories?.slice(0, 2).map((subcategory, index) => (
+              {item.subcategories?.slice(0, 2)?.map((subcategory:string, index:number) => (
                 <Badge variant="destructive" key={index.toString()}>
                   {subcategory}
                 </Badge>
