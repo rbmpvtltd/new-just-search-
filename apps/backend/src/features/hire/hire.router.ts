@@ -198,7 +198,7 @@ export const hirerouter = router({
           views: 0,
           isFeature: false,
           preferredWorkingHours: "",
-          status: true,
+          status: "Pending",
           website: "",
         })
         .returning({
