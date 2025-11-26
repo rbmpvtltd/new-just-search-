@@ -2,20 +2,25 @@
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+
 import React from "react";
 import { IoMdChatboxes } from "react-icons/io";
-import { object } from "zod";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
 
 const menuItems = [
   { name: "Home", href: "/" },
-  { name: "Hire", href: "/hire?page=1" },
-  { name: "Offers", href: "#link" },
+  { name: "Hire", href: "/hire" },
+  { name: "Offers", href: "/offers" },
   { name: "Favourite", href: "/favourite" },
 ];
 
 export const HeroHeader = () => {
+  const trpc = useTRPC();
   const [menuState, setMenuState] = React.useState(false);
+  const authenticated = useQuery(trpc.auth.verifyauth.queryOptions());
+  console.log("user is ",authenticated)
   return (
     <header className="sticky top-0 z-50">
       <nav
@@ -105,19 +110,22 @@ export const HeroHeader = () => {
                     <IoMdChatboxes size={18} />
                   </Link>
                 </Button>
+                {!authenticated.data?.success && (
+                  <>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="text-primary"
+                    >
+                      <Link href="/login">Login</Link>
+                    </Button>
 
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="text-primary"
-                >
-                  <Link href="/login">Login</Link>
-                </Button>
-
-                <Button asChild size="sm" className="bg-primary text-white">
-                  <Link href="#">Sign Up</Link>
-                </Button>
+                    <Button asChild size="sm" className="bg-primary text-white">
+                      <Link href="#">Sign Up</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -63,7 +63,7 @@ function BannerAddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
   const { mutate: createBanner } = useMutation(
-    trpc.adminBanner.create.mutationOptions(),
+    trpc.adminBannerRouter.create.mutationOptions(),
   );
 
   const {
@@ -99,7 +99,7 @@ function BannerAddForm({ setOpen }: AddForm) {
         onSuccess: () => {
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.adminBanner.list.queryKey(),
+            queryKey: trpc.adminBannerRouter.list.queryKey(),
           });
           setOpen(false);
         },

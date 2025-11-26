@@ -1,6 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { UserRole } from "@repo/db/dist/enum/userRole.enum";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
@@ -28,12 +28,12 @@ export const hireSeed = async () => {
 };
 
 const cleardataofhire = async () => {
-  // await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
-  // );
-  // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
-  // console.log("all tables clear successfully")
+  await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  console.log("all tables clear successfully")
 };
 
 export const addHire = async () => {
@@ -176,7 +176,7 @@ export const addHire = async () => {
         schedules: JSON.stringify(row.schedules),
         photo: hireListingPhoto ?? "",
         isFeature: row.is_feature === 1,
-        status: true,
+        status: "Approved",
         website: row.website,
         email: row.email,
         mobileNumber: row.mobile_number,

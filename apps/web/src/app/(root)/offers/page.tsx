@@ -146,6 +146,7 @@ import {
   RangeInput,
   ClearRefinements,
   Pagination,
+  RefinementList,
 } from "react-instantsearch";
 import { serverAlgolia } from "@repo/algolia";
 import React, { useState } from "react";
@@ -153,7 +154,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 function Hit({ hit }: { hit: any }) {
-  console.log("hit is ", hit.categoryId);
   return (
     <div className="shadow-[0_4px_12px_rgba(0,0,0,0.650)] py-4 rounded-md hover:scale-105 transform transition-all duration-300 flex flex-col justify-between items-center">
       <Link
@@ -164,19 +164,21 @@ function Hit({ hit }: { hit: any }) {
         }}
         className="w-full"
       >
-        <div className="relative w-full flex justify-center">
-          <Image
-            width={200}
-            height={400}
-            alt="offer image"
-            src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
-            className="object-contain"
-          />
-          {hit.discountPercent > 0 && (
-            <span className="absolute z-10 top-3 left-0 min-w-[70px] bg-error text-end px-4 py-1 text-white rounded-r-md font-semibold text-sm">
-              -{hit.discountPercent}%
-            </span>
-          )}
+        <div className="relative w-full mx-auto flex justify-center">
+          <div className="relative">
+            <Image
+              width={200}
+              height={400}
+              alt="offer image"
+              src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
+              className="object-contain"
+            />
+            {hit.discountPercent > 0 && (
+              <span className="absolute z-10 top-3 left-0 min-w-[70px] bg-error text-end px-4 py-1 text-white rounded-r-md font-semibold text-sm">
+                -{hit.discountPercent}%
+              </span>
+            )}
+          </div>
         </div>
       </Link>
       <div className="w-full px-4 mt-3 space-y-2">
@@ -302,6 +304,51 @@ export default function AlgoliaSearch() {
                 )}
               </div>
             </div>
+            <div className="mb-6">
+              <h4 className="font-bold mb-2 text-sm lg:text-base">Category</h4>
+              <RefinementList
+                attribute="category"
+                limit={2}
+                searchable={true}
+                searchablePlaceholder="Search Category"
+                showMore={true}
+                classNames={{
+                  item: "flex items-center gap-2 mb-1",
+                  label: "flex items-center gap-2 text-sm cursor-pointer",
+                  checkbox: "cursor-pointer",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                }}
+              />
+            </div>
+
+            <div className="mb-6">
+              <h4 className="font-bold mb-2 text-sm lg:text-base">
+                Subcategories
+              </h4>
+              <RefinementList
+                attribute="subcategories"
+                limit={2}
+                searchable={true}
+                searchablePlaceholder="Search Subcategories"
+                showMore={true}
+                classNames={{
+                  item: "flex items-center gap-2 mb-1",
+                  label: "flex items-center gap-2 text-sm cursor-pointer",
+                  checkbox: "cursor-pointer",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                }}
+              />
+            </div>
           </aside>
 
           {/* Main Results */}
@@ -313,7 +360,6 @@ export default function AlgoliaSearch() {
                 list: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
                 item: "w-full",
               }}
-
             />
 
             {/* Pagination */}

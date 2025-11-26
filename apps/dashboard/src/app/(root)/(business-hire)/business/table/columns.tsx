@@ -165,7 +165,7 @@ export const columns: ColumnDef<Subcategory>[] = [
       <DataTableColumnHeader column={column} title="Active" />
     ),
     cell: ({ row }) => (
-      <ActiveCell id={row.original.id} isActive={row.original.status} />
+      <ActiveCell id={row.original.id} isActive={row.original.status === "Approved"} />
     ),
   },
   {

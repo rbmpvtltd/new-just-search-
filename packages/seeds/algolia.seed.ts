@@ -256,49 +256,113 @@ async function algoliaProductOfferSeed() {
         id: offers.id,
         price: offers.rate,
         discountPercent: offers.discountPercent,
-        businessId : offers.businessId,
+        businessId: offers.businessId,
         finalPrice: offers.finalPrice,
         name: offers.offerName,
         photos: sql<string[]>`
-          COALESCE(
-            (SELECT ARRAY_AGG(offer_photos.photo)
-             FROM offer_photos
-             WHERE offer_photos.offer_id = offers.id),
-            '{}'
-          )
-        `,
+      COALESCE(
+        (SELECT ARRAY_AGG(offer_photos.photo)
+         FROM offer_photos
+         WHERE offer_photos.offer_id = offers.id),
+        '{}'
+      )
+    `,
+        subcategories: sql<string[]>`
+      COALESCE(
+        ARRAY_AGG(DISTINCT subcategories.name)
+        FILTER (WHERE subcategories.id IS NOT NULL),
+        '{}'
+      )
+    `,
+        category: sql<string | null>`
+      MAX(${schemas.not_related.categories.title})
+    `,
       })
-      .from(offers);
+      .from(offers)
+      .leftJoin(
+        schemas.offer.offerSubcategory,
+        eq(offers.id, schemas.offer.offerSubcategory.offerId),
+      )
+      .leftJoin(
+        schemas.not_related.subcategories,
+        eq(
+          schemas.offer.offerSubcategory.subcategoryId,
+          schemas.not_related.subcategories.id,
+        ),
+      )
+      .leftJoin(businessListings, eq(offers.businessId, businessListings.id))
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(
+        schemas.not_related.categories,
+        eq(businessCategories.categoryId, schemas.not_related.categories.id),
+      )
+      .groupBy(offers.id);
 
     const productsData = await db
       .select({
         id: products.id,
         name: products.productName,
         discountPercent: products.discountPercent,
-        businessId :products.businessId,
+        businessId: products.businessId,
         finalPrice: products.finalPrice,
         price: products.rate,
         photos: sql<string[]>`
-          COALESCE(
-            (SELECT ARRAY_AGG(product_photos.photo)
-              FROM product_photos
-              WHERE product_photos.product_id = products.id),
-            '{}'
-          )
-        `,
+      COALESCE(
+        (SELECT ARRAY_AGG(product_photos.photo)
+         FROM product_photos
+         WHERE product_photos.product_id = products.id),
+        '{}'
+      )
+    `,
+        subcategories: sql<string[]>`
+      COALESCE(
+        ARRAY_AGG(DISTINCT subcategories.name)
+        FILTER (WHERE subcategories.id IS NOT NULL),
+        '{}'
+      )
+    `,
+        category: sql<string | null>`
+      MAX(${schemas.not_related.categories.title})
+    `,
       })
-      .from(products);
+      .from(products)
+      .leftJoin(
+        schemas.product.productSubCategories,
+        eq(products.id, schemas.product.productSubCategories.productId),
+      )
+      .leftJoin(
+        schemas.not_related.subcategories,
+        eq(
+          schemas.product.productSubCategories.subcategoryId,
+          schemas.not_related.subcategories.id,
+        ),
+      )
+      .leftJoin(businessListings, eq(products.businessId, businessListings.id))
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(
+        schemas.not_related.categories,
+        eq(businessCategories.categoryId, schemas.not_related.categories.id),
+      )
+      .groupBy(products.id);
 
     const pdata = productsData.map((item) => {
       return {
         id: item.id,
         objectId: `product:${item.id}`,
         name: item.name,
-        businessId : item.businessId,
-        price : item.price,
-        finalPrice : item.finalPrice,
-        discountPercent : item.discountPercent,
-        photos : item.photos
+        businessId: item.businessId,
+        price: item.price,
+        finalPrice: item.finalPrice,
+        discountPercent: item.discountPercent,
+        photos: item.photos,
+        category : item.category,
+        subecategory: item.subcategories,
       };
     });
     const odata = offersData.map((item) => {
@@ -306,24 +370,28 @@ async function algoliaProductOfferSeed() {
         id: item.id,
         objectId: `offers:${item.id}`,
         name: item.name,
-        businessId : item.businessId,
-        price : item.price,
-        finalPrice : item.finalPrice,
-        discountPercent : item.discountPercent,
-        photos : item.photos
+        businessId: item.businessId,
+        price: item.price,
+        finalPrice: item.finalPrice,
+        discountPercent: item.discountPercent,
+        photos: item.photos,
+        category : item.category,
+        subecategory: item.subcategories,
       };
     });
 
-    const finalData = [...pdata,...odata].map((item) => {
+    const finalData = [...pdata, ...odata].map((item) => {
       return {
         objectID: item.objectId,
-        navigationId : item.id,
+        navigationId: item.id,
         name: item.name,
         photo: item.photos,
         businessId: item.businessId,
-        price : item.price,
-        discountPercent : item.discountPercent ?? 0,
-        finalPrice : item.finalPrice ?? 0,
+        price: item.price,
+        discountPercent: item.discountPercent ?? 0,
+        finalPrice: item.finalPrice ?? 0,
+        subcategories: item.subecategory,
+        category : item.category,
       };
     });
 

@@ -21,6 +21,7 @@ import {
   maritalStatusEnum,
   WorkShift,
   workShiftEnum,
+  statusEnum,
 } from "../enum/allEnum.enum";
 import {
   categories,
@@ -57,7 +58,7 @@ export const hireListing = pgTable("hire_listing", {
   schedules: text("schedules"),
   photo: varchar("photo", { length: 500 }),
   isFeature: boolean("is_feature").default(false).notNull(),
-  status: boolean("status").default(true).notNull(),
+  status: statusEnum("status").default("Pending"),
   website: varchar("website", { length: 255 }),
   email: varchar("email", { length: 255 }),
   mobileNumber: varchar("mobile_number", { length: 20 }),

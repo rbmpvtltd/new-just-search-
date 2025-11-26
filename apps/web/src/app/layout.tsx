@@ -19,8 +19,8 @@ export default function RootLayout({
         ></script>
       </head>
       <body>
-        <HeroHeader />
         <TRPCReactProvider>
+          <HeroHeader />
           {children}
           <Toaster />
         </TRPCReactProvider>

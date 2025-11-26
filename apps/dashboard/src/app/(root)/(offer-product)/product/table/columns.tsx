@@ -185,7 +185,7 @@ export const columns: ColumnDef<Subcategory>[] = [
     cell: ({ row }) => (
       <ActiveCell
         id={row.original.id}
-        isActive={row.original.status ?? false}
+        isActive={row.original.status === "Approved"}
       />
     ),
   },

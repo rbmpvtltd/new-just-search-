@@ -22,11 +22,11 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  await addBusiness();
-  await seedFavourites();
-  await businessesCategories();
-  await businessesSubcategory();
-  await BusinessReviews();
+  // await addBusiness();
+  // await seedFavourites();
+  // await businessesCategories();
+  // await businessesSubcategory();
+  // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -304,7 +304,7 @@ const addBusiness = async () => {
       const [newbusinessListing] = await db
         .insert(businessListings)
         .values({
-          // id: row.id,
+          id: row.id,
           userId: createUser!.id,
           name: row.name,
           days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -325,7 +325,7 @@ const addBusiness = async () => {
           landmark: row.landmark,
           pincode: row.pincode,
           state: city!.stateId,
-          cityId: city!.id,
+          city: city!.id,
           status: "Approved",
           email: row.email,
           phoneNumber: row.phone_number,
@@ -446,6 +446,7 @@ const businessesCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_category");
 
   for (const row of rows) {
+    console.log(row.listing_id)
     const [business] = await db
       .select()
       .from(businessListings)
