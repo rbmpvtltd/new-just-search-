@@ -148,7 +148,7 @@ import {
   Pagination,
   RefinementList,
 } from "react-instantsearch";
-import { serverAlgolia } from "@repo/algolia";
+import { algoliaClient } from "@repo/algolia";
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -206,7 +206,7 @@ export default function AlgoliaSearch() {
 
   return (
     <InstantSearch
-      searchClient={serverAlgolia}
+      searchClient={algoliaClient}
       indexName="product_offer_listing"
     >
       <div className="search-container p-4 max-w-7xl mx-auto">

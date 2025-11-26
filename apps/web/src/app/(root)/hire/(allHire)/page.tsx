@@ -10,7 +10,7 @@ import {
   ClearRefinements,
   Pagination,
 } from "react-instantsearch";
-import { serverAlgolia } from "@repo/algolia";
+import { algoliaClient } from "@repo/algolia";
 import React, { useState, useEffect, useRef } from "react";
 import { HireListingCard } from "@/features/hire/show/component/HireListingCard";
 
@@ -38,7 +38,7 @@ export default function Page() {
   }, []);
 
   return (
-    <InstantSearch searchClient={serverAlgolia} indexName="hire_listing">
+    <InstantSearch searchClient={algoliaClient} indexName="hire_listing">
       <div className="search-container p-4 max-w-7xl mx-auto">
         <SearchBox
           placeholder="Search Anything From Hires"

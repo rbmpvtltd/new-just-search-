@@ -9,7 +9,7 @@ import {
   RangeInput,
   ClearRefinements,
 } from "react-instantsearch";
-import { serverAlgolia } from "@repo/algolia";
+import { algoliaClient } from "@repo/algolia";
 import React, { useState, useEffect, useRef } from "react";
 import { HireListingCard } from "@/features/hire/show/component/HireListingCard";
 import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
@@ -76,7 +76,7 @@ export default function AlgoliaSearch() {
   // }, []);
   return (
     <InstantSearch
-      searchClient={serverAlgolia}
+      searchClient={algoliaClient}
       indexName="product_offer_listing"
     >
       <div className="search-container p-4">
