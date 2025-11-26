@@ -1,8 +1,8 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db, schemas } from "@repo/db";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { UserRole } from "../db/src/schema/auth.schema";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
@@ -89,20 +89,20 @@ export const seedUsers = async () => {
       cityId = 1; // 👈 fallback
     }
 
-    if(row.marital_status ==="married"){
-      row.marital_status = "Married"
+    if (row.marital_status === "married") {
+      row.marital_status = "Married";
     }
-    if(row.marital_status ==="unmarried"){
-      row.marital_status = "Unmarried"
+    if (row.marital_status === "unmarried") {
+      row.marital_status = "Unmarried";
     }
-    if(row.marital_status ==="widowed"){
-      row.marital_status = "Widowed"
+    if (row.marital_status === "widowed") {
+      row.marital_status = "Widowed";
     }
-    if(row.marital_status ==="divorced"){
-      row.marital_status = "Divorced"
+    if (row.marital_status === "divorced") {
+      row.marital_status = "Divorced";
     }
-    if(row.marital_status ==="others"){
-      row.marital_status = "Others"
+    if (row.marital_status === "others") {
+      row.marital_status = "Others";
     }
     // 5 Insert profile
     const profileData = {

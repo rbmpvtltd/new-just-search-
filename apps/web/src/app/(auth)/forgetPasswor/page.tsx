@@ -32,10 +32,7 @@ const otpVerifySchema = z.object({
   newPassword: z.string().min(6),
 });
 
-export default function ForgotPasswordForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export default function ForgotPasswordForm() {
   const id = useId();
   const trpc = useTRPC();
 
@@ -172,7 +169,7 @@ export default function ForgotPasswordForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardContent className="p-6 md:p-8">
           <Form {...sendForm}>

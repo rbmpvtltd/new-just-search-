@@ -9,12 +9,30 @@ import { Badge } from "@/components/ui/badge";
 import Rating from "@/components/ui/Rating";
 import Link from "next/link";
 
-type hires = OutputTrpcType["hirerouter"]["allHireLising"]["data"];
+export type HireListing = {
+  objectID: string;
+  name: string;
+  category: string;
+  expectedSalary: number;
+  gender: string;
+  jobType: string[];
+  languages: string[];
+  subcategories: string[];
+  buildingName? : string;
+  workExp: number;
+  workShift: string[];
+  area?: string;
+  phoneNumber? : string 
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  _geoloc: {
+    lat: number;
+    lng: number;
+  };
+};
 
-type hire = hires extends (infer T)[] ? T : never;
-
-export const HireListingCard = ({ item }: { item: hire }) => {
- 
+export const HireListingCard = ({ item }: { item: HireListing }) => {
   return (
     <div className="mx-auto p-4">
       <div className="flex flex-col justify-center gap-4">
@@ -23,7 +41,7 @@ export const HireListingCard = ({ item }: { item: hire }) => {
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/hire/${item.id}`,
+                  pathname: `/hire/${item.objectID}`,
                 }}
               >
                 <Image
@@ -50,13 +68,13 @@ export const HireListingCard = ({ item }: { item: hire }) => {
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
               <p className="text-sm">
-                {item?.area} {item?.streetName} {item?.buildingName}
+                {item?.area} {item?.buildingName}
               </p>
             </div>
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  console.log("chatting with", item.id);
+                  console.log("chatting with", item.objectID);
                 }}
                 type="button"
                 className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
@@ -67,7 +85,7 @@ export const HireListingCard = ({ item }: { item: hire }) => {
               {/* </div> */}
               <Button
                 onClick={() => {
-                  console.log("calling on", item.phoneNumber);
+                  console.log("calling on", item.phoneNumber ?? "9876543201");
                 }}
                 type="button"
                 className="flex whitespace-nowrap items-center text-white font-semibold gap-2 hover:scale-105 transition-all transform duration-300"

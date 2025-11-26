@@ -4,7 +4,7 @@ import {
   feedbackInsertSchema,
   requestAccountsInsertSchema,
   userUpdateSchema,
-} from "@repo/db/src/schema/user.schema";
+} from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -113,12 +113,20 @@ export const userRouter = router({
     }),
 
   getUserProfile: protectedProcedure.query(async ({ ctx }) => {
-    const profile = await db.query.users.findFirst({
+    const profile = await db.query.profiles.findFirst({
       where: (userProfiles, { eq }) => eq(userProfiles.id, ctx.userId),
     });
 
     const role = ctx.role;
     return { ...profile, role };
+  }),
+   getUserDetail: protectedProcedure.query(async ({ ctx }) => {
+    const user = await db.query.users.findFirst({
+      where: (userDetail, { eq }) => eq(userDetail.id, ctx.userId),
+    });
+
+    // const role = ctx.role;
+    return user ;
   }),
 
   accountDeleteRequest: protectedProcedure

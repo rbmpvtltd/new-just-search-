@@ -2,7 +2,7 @@ import { db, schemas } from "@repo/db";
 import {
   productInsertSchema,
   products,
-} from "@repo/db/src/schema/product.schema";
+} from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";

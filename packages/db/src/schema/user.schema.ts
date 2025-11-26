@@ -3,7 +3,6 @@ import {
   boolean,
   date,
   integer,
-  pgEnum,
   pgTable,
   serial,
   text,
@@ -12,18 +11,19 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
+import {
+  MaritalStatus,
+  maritalStatusEnum,
+  UserRole,
+  userRoleEnum,
+} from "../enum/allEnum.enum";
 import { users } from "./auth.schema";
-import { cities, states } from "./not-related.schema";
-
-export const MaritalStatus = {
-  Married: "Married",
-  Unmarried: "Unmarried",
-  Widowed: "Widowed",
-  Divorced: "Divorced",
-  Others: "Others",
-} as const;
-
-export const maritalStatusEnum = pgEnum("user_marital_status", MaritalStatus);
+import {
+  categories,
+  cities,
+  states,
+  subcategories,
+} from "./not-related.schema";
 
 export const profiles = pgTable("profiles", {
   id: serial("id").primaryKey(),
@@ -113,6 +113,28 @@ export const salesmen = pgTable("salesmen", {
     .notNull()
     .references(() => franchises.id, { onDelete: "cascade" }),
   referCode: varchar("refer_code", { length: 255 }).notNull().unique(),
+  status: boolean("status").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const notification = pgTable("notification", {
+  id: serial("id").primaryKey(),
+  role: userRoleEnum("notification_role").default(UserRole.guest).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  state: integer("state").references(() => states.id, {
+    onDelete: "cascade",
+  }),
+  city: integer("city").references(() => cities.id, {
+    onDelete: "cascade",
+  }),
+  categoryId: integer("category_id").references(() => categories.id, {
+    onDelete: "cascade",
+  }),
+  subCategoryId: integer("sub_category_id").references(() => subcategories.id, {
+    onDelete: "cascade",
+  }),
   status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

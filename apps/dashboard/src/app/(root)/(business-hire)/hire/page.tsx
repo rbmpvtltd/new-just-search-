@@ -5,6 +5,18 @@ import { trpcServer } from "@/trpc/trpc-server";
 import { columns } from "./table/columns";
 import { DataTableToolbar } from "./table/toolbar";
 
+interface HireRow {
+  id: number;
+  photo: string | null;
+  name: string;
+  phone: string | null;
+  city: string | null;
+  category: string;
+  subcategories: string;
+  status: "Pending" | "Approved" | "Rejected" | null;
+  created_at: Date | null;
+}
+
 export default function Page() {
   const trpc = useTRPC();
   const queryConfig = {
@@ -40,7 +52,7 @@ export default function Page() {
   };
   return (
     <div className="max-w-full">
-      <DataTable
+      <DataTable<HireRow, unknown>
         columns={columns}
         Toolbar={DataTableToolbar}
         queryConfig={queryConfig}

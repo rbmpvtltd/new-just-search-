@@ -24,7 +24,7 @@ export function MuiltActiveButton() {
   // const isPending = false;
 
   const { mutate, isPending } = useMutation(
-    trpc.adminBanner.multiactive.mutationOptions(),
+    trpc.adminBannerRouter.multiactive.mutationOptions(),
   );
 
   const buttonDisable = !isActiveExist || isPending;
@@ -54,7 +54,7 @@ export function MuiltActiveButton() {
                   if (data.success) {
                     const queryClient = getQueryClient();
                     await queryClient.invalidateQueries({
-                      queryKey: trpc.adminBanner.list.queryKey(),
+                      queryKey: trpc.adminBannerRouter.list.queryKey(),
                     });
                     setTimeout(() => {
                       empty();

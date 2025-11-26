@@ -2,7 +2,7 @@ import {
   categories,
   // categories,
   subcategories,
-} from "@repo/db/src/schema/not-related.schema";
+} from "@repo/db/dist/schema/not-related.schema";
 
 export const subCategoryColumns = {
   status: subcategories.status,

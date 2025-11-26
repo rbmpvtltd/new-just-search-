@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { documentSchema } from "@repo/db/src/schema/hire.schema";
+import { documentSchema } from "@repo/db/dist/schema/hire.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";

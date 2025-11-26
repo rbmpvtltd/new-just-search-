@@ -1,8 +1,8 @@
 import { EventEmitter, on } from "node:events";
 import { db, schemas } from "@repo/db";
 import { chatImages, chatSessions } from "@repo/db/dist/schema/chat.schema";
-import { users } from "@repo/db/src/schema/auth.schema";
-import { profiles } from "@repo/db/src/schema/user.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import { profiles } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError, tracked } from "@trpc/server";
 import { and, desc, eq, inArray, ne, or, sql } from "drizzle-orm";

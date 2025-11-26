@@ -1,10 +1,10 @@
-import { users } from "@repo/db/src/schema/auth.schema";
-import { businessListings } from "@repo/db/src/schema/business.schema";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import { businessListings } from "@repo/db/dist/schema/business.schema";
 import {
   categories,
   cities,
   subcategories,
-} from "@repo/db/src/schema/not-related.schema";
+} from "@repo/db/dist/schema/not-related.schema";
 
 export const businessColumns = {
   id: businessListings.id,

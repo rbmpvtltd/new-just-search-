@@ -108,8 +108,8 @@ export const addProduct = async () => {
 // 2. products_reviews
 const addProductReviews = async () => {
   const [review]: any[] = await sql.execute("SELECT  * FROM products_reviews");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
-  const fakeBusiness = (await fakeBusinessSeed()) || (await fakeSeed()).user;
+  const fakeUser = await fakeUserSeed()
+  const fakeBusiness = await fakeBusinessSeed() ;
 
   for (const row of review) {
     let [user] = await db.select().from(users).where(eq(users.id, row.user_id));
@@ -119,10 +119,12 @@ const addProductReviews = async () => {
       user = fakeUser;
     }
 
-    let [business]: any = await db
+     let [business] = await db
       .select()
       .from(businessListings)
       .where(eq(businessListings.id, row.listing_id));
+    console.log(fakeBusiness)
+
 
     if (!business) {
       console.log(`business not found ${row.id} using faKe business`);
@@ -141,7 +143,7 @@ const addProductReviews = async () => {
     await db.insert(productReviews).values({
       id: row.id,
       userId: user!.id,
-      businessId: business!.id,
+      businessId: business.id,
       productId: Product.id,
       name: row.name,
       email: row.email,

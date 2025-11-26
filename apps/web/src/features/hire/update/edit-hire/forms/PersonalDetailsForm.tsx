@@ -1,10 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Gender,
-  MaritalStatus,
-  personalDetailsHireSchema,
-} from "@repo/db/src/schema/hire.schema";
+import { Gender, MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
+import { personalDetailsHireSchema } from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -41,7 +38,7 @@ export default function PersonalDetailsForm({
     control,
     setValue,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
@@ -65,7 +62,7 @@ export default function PersonalDetailsForm({
       city: hireListing?.city.id ?? undefined,
     },
   });
-  const categories = formReferenceData?.getHireCategories.map((item: any) => {
+  const categories = formReferenceData?.getHireCategories.map((item) => {
     return {
       label: item.title,
       value: item.id,
@@ -80,7 +77,7 @@ export default function PersonalDetailsForm({
     }),
   );
 
-  const states = formReferenceData?.getStates.map((item: any) => {
+  const states = formReferenceData?.getStates.map((item) => {
     return {
       label: item.name,
       value: item.id,
@@ -352,7 +349,7 @@ export default function PersonalDetailsForm({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {formFields
                 .filter((fields) => fields.section === "profile")
-                .map((field, index) => (
+                .map((field) => (
                   <FormField key={field.name} {...field} />
                 ))}
             </div>
@@ -402,7 +399,7 @@ export default function PersonalDetailsForm({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {formFields
                   .filter((fields) => fields.section === "loction")
-                  .map((field, index) => (
+                  .map((field, _) => (
                     <div
                       key={field.name}
                       className={

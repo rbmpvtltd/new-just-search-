@@ -1,5 +1,5 @@
 import { db, schemas } from "@repo/db";
-import { banners } from "@repo/db/src/schema/not-related.schema";
+import { banners } from "@repo/db/dist/schema/not-related.schema";
 import { logger } from "@repo/logger";
 import { eq, sql } from "drizzle-orm";
 

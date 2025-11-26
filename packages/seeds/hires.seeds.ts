@@ -1,5 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
@@ -17,23 +18,22 @@ import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { safeArray } from "./utils";
-import { UserRole } from "@repo/db/dist/schema/auth.schema";
 
 export const hireSeed = async () => {
   await cleardataofhire();
-  // await addHire();
+  await addHire();
   // await seedRecentViewsHire();
-  // await seedHireSubcategories();
-  // await seedHireCategories();
+  await seedHireCategories();
+  await seedHireSubcategories();
 };
 
 const cleardataofhire = async () => {
-  // await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
-  // );
-  // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
-  // console.log("all tables clear successfully")
+  await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  console.log("all tables clear successfully")
 };
 
 export const addHire = async () => {
@@ -132,7 +132,6 @@ export const addHire = async () => {
         clouadinaryFake,
       );
     }
-     
 
     // console.log("=====");
     console.log("createUser-------------------", createUser);
@@ -177,7 +176,7 @@ export const addHire = async () => {
         schedules: JSON.stringify(row.schedules),
         photo: hireListingPhoto ?? "",
         isFeature: row.is_feature === 1,
-        status: true,
+        status: "Approved",
         website: row.website,
         email: row.email,
         mobileNumber: row.mobile_number,

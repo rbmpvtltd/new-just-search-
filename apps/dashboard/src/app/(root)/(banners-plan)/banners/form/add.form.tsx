@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { bannerInsertSchema } from "@repo/db/src/schema/not-related.schema";
+import { bannerInsertSchema } from "@repo/db/dist/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -23,7 +23,7 @@ import {
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
-// import { bannerSelectSchema } from "@repo/db/src/schema/not-related.schema";
+// import { bannerSelectSchema } from "@repo/db/dist/schema/not-related.schema";
 
 const extendedBannerSelectSchema = bannerInsertSchema
   .pick({
@@ -63,7 +63,7 @@ function BannerAddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
   const { mutate: createBanner } = useMutation(
-    trpc.adminBanner.create.mutationOptions(),
+    trpc.adminBannerRouter.create.mutationOptions(),
   );
 
   const {
@@ -99,7 +99,7 @@ function BannerAddForm({ setOpen }: AddForm) {
         onSuccess: () => {
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.adminBanner.list.queryKey(),
+            queryKey: trpc.adminBannerRouter.list.queryKey(),
           });
           setOpen(false);
         },

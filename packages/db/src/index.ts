@@ -10,6 +10,14 @@ const pool = new Pool({
 });
 
 import { migrate } from "drizzle-orm/node-postgres/migrator";
+import {
+  Gender,
+  JobDuration,
+  JobType,
+  MaritalStatus,
+  type UserRole as UserRoleType,
+  WorkShift,
+} from "./enum/allEnum.enum";
 import * as auth from "./schema/auth.schema";
 import * as business from "./schema/business.schema";
 import * as chat from "./schema/chat.schema";
@@ -20,13 +28,14 @@ import * as offer from "./schema/offer.schema";
 import * as plan from "./schema/plan.schema";
 import * as product from "./schema/product.schema";
 import * as user from "./schema/user.schema";
-export type UserRole = (typeof auth.UserRole)[keyof typeof auth.UserRole];
 
-export const MARITAL_STATUS = hire.MaritalStatus;
-export const GENDER = hire.Gender;
-export const JOB_TYPE = hire.JobType;
-export const WORK_SHIFT = hire.WorkShift;
-export const JOB_DURATION = hire.JobDuration;
+export type UserRole = (typeof UserRoleType)[keyof typeof UserRoleType];
+
+export const MARITAL_STATUS = MaritalStatus;
+export const GENDER = Gender;
+export const JOB_TYPE = JobType;
+export const WORK_SHIFT = WorkShift;
+export const JOB_DURATION = JobDuration;
 // export const LANGUAGES = hire.Languages;
 
 export const schemas = {

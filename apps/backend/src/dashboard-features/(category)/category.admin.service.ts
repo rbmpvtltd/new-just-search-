@@ -1,4 +1,4 @@
-import { categories } from "@repo/db/src/schema/not-related.schema";
+import { categories } from "@repo/db/dist/schema/not-related.schema";
 
 export const categoryColumns = {
   id: categories.id,

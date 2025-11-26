@@ -6,7 +6,7 @@ import { asyncHandler } from "@/utils/error/asyncHandler";
 import UpdateDisplayNameForm from "@/features/auth/login/display-update";
 export default async function Login() {
    const { data: userData } = await asyncHandler(
-      trpcServer.userRouter.getUserProfile.query(),
+      trpcServer.userRouter.getUserDetail.query(),
     );
   
   let session = null;

@@ -1,8 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  MaritalStatus,
-  userUpdateSchema,
-} from "@repo/db/dist/schema/user.schema";
+import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
+import { userUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
@@ -254,7 +252,7 @@ export default function UserProfile() {
       data:
         states?.map((state) => ({ label: state.label, value: state.value })) ??
         [],
-        required: false,
+      required: false,
       error: errors.state?.message,
     },
     {

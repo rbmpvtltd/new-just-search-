@@ -8,14 +8,36 @@ import type { OutputTrpcType } from "@/trpc/type";
 import { Badge } from "@/components/ui/badge";
 import Rating from "@/components/ui/Rating";
 import Link from "next/link";
-import Favourite from "../../shared/Favourite";
+// import Favourite from "../../shared/Favourite";
 import { useRouter } from "next/navigation";
+import Favourite from "../../shared/Favourite";
 
+
+type BusinessListing = {
+  objectID: string;
+  name: string;
+  category: string;
+  categoryId: number;
+  rating: string;
+  subcategories: string[];
+  photo: string;
+  area: string;
+
+  longitude: string;
+  latitude: string;
+
+  buildingName: string;
+  phoneNumber: string;
+  streetName: string;
+
+  _geoloc: {
+    lat: number;
+    lng: number;
+  };
+};
 type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
-
-
-export const BussinessListingCard = ({ item ,category,subcategory,rating,initialFav}: { item: businesses[0],category?:string,subcategory?:string[],rating?:string|undefined,initialFav?:boolean }) => {
+export const BussinessListingCard = ({ item }: { item: BusinessListing|businesses,category?:string,subcategory?:string[],rating?:string|undefined}) => {
   const router = useRouter()
   return (
     <div className="mx-auto p-4">
@@ -25,7 +47,7 @@ export const BussinessListingCard = ({ item ,category,subcategory,rating,initial
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/business/shop/${item.id}`,
+                  pathname: `/business/shop/${item.objectID}`,
                 }}
               >
                 <Image
@@ -36,20 +58,21 @@ export const BussinessListingCard = ({ item ,category,subcategory,rating,initial
                   src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change image when upload on cloudinary
                 />
               </Link>
-              <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">
+              {/* <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">
                 <Favourite
                   businessId={Number(item.id)}
                   initialFav={initialFav ?? false}
                 />
-              </div>
+              </div> TODO: navigate to single shop when trying clicked on favourite */}
+              
             </div>
           </div>
           <div className="flex flex-col py-2 justify-between gap-2 ">
             <h1 className="text-2xl font-bold ">{item.name}</h1>
             <div className="flex gap-2 flex-wrap">
-              <Badge variant="default">{category}</Badge>
+              <Badge variant="default">{item.category}</Badge>
 
-              {subcategory?.slice(0, 2).map((subcategory, index) => (
+              {item.subcategories?.slice(0, 2)?.map((subcategory:string, index:number) => (
                 <Badge variant="destructive" key={index.toString()}>
                   {subcategory}
                 </Badge>
@@ -61,11 +84,11 @@ export const BussinessListingCard = ({ item ,category,subcategory,rating,initial
                 {item?.area} {item?.streetName} {item?.buildingName}
               </p>
             </div>
-            <Rating rating={Math.ceil(Number(rating))} />
+            <Rating rating={Math.ceil(Number(item.rating))} />
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.id}`)
+                  router.push(`/business/shop/${item.objectID}`)
                   console.log("clicked", item.latitude, item.longitude);
                 }}
                 type="button"
@@ -76,8 +99,8 @@ export const BussinessListingCard = ({ item ,category,subcategory,rating,initial
               </Button>
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.id}`)
-                  console.log("chatting with", item.id);
+                  router.push(`/business/shop/${item.objectID}`)
+                  console.log("chatting with", item.objectID);
                 }}
                 type="button"
                 className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
@@ -88,7 +111,7 @@ export const BussinessListingCard = ({ item ,category,subcategory,rating,initial
               {/* </div> */}
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.id}`)  
+                  router.push(`/business/shop/${item.objectID}`)  
                   console.log("calling on", item.phoneNumber);
                 }}
                 type="button"

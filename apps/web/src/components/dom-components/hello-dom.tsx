@@ -1,4 +1,3 @@
-"use dom";
 import "./styles.css";
 
 import { CodeHighlightNode } from "@lexical/code";
@@ -26,6 +25,8 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import {
   $createParagraphNode,
   $getRoot,
+  type EditorState,
+  type LexicalEditor,
   ParagraphNode,
   TextNode,
 } from "lexical";
@@ -39,7 +40,7 @@ const placeholder = "Enter some rich text...";
 
 // Define the custom map for cleaner HTML output (strips Lexical's internal attributes)
 const CUSTOM_NODES_TO_MARKUP = {
-  [ParagraphNode.getType()]: (node, children) => `<p>${children}</p>`,
+  [ParagraphNode.getType()]: (node: any, children: string) => `<p>${children}</p>`,
   // [HeadingNode.getType()]: (node, children) => {
   //   const tag = `h${node.__tag.slice(-1)}`; // e.g., 'h1' from 'h1'
   //   return `<${tag}>${children}</${tag}>`;
@@ -54,6 +55,13 @@ const CUSTOM_NODES_TO_MARKUP = {
   // [CodeNode.getType()]: (node, children) =>
   //   `<pre><code>${children}</code></pre>`,
 };
+
+interface EditorProps {
+  setPlainText: (html: string) => void;
+  value?: string;
+  onChange?: (html: string) => void;
+  onContentSizeChange?: (height: number) => void;
+}
 
 const editorConfig = {
   namespace: "React.js Demo",
@@ -73,7 +81,7 @@ const editorConfig = {
     LinkNode,
     AutoLinkNode,
   ],
-  onError(error) {
+  onError(error: Error) {
     throw error;
   },
   theme: ExampleTheme,
@@ -84,10 +92,10 @@ export default function Editor({
   value,
   onChange,
   onContentSizeChange,
-}) {
-  const editorRef = useRef(null);
+}: EditorProps) {
+  const editorRef = useRef<HTMLDivElement>(null);
 
-  const initialEditorState = (editor) => {
+  const initialEditorState = (editor: LexicalEditor) => {
     // 1. If a value is provided, load it from HTML.
     if (value) {
       const root = $getRoot();
@@ -154,7 +162,7 @@ export default function Editor({
             ErrorBoundary={LexicalErrorBoundary}
           />
           <OnChangePlugin
-            onChange={(editorState, editor, tags) => {
+            onChange={(editorState: EditorState, editor: LexicalEditor) => {
               editorState.read(() => {
                 // Generate HTML using the custom map to get cleaner tags
                 let htmlString = $generateHtmlFromNodes(

@@ -1,7 +1,7 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
 import { eq } from "drizzle-orm";
-import { UserRole, users } from "../db/src/schema/auth.schema";
+import { users } from "../db/src/schema/auth.schema";
 import {
   businessCategories,
   businessListings,
@@ -22,11 +22,11 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  await addBusiness();
+  // await addBusiness();
   // await seedFavourites();
   // await businessesCategories();
   // await businessesSubcategory();
-  await BusinessReviews();
+  // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -304,7 +304,7 @@ const addBusiness = async () => {
       const [newbusinessListing] = await db
         .insert(businessListings)
         .values({
-          // id: row.id,
+          id: row.id,
           userId: createUser!.id,
           name: row.name,
           days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -325,7 +325,7 @@ const addBusiness = async () => {
           landmark: row.landmark,
           pincode: row.pincode,
           state: city!.stateId,
-          cityId: city!.id,
+          city: city!.id,
           status: "Approved",
           email: row.email,
           phoneNumber: row.phone_number,
@@ -340,7 +340,7 @@ const addBusiness = async () => {
           updatedAt: row.updated_at,
         })
         .returning();
-      
+
       // images handle
       if (newbusinessListing) {
         const images = ["image1", "image2", "image3", "image4", "image5"];
@@ -446,6 +446,7 @@ const businessesCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_category");
 
   for (const row of rows) {
+    console.log(row.listing_id)
     const [business] = await db
       .select()
       .from(businessListings)

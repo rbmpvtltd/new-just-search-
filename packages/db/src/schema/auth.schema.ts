@@ -1,24 +1,7 @@
+// auth.schema.ts
 import { sql } from "drizzle-orm";
-import {
-  pgEnum,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
-
-export const UserRole = {
-  guest: "guest",
-  visiter: "visiter",
-  hire: "hire",
-  business: "business",
-  salesman: "salesman",
-  franchises: "franchises",
-  admin: "admin",
-} as const;
-
-export const userRoleEnum = pgEnum("user_role", UserRole);
+import { pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { UserRole, userRoleEnum } from "../enum/allEnum.enum";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
