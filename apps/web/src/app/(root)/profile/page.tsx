@@ -1,5 +1,5 @@
 import UpdateDisplayNameForm from "@/features/auth/login/display-update";
-import UserProfile from "@/features/user/profile/UserProfile";
+import UserProfile from "@/features/profile/UserProfile";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 

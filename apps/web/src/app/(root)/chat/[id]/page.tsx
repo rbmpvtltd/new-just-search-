@@ -3,9 +3,7 @@ import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 export default async function Page({
   params,
-  searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;
@@ -15,8 +13,6 @@ export default async function Page({
   // const { data: conversation } = await asyncHandler(
   //   trpcServer.chat.createConversation.query({ userId: Number(id) }),
   // );
-
-  // console.log("conversation", conversation);
 
   // return
   const { data: messageList, error } = await asyncHandler(
@@ -28,16 +24,15 @@ export default async function Page({
   );
 
   const { data } = await asyncHandler(
-    trpcServer.chat.getDisplayNameAndImage.query({
+    trpcServer.chat.getOtherUserDisplayNameAndImage.query({
       conversationId: Number(id),
     }),
   );
-  console.log("Data, display name", data);
 
   return (
     <StoreChat
       conversationId={Number(id)}
-      messageList={messageList}
+      // messageList={messageList}
       userData={userData}
       displayName={data}
     />

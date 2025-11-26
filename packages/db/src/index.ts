@@ -13,13 +13,13 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as auth from "./schema/auth.schema";
 import * as business from "./schema/business.schema";
 import * as chat from "./schema/chat.schema";
+import * as help_and_support from "./schema/help-and-support.schema";
 import * as hire from "./schema/hire.schema";
 import * as not_related from "./schema/not-related.schema";
 import * as offer from "./schema/offer.schema";
 import * as plan from "./schema/plan.schema";
 import * as product from "./schema/product.schema";
 import * as user from "./schema/user.schema";
-
 export type UserRole = (typeof auth.UserRole)[keyof typeof auth.UserRole];
 
 export const MARITAL_STATUS = hire.MaritalStatus;
@@ -39,6 +39,7 @@ export const schemas = {
   product,
   user,
   chat,
+  help_and_support,
 };
 
 export const db = drizzle({
@@ -53,6 +54,7 @@ export const db = drizzle({
     ...product,
     ...user,
     ...chat,
+    ...help_and_support,
   },
 });
 

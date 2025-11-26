@@ -1,84 +1,82 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
-import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
-import React, { useEffect } from "react";
-import { IoMdAdd, IoMdChatboxes, IoMdPulse } from "react-icons/io";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
-import { useChatStore } from "./useStore";
+import BoundaryWrapper from "@/utils/BoundaryWrapper";
 
 type MessageListType = OutputTrpcType["chat"]["getMessageList"] | null;
-type DisplayNameAndImageType =
-  | OutputTrpcType["chat"]["getDisplayNameAndImage"]
+type OtherUerDisplayNameAndImageType =
+  | OutputTrpcType["chat"]["getOtherUserDisplayNameAndImage"]
   | null;
-
+type UserDataType = OutputTrpcType["userRouter"]["getUserProfile"] | null;
 function PrivateChat({
-  displayName,
   userData,
   conversationId,
+  // messageList,
+  displayName,
 }: {
-  displayName: DisplayNameAndImageType;
-  userData: any;
+  userData: UserDataType;
   conversationId: number;
+  // messageList: MessageListType;
+  displayName: OtherUerDisplayNameAndImageType;
 }) {
   const trpc = useTRPC();
-  const allMessagesRef = React.useRef<MessageListType>(null);
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { mutate } = useMutation(trpc.chat.markAsRead.mutationOptions());
-  const zustandStoreMessages = useChatStore(
-    (state) => state.zustandStoreMessages,
+  const { data: messageList } = useSuspenseQuery(
+    trpc.chat.getMessageList.queryOptions({ conversationId }),
   );
-  const liveMessages = useChatStore((state) => state.liveMessages);
-  allMessagesRef.current = [...zustandStoreMessages, ...liveMessages];
-  const setLiveMessage = useChatStore((state) => state.setLiveMessage);
-  const { data, error } = useSubscription(
+  const [store, setStore] = useState<Exclude<MessageListType, null>>(
+    messageList ?? [],
+  );
+
+  const lastMessageId = store?.length
+    ? (store?.[store.length - 1]?.id ?? null)
+    : null;
+  // const lastMessageId =
+  //   setStore ?
+  //   setStore?.length > 0
+  //     ? Number(setStore?[storeRef.current.length - 1].id)
+  //     : setStore :  null;
+
+  const { data: newMessage } = useSubscription(
     trpc.chat.onMessage.subscriptionOptions({
-      conversationId: conversationId,
-      // messageId: String(allMessages[allMessages.length -1]?.id),
+      conversationId,
+      lastMessageId: Number(lastMessageId),
     }),
   );
-  useEffect(() => {
-    console.log("re", Math.random());
-    if (data) {
-      setLiveMessage(data);
-    }
-  }, [data, setLiveMessage]);
 
   useEffect(() => {
-    console.log("re", Math.random());
-    const messages = allMessagesRef.current
-      ?.filter((msg) => msg.senderId !== userData.id && !msg.isRead)
-      .map((msg) => msg.id);
+    if (!newMessage) return;
+    setStore((prev) => [...prev, newMessage]);
+  }, [newMessage]);
 
-    console.log("Message", messages);
-
-    if (!messages?.length) {
-      return;
-    }
-
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-
-    mutate({
-      messageId: messages,
-    });
-    console.log("messages", messages);
-  }, [mutate]);
-
-  console.log("All message", allMessagesRef);
+  // Mark unread messages as read
+  const { mutate: markRead } = useMutation(
+    trpc.chat.markAsRead.mutationOptions(),
+  );
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const unread = store
+      .filter((m) => m.senderId !== userData?.id && !m.isRead)
+      .map((m) => m.id);
+
+    if (unread.length > 0) {
+      markRead({ messageId: unread });
     }
-  }, [allMessagesRef.current]);
+  }, [markRead, userData, store]);
+
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messageList]);
+  console.log("Outside UseEffect ");
   return (
     <div
       ref={scrollRef}
@@ -105,33 +103,32 @@ function PrivateChat({
           {displayName?.[0]?.displayName as string}
         </h2>
       </div>
-
-      {allMessagesRef.current?.map((msg) => (
+      {store?.map((msg) => (
         <div key={msg.id} className="flex flex-col gap-1">
           {msg.message && (
             <div
               className={`flex px-2 py-2 rounded-xl text-sm shadow-sm w-fit ${
-                msg.senderId === userData.id
+                msg.senderId === userData?.id
                   ? "bg-blue-100 ml-auto"
                   : "bg-gray-100"
               }`}
             >
               <h2 className="font-semibold">{msg.message}</h2>
-              <span className="block text-xs text-gray-500 mt-1 mx-1">
+              {/* <span className="block text-xs text-gray-500 mt-1 mx-1">
                 {msg.updatedAt
-                  ? new Date(msg.updatedAt).toLocaleTimeString([], {
+                ? new Date(msg.updatedAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
-                    })
-                  : ""}
-              </span>
+                      })
+                      : ""}
+              </span> */}
             </div>
           )}
 
           {msg.image && (
             <div
               className={`mt-1 max-w-[55%] ${
-                msg.senderId === userData.id ? "ml-auto" : ""
+                msg.senderId === userData?.id ? "ml-auto" : ""
               }`}
             >
               <Link href={msg.route ? msg.route : "#"}>
@@ -191,32 +188,36 @@ const MemorizedSendMessage = React.memo(SendMessage);
 export default function StoreChat({
   userData,
   conversationId,
-  messageList,
+  // messageList,
   displayName,
 }: {
-  displayName: DisplayNameAndImageType;
-  userData: any;
+  displayName: OtherUerDisplayNameAndImageType;
+  userData: UserDataType;
   conversationId: number;
-  messageList: MessageListType;
+  // messageList: MessageListType;
 }) {
-  const setzustandStoreMessages = useChatStore(
-    (state) => state.setzustandStoreMessages,
-  );
-
-  useEffect(() => {
-    if (messageList?.length) {
-      setzustandStoreMessages(messageList);
-    }
-  }, [messageList, setzustandStoreMessages]);
-
+  // const scrollRef = useRef<HTMLDivElement>(null);
+  // useEffect(() => {
+  //   if (!scrollRef.current) return;
+  //   scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  // }, [messageList]);
   return (
     <div className="p-4 max-w-md mx-auto flex flex-col h-[90vh]">
-      <MemorizedPrivateChat
-        conversationId={conversationId}
-        userData={userData}
-        displayName={displayName}
-      />
-      <MemorizedSendMessage conversationId={conversationId} />
+      {/* <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto border border-gray-200 rounded-lg px-2 py-1 space-y-3 mb-3 bg-white relative"
+        > */}
+
+      <BoundaryWrapper>
+        <MemorizedPrivateChat
+          conversationId={conversationId}
+          userData={userData}
+          displayName={displayName}
+          // messageList={messageList}
+        />
+        {/* </div> */}
+        <MemorizedSendMessage conversationId={conversationId} />
+      </BoundaryWrapper>
     </div>
   );
 }

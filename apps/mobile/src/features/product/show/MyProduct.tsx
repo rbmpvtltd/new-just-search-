@@ -29,9 +29,7 @@ export default function MyProductsList() {
       <View className="px-4 mt-4">
         <Pressable
           className="bg-primary py-3 rounded-xl w-full flex-row items-center justify-center shadow-sm"
-          onPress={() =>
-            router.push("/(root)/profile/product/add")
-          }
+          onPress={() => router.push("/(root)/profile/product/add")}
         >
           <Ionicons name="add-circle-outline" size={20} color="#fff" />
           <Text className="text-secondary ml-2 font-semibold">
@@ -62,7 +60,7 @@ type ProductType = NonNullable<
 function ProductCard({ item }: { item: ProductType }) {
   const router = useRouter();
   const { mutate: deleteProduct, isPending } = useMutation(
-    trpc.businessrouter.deleteProduct.mutationOptions(),
+    trpc.productrouter.deleteProduct.mutationOptions(),
   );
 
   const handleDelete = () => {
@@ -120,9 +118,7 @@ function ProductCard({ item }: { item: ProductType }) {
             <Pressable
               className="bg-info flex-row items-center px-3 py-1.5 rounded-lg mr-2"
               onPress={() =>
-                router.push(
-                  `/(root)/profile/product/edit-product/${item.productSlug}`,
-                )
+                router.push(`/(root)/profile/product/edit/${item.productSlug}`)
               }
             >
               <Ionicons name="create-outline" size={14} color="#fff" />

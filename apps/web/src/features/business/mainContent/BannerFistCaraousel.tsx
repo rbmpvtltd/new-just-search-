@@ -1,11 +1,13 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card";
+import { useSubscription } from "@trpc/tanstack-react-query";
 import { CldImage } from "next-cloudinary";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useTRPC } from "@/trpc/client";
 
 type BannerFirstCaraousel = {
   photo: string | null;
@@ -16,9 +18,9 @@ function FirstCaraousel({
   bannerFirst,
 }: {
   bannerFirst: BannerFirstCaraousel[] | null;
-})
- {
-  console.log(bannerFirst)
+}) {
+  console.log(bannerFirst);
+
   return (
     <Carousel opts={{ loop: true }} className="w-full ">
       <CarouselContent className="ml-10">

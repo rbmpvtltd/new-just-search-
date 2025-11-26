@@ -1,7 +1,8 @@
+import { logger } from "@repo/logger";
 import { tracked } from "@trpc/server";
 import { EventEmitter, on } from "events";
 import z from "zod";
-import { publicProcedure, router } from "@/utils/trpc";
+import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
 
 const ee = new EventEmitter();
 
@@ -53,4 +54,36 @@ export const testRouter = router({
 
       return newPost;
     }),
+
+  onMessage: protectedProcedure
+  .input(z.object({}))
+  .subscription(async function* () {
+    logger.info("Client subscribed to onMessage");
+
+    // Send message every 5 seconds
+    const interval = setInterval(() => {
+      ee.emit("message", `Hello every 5 seconds: ${Date.now()}`);
+    }, 5000);
+
+    try {
+      for await (const [msg] of on(ee, "message")) {
+        logger.info("Emitted message:", msg);
+        yield msg;
+      }
+    } finally {
+      clearInterval(interval);
+      logger.info("Client unsubscribed from onMessage");
+    }
+  }),
+
+  sendMessage: protectedProcedure.mutation(async ({ ctx, input }) => {
+    logger.info("input is", { input: input });
+
+    ee.emit("message", "Hello from test chat"); //receiver
+    // ee.emit(`message${user.id}`, { text: newMessage }); //sender
+    return {
+      success: true,
+      message: "Message sent successfully",
+    };
+  }),
 });

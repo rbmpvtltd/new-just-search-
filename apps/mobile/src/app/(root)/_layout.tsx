@@ -49,11 +49,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="home-outline" size={24} color={color} />
           ),
-          headerShown: false,
-          headerLeft: () => (
-            <View className="flex-row items-center">
-            </View>
-          ),
+          // headerShown: false,
+          headerLeft: () => <View className="flex-row items-center"></View>,
           headerRight: () => (
             <View className="flex-row gap-4 mr-4">
               <Pressable
@@ -67,7 +64,8 @@ export default function TabLayout() {
                       },
                     });
                   } else {
-                    router.navigate("/chatSessions");
+                    // router.navigate("/(root)/profile/chats/");
+                    router.navigate("/(root)/chats");
                   }
                 }}
               >

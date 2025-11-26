@@ -1,3 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
+import { useSubscription } from "@trpc/tanstack-react-query";
+import { useEffect } from "react";
+import { ScrollView, Text, View } from "react-native";
 import CustomCarousel from "@/components/Carousel/CustomCaraousel";
 import Banner1 from "@/components/home/Banner1";
 import Banner2 from "@/components/home/Banner2";
@@ -7,8 +11,6 @@ import { CategoryList } from "@/components/home/CategorySameList";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Loading } from "@/components/ui/Loading";
 import { trpc } from "@/lib/trpc";
-import { useQuery } from "@tanstack/react-query";
-import { ScrollView, Text, View } from "react-native";
 // import Banner1 from "@/components/home/Banner1";
 // import Banner2 from "@/components/home/Banner2";
 // import Banner3 from "@/components/home/Banner3";
@@ -27,8 +29,6 @@ export default function TabOneScreen() {
   // const data = Banners();
   // console.log("==============data from trpc============",data)
   //
-  // const trpc = useTRPC();
-
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View className="flex items-center r rounded-4xl">
