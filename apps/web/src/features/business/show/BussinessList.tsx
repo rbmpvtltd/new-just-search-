@@ -9,7 +9,7 @@ import {
   ClearRefinements,
   Pagination,
 } from "react-instantsearch";
-import { serverAlgolia } from "@repo/algolia";
+import { algoliaClient } from "@repo/algolia";
 import { useState, useEffect, useRef } from "react";
 import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
 
@@ -43,7 +43,7 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
   }, []);
 
   return (
-    <InstantSearch searchClient={serverAlgolia} indexName="business_listing">
+    <InstantSearch searchClient={algoliaClient} indexName="business_listing">
       <div className="search-container p-4 max-w-7xl mx-auto">
         <SearchBox
           placeholder="Search Businesses"

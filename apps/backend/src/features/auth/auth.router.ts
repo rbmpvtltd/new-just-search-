@@ -84,7 +84,7 @@ export const authRouter = router({
       ctx.role === "franchises" ||
       ctx.role === "admin"
     ) {
-      return { success: true };
+      return { success: true, role: ctx.role };
     }
     return { success: false };
   }),

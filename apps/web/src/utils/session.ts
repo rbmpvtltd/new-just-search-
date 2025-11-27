@@ -1,10 +1,11 @@
 "use server";
 import { cookies } from "next/headers";
 
-export async function setToken(token: string, persist: boolean = false) {
-  const tempTime = 5 * 1000;
+export async function setToken(token: string) {
+  // TODO: fixing persist in production
+  const persist = process.env.NODE_ENV === "production";
   const week = 7 * 24 * 60 * 60 * 1000;
-  const expiresAt = new Date(Date.now() + tempTime);
+  const expiresAt = new Date(Date.now() + week);
   const cookieStore = await cookies();
   if (persist) {
     cookieStore.set("token", token, {
