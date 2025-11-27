@@ -1,9 +1,9 @@
-import { SiteHeader } from "@/components/site-header";
+import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
-import { redirect } from "next/navigation";
 export default async function DashboardLayout({
   children,
 }: {
