@@ -9,7 +9,11 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 import z from "zod";
 import {
   MaritalStatus,
@@ -120,7 +124,8 @@ export const salesmen = pgTable("salesmen", {
 
 export const notification = pgTable("notification", {
   id: serial("id").primaryKey(),
-  role: userRoleEnum("notification_role").default(UserRole.guest).notNull(),
+  notificationId: integer("notification_id").notNull().default(0),
+  role: userRoleEnum("notification_role").notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   state: integer("state").references(() => states.id, {
@@ -139,3 +144,9 @@ export const notification = pgTable("notification", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const notificationInsertSchema = createInsertSchema(notification, {
+  role: () => z.enum(UserRole),
+});
+export const notificationUpdateSchema = createUpdateSchema(notification);
+export const notificationSelectSchema = createSelectSchema(notification);

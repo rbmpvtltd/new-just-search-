@@ -1,15 +1,15 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
-import { notificationInsertSchema } from "@repo/db/dist/schema/user.schema";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
+import { useMutation } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
+import { z } from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,9 +23,21 @@ import {
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
-const extendedInsertSchema = notificationInsertSchema;
+// import { bannerSelectSchema } from "@repo/db/dist/schema/not-related.schema";
 
-type SelectSchema = z.infer<typeof extendedInsertSchema>;
+const extendedCategoryInsertSchema = categoryInsertSchema
+  .pick({
+    photo: true,
+    isPopular: true,
+    type: true,
+    title: true,
+    status: true,
+  })
+  .extend({
+    photo: z.any(),
+  });
+
+type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
 
 export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
@@ -50,76 +62,76 @@ interface AddForm {
 function AddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
-  const { data } = useSuspenseQuery(
-    trpc.adminNotificationRouter.add.queryOptions(),
-  );
-
   const { mutate: create } = useMutation(
-    trpc.adminNotificationRouter.create.mutationOptions(),
+    trpc.adminCategoryRouter.create.mutationOptions(),
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SelectSchema>({
-    resolver: zodResolver(extendedInsertSchema),
+  } = useForm<CategorySelectSchema>({
+    resolver: zodResolver(extendedCategoryInsertSchema),
     defaultValues: {
-      description: "",
-      title: "",
-      city: null,
-      notificationId: data.newNotificationId,
-      state: null,
-      role: "all",
-      status: true,
+      photo: "",
+      type: 1,
+      status: false,
+      isPopular: false,
     },
   });
 
-  const onSubmit = async (data: SelectSchema) => {
-    create(data, {
-      onSuccess: () => {
-        const queryClient = getQueryClient();
-        queryClient.invalidateQueries({
-          queryKey: trpc.adminNotificationRouter.list.queryKey(),
-        });
-        setOpen(false);
+  const onSubmit = async (data: CategorySelectSchema) => {
+    const files = await uploadToCloudinary([data.photo], "banner");
+    if (!files || !files[0]) {
+      console.error("file uploading to cloudinary failed");
+      return;
+    }
+    create(
+      {
+        ...data,
+        photo: files[0],
       },
-      onError: (e) => {
-        console.error(e);
+      {
+        onSuccess: () => {
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.adminCategoryRouter.list.queryKey(),
+          });
+          setOpen(false);
+        },
+        onError: (e) => {
+          console.error(e);
+        },
       },
-    });
+    );
   };
 
-  const formFields: FormFieldProps<SelectSchema>[] = [
+  const formFields: FormFieldProps<CategorySelectSchema>[] = [
     {
       control,
-      label: "Role",
-      name: "role",
+      label: "Type",
+      name: "type",
       placeholder: "Select Type of category",
       component: "select",
       options: [
-        { label: UserRole.all, value: UserRole.all },
-        { label: UserRole.business, value: UserRole.business },
-        { label: UserRole.hire, value: UserRole.hire },
-        { label: UserRole.guest, value: UserRole.guest },
-        { label: UserRole.visiter, value: UserRole.visiter },
+        { label: "Business", value: 1 },
+        { label: "Hire", value: 2 },
       ],
-      error: errors.role?.message,
+      error: errors.type?.message,
     },
     {
       control,
       label: "Title",
       name: "title",
-      placeholder: "eg: Notification Title",
+      placeholder: "eg: garment",
       component: "input",
-      error: errors.title?.message,
     },
     {
       control,
-      label: "description",
-      name: "description",
-      component: "input",
-      error: errors.description?.message,
+      label: "Photo",
+      name: "photo",
+      component: "image",
+      error: "",
     },
     {
       control,
@@ -128,7 +140,14 @@ function AddForm({ setOpen }: AddForm) {
       mainDivClassName: "flex gap-4",
       placeholder: "",
       component: "single-checkbox",
-      error: errors.state?.message,
+    },
+    {
+      control,
+      label: "isPopular",
+      name: "isPopular",
+      mainDivClassName: "flex gap-4",
+      placeholder: "",
+      component: "single-checkbox",
     },
   ];
 

@@ -95,8 +95,13 @@ const data = {
       icon: IconDatabase,
     },
     {
+      name: "Manage Saleman",
+      url: "/salesman",
+      icon: IconDatabase,
+    },
+    {
       name: "Help & Support",
-      url: "/support-ticket",
+      url: "/help-support",
       icon: IconReport,
     },
     {

@@ -3,7 +3,7 @@ import Select, { type StylesConfig } from "react-select";
 
 export interface Option {
   label: string;
-  value: string |  number;
+  value: string | number | null | boolean;
 }
 
 interface MultiSelectProps {

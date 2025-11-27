@@ -14,7 +14,8 @@
   },
   "scripts": {
     "dev": "bunx drizzle-kit studio",
-    "start": "bunx drizzle-kit migrate",
+    "migrate": "bunx drizzle-kit migrate",
+    "generate": "bunx drizzle-kit generate",
     "build": "bunx tsc -p tsconfig.json",
     "setup": "bunx tsc -p tsconfig.json",
     "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"

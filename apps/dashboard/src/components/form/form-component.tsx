@@ -119,12 +119,15 @@ export const FormField = <T extends FieldValues>({
               return (
                 <div className="flex gap-3 flex-wrap">
                   {options?.map((i) => (
-                    <div key={i.value} className="">
-                      <div key={i.value} className="flex items-center gap-2 ">
+                    <div key={String(i.value)} className="">
+                      <div
+                        key={String(i.value)}
+                        className="flex items-center gap-2 "
+                      >
                         <div className="mt-1 flex items-center justify-center">
                           <Checkbox
                             className="border-gray-300"
-                            key={i.value}
+                            key={String(i.value)}
                             name={name}
                             value={value}
                             id={`checkbox${i.label}`}
