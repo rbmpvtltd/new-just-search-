@@ -3,6 +3,8 @@ import { adminBusinessRouter } from "./dashboard-features/(business-hire)/busine
 import { adminHireRouter } from "./dashboard-features/(business-hire)/hire.admin.routes";
 import { adminCategoryRouter } from "./dashboard-features/(category)/category.admin.routes";
 import { adminSubcategoryRouter } from "./dashboard-features/(category)/subcategory.admin.routes";
+import { adminFranchiseRouter } from "./dashboard-features/(franchise-saleman)/franchise.admin.routes";
+import { adminSalemanRouter } from "./dashboard-features/(franchise-saleman)/saleman.admin.routes";
 import { adminDeleteRequestRouter } from "./dashboard-features/(users)/deleteRequest.admin.routes";
 import { adminFeedbackRouter } from "./dashboard-features/(users)/feedback.admin.routes";
 import { adminNotificationRouter } from "./dashboard-features/(users)/notification.admin.routes";
@@ -45,6 +47,8 @@ const adminRouter = router({
   adminDeleteRequestRouter,
   adminFeedbackRouter,
   adminNotificationRouter,
+  adminSalemanRouter,
+  adminFranchiseRouter,
 });
 
 export const appRouter = mergeRouters(usersRouter, adminRouter);

@@ -1,11 +1,11 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
-import { EditBanner } from "../form/edit.form";
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { useTableStore } from "../store";
+import { EditBanner } from "../form/edit.form";
+import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
 
 function SelectCell({ id }: { id: number }) {
   const select = useTableStore((state) => state.select);
@@ -23,25 +23,6 @@ function SelectCell({ id }: { id: number }) {
 
 function ActionCell({ id }: { id: number }) {
   return <EditBanner id={id} />;
-}
-
-function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
-  const allActive = useTableStore((state) => state.active);
-  const toggleActive = useTableStore((state) => state.toggleActive);
-  const isSelected = allActive.filter((item) => item.id === id)[0];
-  const active = isSelected ? isSelected.isActive : isActive;
-  const handleToggle = () => {
-    toggleActive(id, !active);
-  };
-
-  return (
-    <Checkbox
-      checked={active}
-      onCheckedChange={handleToggle}
-      aria-label="Select all"
-      className="translate-y-0.5"
-    />
-  );
 }
 
 function SelectHeader({ ids }: { ids: number[] }) {
@@ -77,58 +58,83 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type FeedbackArray = OutputTrpcType["adminNotificationRouter"]["list"]["data"];
-type Feedback = UnwrapArray<FeedbackArray>;
+type ListerArray = OutputTrpcType["adminUsersRouter"]["list"]["data"];
+type Lister = UnwrapArray<ListerArray>;
 
-export const columns: ColumnDef<Feedback>[] = [
+export const columns: ColumnDef<Lister>[] = [
   {
-    accessorKey: "notificationId",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ID" />
-    ),
-    cell: ({ row }) => (
-      <div className="w-20">{row.original.notificationId}</div>
-    ),
+    id: "select",
+    header: ({ table }) => {
+      const currentPageIds = table
+        .getRowModel()
+        .rows.map((row) => row.original.id);
+      return <SelectHeader ids={currentPageIds} />;
+    },
+    cell: ({ row }) => <SelectCell id={row.original.id} />,
+    enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "title",
+    accessorKey: "id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => row.original.title ?? "NO Type",
+    cell: ({ row }) => <div className="w-20">{row.original.id}</div>,
+    enableHiding: false,
   },
   {
-    accessorKey: "description",
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
+      <DataTableColumnHeader column={column} title="Display Name" />
     ),
-    cell: ({ row }) => row.original.description,
+    cell: ({ row }) => (
+      <div className="max-w-[200px] truncate">
+        {row.original.displayName || "No Name"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "phoneNumber",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phone Number" />
+    ),
+    cell: ({ row }) => <div>{row.original.phoneNumber}</div>,
+  },
+  {
+    accessorKey: "email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
+    cell: ({ row }) => <div>{row.original.email}</div>,
   },
   {
     accessorKey: "role",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Role" />
     ),
-    cell: ({ row }) => row.original.role,
+    cell: ({ row }) => <div>{row.original.role}</div>,
   },
   {
-    accessorKey: "status",
+    accessorKey: "googleId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Active" />
+      <DataTableColumnHeader column={column} title="Google Id" />
     ),
-    cell: ({ row }) => (
-      <ActiveCell
-        id={row.original.id}
-        isActive={row.original.status ?? false}
-      />
-    ),
+    cell: ({ row }) => <div>{row.original.googleId}</div>,
   },
   {
     accessorKey: "created_at",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
-    cell: ({ row }) => row?.original?.createdAt?.toLocaleDateString() ?? "null",
+    cell: ({ row }) => (
+      <div>{row?.original?.createdAt?.toLocaleDateString() ?? "null"}</div>
+    ),
+  },
+  {
+    id: "action",
+    header: () => <div className="text-center">Action</div>,
+    cell: ({ row }) => <ActionCell id={row.original.id} />,
+    enableSorting: false,
+    enableHiding: false,
   },
 ];

@@ -1,11 +1,11 @@
-CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin');--> statement-breakpoint
+CREATE TYPE "public"."gender" AS ENUM('Male', 'Female', 'Others');--> statement-breakpoint
+CREATE TYPE "public"."job_duration" AS ENUM('Day', 'Week', 'Month', 'Year');--> statement-breakpoint
+CREATE TYPE "public"."job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
+CREATE TYPE "public"."marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
+CREATE TYPE "public"."notification_enum" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('Pending', 'Approved', 'Rejected');--> statement-breakpoint
-CREATE TYPE "public"."hire_gender" AS ENUM('Male', 'Female', 'Others');--> statement-breakpoint
-CREATE TYPE "public"."hire_job_duration" AS ENUM('Day', 'Week', 'Month', 'Year');--> statement-breakpoint
-CREATE TYPE "public"."hire_job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
-CREATE TYPE "public"."hire_marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
-CREATE TYPE "public"."hire_work_shift" AS ENUM('Morning', 'Evening', 'Night');--> statement-breakpoint
-CREATE TYPE "public"."user_marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
+CREATE TYPE "public"."work_shift" AS ENUM('Morning', 'Evening', 'Night');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"display_name" varchar(100),
@@ -151,8 +151,8 @@ CREATE TABLE "hire_listing" (
 	"name" varchar(255) NOT NULL,
 	"father_name" varchar(255),
 	"dob" date,
-	"gender" "hire_gender" NOT NULL,
-	"marital_status" "hire_marital_status" NOT NULL,
+	"gender" "gender" NOT NULL,
+	"marital_status" "marital_status" NOT NULL,
 	"language" varchar(255)[] NOT NULL,
 	"slug" varchar(255),
 	"specialities" text,
@@ -188,11 +188,11 @@ CREATE TABLE "hire_listing" (
 	"expertise" text,
 	"skillset" text,
 	"abilities" text,
-	"job_type" "hire_job_type"[] NOT NULL,
-	"job_duration" "hire_job_duration"[] NOT NULL,
+	"job_type" "job_type"[] NOT NULL,
+	"job_duration" "job_duration"[] NOT NULL,
 	"location_preferred" varchar(255),
 	"certificates" text,
-	"work_shift" "hire_work_shift"[] NOT NULL,
+	"work_shift" "work_shift"[] NOT NULL,
 	"expected_salary_from" varchar(100),
 	"expected_salary_to" varchar(100),
 	"preferred_working_hours" varchar(100),
@@ -456,6 +456,21 @@ CREATE TABLE "franchises" (
 	CONSTRAINT "franchises_gst_no_unique" UNIQUE("gst_no")
 );
 --> statement-breakpoint
+CREATE TABLE "notification" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"notification_id" integer DEFAULT 0 NOT NULL,
+	"notification_role" "user_role" NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"description" text,
+	"state" integer,
+	"city" integer,
+	"category_id" integer,
+	"sub_category_id" integer,
+	"status" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "profiles" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
@@ -467,7 +482,7 @@ CREATE TABLE "profiles" (
 	"email" varchar(255),
 	"dob" date,
 	"occupation" varchar(100),
-	"marital_status" "user_marital_status",
+	"marital_status" "marital_status",
 	"address" varchar(255),
 	"pincode" varchar(10),
 	"state" integer NOT NULL,
@@ -538,6 +553,10 @@ ALTER TABLE "recent_view_products" ADD CONSTRAINT "recent_view_products_product_
 ALTER TABLE "account_delete_request" ADD CONSTRAINT "account_delete_request_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedbacks" ADD CONSTRAINT "feedbacks_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "franchises" ADD CONSTRAINT "franchises_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification" ADD CONSTRAINT "notification_state_states_id_fk" FOREIGN KEY ("state") REFERENCES "public"."states"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification" ADD CONSTRAINT "notification_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification" ADD CONSTRAINT "notification_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification" ADD CONSTRAINT "notification_sub_category_id_subcategories_id_fk" FOREIGN KEY ("sub_category_id") REFERENCES "public"."subcategories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

@@ -8,9 +8,11 @@ export const UserRole = {
   salesman: "salesman",
   franchises: "franchises",
   admin: "admin",
+  all: "all",
 } as const;
 
 export const userRoleEnum = pgEnum("user_role", UserRole);
+export const notificationRoleEnum = pgEnum("notification_enum", UserRole);
 
 export const MaritalStatus = {
   Married: "Married",

@@ -124,7 +124,8 @@ export const salesmen = pgTable("salesmen", {
 
 export const notification = pgTable("notification", {
   id: serial("id").primaryKey(),
-  role: userRoleEnum("notification_role").default(UserRole.guest),
+  notificationId: integer("notification_id").notNull().default(0),
+  role: userRoleEnum("notification_role").notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   state: integer("state").references(() => states.id, {

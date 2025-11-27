@@ -1,5 +1,5 @@
 {
-  "id": "69501efd-b720-45b4-8c78-26ada8e2732c",
+  "id": "b3353bfb-2420-4dd8-ba36-fc1e772661d9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1060,13 +1060,13 @@
         },
         "gender": {
           "name": "gender",
-          "type": "hire_gender",
+          "type": "gender",
           "primaryKey": false,
           "notNull": true
         },
         "marital_status": {
           "name": "marital_status",
-          "type": "hire_marital_status",
+          "type": "marital_status",
           "primaryKey": false,
           "notNull": true
         },
@@ -1285,13 +1285,13 @@
         },
         "job_type": {
           "name": "job_type",
-          "type": "hire_job_type[]",
+          "type": "job_type[]",
           "primaryKey": false,
           "notNull": true
         },
         "job_duration": {
           "name": "job_duration",
-          "type": "hire_job_duration[]",
+          "type": "job_duration[]",
           "primaryKey": false,
           "notNull": true
         },
@@ -1309,7 +1309,7 @@
         },
         "work_shift": {
           "name": "work_shift",
-          "type": "hire_work_shift[]",
+          "type": "work_shift[]",
           "primaryKey": false,
           "notNull": true
         },
@@ -3274,6 +3274,148 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.notification": {
+      "name": "notification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "notification_id": {
+          "name": "notification_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "notification_role": {
+          "name": "notification_role",
+          "type": "user_role",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sub_category_id": {
+          "name": "sub_category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "notification_state_states_id_fk": {
+          "name": "notification_state_states_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "states",
+          "columnsFrom": [
+            "state"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "notification_city_cities_id_fk": {
+          "name": "notification_city_cities_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "cities",
+          "columnsFrom": [
+            "city"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "notification_category_id_categories_id_fk": {
+          "name": "notification_category_id_categories_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "notification_sub_category_id_subcategories_id_fk": {
+          "name": "notification_sub_category_id_subcategories_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "subcategories",
+          "columnsFrom": [
+            "sub_category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.profiles": {
       "name": "profiles",
       "schema": "",
@@ -3340,7 +3482,7 @@
         },
         "marital_status": {
           "name": "marital_status",
-          "type": "user_marital_status",
+          "type": "marital_status",
           "primaryKey": false,
           "notNull": false
         },
@@ -3519,8 +3661,47 @@
     }
   },
   "enums": {
-    "public.user_role": {
-      "name": "user_role",
+    "public.gender": {
+      "name": "gender",
+      "schema": "public",
+      "values": [
+        "Male",
+        "Female",
+        "Others"
+      ]
+    },
+    "public.job_duration": {
+      "name": "job_duration",
+      "schema": "public",
+      "values": [
+        "Day",
+        "Week",
+        "Month",
+        "Year"
+      ]
+    },
+    "public.job_type": {
+      "name": "job_type",
+      "schema": "public",
+      "values": [
+        "FullTime",
+        "PartTime",
+        "Both"
+      ]
+    },
+    "public.marital_status": {
+      "name": "marital_status",
+      "schema": "public",
+      "values": [
+        "Married",
+        "Unmarried",
+        "Widowed",
+        "Divorced",
+        "Others"
+      ]
+    },
+    "public.notification_enum": {
+      "name": "notification_enum",
       "schema": "public",
       "values": [
         "guest",
@@ -3529,7 +3710,8 @@
         "business",
         "salesman",
         "franchises",
-        "admin"
+        "admin",
+        "all"
       ]
     },
     "public.status": {
@@ -3541,63 +3723,27 @@
         "Rejected"
       ]
     },
-    "public.hire_gender": {
-      "name": "hire_gender",
+    "public.user_role": {
+      "name": "user_role",
       "schema": "public",
       "values": [
-        "Male",
-        "Female",
-        "Others"
+        "guest",
+        "visiter",
+        "hire",
+        "business",
+        "salesman",
+        "franchises",
+        "admin",
+        "all"
       ]
     },
-    "public.hire_job_duration": {
-      "name": "hire_job_duration",
-      "schema": "public",
-      "values": [
-        "Day",
-        "Week",
-        "Month",
-        "Year"
-      ]
-    },
-    "public.hire_job_type": {
-      "name": "hire_job_type",
-      "schema": "public",
-      "values": [
-        "FullTime",
-        "PartTime",
-        "Both"
-      ]
-    },
-    "public.hire_marital_status": {
-      "name": "hire_marital_status",
-      "schema": "public",
-      "values": [
-        "Married",
-        "Unmarried",
-        "Widowed",
-        "Divorced",
-        "Others"
-      ]
-    },
-    "public.hire_work_shift": {
-      "name": "hire_work_shift",
+    "public.work_shift": {
+      "name": "work_shift",
       "schema": "public",
       "values": [
         "Morning",
         "Evening",
         "Night"
-      ]
-    },
-    "public.user_marital_status": {
-      "name": "user_marital_status",
-      "schema": "public",
-      "values": [
-        "Married",
-        "Unmarried",
-        "Widowed",
-        "Divorced",
-        "Others"
       ]
     }
   },

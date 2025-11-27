@@ -1,16 +1,15 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
+  categoryInsertSchema,
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
-import {
-  notification,
-  notificationInsertSchema,
-} from "@repo/db/dist/schema/user.schema";
 import { TRPCError } from "@trpc/server";
-import { desc, eq, inArray, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
+import slugify from "slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
@@ -23,23 +22,23 @@ import {
 } from "@/lib/tableUtils";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
-  notificationAllowedSortColumns,
-  notificationColumns,
-  notificationGlobalFilterColumns,
-} from "./notification.admin.service";
+  usersAllowedSortColumns,
+  usersColumns,
+  usersGlobalFilterColumns,
+} from "./franchise.admin.service";
 
-export const adminNotificationRouter = router({
+export const adminSalemanRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
       input.globalFilter,
-      notificationColumns,
-      notificationGlobalFilterColumns,
+      usersColumns,
+      usersGlobalFilterColumns,
     );
 
     const orderBy = buildOrderByClause(
       input.sorting,
-      notificationAllowedSortColumns,
+      usersAllowedSortColumns,
       sql`created_at DESC`,
     );
 
@@ -49,17 +48,19 @@ export const adminNotificationRouter = router({
 
     const data = await db
       .select()
-      .from(notification)
+      .from(users)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
+      // .leftJoin(categories, eq(subcategories.categoryId, categories.id))
       .offset(offset);
 
+    // PostgreSQL returns `bigint` for count → cast to number
     const totalResult = await db
       .select({
-        count: sql<number>`count(distinct ${notification.id})::int`,
+        count: sql<number>`count(distinct ${users.id})::int`,
       })
-      .from(notification)
+      .from(users)
       // .leftJoin(categories, eq(subcategories.categoryId, categories.id))
       .where(where);
 
@@ -74,22 +75,17 @@ export const adminNotificationRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    const lastNotificationId = (
-      await db
-        .select({
-          notification_id: notification.notificationId,
-        })
-        .from(notification)
-        .orderBy(desc(notification.notificationId))
-        .limit(1)
-    )[0]?.notification_id;
-    const newNotificationId = Number(lastNotificationId ?? 0) + 1;
-    return { newNotificationId };
+    return;
   }),
   create: adminProcedure
-    .input(notificationInsertSchema)
+    .input(
+      categoryInsertSchema.omit({
+        slug: true,
+      }),
+    )
     .mutation(async ({ input }) => {
-      await db.insert(notification).values(input);
+      const slug = slugify(input.title);
+      await db.insert(categories).values({ ...input, slug });
       return { success: true };
     }),
   edit: adminProcedure
@@ -158,9 +154,9 @@ export const adminNotificationRouter = router({
     )
     .mutation(async ({ input }) => {
       await db
-        .update(notification)
+        .update(categories)
         .set({
-          status: sql`CASE ${notification.id} 
+          status: sql`CASE ${categories.id} 
             ${sql.join(
               input.map(
                 (item) =>
@@ -168,12 +164,12 @@ export const adminNotificationRouter = router({
               ),
               sql` `,
             )}
-                ELSE ${notification.status} 
+                ELSE ${categories.status} 
                 END`,
         })
         .where(
           inArray(
-            notification.id,
+            categories.id,
             input.map((item) => item.id),
           ),
         );
