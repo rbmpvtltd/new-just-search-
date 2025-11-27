@@ -1,14 +1,12 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
-import Link from "next/link";
 import { CldImage } from "next-cloudinary";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
-import { useChatStore } from "../store/useStore";
 
 type MessageListType =
   | OutputTrpcType["helpAndSupportRouter"]["messageList"]
@@ -20,50 +18,51 @@ function HelpAndSupportPrivateChat({
   chatTokenSessionId: number;
 }) {
   const trpc = useTRPC();
-  const allMessagesRef = React.useRef<MessageListType>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  const { mutate } = useMutation(trpc.chat.markAsRead.mutationOptions());
-  const zustandStoreMessages = useChatStore(
-    (state) => state.zustandStoreMessages,
+  const { data: messageList } = useSuspenseQuery(
+    trpc.helpAndSupportRouter.messageList.queryOptions({
+      chatTokenSessionId: chatTokenSessionId,
+    }),
   );
-  const liveMessages = useChatStore((state) => state.liveMessages);
-  allMessagesRef.current = [...zustandStoreMessages, ...liveMessages];
-  const setLiveMessage = useChatStore((state) => state.setLiveMessage);
-  const { data, error } = useSubscription(
+  const [store, setStore] = useState<Exclude<MessageListType, null>>(
+    messageList ?? [],
+  );
+
+  // const lastMessageId = store?.length
+  //   ? (store?.[store.length - 1]?.id ?? null)
+  //   : null;
+
+  const { data } = useSubscription(
     trpc.helpAndSupportRouter.onMessage.subscriptionOptions({
       chatTokenSessionId: chatTokenSessionId,
     }),
   );
-  useEffect(() => {
-    if (data) {
-      setLiveMessage(data);
-    }
-  }, [data, setLiveMessage]);
 
   useEffect(() => {
-    const messages = allMessagesRef.current
+    if (!data) return;
+    setStore((prev) => [...prev, data]);
+  }, [data]);
+
+  const { mutate: markRead } = useMutation(
+    trpc.chat.markAsRead.mutationOptions(),
+  );
+
+  useEffect(() => {
+    const unread = store
       ?.filter((msg) => msg.sendByRole !== "User" && !msg.isRead)
       .map((msg) => msg.id);
 
-    if (!messages?.length) {
-      return;
+    if (unread.length > 0) {
+      markRead({ messageId: unread });
     }
-
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-
-    mutate({
-      messageId: messages,
-    });
-  }, [mutate]);
+  }, [markRead, store]);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [allMessagesRef.current]);
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messageList]);
+
   return (
     <div
       ref={scrollRef}
@@ -82,7 +81,7 @@ function HelpAndSupportPrivateChat({
 
         <h2 className="font-semibold text-gray-800 text-lg">Admin</h2>
       </div>
-      {allMessagesRef.current?.map((msg) => (
+      {store.map((msg) => (
         <div key={msg.id} className="flex flex-col gap-1">
           {msg.message && (
             <div
@@ -147,21 +146,9 @@ const MemorizedSendMessage = React.memo(SendMessage);
 
 export default function HelpAndSupportChat({
   chatTokenSessionId,
-  messageList,
 }: {
   chatTokenSessionId: number;
-  messageList: MessageListType;
 }) {
-  const setzustandStoreMessages = useChatStore(
-    (state) => state.setzustandStoreMessages,
-  );
-
-  useEffect(() => {
-    if (messageList?.length) {
-      setzustandStoreMessages(messageList);
-    }
-  }, [messageList, setzustandStoreMessages]);
-
   return (
     <div className="p-4 max-w-md mx-auto flex flex-col h-[90vh]">
       <MemorizedPrivateChat chatTokenSessionId={chatTokenSessionId} />

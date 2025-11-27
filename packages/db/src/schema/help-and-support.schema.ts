@@ -1,7 +1,6 @@
 import {
   boolean,
   integer,
-  pgEnum,
   pgTable,
   serial,
   timestamp,
@@ -9,12 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
-
-export const SendByRole = {
-  Admin: "Admin",
-  User: "User",
-} as const;
-export const sendByRoleEnum = pgEnum("send_by_role", SendByRole);
+import { sendByRoleEnum } from "../enum/allEnum.enum";
 
 export const chatTokenSessions = pgTable("chat_token_sessions", {
   id: serial("id").primaryKey(),

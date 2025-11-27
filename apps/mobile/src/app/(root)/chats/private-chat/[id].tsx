@@ -17,18 +17,15 @@ function Chats({ conversationId }: { conversationId: number }) {
   );
 
   console.log("Conversation id", conversationId);
-  
+
   return (
-    <>
-    
-      <View>
-        <StoreChat
-          userData={userData}
-          conversationId={Number(conversationId)}
-          displayName={otherUserName}
-        />
-      </View>
-    </>
+    <View>
+      <StoreChat
+        userData={userData}
+        conversationId={Number(conversationId)}
+        displayName={otherUserName}
+      />
+    </View>
   );
 }
 

@@ -2,6 +2,7 @@ CREATE TYPE "public"."gender" AS ENUM('Male', 'Female', 'Others');--> statement-
 CREATE TYPE "public"."job_duration" AS ENUM('Day', 'Week', 'Month', 'Year');--> statement-breakpoint
 CREATE TYPE "public"."job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
 CREATE TYPE "public"."marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
+CREATE TYPE "public"."send_by_role" AS ENUM('Admin', 'User');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('Pending', 'Approved', 'Rejected');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin');--> statement-breakpoint
 CREATE TYPE "public"."work_shift" AS ENUM('Morning', 'Evening', 'Night');--> statement-breakpoint
@@ -131,11 +132,25 @@ CREATE TABLE "chat_sessions" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "chat_token_messages" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"chat_token_sessions_id" serial NOT NULL,
+	"send_by_role" "send_by_role" NOT NULL,
+	"message" varchar NOT NULL,
+	"is_read" boolean DEFAULT false NOT NULL,
+	"image" varchar,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "chat_token_sessions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"token_number" varchar NOT NULL,
-	"subject" varchar NOT NULL
+	"subject" varchar NOT NULL,
+	"status" integer NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "hire_categories" (
@@ -516,6 +531,7 @@ ALTER TABLE "recent_view_business" ADD CONSTRAINT "recent_view_business_user_id_
 ALTER TABLE "recent_view_business" ADD CONSTRAINT "recent_view_business_business_id_business_listings_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."business_listings"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_images" ADD CONSTRAINT "chat_images_message_id_chat_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."chat_messages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_chat_session_id_chat_sessions_id_fk" FOREIGN KEY ("chat_session_id") REFERENCES "public"."chat_sessions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "chat_token_messages" ADD CONSTRAINT "chat_token_messages_chat_token_sessions_id_chat_token_sessions_id_fk" FOREIGN KEY ("chat_token_sessions_id") REFERENCES "public"."chat_token_sessions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_categories" ADD CONSTRAINT "hire_categories_hire_id_hire_listing_id_fk" FOREIGN KEY ("hire_id") REFERENCES "public"."hire_listing"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_categories" ADD CONSTRAINT "hire_categories_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

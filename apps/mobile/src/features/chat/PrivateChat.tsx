@@ -74,29 +74,29 @@ function PrivateChat({
 
   return (
     <View className="flex-1">
-      {/* HEADER */}
-      <View className="flex-row items-center gap-3 bg-gray-300 p-3 rounded-xl">
-        <View className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 border">
-          {displayName?.[0]?.profileImage ? (
+      <View className="flex-row items-center gap-3 bg-gray-300 p-3 rounded-xl sticky top-0 left-0 right-0 z-10">
+        <View className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 border border-gray-300 items-center justify-center">
+          {displayName?.[0].profileImage ? (
             <AdvancedImage
-              cldImg={cld.image(displayName?.[0].profileImage)}
-              className="w-full h-full"
+              cldImg={cld.image(displayName?.[0]?.profileImage)}
+              className="w-full h-full rounded-full"
             />
           ) : (
-            <Text className="text-blue-600 text-lg font-bold">
-              {displayName?.[0]?.displayName?.[0]}
+            <Text className="text-blue-600 font-semibold text-lg">
+              {displayName?.[0]?.displayName?.charAt(0).toUpperCase()}
             </Text>
           )}
         </View>
 
-        <Text className="font-semibold text-gray-900 text-lg">
-          {displayName?.[0]?.displayName}
-        </Text>
+        <View>
+          <Text className="font-semibold text-gray-900 text-lg">
+            {displayName?.[0]?.displayName}
+          </Text>
+        </View>
       </View>
 
-      {/* MESSAGE LIST */}
       <ScrollView>
-        <View className="mt-3 space-y-3 px-2 mb-2">
+        <View className="mt-3 space-y-3 px-2 max-h-full gap-2 overflow-y-scroll mb-2">
           {store.map((msg) => (
             <View key={msg.id} className="px-1">
               {msg.message && (
@@ -107,23 +107,30 @@ function PrivateChat({
                       : "bg-gray-200 self-start"
                   }`}
                 >
-                  <Text>{msg.message}</Text>
+                  <Text className="text-gray-800">{msg.message}</Text>
+
                   <Text className="text-[10px] text-gray-500 mt-1 text-right">
-                    {new Date(msg.updatedAt!).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {msg.updatedAt
+                      ? new Date(msg.updatedAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : ""}
                   </Text>
                 </View>
               )}
 
               {msg.image && (
-                <AdvancedImage
-                  cldImg={cld.image(msg.image)}
-                  className={`w-48 h-48 rounded-xl shadow border ${
+                <View
+                  className={`max-w-[65%] mt-1 ${
                     msg.senderId === userData?.id ? "self-end" : "self-start"
                   }`}
-                />
+                >
+                  <AdvancedImage
+                    cldImg={cld.image(msg.image)}
+                    className="w-48 h-48 rounded-xl shadow border"
+                  />
+                </View>
               )}
             </View>
           ))}
@@ -183,7 +190,7 @@ export default function StoreChat({
 }) {
   return (
     <BoundaryWrapper>
-      <View className="h-[79vh]">
+      <View className="h-[89vh]">
         <MemorizedPrivateChat
           conversationId={conversationId}
           displayName={displayName}

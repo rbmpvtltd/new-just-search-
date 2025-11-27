@@ -1,5 +1,5 @@
 {
-  "id": "f4f8f05c-7de4-4365-8882-44b35fb658f8",
+  "id": "caee7fa6-835c-4e07-83dc-56d8918c2526",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -929,6 +929,84 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.chat_token_messages": {
+      "name": "chat_token_messages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "chat_token_sessions_id": {
+          "name": "chat_token_sessions_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "send_by_role": {
+          "name": "send_by_role",
+          "type": "send_by_role",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_read": {
+          "name": "is_read",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "chat_token_messages_chat_token_sessions_id_chat_token_sessions_id_fk": {
+          "name": "chat_token_messages_chat_token_sessions_id_chat_token_sessions_id_fk",
+          "tableFrom": "chat_token_messages",
+          "tableTo": "chat_token_sessions",
+          "columnsFrom": [
+            "chat_token_sessions_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.chat_token_sessions": {
       "name": "chat_token_sessions",
       "schema": "",
@@ -956,6 +1034,26 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -3692,6 +3790,14 @@
         "Widowed",
         "Divorced",
         "Others"
+      ]
+    },
+    "public.send_by_role": {
+      "name": "send_by_role",
+      "schema": "public",
+      "values": [
+        "Admin",
+        "User"
       ]
     },
     "public.status": {

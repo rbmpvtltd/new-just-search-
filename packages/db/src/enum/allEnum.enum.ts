@@ -63,4 +63,10 @@ export const Status = {
 
 export const statusEnum = pgEnum("status", Status);
 
+export const SendByRole = {
+  Admin: "Admin",
+  User: "User",
+} as const;
+export const sendByRoleEnum = pgEnum("send_by_role", SendByRole);
+
 // export const languagesEnum = pgEnum("hire_languages", Languages);

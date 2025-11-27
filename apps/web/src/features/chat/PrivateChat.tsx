@@ -18,12 +18,10 @@ type UserDataType = OutputTrpcType["userRouter"]["getUserProfile"] | null;
 function PrivateChat({
   userData,
   conversationId,
-  // messageList,
   displayName,
 }: {
   userData: UserDataType;
   conversationId: number;
-  // messageList: MessageListType;
   displayName: OtherUerDisplayNameAndImageType;
 }) {
   const trpc = useTRPC();
@@ -39,11 +37,6 @@ function PrivateChat({
   const lastMessageId = store?.length
     ? (store?.[store.length - 1]?.id ?? null)
     : null;
-  // const lastMessageId =
-  //   setStore ?
-  //   setStore?.length > 0
-  //     ? Number(setStore?[storeRef.current.length - 1].id)
-  //     : setStore :  null;
 
   const { data: newMessage } = useSubscription(
     trpc.chat.onMessage.subscriptionOptions({
@@ -114,14 +107,14 @@ function PrivateChat({
               }`}
             >
               <h2 className="font-semibold">{msg.message}</h2>
-              {/* <span className="block text-xs text-gray-500 mt-1 mx-1">
+              <span className="block text-xs text-gray-500 mt-1 mx-1">
                 {msg.updatedAt
-                ? new Date(msg.updatedAt).toLocaleTimeString([], {
+                  ? new Date(msg.updatedAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
-                      })
-                      : ""}
-              </span> */}
+                    })
+                  : ""}
+              </span>
             </div>
           )}
 
@@ -188,34 +181,20 @@ const MemorizedSendMessage = React.memo(SendMessage);
 export default function StoreChat({
   userData,
   conversationId,
-  // messageList,
   displayName,
 }: {
   displayName: OtherUerDisplayNameAndImageType;
   userData: UserDataType;
   conversationId: number;
-  // messageList: MessageListType;
 }) {
-  // const scrollRef = useRef<HTMLDivElement>(null);
-  // useEffect(() => {
-  //   if (!scrollRef.current) return;
-  //   scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  // }, [messageList]);
   return (
     <div className="p-4 max-w-md mx-auto flex flex-col h-[90vh]">
-      {/* <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto border border-gray-200 rounded-lg px-2 py-1 space-y-3 mb-3 bg-white relative"
-        > */}
-
       <BoundaryWrapper>
         <MemorizedPrivateChat
           conversationId={conversationId}
           userData={userData}
           displayName={displayName}
-          // messageList={messageList}
         />
-        {/* </div> */}
         <MemorizedSendMessage conversationId={conversationId} />
       </BoundaryWrapper>
     </div>
