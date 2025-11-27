@@ -29,7 +29,7 @@ export default function AllListing() {
       return (
         <Redirect
           href={{
-            pathname: "/aboutBusiness/[premiumshops]",
+            pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
             params: {
               premiumshops: id,
               location: location?.toString(),

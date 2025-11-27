@@ -19,7 +19,7 @@ import { verifyBusinessOtp } from "@/query/verifyBusiness";
 import { type VerifyOtpData, verifyOtp } from "@/query/verifyOtp";
 import { type SignupFormData, signupSchema } from "@/schemas/signupSchema";
 import { useAuthStore } from "@/store/authStore";
-import { setToken } from "@/utils/secureStore";
+import { setTokenRole } from "@/utils/secureStore";
 import Input from "../inputs/Input";
 
 // import { Pressable } from 'react-native-gesture-handler';
@@ -51,7 +51,7 @@ const SignupComponent: React.FC = () => {
     const response = await verifyBusinessOtp(data);
     if (response.success) {
       setAuthStoreToken(response.token, response.role);
-      await setToken(response.token);
+      await setTokenRole(response.token,response.role);
       return router.back();
     }
     Alert.alert(response.message);
@@ -208,7 +208,7 @@ const SignupComponent: React.FC = () => {
           />
           <Pressable
             onPress={() => {
-              router.navigate("/user/termCondition");
+              router.navigate("/(root)/(home)/home"); // TODO: redirect to terms and conditions
             }}
           >
             <Text className="px-5 -mt-4 font-semibold underline text-primary">

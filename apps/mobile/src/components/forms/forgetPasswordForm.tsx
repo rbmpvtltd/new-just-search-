@@ -12,7 +12,7 @@ import {
   forgetPasswordSchema,
 } from "@/schemas/loginSchema";
 import { useAuthStore } from "@/store/authStore";
-import { setToken } from "@/utils/secureStore";
+import { setTokenRole } from "@/utils/secureStore";
 import Input from "../inputs/Input";
 
 export default function ForgetPasswordForm() {
@@ -40,8 +40,8 @@ export default function ForgetPasswordForm() {
 
     if (response.success) {
       setAuthStoreToken(response.token, response.role);
-      await setToken(response.token);
-      return router.navigate("/user/bottomNav/profile");
+      await setTokenRole(response.token,response.role);
+      return router.navigate("/(root)/profile");
     }
     Alert.alert(response.message);
   };

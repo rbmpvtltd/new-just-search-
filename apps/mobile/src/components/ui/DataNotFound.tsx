@@ -14,7 +14,7 @@ export default function DataNotFound() {
           if (router.canGoBack()) {
             router.back();
           } else {
-            router.replace("/user/bottomNav");
+            router.replace("/(root)/(home)/home");
           }
         }}
       >

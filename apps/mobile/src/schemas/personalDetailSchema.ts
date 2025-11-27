@@ -21,8 +21,7 @@ export const personalDetailSchema = z.object({
   email: z.string().email("Invalid Email Address"),
 
   dob: z.date({
-    required_error: "Date of birth is required",
-    invalid_type_error: "Invalid date",
+    error: "Date of birth is required",
   }),
 
   occupation: z.string().min(1, {

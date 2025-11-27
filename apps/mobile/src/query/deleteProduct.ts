@@ -1,4 +1,4 @@
-import { queryClient } from "@/app/_layout";
+import { queryClient } from "@/lib/trpc";
 import { getAuthHeader } from "@/constants/authHeader";
 import { apiUrl } from "@/constants/Variable";
 import { api, methods } from "@/lib/api";

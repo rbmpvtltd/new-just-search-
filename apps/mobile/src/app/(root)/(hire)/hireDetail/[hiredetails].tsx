@@ -1,4 +1,4 @@
-import HireDetailsCard from "@/components/hirePageComp/HireDetailsCard";
+import HireDetailsCard from "@/features/hire/show/HireDetailsCard";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 

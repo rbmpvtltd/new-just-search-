@@ -3,7 +3,8 @@ import { LoginBusinessFormData } from "@/schemas/loginSchema";
 import { ChangePasswordData } from "@/schemas/changePasswordSchema";
 import { getAuthHeader } from "@/constants/authHeader";
 import { apiUrl } from "@/constants/Variable";
-import { role } from "@/store/authStore";
+import { UserRole } from "@repo/db";
+
 
 export type UserData = {
   success: boolean;
@@ -14,7 +15,7 @@ export type UserData = {
     name: string;
     phone: string;
   };
-  role: role;
+  role: UserRole;
   token: string;
 };
 

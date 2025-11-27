@@ -39,7 +39,7 @@ export default function Notification() {
   };
 
   if (!isAuthenticated) {
-    router.replace("/user/bottomNav/profile");
+    router.replace("/(root)/profile");
   }
 
   const { data } = useSuspenceData(NOTIFICATION_URL.url, NOTIFICATION_URL.key);

@@ -1,7 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import OfferSearchForm from "@/components/forms/offerSearchForm";
+import OfferSearchForm from "@/features/offer/show/offerSearchForm";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import OffersList from "@/components/offerPageCompo/OffersList";
+import OffersList from "@/features/offer/show/OffersList";
 
 function AllOffers() {
   return (

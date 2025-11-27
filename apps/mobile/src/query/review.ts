@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { Alert } from "react-native";
-import { queryClient } from "@/app/_layout";
+import { queryClient } from "@/lib/trpc";
 import { MY_BUSINESS_LIST_URL, MY_LISTING_URL } from "@/constants/apis";
 import { getFormAuthHeader } from "@/constants/authHeader";
 import { apiUrl } from "@/constants/Variable";

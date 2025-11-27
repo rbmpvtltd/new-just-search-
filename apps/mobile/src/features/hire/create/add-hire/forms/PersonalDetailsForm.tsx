@@ -1,8 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import {
-  Gender,
-  MaritalStatus,
   personalDetailsHireSchema,
 } from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +18,7 @@ import PrimaryButton from "@/components/inputs/SubmitBtn";
 import LocationAutoDetect from "@/components/ui/LocationAutoDetect";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
+import { genderEnum, maritalStatusEnum } from "@repo/db/dist/enum/allEnum.enum";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
@@ -178,7 +177,7 @@ export default function PersonalDetailsForm({
       name: "gender",
       label: "Gender",
       component: "dropdown",
-      data: Object.values(Gender).map((item) => ({
+      data: Object.values(genderEnum).map((item) => ({
         label: item,
         value: item,
       })),
@@ -191,7 +190,7 @@ export default function PersonalDetailsForm({
       name: "maritalStatus",
       label: "Marital Status",
       component: "dropdown",
-      data: Object.values(MaritalStatus).map((item) => {
+      data: Object.values(maritalStatusEnum).map((item) => {
         return {
           label: item,
           value: item,

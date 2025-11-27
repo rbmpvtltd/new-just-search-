@@ -15,7 +15,7 @@ import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStor
 import { trpc } from "@/lib/trpc";
 import { fetchVerifyAuth } from "@/query/auth";
 import { useAuthStore } from "@/store/authStore";
-import { setToken } from "@/utils/secureStore";
+import { setTokenRole } from "@/utils/secureStore";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
 

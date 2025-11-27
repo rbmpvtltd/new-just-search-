@@ -1,9 +1,9 @@
 import CustomCarousel from "@/components/Carousel/CustomCaraousel";
-import Banner1 from "@/components/home/Banner1";
-import Banner2 from "@/components/home/Banner2";
-import Banner3 from "@/components/home/Banner3";
-import Banner4 from "@/components/home/Banner4";
-import { CategoryList } from "@/components/home/CategorySameList";
+import Banner1 from "@/features/home/show/Banner1";
+import Banner2 from "@/features/home/show/Banner2";
+import Banner3 from "@/features/home/show/Banner3";
+import Banner4 from "@/features/home/show/Banner4";
+import { CategoryList } from "@/features/home/show/CategorySameList";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Loading } from "@/components/ui/Loading";
 import { trpc } from "@/lib/trpc";

@@ -259,7 +259,7 @@ export const FormField = <T extends FieldValues>({
                 <View className="space-y-2">
                   {(data || []).map((item) => {
                     if (!item.value) return null;
-                    const isChecked = (value || []).includes(item?.value);
+                    const isChecked = (value || []).includes(item?.value as never);
                     return (
                       <Checkbox.Item
                         labelStyle={{
@@ -287,7 +287,7 @@ export const FormField = <T extends FieldValues>({
                 <MultiSelectDropdown
                   value={value || []}
                   onChange={onChange}
-                  data={data || []}
+                  data={data as any ?? []}
                   placeholder={placeholder}
                   multiselect={multiselect}
                   dropdownPosition={dropdownPosition}

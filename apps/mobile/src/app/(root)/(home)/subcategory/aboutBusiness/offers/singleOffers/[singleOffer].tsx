@@ -67,7 +67,7 @@ export default function TabOneScreen() {
                 height={300}
                 autoPlay={true}
                 autoPlayInterval={4000}
-                data={data?.photos}
+                data={data?.photos ?? []}
                 scrollAnimationDuration={1000}
                 renderItem={({ item }) => (
                   <View className="relative bg-base-200">

@@ -125,7 +125,7 @@ export default function CarouselCompo({
       width={width}
       height={height}
       autoPlay={false} 
-      data={data}
+      data={data ?? []}
       scrollAnimationDuration={1000}
       style={{ flexGrow: 0 }}
       pagingEnabled

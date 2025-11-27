@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Alert, Text, useColorScheme, View } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
 import RazorpayCheckout from "react-native-razorpay";
-import { queryClient } from "@/app/_layout";
+import { queryClient } from "@/lib/trpc";
 import Colors from "@/constants/Colors";
 import type { PlanInterface } from "@/query/getPlans";
 import { useInitiateRazorPay, useVerityRazorPay } from "@/query/razorPay";
@@ -53,7 +53,7 @@ export default function PricingCard(item: PlanInterface) {
             item.title === "Free" ? freeFeatures.includes(feature) : true;
 
           return (
-            <View className="flex-row items-start gap-3" key={index}>
+            <View className="flex-row items-start gap-3" key={index.toString()}>
               <Ionicons
                 name={isAvailable ? "checkmark-circle" : "close-circle"}
                 size={22}

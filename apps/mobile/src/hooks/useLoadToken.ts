@@ -20,7 +20,7 @@ export function useLoadToken() {
       console.error(error);
     }
   }, [isLoading, isError, data, error, setTokenRole]);
-  return { isLoading };
+  return {data, isLoading };
 }
 
 // import { useEffect, useState } from "react";

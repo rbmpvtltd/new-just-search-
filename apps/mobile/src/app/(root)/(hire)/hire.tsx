@@ -1,6 +1,6 @@
 import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import HireSearchForm from "@/components/forms/hireSearchForm";
+import HireSearchForm from "@/features/hire/show/hireSearchForm";
 import HireCard from "@/features/hire/show/HireCard";
 import { Loading } from "@/components/ui/Loading";
 import { useHireList } from "@/query/hireListing";

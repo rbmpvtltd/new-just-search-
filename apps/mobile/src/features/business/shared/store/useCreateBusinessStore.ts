@@ -51,7 +51,7 @@ const initialFormValue: CombinedBusinessForm = {
   longitude: "",
   pincode: "",
   state: 0,
-  cityId: 0,
+  city: 0,
 
   days: [],
   fromHour: "",

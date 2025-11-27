@@ -1,9 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  JobDuration,
-  JobType,
   preferredPositionSchema,
-  WorkShift,
 } from "@repo/db/dist/schema/hire.schema";
 import { useForm } from "react-hook-form";
 import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
@@ -17,6 +14,7 @@ import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import type { OutputTrpcType } from "@/lib/trpc";
 import type { UserHireListingType } from "..";
+import { jobDurationEnum, jobTypeEnum, workShiftEnum } from "@repo/db/dist/enum/allEnum.enum";
 
 type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
 
@@ -70,7 +68,7 @@ export default function PreferredPositionForm({
       label: "Job Type",
       component: "checkbox",
       className: "w-[90%] text-secondary",
-      data: Object.values(JobType).map((jobType) => ({
+      data: Object.values(jobTypeEnum).map((jobType) => ({
         label: jobType,
         value: jobType,
       })),
@@ -91,7 +89,7 @@ export default function PreferredPositionForm({
       name: "workShift",
       label: "Work Shift",
       component: "checkbox",
-      data: Object.values(WorkShift).map((shift) => ({
+      data: Object.values(workShiftEnum).map((shift) => ({
         label: shift,
         value: shift,
       })),
@@ -122,7 +120,7 @@ export default function PreferredPositionForm({
       name: "jobDuration",
       label: "Job Duration",
       component: "checkbox",
-      data: Object.values(JobDuration).map((duration) => ({
+      data: Object.values(jobDurationEnum).map((duration) => ({
         label: duration,
         value: duration,
       })),

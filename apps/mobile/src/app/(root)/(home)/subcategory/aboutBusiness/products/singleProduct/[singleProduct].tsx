@@ -57,7 +57,7 @@ export default function TabOneScreen() {
                 height={400}
                 autoPlay={true}
                 autoPlayInterval={4000}
-                data={data?.photos}
+                data={data?.photos ?? []}
                 scrollAnimationDuration={1000}
                 renderItem={({ item }) => (
                   <View className="relative  h-[500px]  mx-auto bg-base-200 w-[100%] ">

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import * as Location from "expo-location";
 import { Alert } from "react-native";
 
-async function reverseGeocodeWithTimeout(coords, timeout = 8000) {
+async function reverseGeocodeWithTimeout(coords:any, timeout = 8000) {
   return Promise.race([
     Location.reverseGeocodeAsync(coords),
     new Promise((_, reject) =>
@@ -27,10 +27,10 @@ const fetchLocationData = async () => {
   const loc = await Location.getCurrentPositionAsync({});
   const { latitude, longitude } = loc.coords;
 
-  let geo = null;
+  let geo:any = null;
   try {
-    [geo] = await reverseGeocodeWithTimeout({ latitude, longitude });
-  } catch (err) {
+    geo = await reverseGeocodeWithTimeout({ latitude, longitude });
+  } catch (err:any) {
     console.warn("Reverse geocode failed:", err.message);
     Alert.alert(
       "Location Error",

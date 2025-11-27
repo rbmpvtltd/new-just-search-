@@ -2,7 +2,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Dimensions, Image, ScrollView, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Carousel from "react-native-reanimated-carousel";
-import ShposCard from "@/components/cards/PremiumShopsCard";
+import ShposCard from "@/features/business/show/PremiumShopsCard";
 import { useQuery } from "@tanstack/react-query";
 import { cld } from "@/lib/cloudinary";
 import { AdvancedImage } from "cloudinary-react-native";
@@ -110,7 +110,7 @@ export default function TabOneScreen() {
               height={360}
               autoPlay={true}
               autoPlayInterval={5000}
-              data={data?.businessPhotos}
+              data={data?.businessPhotos ?? []}
               scrollAnimationDuration={1000}
               mode="parallax"
               renderItem={({ item }) => {

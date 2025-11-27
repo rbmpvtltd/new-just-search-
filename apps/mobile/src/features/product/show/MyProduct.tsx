@@ -62,7 +62,7 @@ type ProductType = NonNullable<
 function ProductCard({ item }: { item: ProductType }) {
   const router = useRouter();
   const { mutate: deleteProduct, isPending } = useMutation(
-    trpc.businessrouter.deleteProduct.mutationOptions(),
+    trpc.productrouter.deleteProduct.mutationOptions(),
   );
 
   const handleDelete = () => {
@@ -121,7 +121,7 @@ function ProductCard({ item }: { item: ProductType }) {
               className="bg-info flex-row items-center px-3 py-1.5 rounded-lg mr-2"
               onPress={() =>
                 router.push(
-                  `/(root)/profile/product/edit-product/${item.productSlug}`,
+                  `/(root)/profile/product/[${item.productSlug}]`,
                 )
               }
             >

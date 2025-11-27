@@ -123,7 +123,7 @@ const HireCategorySearch: React.FC<CategorySearchProps> = ({
             }}
             className="rounded-b-lg"
           >
-            {suggestions.map((item) => (
+            {suggestions.map((item:any) => (
               <TouchableOpacity
                 key={item?.id}
                 onPress={() => handleSelect(item)}

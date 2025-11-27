@@ -51,7 +51,7 @@ const ChatScreen = () => {
           body: {
             message: inputText,
             chat_session_id: Number(chatSessionId),
-            sender_type: role === "visitor" ? "user" : "owner",
+            sender_type: role === "visiter" ? "user" : "owner",
           },
         },
         {

@@ -62,11 +62,12 @@ const CitySearch: React.FC<CitySearchProps> = ({
 
   const handleAutoDetect = (result: {
     success: boolean;
-    latitude: number;
-    longitude: number;
+    latitude: number | undefined;
+    longitude: number | undefined;
     name: string;
     street: string;
     formattedAddress: string;
+    postalCode?: string;
     city?: string;
     region?: string;
     country?: string;

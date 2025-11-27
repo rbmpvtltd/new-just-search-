@@ -51,7 +51,7 @@ function Favourite({
           { text: "No Thanks", onPress: () => console.log("OK Pressed") },
           {
             text: "Login Now",
-            onPress: () => router.push("/(root)/profile/profile"),
+            onPress: () => router.push("/(root)/profile"),
             style: "cancel",
           },
         ],

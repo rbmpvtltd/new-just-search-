@@ -1,5 +1,5 @@
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import ShopOffersList from "@/components/offerPageCompo/ShopOffers";
+import ShopOffersList from "@/features/offer/show/ShopOffers";
 import { useShopIdStore } from "@/store/shopIdStore";
 import { Stack } from "expo-router";
 

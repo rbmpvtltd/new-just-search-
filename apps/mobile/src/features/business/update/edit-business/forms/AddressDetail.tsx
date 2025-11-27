@@ -50,7 +50,7 @@ export default function AddressDetail({
       longitude: businessListing?.longitude ?? "",
       pincode: businessListing?.pincode ?? "",
       state: businessListing?.state.id ?? 0,
-      cityId: businessListing?.cityId ?? 0,
+      city: businessListing?.city.id ?? 0,
     },
   });
   const states = formReferenceData?.getStates.map((item) => {
@@ -75,7 +75,7 @@ export default function AddressDetail({
     setFormValue("longitude", data.longitude ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state);
-    setFormValue("cityId", data.cityId);
+    setFormValue("city", data.city);
     nextPage();
   };
 
@@ -161,13 +161,13 @@ export default function AddressDetail({
     },
     {
       control,
-      name: "cityId",
+      name: "city",
       label: "City",
       placeholder: "Enter your City",
       component: "dropdown",
       className: "w-[90%] bg-base-200",
       data: cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: errors.cityId?.message,
+      error: errors.city?.message,
     },
   ];
   return (
@@ -180,9 +180,9 @@ export default function AddressDetail({
       >
         <View className="mx-auto w-[90%]">
           <LocationAutoDetect
-            onResult={(data) => {
+            onResult={(data:any) => {
               const formatted = data.formattedAddress ?? "";
-              const parts = formatted.split(",").map((p) => p.trim());
+              const parts = formatted.split(",").map((p:string) => p.trim());
 
               const lat = data.latitude;
               const lng = data.longitude;
@@ -210,7 +210,7 @@ export default function AddressDetail({
               setValue("latitude", String(lat));
               setValue("longitude", String(lng));
               setValue("pincode", pincode);
-              setValue("cityId", city);
+              setValue("city", city);
               setValue("state", state);
               setValue("area", area);
               setValue("buildingName", building_name);
@@ -220,7 +220,7 @@ export default function AddressDetail({
               setFormValue("latitude", lat);
               setFormValue("longitude", lng);
               setFormValue("pincode", pincode);
-              setFormValue("cityId", city);
+              setFormValue("city", city);
               setFormValue("state", state);
               setFormValue("area", area);
               setFormValue("buildingName", building_name);

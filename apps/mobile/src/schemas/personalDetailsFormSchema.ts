@@ -13,8 +13,7 @@ export const personalDetailsFormSchema = z.object({
     .regex(/^[A-Za-z\s]+$/, "Only alphabets are allowed"),
 
   dob: z.date({
-    required_error: "Date of birth is required",
-    invalid_type_error: "Invalid date",
+    error: "Date of birth is required",
   }),
 
   gender: z.string().min(1, {
@@ -28,8 +27,7 @@ export const personalDetailsFormSchema = z.object({
   languages: z
     .array(
       z.string({
-        required_error: "Please select at least one language",
-        invalid_type_error: "Invalid language selection",
+        error: "Please select at least one language",
       }),
     )
     .min(1, "Please select at least one language"),

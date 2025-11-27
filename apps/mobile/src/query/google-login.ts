@@ -1,7 +1,7 @@
 import { getJsonAuthHeader } from "@/constants/authHeader";
 import { apiUrl } from "@/constants/Variable";
 import { api, methods } from "@/lib/api";
-import type { role } from "@/store/authStore";
+import { UserRole } from "@repo/db";
 
 interface IloginWithGoogleRequest {
   email: string;
@@ -14,7 +14,7 @@ interface IloginWithGoogleResponse {
   success: boolean;
   message: string;
   status: number;
-  role: role;
+  role: UserRole;
   token: string;
 }
 

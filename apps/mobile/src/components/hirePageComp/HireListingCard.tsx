@@ -86,7 +86,7 @@ export default function HireListingCard({
             }}
             onPress={() => {
               router.push({
-                pathname: "/editHire/[editHire]",
+                pathname: "/(root)/profile/business/edit",
                 params: { editHire: item.id },
               });
             }}

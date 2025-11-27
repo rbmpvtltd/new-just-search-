@@ -1,5 +1,5 @@
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import ListingProduct from "@/components/ui/ListingProducts";
+import ListingProduct from "@/features/product/show/ListingProducts";
 import { useShopIdStore } from "@/store/shopIdStore";
 import { Stack } from "expo-router";
 
