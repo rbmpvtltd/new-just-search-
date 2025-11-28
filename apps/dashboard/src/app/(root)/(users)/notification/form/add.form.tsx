@@ -70,7 +70,7 @@ function AddForm({ setOpen }: AddForm) {
       city: null,
       notificationId: data.newNotificationId,
       state: null,
-      role: "all",
+      role: [],
       status: true,
     },
   });
@@ -96,7 +96,7 @@ function AddForm({ setOpen }: AddForm) {
       label: "Role",
       name: "role",
       placeholder: "Select Type of category",
-      component: "select",
+      component: "checkbox",
       options: [
         { label: UserRole.all, value: UserRole.all },
         { label: UserRole.business, value: UserRole.business },

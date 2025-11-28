@@ -2,15 +2,10 @@ CREATE TYPE "public"."gender" AS ENUM('Male', 'Female', 'Others');--> statement-
 CREATE TYPE "public"."job_duration" AS ENUM('Day', 'Week', 'Month', 'Year');--> statement-breakpoint
 CREATE TYPE "public"."job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
 CREATE TYPE "public"."marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
-<<<<<<<< HEAD:packages/db/drizzle/0000_aspiring_justin_hammer.sql
+CREATE TYPE "public"."notification_enum" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
 CREATE TYPE "public"."send_by_role" AS ENUM('Admin', 'User');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('Pending', 'Approved', 'Rejected');--> statement-breakpoint
-CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin');--> statement-breakpoint
-========
-CREATE TYPE "public"."notification_enum" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
-CREATE TYPE "public"."status" AS ENUM('Pending', 'Approved', 'Rejected');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
->>>>>>>> ritik:packages/db/drizzle/0000_bored_bill_hollister.sql
 CREATE TYPE "public"."work_shift" AS ENUM('Morning', 'Evening', 'Night');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,
@@ -478,12 +473,8 @@ CREATE TABLE "franchises" (
 --> statement-breakpoint
 CREATE TABLE "notification" (
 	"id" serial PRIMARY KEY NOT NULL,
-<<<<<<<< HEAD:packages/db/drizzle/0000_aspiring_justin_hammer.sql
-	"notification_role" "user_role" DEFAULT 'guest' NOT NULL,
-========
 	"notification_id" integer DEFAULT 0 NOT NULL,
 	"notification_role" "user_role" NOT NULL,
->>>>>>>> ritik:packages/db/drizzle/0000_bored_bill_hollister.sql
 	"title" varchar(255) NOT NULL,
 	"description" text,
 	"state" integer,

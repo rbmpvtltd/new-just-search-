@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "bunx drizzle-kit studio",
     "migrate": "bunx drizzle-kit migrate",
+    "query-test": "bun ./src/test.ts",
     "generate": "bunx drizzle-kit generate",
     "build": "bunx tsc -p tsconfig.json",
     "setup": "bunx tsc -p tsconfig.json",

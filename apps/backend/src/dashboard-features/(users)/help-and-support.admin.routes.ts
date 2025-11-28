@@ -89,7 +89,7 @@ export const adminNotificationRouter = router({
   create: adminProcedure
     .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
-      await db.insert(notification).values(input);
+      // await db.insert(notification).values(input);
       return { success: true };
     }),
   edit: adminProcedure

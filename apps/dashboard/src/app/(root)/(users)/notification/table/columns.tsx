@@ -119,7 +119,7 @@ export const columns: ColumnDef<Feedback>[] = [
     ),
     cell: ({ row }) => (
       <ActiveCell
-        id={row.original.id}
+        id={row.original.notificationId}
         isActive={row.original.status ?? false}
       />
     ),
@@ -129,6 +129,7 @@ export const columns: ColumnDef<Feedback>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
-    cell: ({ row }) => row?.original?.createdAt?.toLocaleDateString() ?? "null",
+    cell: ({ row }) =>
+      row?.original?.created_at?.toLocaleDateString() ?? "null",
   },
 ];

@@ -146,7 +146,7 @@ export const notification = pgTable("notification", {
 });
 
 export const notificationInsertSchema = createInsertSchema(notification, {
-  role: () => z.enum(UserRole),
+  role: () => z.array(z.enum(UserRole)),
 });
 export const notificationUpdateSchema = createUpdateSchema(notification);
 export const notificationSelectSchema = createSelectSchema(notification);

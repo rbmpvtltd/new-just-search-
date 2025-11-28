@@ -43,15 +43,42 @@ export const adminNotificationRouter = router({
       sql`created_at DESC`,
     );
 
-    // const orderBy = sql`created_at DESC`;
-
     const offset = input.pagination.pageIndex * input.pagination.pageSize;
+    // const data = await db
+    //   .select({
+    //     notificationId: notification.notificationId,
+    //     title: notification.title,
+    //     description: notification.description,
+    //     role: sql<string>`STRING_AGG(DISTINCT ${notification.role}::text, ', ')`.as(
+    //       "notification_role",
+    //     ),
+    //   })
+    //   .from(notification)
+    //   .groupBy(notification.notificationId)
+    //   .limit(10);
 
     const data = await db
-      .select()
+      .select({
+        // id: sql`min(${notification.id})`.as("id"),
+        notificationId: notification.notificationId,
+        title: notification.title,
+        description: notification.description,
+        status: notification.status,
+        // created_at: notification.createdAt,
+        role: sql<string>`string_agg(DISTINCT ${notification.role}::text, ', ' ORDER BY ${notification.role})`.as(
+          "role",
+        ),
+      })
       .from(notification)
       .where(where)
-      .orderBy(orderBy)
+      // .orderBy(orderBy)
+      .groupBy(
+        notification.notificationId,
+        notification.title,
+        notification.description,
+        notification.status,
+        // notification.createdAt,
+      )
       .limit(input.pagination.pageSize)
       .offset(offset);
 
@@ -61,7 +88,8 @@ export const adminNotificationRouter = router({
       })
       .from(notification)
       // .leftJoin(categories, eq(subcategories.categoryId, categories.id))
-      .where(where);
+      .where(where)
+      .groupBy(notification.notificationId);
 
     const total = totalResult[0]?.count ?? 0;
     const totalPages = Math.ceil(total / input.pagination.pageSize);
@@ -89,7 +117,13 @@ export const adminNotificationRouter = router({
   create: adminProcedure
     .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
-      await db.insert(notification).values(input);
+      if (input.role.includes("all") || input.role.length === 0) {
+        await db.insert(notification).values({ ...input, role: "all" });
+      } else {
+        for (const role of input.role) {
+          await db.insert(notification).values({ ...input, role });
+        }
+      }
       return { success: true };
     }),
   edit: adminProcedure

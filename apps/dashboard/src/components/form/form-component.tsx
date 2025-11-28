@@ -118,35 +118,44 @@ export const FormField = <T extends FieldValues>({
             case "checkbox":
               return (
                 <div className="flex gap-3 flex-wrap">
-                  {options?.map((i) => (
-                    <div key={String(i.value)} className="">
+                  {options?.map((option) => (
+                    <div key={String(option.value)} className="">
                       <div
-                        key={String(i.value)}
+                        key={String(option.value)}
                         className="flex items-center gap-2 "
                       >
                         <div className="mt-1 flex items-center justify-center">
                           <Checkbox
                             className="border-gray-300"
-                            key={String(i.value)}
-                            name={name}
-                            value={value}
-                            id={`checkbox${i.label}`}
-                            onChange={onChange}
+                            checked={
+                              Array.isArray(value) &&
+                              value.includes(option.value)
+                            }
+                            onCheckedChange={(checked) => {
+                              console.log({ value });
+                              if (checked) {
+                                onChange([...(value || []), option.value]);
+                              } else {
+                                onChange(
+                                  value?.filter(
+                                    (val: string) => val !== option.value,
+                                  ),
+                                );
+                              }
+                            }}
                           />
                         </div>
-                        <div className="">
-                          <label
-                            htmlFor={`checkbox${i.label}`}
-                            className="text-sm text-gray-700"
-                          >
-                            {i.label}
-                          </label>
-                        </div>
+                        {/* <div className=""> */}
+                        <label htmlFor="" className="text-sm text-gray-700">
+                          {option.label}
+                        </label>
+                        {/* </div> */}
                       </div>
                     </div>
                   ))}
                 </div>
               );
+
             case "single-checkbox":
               return (
                 <Checkbox

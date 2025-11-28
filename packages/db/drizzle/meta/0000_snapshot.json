@@ -1,5 +1,5 @@
 {
-  "id": "caee7fa6-835c-4e07-83dc-56d8918c2526",
+  "id": "68a664f5-d75b-4ca7-b609-6c3de2e60621",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -3382,12 +3382,18 @@
           "primaryKey": true,
           "notNull": true
         },
+        "notification_id": {
+          "name": "notification_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "notification_role": {
           "name": "notification_role",
           "type": "user_role",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'guest'"
+          "notNull": true
         },
         "title": {
           "name": "title",
@@ -3792,6 +3798,20 @@
         "Others"
       ]
     },
+    "public.notification_enum": {
+      "name": "notification_enum",
+      "schema": "public",
+      "values": [
+        "guest",
+        "visiter",
+        "hire",
+        "business",
+        "salesman",
+        "franchises",
+        "admin",
+        "all"
+      ]
+    },
     "public.send_by_role": {
       "name": "send_by_role",
       "schema": "public",
@@ -3819,7 +3839,8 @@
         "business",
         "salesman",
         "franchises",
-        "admin"
+        "admin",
+        "all"
       ]
     },
     "public.work_shift": {
