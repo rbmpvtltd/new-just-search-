@@ -10,7 +10,8 @@
     "test": "jest --watchAll",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postinstall": "cd ../../ && bunx turbo run build --filter=com.rbm.justsearch"
   },
   "expo": {
     "doctor": {

@@ -1,0 +1,10 @@
+build:
+  name: Turbo Monorepo Preview Build
+  steps:
+    - eas/checkout@2
+    - eas/install_node_modules@2
+    - run:
+        name: Build monorepo dependencies with Turbo
+        command: bunx turbo run build --filter=com.rbm.justsearch
+    - eas/prebuild@2
+    - eas/build-android@2

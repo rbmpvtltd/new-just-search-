@@ -1,7 +1,10 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMutation } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
-import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
 import { setRole, setToken } from "@/utils/session";
 
 const formSchema = z
@@ -91,7 +91,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   const sendOTP = async (identifier: string) => {
     try {
       mutate(
-        { identifier, },
+        { identifier },
         {
           onSuccess: async () => {
             console.log("otp sended successfully");
@@ -128,12 +128,12 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   // Handle registration form submission
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setTempFormData(data);
-    if(data.email){
+    if (data.email) {
       const success = await sendOTP(data.email);
       if (success) {
         setStep("verify");
       }
-    }else{
+    } else {
       const success = await sendOTP(String(data.mobileNumber));
       if (success) {
         setStep("verify");
@@ -169,8 +169,8 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
               title: "Success!",
               text: "Account created successfully!",
             });
-            setToken(data?.session || "", false);
-            setRole(data?.role || "", false);
+            setToken(data?.session || "");
+            setRole(data?.role || "");
             console.log("registration sucessfully");
             router.push("/");
           },
@@ -192,8 +192,8 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   // Handle resend OTP
   const handleResendOTP = async () => {
     if (resendTimer > 0) return;
-    if(tempFormData.email){
-      await sendOTP(tempFormData.email)
+    if (tempFormData.email) {
+      await sendOTP(tempFormData.email);
     }
     await sendOTP(tempFormData.mobileNumber);
   };
