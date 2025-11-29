@@ -19,6 +19,7 @@ import { hirerouter } from "./features/hire/hire.router";
 import { categoryRouter } from "./features/mainContent/category.route";
 import { offerrouter } from "./features/offer/offer.router";
 import { productrouter } from "./features/product/product.router";
+import { utilsRouter } from "./features/routeUtils/utils.route";
 import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
@@ -39,6 +40,7 @@ const usersRouter = router({
   productrouter,
   helpAndSupportRouter,
   testRouter,
+  utilsRouter,
 });
 
 const adminRouter = router({

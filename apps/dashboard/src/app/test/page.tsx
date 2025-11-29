@@ -1,54 +1,105 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { getQueryClient } from "@/trpc/query-client";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useEffect, useRef, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "@/components/ui/input-debounced";
+import { useTRPC } from "@/trpc/client";
 
 export default function UserDataComponent() {
-  const queryClient = getQueryClient();
+  return <CategoryComponent />;
+}
 
-  // Fake API function
-  const fetchUserData = async () => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+const CategoryComponent = () => {
+  const trpc = useTRPC();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [name, setName] = useState("");
+  const [dbname, setDbName] = useState("");
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(
+    trpc.utilsRouter.categoryInfinate.infiniteQueryOptions(
+      {
+        name: dbname,
+        cursor: 0,
+        limit: 50,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    ),
+  );
 
-    // Return random data to show changes on refetch
-    return {
-      id: Math.floor(Math.random() * 1000),
-      name: `User ${Math.floor(Math.random() * 100)}`,
-      timestamp: new Date().toLocaleTimeString(),
-    };
-  };
+  if (isLoading) <div>Loading...</div>;
+  if (isError) <div> Error</div>;
 
-  // useQuery with cache key
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["userData"],
-    queryFn: fetchUserData,
-    staleTime: 30000,
+  const alldata = (data?.pages.flatMap((page) => page.data) ?? []).filter(
+    (item) => item.name.includes(name),
+  );
+
+  const virtualizer = useVirtualizer({
+    count: alldata?.length ?? 0,
+    estimateSize: () => 60,
+    getScrollElement: () => scrollRef.current,
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error fetching data!</div>;
+  const virtualItems = virtualizer.getVirtualItems();
+
+  useEffect(() => {
+    const lastItem = virtualItems[virtualItems.length - 1];
+    if (
+      !hasNextPage ||
+      isFetchingNextPage ||
+      !lastItem ||
+      lastItem.index < alldata?.length - 1
+    )
+      return;
+    fetchNextPage();
+  }, [virtualItems, isFetchingNextPage, hasNextPage, fetchNextPage, alldata]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDbName(name);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [name]);
 
   return (
     <div>
-      <h2>User Data:</h2>
-      <p>
-        <strong>ID:</strong> {data?.id}
-      </p>
-      <p>
-        <strong>Name:</strong> {data?.name}
-      </p>
-      <p>
-        <strong>Time:</strong> {data?.timestamp}
-      </p>
+      <Input value={name} onChange={(e) => setName(String(e.target.value))} />
+      <div ref={scrollRef} className="h-96 overflow-y-scroll">
+        <div
+          className="relative overflow-visible"
+          style={{ height: `${virtualizer.getTotalSize()}px` }}
+        >
+          {virtualItems?.map((vItem) => {
+            const item = alldata?.[vItem.index];
+            if (!item) return null;
+            return (
+              <div
+                key={item.id}
+                className="absolute top-0 left-0 w-full text-center"
+                style={{
+                  transform: `translateY(${vItem.start}px)`,
+                  height: `${vItem.size}px`,
+                }}
+                data-vindex={vItem.index}
+                data-allindex={item.id}
+              >
+                <div>{item.name}</div>
+              </div>
+            );
+          })}
+        </div>
 
-      <Button type="button" onClick={() => refetch()}>
-        Refetch Data
-      </Button>
-
-      <Button type="button" onClick={() => queryClient.invalidateQueries()}>
-        Invalidate Cache
-      </Button>
+        {isFetchingNextPage && <div>Loading More data ...</div>}
+      </div>
     </div>
   );
-}
+};

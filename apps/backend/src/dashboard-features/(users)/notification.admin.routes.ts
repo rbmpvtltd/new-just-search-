@@ -10,7 +10,7 @@ import {
   notificationInsertSchema,
 } from "@repo/db/dist/schema/user.schema";
 import { TRPCError } from "@trpc/server";
-import { desc, eq, inArray, sql } from "drizzle-orm";
+import { desc, eq, type InferInsertModel, inArray, sql } from "drizzle-orm";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
@@ -57,6 +57,7 @@ export const adminNotificationRouter = router({
     //   .groupBy(notification.notificationId)
     //   .limit(10);
 
+    console.log("where", where);
     const data = await db
       .select({
         // id: sql`min(${notification.id})`.as("id"),
@@ -64,20 +65,20 @@ export const adminNotificationRouter = router({
         title: notification.title,
         description: notification.description,
         status: notification.status,
-        // created_at: notification.createdAt,
-        role: sql<string>`string_agg(DISTINCT ${notification.role}::text, ', ' ORDER BY ${notification.role})`.as(
+        created_at: notification.createdAt,
+        role: sql<string>`string_agg(DISTINCT ${notification.role}::text, ', ' ORDER BY ${notification.role}::text)`.as(
           "role",
         ),
       })
       .from(notification)
       .where(where)
-      // .orderBy(orderBy)
+      .orderBy(orderBy)
       .groupBy(
         notification.notificationId,
         notification.title,
         notification.description,
         notification.status,
-        // notification.createdAt,
+        notification.createdAt,
       )
       .limit(input.pagination.pageSize)
       .offset(offset);
@@ -117,13 +118,17 @@ export const adminNotificationRouter = router({
   create: adminProcedure
     .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
+      type NotificationInsert = InferInsertModel<typeof notification>;
+      const data: NotificationInsert[] = [];
       if (input.role.includes("all") || input.role.length === 0) {
-        await db.insert(notification).values({ ...input, role: "all" });
+        data.pop();
+        data.push({ ...input, role: "all" });
       } else {
         for (const role of input.role) {
-          await db.insert(notification).values({ ...input, role });
+          data.push({ ...input, role });
         }
       }
+      await db.insert(notification).values(data);
       return { success: true };
     }),
   edit: adminProcedure
