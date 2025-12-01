@@ -12,14 +12,14 @@ import {
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
@@ -31,16 +31,16 @@ export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
+    <Sheet onOpenChange={setOpen} open={open}>
+      <SheetTrigger asChild>
         <Button>Add Entry</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      </SheetTrigger>
+      <SheetContent className="sm:max-w-[425px] p-4">
         <Suspense fallback={<div> loading ...</div>}>
           {open && <AddForm setOpen={setOpen} />}
         </Suspense>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -67,11 +67,13 @@ function AddForm({ setOpen }: AddForm) {
     defaultValues: {
       description: "",
       title: "",
-      city: null,
+      //city: [],
       notificationId: data.newNotificationId,
-      state: null,
+      //state: [],
       role: [],
       status: true,
+      //categoryId: [],
+      //subCategoryId: [],
     },
   });
 
@@ -106,6 +108,17 @@ function AddForm({ setOpen }: AddForm) {
       ],
       error: errors.role?.message,
     },
+    // {
+    //   control,
+    //   label: "Category",
+    //   name: "categoryId",
+    //   placeholder: "Category",
+    //   component: "select",
+    //   options:
+    //     categories?.map((item) => ({ label: item.label, value: item.value })) ??
+    //     [],
+    //   error: errors.categoryId?.message,
+    // },
     {
       control,
       label: "Title",
@@ -133,23 +146,23 @@ function AddForm({ setOpen }: AddForm) {
   ];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogHeader>
-        <DialogTitle>Add</DialogTitle>
-      </DialogHeader>
+    <form className="" onSubmit={handleSubmit(onSubmit)}>
+      <SheetHeader>
+        <SheetTitle>Add</SheetTitle>
+      </SheetHeader>
       <div className="grid grid-cols-1 gap-6 ">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
       </div>
-      <DialogFooter className="mt-2">
-        <DialogClose asChild>
+      <SheetFooter className="mt-2">
+        <SheetClose asChild>
           <Button variant="outline">Cancel</Button>
-        </DialogClose>
+        </SheetClose>
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogFooter>
+      </SheetFooter>
     </form>
   );
 }

@@ -3,6 +3,8 @@ import { db } from "@repo/db";
 import {
   categories,
   categoryUpdateSchema,
+  cities,
+  states,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
 import {
@@ -21,6 +23,7 @@ import {
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
+import { expandObject } from "@/utils/expandObject";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
   notificationAllowedSortColumns,
@@ -113,21 +116,69 @@ export const adminNotificationRouter = router({
         .limit(1)
     )[0]?.notification_id;
     const newNotificationId = Number(lastNotificationId ?? 0) + 1;
-    return { newNotificationId };
+
+    const category = await db
+      .select({
+        id: categories.id,
+        name: categories.title,
+      })
+      .from(categories);
+
+    const state = await db
+      .select({
+        id: states.id,
+        name: states.name,
+      })
+      .from(states);
+
+    return { newNotificationId, category, state };
   }),
+
+  subcategory: adminProcedure
+    .input(z.array(z.number()))
+    .query(async ({ input }) => {
+      const subcategory = await db
+        .select({
+          id: subcategories.id,
+          name: subcategories.name,
+        })
+        .from(subcategories)
+        .where(inArray(subcategories.categoryId, input));
+      return subcategory;
+    }),
+
+  city: adminProcedure.input(z.array(z.number())).query(async ({ input }) => {
+    const city = await db
+      .select({
+        id: cities.id,
+        name: cities.city,
+      })
+      .from(cities)
+      .where(inArray(cities.stateId, input));
+    return city;
+  }),
+
   create: adminProcedure
     .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
       type NotificationInsert = InferInsertModel<typeof notification>;
+      // const expandData = expandObject(input);
       const data: NotificationInsert[] = [];
+
+      // for (const role of input.categoryId) {
+      //   data.push({ ...input, role });
+      // }
       if (input.role.includes("all") || input.role.length === 0) {
-        data.pop();
         data.push({ ...input, role: "all" });
       } else {
         for (const role of input.role) {
           data.push({ ...input, role });
         }
       }
+
+      // for (const state of input.state){
+      //
+      // }
       await db.insert(notification).values(data);
       return { success: true };
     }),
