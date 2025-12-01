@@ -142,7 +142,7 @@ export const FormField = <T extends FieldValues>({
             case "datepicker": {
               return (
                 <DatePickerComponent
-                  value={value}
+                  value={value ?? ""}
                   onChange={onChange}
                   onBlur={onBlur}
                   mode={mode || "date"}
@@ -271,7 +271,7 @@ export const FormField = <T extends FieldValues>({
                         onPress={() => {
                           if (isChecked) {
                             onChange(
-                              value.filter((v: string) => v !== item.value),
+                              value?.filter((v: string) => v !== item.value),
                             );
                           } else {
                             onChange([...(value || []), item.value]);
@@ -355,7 +355,7 @@ export const FormField = <T extends FieldValues>({
             case "timepicker":
               return (
                 <TimePickerField
-                  value={value}
+                  value={value ?? ""}
                   onChange={(time) => {
                     if (onValueChange) onValueChange(time);
                     onChange(time);

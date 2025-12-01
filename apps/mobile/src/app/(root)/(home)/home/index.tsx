@@ -30,44 +30,47 @@ export default function TabOneScreen() {
   // const trpc = useTRPC();
 
   return (
-    <ScrollView keyboardShouldPersistTaps="handled">
-      <View className="flex items-center r rounded-4xl">
-        <CustomCarousel />
+    // <ScrollView keyboardShouldPersistTaps="handled">
+    //   <View className="flex items-center r rounded-4xl">
+    //     <CustomCarousel />
 
-        {/* <Banner1 /> */}
-        {/* <Banner1 />
+    //     {/* <Banner1 /> */}
+    //     {/* <Banner1 />
         
-        <Banner1 />
-        <Banner1 /> */}
+    //     <Banner1 />
+    //     <Banner1 /> */}
 
-        {/* <SearchForm /> */}
-        <BoundaryWrapper>
-          <CategoryList />
-        </BoundaryWrapper>
-        {/* <CustomCarousel /> */}
-        {/* <BoundaryWrapper> */}
-        {/*   <CategoryList /> */}
-        {/* </BoundaryWrapper> */}
-        {/* <BoundaryWrapper> */}
-        {/*   <CategoryList /> */}
-        {/* </BoundaryWrapper> */}
-        {/* <BoundaryWrapper> */}
-        {/*   <CategoryList /> */}
-        {/* </BoundaryWrapper> */}
-        {/* <CustomCarousel /> */}
-        {/* <BoundaryWrapper> */}
-        {/*   <CategoryList /> */}
-        {/* </BoundaryWrapper> */}
-        {/* <CustomCarousel /> */}
-        {/* <CustomCarousel /> */}
-        {/* <CustomCarousel /> */}
-        {/* <CustomCarousel /> */}
-        {/* <CustomCarousel /> */}
+    //     {/* <SearchForm /> */}
+    //     <BoundaryWrapper>
+    //       <CategoryList />
+    //     </BoundaryWrapper>
+    //     {/* <CustomCarousel /> */}
+    //     {/* <BoundaryWrapper> */}
+    //     {/*   <CategoryList /> */}
+    //     {/* </BoundaryWrapper> */}
+    //     {/* <BoundaryWrapper> */}
+    //     {/*   <CategoryList /> */}
+    //     {/* </BoundaryWrapper> */}
+    //     {/* <BoundaryWrapper> */}
+    //     {/*   <CategoryList /> */}
+    //     {/* </BoundaryWrapper> */}
+    //     {/* <CustomCarousel /> */}
+    //     {/* <BoundaryWrapper> */}
+    //     {/*   <CategoryList /> */}
+    //     {/* </BoundaryWrapper> */}
+    //     {/* <CustomCarousel /> */}
+    //     {/* <CustomCarousel /> */}
+    //     {/* <CustomCarousel /> */}
+    //     {/* <CustomCarousel /> */}
+    //     {/* <CustomCarousel /> */}
 
-        {/* <Banner3 />
-        <Banner2 />
-        <Banner4 />  */}
-      </View>
-    </ScrollView>
+    //     {/* <Banner3 />
+    //     <Banner2 />
+    //     <Banner4 />  */}
+    //   </View>
+    // </ScrollView>
+    <View className="mt-10">
+      <Text className="text-secondary">test jasjkjkldljsa;;djsafjf;dlsaj;lkfdsajl;</Text>
+    </View>
   );
 }

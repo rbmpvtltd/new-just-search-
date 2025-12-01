@@ -1,6 +1,4 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
-import React from "react";
-import { Text, useColorScheme, View } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";import { Text, useColorScheme, View } from "react-native";
 import { MultiSelect } from "react-native-element-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
@@ -48,7 +46,7 @@ export default function MultiSelectDropdown({
           {item.label}
         </Text>
         {isSelected && (
-          <AntDesign name="Safety" size={20} color={theme.primary} />
+          <AntDesign name="alert" size={20} color={theme.primary} />
         )}
       </View>
     );

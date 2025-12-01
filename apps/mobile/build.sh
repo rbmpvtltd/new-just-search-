@@ -1,63 +1,77 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-# Function to clean temp and gradle files
+# Color codes
+YELLOW="\033[33m"
+GREEN="\033[32m"
+CYAN="\033[36m"
+NC="\033[0m"
+
 cleanup() {
-	echo -e "\033[33mSetting java version 17\033[0m"
-	echo -e "\033[33mEnter your password\033[0m"
-	java-17
-	echo -e "\033[33m[INFO] Cleaning temp build files...\033[0m"
+    echo "${YELLOW}Setting java version 17${NC}"
+    echo "${YELLOW}Enter your password${NC}"
+    java-17
 
-	cd ~/eas-build-tmp || exit 1
-	if [ "$(ls -A . 2>/dev/null)" ]; then
-		rm -rf ./*
-		echo -e "\033[32m[OK] Temp directory cleared.\033[0m"
-	else
-		echo -e "\033[31m[SKIP] Temp directory already empty.\033[0m"
-	fi
-	cd ~ || exit 1
+    echo "${YELLOW}[INFO] Cleaning temp build files...${NC}"
 
-	if [ -d ".gradle" ]; then
-		rm -rf .gradle
-		echo -e "\033[32m[OK] Removed .gradle.\033[0m"
-	else
-		echo -e "\033[31m[SKIP] .gradle not found.\033[0m"
-	fi
+    tmpdir="$HOME/eas-build-tmp"
+
+    if [ ! -d "$tmpdir" ]; then
+        mkdir -p "$tmpdir"
+        echo "${GREEN}[OK] Created temp directory $tmpdir.${NC}"
+    fi
+
+    cd "$tmpdir" || exit 1
+
+    if [ "$(ls -A "$tmpdir" 2>/dev/null)" ]; then
+        rm -rf "$tmpdir"/*
+        echo "${GREEN}[OK] Temp directory cleared.${NC}"
+    else
+        echo "${CYAN}[SKIP] Temp directory already empty.${NC}"
+    fi
+
+    cd "$HOME" || exit 1
+
+    if [ -d "$HOME/.gradle/caches" ]; then
+        rm -rf "$HOME/.gradle/caches"
+        echo "${GREEN}[OK] Removed .gradle.${NC}"
+    else
+        echo "${CYAN}[SKIP] .gradle not found.${NC}"
+    fi
 }
 
-# Print usage helper
 usage() {
-	echo "Usage:"
-	echo "  ./build.sh <platform> <profile>"
-	echo ""
-	echo "Platforms: android | ios"
-	echo "Profiles : development | preview | production"
-	exit 1
+    echo "Usage:"
+    echo "  ./build.sh <platform> <profile>"
+    echo ""
+    echo "Platforms: android | ios"
+    echo "Profiles : development | preview | production"
+    exit 1
 }
 
-# Ensure at least 2 arguments
+# Require 2 args
 if [ $# -lt 2 ]; then
-	usage
+    usage
 fi
 
-platform=$1
-profile=$2
+platform="$1"
+profile="$2"
+mydir="$(pwd)"
 
-# Validate platform and profile
-case $platform in
-android | ios)
-	case $profile in
-	development | preview | production)
-		cleanup
-		cd ~/Project/OldJustSearch/OldJSExpo || exit 1
-		TMPDIR=~/eas-build-tmp eas build --platform "$platform" --clear-cache --local --profile="$profile"
-		java-24
-		;;
-	*)
-		usage
-		;;
-	esac
-	;;
-*)
-	usage
-	;;
-esac
+# Validate platform
+if [ "$platform" = "android" ] || [ "$platform" = "ios" ]; then
+
+    # Validate profile
+    case "$profile" in
+        development|preview|production)
+            cleanup
+            cd "$mydir" || exit 1
+            TMPDIR="$HOME/eas-build-tmp" eas build --platform "$platform" --clear-cache --local --profile="$profile"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+
+else
+    usage
+fi
