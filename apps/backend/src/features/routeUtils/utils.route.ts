@@ -3,7 +3,7 @@ import {
   categories,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
-import { and, eq, gt, like } from "drizzle-orm";
+import { and, eq, gt, ilike } from "drizzle-orm";
 import z from "zod";
 import { publicProcedure, router } from "@/utils/trpc";
 
@@ -28,7 +28,7 @@ export const utilsRouter = router({
         .where(
           and(
             gt(categories.id, input.cursor),
-            like(categories.title, `%${input.name}%`),
+            ilike(categories.title, `%${input.name}%`),
           ),
         )
         .limit(limit);
@@ -63,7 +63,7 @@ export const utilsRouter = router({
           and(
             eq(subcategories.categoryId, input.categoryId),
             gt(subcategories.id, input.cursor),
-            like(categories.title, `%${input.name}%`),
+            ilike(categories.title, `%${input.name}%`),
           ),
         )
         .limit(limit);

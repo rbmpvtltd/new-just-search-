@@ -1,15 +1,19 @@
 import { db, schemas } from "@repo/db";
-// import { algoliaClient } from "@repo/algolia";
-import { hireListing } from "@repo/db/src/schema/hire.schema";
-import { eq, sql } from "drizzle-orm";
-import { algoliasearch } from "algoliasearch";
-import { cities, states } from "@repo/db/src/schema/not-related.schema";
+import {
+  categories,
+  subcategories,
+} from "@repo/db/dist/schema/not-related.schema";
 import {
   businessCategories,
   businessListings,
 } from "@repo/db/src/schema/business.schema";
+// import { algoliaClient } from "@repo/algolia";
+import { hireListing } from "@repo/db/src/schema/hire.schema";
+import { cities, states } from "@repo/db/src/schema/not-related.schema";
 import { offers } from "@repo/db/src/schema/offer.schema";
 import { products } from "@repo/db/src/schema/product.schema";
+import { algoliasearch } from "algoliasearch";
+import { eq, sql } from "drizzle-orm";
 
 const algoliaClient = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
@@ -19,7 +23,47 @@ const algoliaClient = algoliasearch(
 export async function algoliaSeed() {
   // await algoliaHireSeed()
   // await algoliaBusinessSeed()
-  await algoliaProductOfferSeed();
+  // await algoliaProductOfferSeed();
+  await algoliaCategorySeed();
+  // await algoliaSubCategorySeed();
+}
+
+async function algoliaCategorySeed() {
+  try {
+    const data = await db
+      .select({
+        id: categories.id,
+        title: categories.title,
+        type: categories.type,
+      })
+      .from(categories);
+
+    await algoliaClient.saveObjects({
+      indexName: "category",
+      objects: data,
+    });
+
+    return { success: true, count: data.length };
+  } catch (error) {
+    console.error("❌ Error uploading to Algolia:", error);
+    throw error;
+  }
+}
+
+async function algoliaSubCategorySeed() {
+  try {
+    const data = await db.select().from(subcategories);
+
+    await algoliaClient.saveObjects({
+      indexName: "subcategory",
+      objects: data,
+    });
+
+    return { success: true, count: data.length };
+  } catch (error) {
+    console.error("❌ Error uploading to Algolia:", error);
+    throw error;
+  }
 }
 
 async function algoliaHireSeed() {
@@ -361,7 +405,7 @@ async function algoliaProductOfferSeed() {
         finalPrice: item.finalPrice,
         discountPercent: item.discountPercent,
         photos: item.photos,
-        category : item.category,
+        category: item.category,
         subecategory: item.subcategories,
       };
     });
@@ -375,7 +419,7 @@ async function algoliaProductOfferSeed() {
         finalPrice: item.finalPrice,
         discountPercent: item.discountPercent,
         photos: item.photos,
-        category : item.category,
+        category: item.category,
         subecategory: item.subcategories,
       };
     });
@@ -391,7 +435,7 @@ async function algoliaProductOfferSeed() {
         discountPercent: item.discountPercent ?? 0,
         finalPrice: item.finalPrice ?? 0,
         subcategories: item.subecategory,
-        category : item.category,
+        category: item.category,
       };
     });
 
