@@ -2,7 +2,7 @@
   "expo": {
     "name": "Just Search",
     "slug": "justsearch",
-    "version": "1.1.00",
+    "version": "2.0.00",
     "orientation": "portrait",
     "icon": "./src/assets/images/app-icon.png",
     "userInterfaceStyle": "automatic",

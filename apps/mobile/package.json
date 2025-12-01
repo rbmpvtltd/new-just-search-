@@ -1,7 +1,7 @@
 {
   "name": "com.rbm.justsearch",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "dev": "expo start",
     "android": "expo run:android",
@@ -11,7 +11,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
-    "postinstall": "cd ../../ && bunx turbo run build --filter=com.rbm.justsearch"
+    "postinstall": "cd ../../ && bun x turbo run build --filter=com.rbm.justsearch"
   },
   "expo": {
     "doctor": {
