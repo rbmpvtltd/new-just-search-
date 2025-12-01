@@ -702,62 +702,6 @@ export const businessrouter = router({
       return product[0];
     }),
 
-  // singleProduct: publicProcedure
-  //   .input(z.object({ productId: z.number() }))
-  //   .query(async ({ input }) => {
-  //     const product = await db
-  //       .select({
-  //         id: products.id,
-  //         name: products.productName,
-  //         rate: products.rate,
-  //         businessId: products.businessId,
-  //         description: products.productDescription,
-  //         latitude: businessListing.latitude,
-  //         longitude: businessListing.longitude,
-  //         phone: businessListing.phoneNumber,
-  //         photos: sql<string[]>`COALESCE(
-  //           ARRAY_AGG(DISTINCT product_photos.photo)
-  //           FILTER (WHERE product_photos.id IS NOT NULL),
-  //           '{}'
-  //         )`,
-  //         shopName: sql<string | null>`COALESCE((
-  //             SELECT name FROM business_listings LIMIT 1
-  //         ), '')`,
-  //         rating: sql<
-  //           {
-  //             id: number;
-  //             created_at: string;
-  //             rating: number;
-  //             message: string;
-  //             user: string;
-  //           }[]
-  //         >`COALESCE(
-  //           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
-  //             'id', product_reviews.id,
-  //             'created_at', product_reviews.created_at,
-  //             'rating', product_reviews.rate,
-  //             'message', product_reviews.message,
-  //             'user', users.display_name
-  //           ))
-  //             FILTER (WHERE product_reviews.id IS NOT NULL),
-  //           '[]'
-  //         )`,
-  //       })
-  //       .from(products)
-  //       .leftJoin(businessListing, eq(businessListing.id, products.businessId))
-  //       .leftJoin(productReviews, eq(products.id, productReviews.productId))
-  //       .leftJoin(productPhotos, eq(products.id, productPhotos.productId))
-  //       .leftJoin(users, eq(productReviews.userId, users.id))
-  //       .groupBy(
-  //         products.id,
-  //         businessListing.latitude,
-  //         businessListing.longitude,
-  //         businessListing.phoneNumber,
-  //       )
-  //       .where(eq(products.id, input.productId));
-  //     return product[0];
-  //   }),
-
   singleOffer: publicProcedure
     .input(z.object({ offerId: z.number() }))
     .query(async ({ input }) => {
@@ -854,7 +798,6 @@ export const businessrouter = router({
         return { status: "added", success: true };
       }
     }),
-
   favouritesShops: protectedProcedure.query(async ({ ctx }) => {
     // TODO : add pagination after complete some work
     const data = await db
@@ -915,4 +858,17 @@ export const businessrouter = router({
       ctx: { userId: ctx.userId },
     };
   }),
+  businessReview : publicProcedure.input(z.object({
+    businessId : z.number(),
+    userId : z.number(),
+    message : z.string(),
+    rating : z.number()
+  })).mutation(async ({input})=>{
+    const {businessId,userId,message,rating} = input;
+    console.log("businessId is:",businessId)
+    console.log("userId is:",userId)
+    console.log("message is:",message)
+    console.log("rating is:",rating)
+
+  })
 });

@@ -85,7 +85,7 @@ export default function SubCategory() {
         }}
       />
       <FlatList
-        className="bg-base-100 mb-16"
+        className="bg-base-100  flex-1"
         data={subcategoryData}
         keyExtractor={(item) => item.id.toString()}
         initialNumToRender={5}
