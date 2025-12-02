@@ -11,11 +11,12 @@
 //   return <DrawerLayout />;
 // }
 
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { useEffect } from "react";
+import { SafeAreaView } from "react-native";
 import DrawerLayout from "@/components/layout/Drawer";
 import { useLoadToken } from "@/hooks/useLoadToken";
 import { useAuthStore } from "@/store/authStore";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 
 export default function HomeLayout() {
   const { token, role, isLoading } = useLoadToken();

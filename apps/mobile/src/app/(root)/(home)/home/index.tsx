@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { useEffect } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import CustomCarousel from "@/components/Carousel/CustomCaraousel";
 import Banner1 from "@/components/home/Banner1";
 import Banner2 from "@/components/home/Banner2";

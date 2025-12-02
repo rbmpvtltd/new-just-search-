@@ -4,20 +4,24 @@ import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 
 export default async function page() {
+  const { data: userProfile } = await asyncHandler(
+    trpcServer.userRouter.getUserProfile.query(),
+  );
   const { data: userData } = await asyncHandler(
     trpcServer.userRouter.getUserDetail.query(),
   );
-
   const { data: referenceData } = await asyncHandler(
     trpcServer.userRouter.add.query(),
   );
-  console.log(userData)
-  if(userData?.displayName === null || userData?.displayName === "null"){
-    return <div className="w-full">
-      <UpdateDisplayNameForm userId={Number(userData?.id)}/>
-    </div>
+  console.log("userProfile", userProfile);
+  if (userData?.displayName === null || userData?.displayName === "null") {
+    return (
+      <div className="w-full">
+        <UpdateDisplayNameForm userId={Number(userData?.id)} />
+      </div>
+    );
   }
 
   if (!userData) return <div className="">no data</div>;
-  return <UserProfile user={userData} formReferenceData={referenceData} />;
+  return <UserProfile user={userProfile} formReferenceData={referenceData} />;
 }

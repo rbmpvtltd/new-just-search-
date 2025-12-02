@@ -1,4 +1,5 @@
 import { Redirect } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Loading } from "@/components/ui/Loading";
 import { useLoadToken } from "@/hooks/useLoadToken";
 import { useAuthStore } from "@/store/authStore";

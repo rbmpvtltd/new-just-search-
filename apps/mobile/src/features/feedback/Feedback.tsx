@@ -55,9 +55,12 @@ export default function Feedback() {
 
   return (
     <View className="m-4 shadow-md bg-base-200 rounded-lg h-full">
-      <View>
-        <Text className="text-xl text-secondary font-semibold p-2">
+      <View className="">
+        <Text className="text-xl text-secondary font-semibold p-2 ">
           What feedback do you have?
+          <Text style={{ color: "red" }} className="ml-1 mt-2">
+            *
+          </Text>
         </Text>
         <FormField
           control={control}
@@ -67,6 +70,7 @@ export default function Feedback() {
           className="mt-0 m-0 p-0"
           error={errors.feedbackType?.message}
           labelHidden
+          required={false}
         />
       </View>
       <View className="m-4">
@@ -80,6 +84,7 @@ export default function Feedback() {
           component="textarea"
           placeholder="Type here..."
           labelHidden
+          required={false}
           error={errors.additionalFeedback?.message}
         />
       </View>
