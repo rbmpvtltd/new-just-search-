@@ -7,7 +7,7 @@ import {
 } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, ne } from "drizzle-orm";
 import z from "zod";
 import { protectedProcedure, router } from "@/utils/trpc";
 
@@ -33,7 +33,8 @@ export const userRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const existingEmail = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.email, String(input.email)),
+        where: (users, { eq, and }) =>
+          and(eq(users.email, String(input.email)), ne(users.id, ctx.userId)),
       });
 
       if (existingEmail) {
@@ -114,19 +115,19 @@ export const userRouter = router({
 
   getUserProfile: protectedProcedure.query(async ({ ctx }) => {
     const profile = await db.query.profiles.findFirst({
-      where: (userProfiles, { eq }) => eq(userProfiles.id, ctx.userId),
+      where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
     });
 
     const role = ctx.role;
     return { ...profile, role };
   }),
-   getUserDetail: protectedProcedure.query(async ({ ctx }) => {
+  getUserDetail: protectedProcedure.query(async ({ ctx }) => {
     const user = await db.query.users.findFirst({
       where: (userDetail, { eq }) => eq(userDetail.id, ctx.userId),
     });
 
     // const role = ctx.role;
-    return user ;
+    return user;
   }),
 
   accountDeleteRequest: protectedProcedure

@@ -1,10 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  
-  userUpdateSchema,
-} from "@repo/db/dist/schema/user.schema";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
+import { userUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
@@ -33,6 +30,8 @@ export default function UserProfile({
   user: UserProfile;
   formReferenceData: FormReferenceDataType;
 }) {
+  console.log("USer profile data", user);
+
   const trpc = useTRPC();
   const router = useRouter();
   const {

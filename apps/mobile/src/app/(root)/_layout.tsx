@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, Tabs, usePathname } from "expo-router";
-import { Alert, Text, useColorScheme, View } from "react-native";
+import { Alert, SafeAreaView, Text, useColorScheme, View } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
@@ -46,7 +46,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="home-outline" size={24} color={color} />
           ),
-          headerShown: false,
+          // headerShown: false,
           headerLeft: () => <View className="flex-row items-center"></View>,
           headerRight: () => (
             <View className="flex-row gap-4 mr-4">

@@ -29,7 +29,6 @@ const MyToken = memo(({ myTokens }: { myTokens: MyTokenType }) => {
         </Text>
         <Text className="text-lg font-bold text-info">
           {myTokens?.tokenNumber}
-          1234
         </Text>
       </View>
 
