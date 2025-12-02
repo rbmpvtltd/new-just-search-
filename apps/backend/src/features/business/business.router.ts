@@ -874,9 +874,6 @@ export const businessrouter = router({
       const { businessId, message, rating } = input;
       const {userId} = ctx
 
-      console.log("Full ctx:", ctx);
-    console.log("userId from ctx:", userId);
-    console.log("typeof userId:", typeof userId);
 
       const isReviewExist = await reviewExist(businessId, userId);
       console.log("review exist status is==>", isReviewExist);

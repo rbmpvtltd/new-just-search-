@@ -1,6 +1,9 @@
 import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
+import { reviewExist } from "../business/business.service";
+import { offerReviews } from "@repo/db/dist/schema/offer.schema";
+import { TRPCError } from "@trpc/server";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -141,4 +144,65 @@ async function singleShop(shopId: number) {
   return singleShopData;
 }
 
-export { singleShop };
+async function offerReviewExist(
+  userId: number,
+  offerId: number,
+  email?: string,
+) {
+  if (email) {
+    const data = await db
+      .select()
+      .from(offerReviews)
+      .where(
+        and(
+          eq(offerReviews.email, email),
+          eq(offerReviews.userId, userId),
+          eq(offerReviews.offerId, offerId),
+        ),
+      );
+
+    return data.length > 0;
+  }
+  const data = await db
+    .select()
+    .from(offerReviews)
+    .where(
+      and(eq(offerReviews.userId, userId), eq(offerReviews.offerId, offerId)),
+    );
+
+  return data.length > 0;
+}
+
+async function createOfferReview(
+  userId: number,
+  offerId: number,
+  rating: number,
+  message: string,
+  name: string,
+  email: string,
+  status: boolean,
+  view: boolean,
+) {
+  try {
+    const data = db.insert(offerReviews).values({
+      userId: userId,
+      offerId: offerId,
+      name: name,
+      rate: rating,
+      email: email,
+      message: message,
+      view: view,
+      status: status,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
+    return data
+  } catch (err) {
+    throw new TRPCError({
+      code : "INTERNAL_SERVER_ERROR",
+      message : "Could Not Create Review",
+    });
+  }
+}
+
+export { singleShop, offerReviewExist,createOfferReview };

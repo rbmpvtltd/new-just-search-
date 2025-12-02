@@ -191,7 +191,6 @@ async function createReview(
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Could Not Create Review",
-      cause: err,
     });
   }
 }

@@ -18,7 +18,7 @@ function LoginRedirect() {
                     <div>
                         <CardTitle className="text-blue-900">Authentication Required</CardTitle>
                         <CardDescription className="text-blue-700 mt-1">
-                            Please log in or create an account to submit a review for this business.
+                            Please log in or create an account to submit a review.
                         </CardDescription>
                     </div>
                 </div>

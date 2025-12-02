@@ -21,9 +21,13 @@ import { useTRPC } from "@/trpc/client"
 import { useMutation } from "@tanstack/react-query"
 
 const reviewSchema = z.object({
-  businessId: z.number().positive("Business ID is required"),
+  offerId: z.number().positive("Business ID is required"),
   message: z.string().min(10, "Review must be at least 10 characters").max(500, "Review must not exceed 500 characters"),
   rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
+  email :z.email().min(8,"Email Must Be Contain 8 Characters").max(500),
+  name : z.string().min(3,"Name Must Be Constain 3 Characters").max(255,"Too Long Name"),
+  view : z.boolean(),
+  status : z.boolean()
 })
 
 type ReviewFormValues = z.infer<typeof reviewSchema>
@@ -31,22 +35,23 @@ type ReviewFormValues = z.infer<typeof reviewSchema>
 function ReviewForm() {
   const trpc = useTRPC()
   const [submittedData, setSubmittedData] = useState<any>(null)
-  
-  const { mutate, isPending } = useMutation(
-    trpc.businessrouter.businessReview.mutationOptions()
-  )
+  const {mutate}= useMutation(trpc.offerrouter.createOfferReview.mutationOptions())
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
     defaultValues: {
-      businessId: 36,
+      offerId: 26,
       message: "",
       rating: 5,
+      email : "",
+      name : "Guest",
+      view : false,
+      status : true,
     },
   })
 
   function onSubmit(data: ReviewFormValues) {
-    mutate(data, {
+    mutate({userId:1427,...data}, {
       onSuccess: (responseData) => {
         console.log("Review submitted successfully:", responseData)
         setSubmittedData(responseData)
@@ -133,9 +138,50 @@ function ReviewForm() {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Your Name</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Tell us about your experience..."
+                    className="min-h-[120px] resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Write at least 10 characters (max 500)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Your Email</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Tell us about your experience..."
+                    className="min-h-[120px] resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Write at least 10 characters (max 500)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          <Button type="submit" disabled={isPending || submittedData} className="w-full">
-            {isPending ? "Submitting..." : "Submit Review"}
+          <Button type="submit" disabled={false|| submittedData} className="w-full">
+            {/* {isPending ? "Submitting..." : "Submit Review"} */}
+            submit
           </Button>
         </form>
       </Form>
