@@ -13,9 +13,12 @@ import {
   categories,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
-import { offerPhotos, offerReviews, offers } from "@repo/db/dist/schema/offer.schema";
 import {
-  productInsertSchema,
+  offerPhotos,
+  offerReviews,
+  offers,
+} from "@repo/db/dist/schema/offer.schema";
+import {
   productPhotos,
   productReviews,
   products,
@@ -37,6 +40,7 @@ import {
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
+import { createReview, reviewExist } from "./business.service";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -858,17 +862,38 @@ export const businessrouter = router({
       ctx: { userId: ctx.userId },
     };
   }),
-  businessReview : publicProcedure.input(z.object({
-    businessId : z.number(),
-    userId : z.number(),
-    message : z.string(),
-    rating : z.number()
-  })).mutation(async ({input})=>{
-    const {businessId,userId,message,rating} = input;
-    console.log("businessId is:",businessId)
-    console.log("userId is:",userId)
-    console.log("message is:",message)
-    console.log("rating is:",rating)
+  businessReview: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+        message: z.string(),
+        rating: z.number(),
+      }),
+    )
+    .mutation(async ({ input,ctx }) => {
+      const { businessId, message, rating } = input;
+      const {userId} = ctx
 
-  })
+      console.log("Full ctx:", ctx);
+    console.log("userId from ctx:", userId);
+    console.log("typeof userId:", typeof userId);
+
+      const isReviewExist = await reviewExist(businessId, userId);
+      console.log("review exist status is==>", isReviewExist);
+      if (isReviewExist) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You've already submitted review on that business",
+        });
+      }
+      await createReview(userId, businessId, rating, message);
+
+      return { success: true, message:"Review Has Been Submitted" };
+    }),
+    ReviewSubmitted : protectedProcedure.input(z.object({businessId:z.number()})).query(async ({input,ctx})=>{
+      const {businessId} = input
+      const {userId} = ctx
+      const isSubmitted = await reviewExist(businessId,userId)
+      return {submitted:isSubmitted}
+    })
 });

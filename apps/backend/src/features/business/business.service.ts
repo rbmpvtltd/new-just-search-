@@ -1,6 +1,9 @@
 import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
-import { eq, sql } from "drizzle-orm";
+import { businessReviews } from "@repo/db/dist/schema/business.schema";
+import { TRPCError } from "@trpc/server";
+import { and, eq, sql } from "drizzle-orm";
+import { boolean } from "zod";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -141,4 +144,56 @@ async function singleShop(shopId: number) {
   return singleShopData;
 }
 
-export { singleShop };
+async function reviewExist(
+  businessId: number,
+  userId: number,
+): Promise<boolean> {
+  // find review based on userId and businessId
+  const data = await db
+    .select()
+    .from(businessReviews)
+    .where(
+      and(
+        eq(businessReviews.userId, userId),
+        eq(businessReviews.businessId, businessId),
+      ),
+    );
+
+  // return true if reviwe already exist
+  if (data.length > 0) {
+    return true;
+  }
+  // return if review is not exist
+  return false;
+}
+
+async function createReview(
+  userId: number,
+  businessId: number,
+  rate: number,
+  message: string,
+) {
+  try {
+    console.log("execution comes here===>", userId, businessId, rate, message);
+    const data = await db
+      .insert(businessReviews)
+      .values({
+        businessId,
+        userId,
+        rate,
+        message,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }).returning();
+    console.log("review created successfully",data);
+    return data;
+  } catch (err: any) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Could Not Create Review",
+      cause: err,
+    });
+  }
+}
+
+export { singleShop, reviewExist, createReview };

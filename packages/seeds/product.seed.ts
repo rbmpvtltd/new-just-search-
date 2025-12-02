@@ -23,9 +23,9 @@ import { clouadinaryFake } from "./seeds";
 dotenv.config();
 export const productSeed = async () => {
   await clearAllTablesBusiness();
-  await addProduct();
-  await addProductReviews();
-  await addRecentViewProduct();
+  // await addProduct();
+  // await addProductReviews();
+  // await addRecentViewProduct();
   await addProductSubCategroy();
 };
 
