@@ -3,12 +3,13 @@ import { db } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   businessCategories,
+  businessInsertSchema,
   businessListings,
+  businessPhotos,
   businessSubcategories,
 } from "@repo/db/dist/schema/business.schema";
 import {
   categories,
-  categoryInsertSchema,
   categoryUpdateSchema,
   cities,
   subcategories,
@@ -26,7 +27,7 @@ import {
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
-import { adminProcedure, router } from "@/utils/trpc";
+import { adminProcedure, router, visitorProcedure } from "@/utils/trpc";
 import {
   businessAllowedSortColumns,
   businessColumns,
@@ -131,19 +132,152 @@ export const adminBusinessRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    return;
+    const getBusinessCategories = await db.query.categories.findMany({
+      where: (categories, { eq }) => eq(categories.type, 1),
+    });
+    const getStates = await db.query.states.findMany();
+    const users = await db.query.users.findMany({
+      where: (user, { eq }) => eq(user.role, "visiter"),
+      columns: {
+        displayName: true,
+        id: true,
+      },
+    });
+    return {
+      users,
+      getBusinessCategories,
+      getStates,
+    };
   }),
-  create: adminProcedure
-    .input(
-      categoryInsertSchema.omit({
-        slug: true,
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const slug = slugify(input.title);
-      await db.insert(categories).values({ ...input, slug });
-      return { success: true };
+
+  getSubCategories: visitorProcedure
+    .input(z.object({ categoryId: z.number() }))
+    .query(async ({ input }) => {
+      const businessSubCategories = await db.query.subcategories.findMany({
+        where: (subcategories, { eq }) =>
+          eq(subcategories.categoryId, input.categoryId),
+      });
+      return businessSubCategories;
     }),
+
+  getCities: visitorProcedure
+    .input(z.object({ state: z.number() }))
+    .query(async ({ input }) => {
+      const cities = await db.query.cities.findMany({
+        where: (cities, { eq }) => eq(cities.stateId, input.state),
+      });
+      return cities;
+    }),
+
+  create: adminProcedure
+    .input(businessInsertSchema)
+    .mutation(async ({ input }) => {
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, input.userId),
+      });
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not found",
+        });
+      }
+
+      const existingBusiness = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, input.userId),
+      });
+
+      if (existingBusiness) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Business already exist",
+        });
+      }
+
+      const isStateExists = await db.query.states.findFirst({
+        where: (states, { eq }) => eq(states.id, input.state),
+      });
+
+      if (!isStateExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "State not found",
+        });
+      }
+
+      const isCityExists = await db.query.cities.findFirst({
+        where: (cities, { eq }) => eq(cities.id, input.city),
+      });
+      if (!isCityExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "City not found",
+        });
+      }
+
+      const slugifyName = slugify(input.name, {
+        lower: true,
+        strict: true,
+      });
+      const [createBusiness] = await db
+        .insert(businessListings)
+        .values({
+          ...input,
+          status: "Approved",
+          slug: slugifyName,
+        })
+        .returning({
+          id: businessListings.id,
+        });
+      if (!createBusiness) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Failed to create business",
+        });
+      }
+      const businessId = createBusiness.id;
+      await db.insert(businessCategories).values({
+        businessId,
+        categoryId: input.categoryId,
+      });
+
+      if (input.subcategoryId.length > 0) {
+        await db.insert(businessSubcategories).values(
+          input.subcategoryId.map((subCategoryId) => ({
+            businessId,
+            subcategoryId: Number(subCategoryId),
+          })),
+        );
+      }
+
+      const allPhotos = [
+        input.image1,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(businessPhotos).values(
+          allPhotos.map((photo) => ({
+            businessId: businessId,
+            photo,
+          })),
+        );
+      }
+
+      await db
+        .update(users)
+        .set({
+          role: "business",
+          displayName: input.name,
+        })
+        .where(eq(users.id, input.userId));
+
+      return { success: true, message: "Business created successfully" };
+    }),
+
   edit: adminProcedure
     .input(
       z.object({

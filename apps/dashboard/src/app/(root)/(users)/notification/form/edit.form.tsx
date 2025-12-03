@@ -1,158 +1,209 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { type Dispatch, type SetStateAction, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { notificationInsertSchema } from "@repo/db/dist/schema/user.schema";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import type { z } from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
-import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
-import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
+import type { OutputTrpcType } from "@/trpc/type";
 
-const extendedCategoryInsertSchema = categoryInsertSchema
-  .pick({
-    id: true,
-    photo: true,
-    isPopular: true,
-    type: true,
-    title: true,
-    status: true,
-  })
-  .extend({
-    photo: z.any(),
-  });
+type EditData = OutputTrpcType["adminNotificationRouter"]["edit"];
+const extendedInsertSchema = notificationInsertSchema;
 
-type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
+type SelectSchema = z.infer<typeof extendedInsertSchema>;
 
-export function EditBanner({ id }: { id: number }) {
+export function EditEntiry({ notificationId }: { notificationId: number }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
-        <Button>Edit</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <BoundaryWrapper>
-          {open && <BannerEditForm id={id} setOpen={setOpen} />}
-        </BoundaryWrapper>
-      </DialogContent>
-    </Dialog>
+    <Sheet onOpenChange={setOpen} open={open}>
+      <SheetTrigger asChild>
+        <Button>Edit Entiry</Button>
+      </SheetTrigger>
+      <SheetContent className="sm:max-w-[425px] p-4">
+        {open && (
+          <Suspense fallback={<div> loading ...</div>}>
+            <GetData setOpen={setOpen} id={notificationId} />
+          </Suspense>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
 
 interface EditForm {
-  id: number;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  data: EditData;
 }
-function BannerEditForm({ id, setOpen }: EditForm) {
+
+function GetData({
+  setOpen,
+  id,
+}: {
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  id: number;
+}) {
   const trpc = useTRPC();
 
-  const { data, refetch } = useSuspenseQuery(
-    trpc.adminCategoryRouter.edit.queryOptions({ id }),
+  const { data, isFetching } = useSuspenseQuery(
+    trpc.adminNotificationRouter.edit.queryOptions(
+      {
+        id,
+      },
+      {
+        staleTime: 0,
+      },
+    ),
   );
 
+  if (isFetching) return <Spinner />;
+
+  return <EditForm setOpen={setOpen} data={data} />;
+}
+
+function EditForm({ setOpen, data }: EditForm) {
+  const trpc = useTRPC();
+
   const { mutate: update } = useMutation(
-    trpc.adminCategoryRouter.update.mutationOptions(),
+    trpc.adminNotificationRouter.update.mutationOptions(),
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CategorySelectSchema>({
-    resolver: zodResolver(extendedCategoryInsertSchema),
+  } = useForm<SelectSchema>({
+    resolver: zodResolver(extendedInsertSchema),
     defaultValues: {
-      id: data?.id,
-      photo: data?.photo,
-      title: data?.title,
-      type: data?.type,
-      status: data?.status,
-      isPopular: data?.isPopular,
+      description: data.lastData?.description,
+      title: data.lastData?.title,
+      city: data.lastData?.cities,
+      notificationId: data.lastData?.notificationId,
+      state: data.lastData?.states,
+      role: data.lastData?.role,
+      status: true,
+      categoryId: data.lastData?.category,
+      subCategoryId: data.lastData?.subcategories,
     },
   });
 
-  const onSubmit = async (data: CategorySelectSchema) => {
-    console.log("submiting started");
-    const files = await uploadToCloudinary([data.photo], "banner");
-    if (!files || !files[0]) {
-      console.log("files", files);
-      console.error("file uploading to cloudinary failed");
-      return;
-    }
-    console.log("data is", data);
-    update(
-      {
-        ...data,
-        photo: files[0],
+  const selectedCategoryId = useWatch({ control, name: "categoryId" }) ?? [];
+  const { data: subCategories, isLoading: subCategoriesLoading } = useQuery(
+    trpc.utilsRouter.getSubCategories.queryOptions(selectedCategoryId),
+  );
+
+  const selectedStateIds = useWatch({ control, name: "state" }) ?? [];
+  const { data: cities, isLoading: citiesLoading } = useQuery(
+    trpc.utilsRouter.getCities.queryOptions(selectedStateIds),
+  );
+
+  const onSubmit = async (data: SelectSchema) => {
+    update(data, {
+      onSuccess: () => {
+        const queryClient = getQueryClient();
+        queryClient.invalidateQueries({
+          queryKey: trpc.adminNotificationRouter.list.queryKey(),
+        });
+        setOpen(false);
       },
-      {
-        onSuccess: () => {
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.adminCategoryRouter.list.queryKey(),
-          });
-          refetch();
-          setOpen(false);
-        },
-        onError: (e) => {
-          console.error(e);
-        },
+      onError: (e) => {
+        console.error(e);
       },
-    );
+    });
   };
 
-  const formFields: FormFieldProps<CategorySelectSchema>[] = [
+  const formFields: FormFieldProps<SelectSchema>[] = [
     {
       control,
-      label: "",
-      name: "id",
-      placeholder: "idis",
-      type: "hidden",
-      component: "input",
-      required: false,
+      label: "Role",
+      name: "role",
+      placeholder: "Select Type of category",
+      component: "checkbox",
+      options: [
+        { label: UserRole.all, value: UserRole.all },
+        { label: UserRole.business, value: UserRole.business },
+        { label: UserRole.hire, value: UserRole.hire },
+        { label: UserRole.guest, value: UserRole.guest },
+        { label: UserRole.visiter, value: UserRole.visiter },
+      ],
+      error: errors.role?.message,
     },
     {
       control,
-      label: "Type",
-      name: "type",
-      placeholder: "Select Type of category",
-      component: "select",
-      options: [
-        { label: "Business", value: 1 },
-        { label: "Hire", value: 2 },
-      ],
-      error: errors.type?.message,
+      label: "Category",
+      name: "categoryId",
+      placeholder: "Category",
+      component: "multiselect",
+      options:
+        data.category?.map((item) => ({ label: item.name, value: item.id })) ??
+        [],
+      error: errors.categoryId?.message,
+    },
+    {
+      control,
+      label: "Sub Category",
+      name: "subCategoryId",
+      placeholder: "Sub category",
+      component: "multiselect",
+      loading: subCategoriesLoading,
+      options:
+        subCategories?.map((item) => ({ label: item.name, value: item.id })) ??
+        [],
+      error: errors.subCategoryId?.message,
+    },
+    {
+      control,
+      label: "State",
+      name: "state",
+      placeholder: "State",
+      component: "multiselect",
+      options:
+        data.state?.map((item) => ({ label: item.name, value: item.id })) ?? [],
+      error: errors.state?.message,
+    },
+    {
+      control,
+      label: "City",
+      name: "city",
+      placeholder: "City",
+      component: "multiselect",
+      loading: citiesLoading,
+      options:
+        cities?.map((item) => ({ label: item.name, value: item.id })) ?? [],
+      error: errors.city?.message,
     },
     {
       control,
       label: "Title",
       name: "title",
-      placeholder: "eg: garment",
+      placeholder: "eg: Notification Title",
       component: "input",
+      error: errors.title?.message,
     },
     {
       control,
-      label: "Photo",
-      name: "photo",
-      component: "image",
-      required: false,
-      // error: errors.photo?.message,
+      label: "description",
+      name: "description",
+      component: "input",
+      error: errors.description?.message,
     },
     {
       control,
@@ -161,35 +212,29 @@ function BannerEditForm({ id, setOpen }: EditForm) {
       mainDivClassName: "flex gap-4",
       placeholder: "",
       component: "single-checkbox",
-    },
-    {
-      control,
-      label: "isPopular",
-      name: "isPopular",
-      mainDivClassName: "flex gap-4",
-      placeholder: "",
-      component: "single-checkbox",
+      error: errors.state?.message,
     },
   ];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogHeader>
-        <DialogTitle>Edit</DialogTitle>
-      </DialogHeader>
-      <div className="grid grid-cols-1 gap-6">
+    <form className="overflow-y-scroll" onSubmit={handleSubmit(onSubmit)}>
+      <SheetHeader>
+        <div>{data.lastData?.notificationId}</div>
+        <SheetTitle>Add</SheetTitle>
+      </SheetHeader>
+      <div className="grid grid-cols-1 gap-6 ">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
       </div>
-      <DialogFooter className="mt-2">
-        <DialogClose asChild>
+      <SheetFooter className="mt-2">
+        <SheetClose asChild>
           <Button variant="outline">Cancel</Button>
-        </DialogClose>
+        </SheetClose>
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogFooter>
+      </SheetFooter>
     </form>
   );
 }

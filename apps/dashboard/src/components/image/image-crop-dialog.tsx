@@ -125,7 +125,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
   }, [onCancel]);
 
   return (
-    <div>
+    <div className="relative">
       <div className="backdrop"></div>
       <div className="crop-container">
         <Cropper
@@ -138,7 +138,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
           onCropComplete={onCropComplete}
         />
       </div>
-      <div className="controls">
+      <div className="controls left-0">
         <div className="controls-upper-area">
           <input
             type="range"

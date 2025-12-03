@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
-import { EditBanner } from "../form/edit.form";
+import { EditEntiry } from "../form/edit.form";
 import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {
@@ -22,7 +22,7 @@ function SelectCell({ id }: { id: number }) {
 }
 
 function ActionCell({ id }: { id: number }) {
-  return <EditBanner id={id} />;
+  return <EditEntiry notificationId={id} />;
 }
 
 function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
@@ -82,6 +82,18 @@ type Feedback = UnwrapArray<FeedbackArray>;
 
 export const columns: ColumnDef<Feedback>[] = [
   {
+    id: "select",
+    header: ({ table }) => {
+      const currentPageIds = table
+        .getRowModel()
+        .rows.map((row) => row.original.notificationId);
+      return <SelectHeader ids={currentPageIds} />;
+    },
+    cell: ({ row }) => <SelectCell id={row.original.notificationId} />,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "notificationId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
@@ -113,9 +125,37 @@ export const columns: ColumnDef<Feedback>[] = [
     cell: ({ row }) => row.original.role,
   },
   {
+    accessorKey: "category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="category" />
+    ),
+    cell: ({ row }) => row.original.category ?? "any",
+  },
+  {
+    accessorKey: "subcategories",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="subcategories" />
+    ),
+    cell: ({ row }) => row.original.subcategories ?? "any",
+  },
+  {
+    accessorKey: "states",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="states" />
+    ),
+    cell: ({ row }) => row.original.states ?? "any",
+  },
+  {
+    accessorKey: "cities",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="cities" />
+    ),
+    cell: ({ row }) => row.original.cities ?? "any",
+  },
+  {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Active" />
+      <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => (
       <ActiveCell
@@ -131,5 +171,13 @@ export const columns: ColumnDef<Feedback>[] = [
     ),
     cell: ({ row }) =>
       row?.original?.created_at?.toLocaleDateString() ?? "null",
+  },
+
+  {
+    id: "action",
+    header: () => <div className="text-center">Action</div>,
+    cell: ({ row }) => <ActionCell id={row.original.notificationId} />,
+    enableSorting: false,
+    enableHiding: false,
   },
 ];
