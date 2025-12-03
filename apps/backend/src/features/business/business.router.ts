@@ -8,6 +8,7 @@ import {
   businessSubcategories,
   businessUpdateSchema,
   favourites,
+  insertBusinessReviewSchema,
 } from "@repo/db/dist/schema/business.schema";
 import {
   categories,
@@ -863,17 +864,10 @@ export const businessrouter = router({
     };
   }),
   businessReview: protectedProcedure
-    .input(
-      z.object({
-        businessId: z.number(),
-        message: z.string(),
-        rating: z.number(),
-      }),
-    )
-    .mutation(async ({ input,ctx }) => {
-      const { businessId, message, rating } = input;
-      const {userId} = ctx
-
+    .input(insertBusinessReviewSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { businessId, message, rate } = input;
+      const { userId } = ctx;
 
       const isReviewExist = await reviewExist(businessId, userId);
       console.log("review exist status is==>", isReviewExist);
@@ -883,14 +877,16 @@ export const businessrouter = router({
           message: "You've already submitted review on that business",
         });
       }
-      await createReview(userId, businessId, rating, message);
+      await createReview(userId, businessId, rate ?? 0, message ?? "");
 
-      return { success: true, message:"Review Has Been Submitted" };
+      return { success: true, message: "Review Has Been Submitted" };
     }),
-    ReviewSubmitted : protectedProcedure.input(z.object({businessId:z.number()})).query(async ({input,ctx})=>{
-      const {businessId} = input
-      const {userId} = ctx
-      const isSubmitted = await reviewExist(businessId,userId)
-      return {submitted:isSubmitted}
-    })
+  ReviewSubmitted: protectedProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { businessId } = input;
+      const { userId } = ctx;
+      const isSubmitted = await reviewExist(businessId, userId);
+      return { submitted: isSubmitted };
+    }),
 });

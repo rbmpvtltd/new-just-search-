@@ -17,7 +17,7 @@ import type { OutputTrpcType } from "@/trpc/type";
 import { useForm } from "react-hook-form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
-import {  CheckCircle2, Star } from "lucide-react"
+import { CheckCircle2, Star } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useState } from "react";
@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/form"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import LoginRedirect from "@/components/LoginRedirect";
+import { insertBusinessReviewSchema } from "@repo/db/dist/schema/business.schema";
+import Swal from "sweetalert2";
 
 type SingleShopType = OutputTrpcType["businessrouter"]["singleShop"] | null;
 
@@ -384,7 +386,7 @@ const reviewSchema = z.object({
   rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
 })
 
-type ReviewFormValues = z.infer<typeof reviewSchema>
+type ReviewFormValues = z.infer<typeof insertBusinessReviewSchema>
 
 function ReviewForm({ businessId }: { businessId: number }) {
   const trpc = useTRPC()
@@ -395,11 +397,11 @@ function ReviewForm({ businessId }: { businessId: number }) {
   )
 
   const form = useForm<ReviewFormValues>({
-    resolver: zodResolver(reviewSchema),
+    resolver: zodResolver(insertBusinessReviewSchema),
     defaultValues: {
       businessId: businessId,
       message: "",
-      rating: 5,
+      rate: 5,
     },
   })
 
@@ -408,6 +410,11 @@ function ReviewForm({ businessId }: { businessId: number }) {
       onSuccess: (responseData) => {
         console.log("Review submitted successfully:", responseData)
         setSubmittedData(responseData)
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: `Review Submitted Successfully`,
+        });
         form.reset()
       },
       onError: (err) => {
@@ -416,7 +423,7 @@ function ReviewForm({ businessId }: { businessId: number }) {
     })
   }
 
-  const watchRating = form.watch("rating")
+  const watchRating = form.watch("rate")
 
   return (
     <div className="">
@@ -435,7 +442,7 @@ function ReviewForm({ businessId }: { businessId: number }) {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
-            name="rating"
+            name="rate"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Rating</FormLabel>
@@ -452,7 +459,7 @@ function ReviewForm({ businessId }: { businessId: number }) {
                         </FormControl>
                         <FormLabel className="cursor-pointer">
                           <Star
-                            className={`w-8 h-8 transition-colors ${rating <= watchRating
+                            className={`w-8 h-8 transition-colors ${rating <= (watchRating ?? 0)
                               ? "fill-yellow-400 text-yellow-400"
                               : "text-gray-300"
                               }`}

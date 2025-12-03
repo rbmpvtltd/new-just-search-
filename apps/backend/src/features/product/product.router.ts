@@ -1,5 +1,6 @@
 import { db, schemas } from "@repo/db";
 import {
+  insertProductReviewSchema,
   productInsertSchema,
   products,
 } from "@repo/db/dist/schema/product.schema";
@@ -9,7 +10,13 @@ import { eq } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
-import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
+import {
+  businessProcedure,
+  protectedProcedure,
+  router,
+  visitorProcedure,
+} from "@/utils/trpc";
+import { createProductReview, productReviewExist } from "./product.service";
 
 export const productrouter = router({
   add: businessProcedure.query(async ({ ctx }) => {
@@ -311,5 +318,51 @@ export const productrouter = router({
         .where(eq(schemas.product.products.id, input.id));
 
       return { success: true };
+    }),
+  createProductReview: protectedProcedure
+    .input(insertProductReviewSchema)
+    .mutation(async ({ input, ctx }) => {
+      const {
+        email,
+        message,
+        name,
+        productId,
+        businessId,
+        rate,
+        status,
+        view,
+      } = input;
+      const { userId } = ctx;
+      const reviewExist = await productReviewExist(
+        userId,
+        productId,
+        email ?? "",
+      );
+      if (reviewExist) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You've already submitted review on that offer",
+        });
+      }
+      const data = await createProductReview(
+        userId,
+        productId,
+        businessId,
+        rate ?? 0,
+        message ?? "",
+        name ?? "",
+        email ?? "",
+        status,
+        view,
+      );
+      return { success: true, data: data };
+    }),
+  productReviewSubmitted: protectedProcedure
+    .input(z.object({ productId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { productId } = input;
+      const { userId } = ctx;
+      const submitted = await productReviewExist(userId, productId);
+      return { submitted: submitted };
     }),
 });

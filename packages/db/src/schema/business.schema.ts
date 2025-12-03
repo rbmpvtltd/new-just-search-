@@ -216,6 +216,17 @@ export const businessReviews = pgTable("business_reviews", {
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
+export const insertBusinessReviewSchema = createInsertSchema(businessReviews, {
+  businessId: () => z.number().positive("Business ID is required"),
+  message: () =>
+    z
+      .string()
+      .min(10, "Review must be at least 10 characters")
+      .max(500, "Review must not exceed 500 characters").optional(),
+  rate: () => z.number().min(1).max(5, "Rating must be between 1 and 5").optional(),
+}).omit({
+  userId : true
+});
 
 // // 7. comment_business
 // export const commentsBusiness = pgTable("comments_business", {

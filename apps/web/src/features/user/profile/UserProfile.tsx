@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  
+
   userUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
@@ -21,7 +21,8 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
-
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 type UserProfile = OutputTrpcType["userRouter"]["getUserProfile"] | null;
 type FormReferenceDataType = OutputTrpcType["userRouter"]["add"] | null;
 
@@ -205,13 +206,14 @@ export default function UserProfile({
   ];
   return (
     <div className="p-8 bg-muted/20 min-h-screen">
+      
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="shadow-xl mx-auto rounded-xl max-w-4xl bg-white"
       >
         <div className="w-[90%] mx-auto bg-white shadow rounded-xl p-6 flex flex-col md:flex-row items-center gap-6">
           <Avatar className="w-32 h-32 border shadow-sm">
-            <AvatarImage src="/placeholder-user.jpg" alt="User Profile" />
+            <AvatarImage src="/images/demo-img.webp" alt="User Profile" />
             <div className="-mt-4 -ml-2">
               <FormField
                 control={control}

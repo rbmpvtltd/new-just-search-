@@ -21,7 +21,7 @@ import { useTRPC } from "@/trpc/client"
 import { useMutation } from "@tanstack/react-query"
 
 const reviewSchema = z.object({
-  offerId: z.number().positive("Business ID is required"),
+  productId: z.number().positive("Business ID is required"),
   message: z.string().min(10, "Review must be at least 10 characters").max(500, "Review must not exceed 500 characters"),
   rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
   email :z.email().min(8,"Email Must Be Contain 8 Characters").max(500),
@@ -40,7 +40,7 @@ function ReviewForm() {
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
     defaultValues: {
-      offerId: 26,
+      productId: 26,
       message: "",
       rating: 5,
       email : "",
@@ -51,16 +51,17 @@ function ReviewForm() {
   })
 
   function onSubmit(data: ReviewFormValues) {
-    mutate({userId:1427,...data}, {
-      onSuccess: (responseData) => {
-        console.log("Review submitted successfully:", responseData)
-        setSubmittedData(responseData)
-        form.reset()
-      },
-      onError: (err) => {
-        console.error("Error submitting review:", err)
-      },
-    })
+    // mutate({userId:1427,...data}, {
+    //   onSuccess: (responseData) => {
+    //     console.log("Review submitted successfully:", responseData)
+    //     setSubmittedData(responseData)
+    //     form.reset()
+    //   },
+    //   onError: (err) => {
+    //     console.error("Error submitting review:", err)
+    //   },
+    // })
+    console.log("===========>",data)
   }
 
   const watchRating = form.watch("rating")

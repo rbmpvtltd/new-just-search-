@@ -22,9 +22,9 @@ import { clouadinaryFake } from "./seeds";
 
 dotenv.config();
 export const productSeed = async () => {
-  await clearAllTablesBusiness();
-  // await addProduct();
-  // await addProductReviews();
+  // await clearAllTablesBusiness();
+  await addProduct();
+  await addProductReviews();
   // await addRecentViewProduct();
   await addProductSubCategroy();
 };
@@ -143,14 +143,14 @@ const addProductReviews = async () => {
     await db.insert(productReviews).values({
       id: row.id,
       userId: user!.id,
-      businessId: business.id,
+      businessId: business!.id,
       productId: Product.id,
       name: row.name,
       email: row.email,
       message: row.message,
       rate: row.rate,
       view: row.view,
-      status: "Pending",
+      status: true,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });

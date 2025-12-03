@@ -1,5 +1,6 @@
 import { db, schemas } from "@repo/db";
 import {
+  insertOfferReviewSchema,
   offers,
   offersInsertSchema,
   offersUpdateSchema,
@@ -332,31 +333,14 @@ export const offerrouter = router({
 
       return { success: true };
     }),
-  // TODO: replace publiceProcudure and remove userId from input
   createOfferReview: protectedProcedure
     .input(
-      z.object({
-        offerId: z.number(),
-        rating: z.number(),
-        message: z.string(),
-        name: z.string(),
-        email: z.email(),
-        status: z.boolean(),
-        view: z.boolean(),
-      }),
+      insertOfferReviewSchema
     )
     .mutation(async ({ input,ctx }) => {
-      const { email, message, name, offerId, rating, status, view } = input;
+      const { email, message, name, offerId, rate, status, view } = input;
       const {userId} = ctx
-      console.log("userId ====>", userId);
-      console.log("emai ====>", email);
-      console.log("message ====>", message);
-      console.log("name ====>", name);
-      console.log("offerId ====>", offerId);
-      console.log("rating ====>", rating);
-      console.log("status ====>", status);
-      console.log("view ====>", view);
-      const reviewExist = await offerReviewExist(userId, offerId, email);
+      const reviewExist = await offerReviewExist(userId, offerId, email ?? "");
       if (reviewExist) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -366,21 +350,19 @@ export const offerrouter = router({
       const data = await createOfferReview(
         userId,
         offerId,
-        rating,
-        message,
-        name,
-        email,
+        rate ?? 0,
+        message ?? "",
+        name ?? "",
+        email ?? "",
         status,
         view,
       );
       return { success: true, data: data };
     }),
-  // TODO: replace publiceProcudure and remove userId from input
     offerReviewSubmitted : protectedProcedure.input(z.object({offerId:z.number()})).query(async ({input,ctx})=>{
       const {offerId} = input;
       const {userId} = ctx
       const submitted = await offerReviewExist(userId,offerId)
-      console.log("this is the end ",submitted)
       return {submitted:submitted}
     })
 });

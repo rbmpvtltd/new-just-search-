@@ -30,6 +30,8 @@ import { CheckCircle2, Star } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import LoginRedirect from "@/components/LoginRedirect";
+import { insertOfferReviewSchema } from "@repo/db/dist/schema/offer.schema";
+import Swal from "sweetalert2";
 
 const reviewSchema = z.object({
   offerId: z.number().positive("Business ID is required"),
@@ -42,7 +44,7 @@ const reviewSchema = z.object({
 })
 
 type SingleOfferType = OutputTrpcType["businessrouter"]["singleOffer"] | null;
-type ReviewFormValues = z.infer<typeof reviewSchema>
+type ReviewFormValues = z.infer<typeof insertOfferReviewSchema>
 
 function SingleOfferComp({
   offerPhotos,
@@ -185,11 +187,11 @@ function ReviewForm({ offerId }: { offerId: number }) {
   const { mutate, isPending } = useMutation(trpc.offerrouter.createOfferReview.mutationOptions())
 
   const form = useForm<ReviewFormValues>({
-    resolver: zodResolver(reviewSchema),
+    resolver: zodResolver(insertOfferReviewSchema),
     defaultValues: {
       offerId: offerId,
       message: "",
-      rating: 5,
+      rate: 5,
       email: "",
       name: "Guest",
       view: false,
@@ -198,10 +200,15 @@ function ReviewForm({ offerId }: { offerId: number }) {
   })
 
   function onSubmit(data: ReviewFormValues) {
-    mutate(data , {
+    mutate(data, {
       onSuccess: (responseData) => {
         console.log("Review submitted successfully:", responseData)
         setSubmittedData(responseData)
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: `Review Submitted Successfully`,
+        });
         form.reset()
       },
       onError: (err) => {
@@ -210,7 +217,7 @@ function ReviewForm({ offerId }: { offerId: number }) {
     })
   }
 
-  const watchRating = form.watch("rating")
+  const watchRating = form.watch("rate")
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -229,7 +236,7 @@ function ReviewForm({ offerId }: { offerId: number }) {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
-            name="rating"
+            name="rate"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Rating</FormLabel>
@@ -246,7 +253,7 @@ function ReviewForm({ offerId }: { offerId: number }) {
                         </FormControl>
                         <FormLabel className="cursor-pointer">
                           <Star
-                            className={`w-8 h-8 transition-colors ${rating <= watchRating
+                            className={`w-8 h-8 transition-colors ${rating <= (watchRating ?? 0)
                               ? "fill-yellow-400 text-yellow-400"
                               : "text-gray-300"
                               }`}
@@ -275,6 +282,7 @@ function ReviewForm({ offerId }: { offerId: number }) {
                       placeholder="Tell us about your experience..."
                       className="resize-none"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormDescription>
@@ -295,6 +303,7 @@ function ReviewForm({ offerId }: { offerId: number }) {
                       placeholder="Tell us about your experience..."
                       className="resize-none"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormDescription>
@@ -317,6 +326,7 @@ function ReviewForm({ offerId }: { offerId: number }) {
                     placeholder="Tell us about your experience..."
                     className="min-h-[120px] resize-none"
                     {...field}
+                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormDescription>
