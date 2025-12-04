@@ -37,7 +37,7 @@ type BusinessListing = {
 };
 type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
-export const BussinessListingCard = ({ item }: { item: BusinessListing|businesses,category?:string,subcategory?:string[],rating?:string|undefined}) => {
+export const BussinessListingCard = ({ item,category,subcategory,rating,shopId }: { item: BusinessListing|businesses,category?:string,subcategory?:string[],rating?:string|undefined,shopId?: number}) => {
   const router = useRouter()
   return (
     <div className="mx-auto p-4">
@@ -47,7 +47,7 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/business/shop/${item.objectID}`,
+                  pathname: `/business/shop/${shopId}`,
                 }}
               >
                 <Image
@@ -70,9 +70,9 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
           <div className="flex flex-col py-2 justify-between gap-2 ">
             <h1 className="text-2xl font-bold ">{item.name}</h1>
             <div className="flex gap-2 flex-wrap">
-              <Badge variant="default">{item.category}</Badge>
+              <Badge variant="default">{category}</Badge>
 
-              {item.subcategories?.slice(0, 2)?.map((subcategory:string, index:number) => (
+              {subcategory?.slice(0, 2)?.map((subcategory:string, index:number) => (
                 <Badge variant="destructive" key={index.toString()}>
                   {subcategory}
                 </Badge>
@@ -84,11 +84,11 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
                 {item?.area} {item?.streetName} {item?.buildingName}
               </p>
             </div>
-            <Rating rating={Math.ceil(Number(item.rating))} />
+            <Rating rating={Math.ceil(Number(rating))} />
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.objectID}`)
+                  router.push(`/business/shop/${shopId}`)
                   console.log("clicked", item.latitude, item.longitude);
                 }}
                 type="button"
@@ -99,8 +99,8 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
               </Button>
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.objectID}`)
-                  console.log("chatting with", item.objectID);
+                  router.push(`/business/shop/${shopId}`)
+                  console.log("chatting with", shopId);
                 }}
                 type="button"
                 className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
@@ -111,7 +111,7 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
               {/* </div> */}
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.objectID}`)  
+                  router.push(`/business/shop/${shopId}`)  
                   console.log("calling on", item.phoneNumber);
                 }}
                 type="button"

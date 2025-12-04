@@ -1,13 +1,13 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
 import React from "react";
 import { IoMdChatboxes } from "react-icons/io";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
+import { User } from 'lucide-react';
 
 const menuItems = [
   { name: "Home", href: "/" },
@@ -20,7 +20,7 @@ export const HeroHeader = () => {
   const trpc = useTRPC();
   const [menuState, setMenuState] = React.useState(false);
   const authenticated = useQuery(trpc.auth.verifyauth.queryOptions());
-  console.log("user is ",authenticated)
+  console.log("user is ", authenticated);
   return (
     <header className="sticky top-0 z-50">
       <nav
@@ -88,28 +88,30 @@ export const HeroHeader = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="text-primary flex items-center justify-center"
-                >
-                  <Link href="/chat">
-                    <IoMdChatboxes size={18} />
-                    {/* <Link href="/login">
-                    <span>Login</span> */}
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="text-primary flex items-center justify-center"
-                >
-                  <Link href="/chat">
-                    <IoMdChatboxes size={18} />
-                  </Link>
-                </Button>
+                {authenticated.data?.success && (
+                  <div className="flex gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="text-primary flex items-center justify-center border-2 border-primary"
+                    >
+                      <Link href="/chat">
+                        <IoMdChatboxes size={18} />
+                      </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="text-primary flex items-center justify-center border-2 border-primary"
+                    >
+                      <Link href="/profile">
+                        <User size={18} />
+                      </Link>
+                    </Button>
+                  </div>
+                )}
                 {!authenticated.data?.success && (
                   <>
                     <Button

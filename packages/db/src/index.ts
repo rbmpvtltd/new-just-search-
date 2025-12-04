@@ -21,6 +21,7 @@ import {
 import * as auth from "./schema/auth.schema";
 import * as business from "./schema/business.schema";
 import * as chat from "./schema/chat.schema";
+import * as help_and_support from "./schema/help-and-support.schema";
 import * as hire from "./schema/hire.schema";
 import * as not_related from "./schema/not-related.schema";
 import * as offer from "./schema/offer.schema";
@@ -47,6 +48,7 @@ export const schemas = {
   product,
   user,
   chat,
+  help_and_support,
 };
 
 export const db = drizzle({
@@ -61,6 +63,7 @@ export const db = drizzle({
     ...product,
     ...user,
     ...chat,
+    ...help_and_support,
   },
 });
 

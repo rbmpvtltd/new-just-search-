@@ -1,11 +1,12 @@
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HireSearchForm from "@/features/hire/show/hireSearchForm";
 import HireCard from "@/features/hire/show/HireCard";
 import { Loading } from "@/components/ui/Loading";
-import { useHireList } from "@/query/hireListing";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import HireCard from "@/features/hire/show/HireCard";
 import { trpc } from "@/lib/trpc";
+import { useHireList } from "@/query/hireListing";
 
 export default function HireListScreen() {
   const {
@@ -60,7 +61,7 @@ export default function HireListScreen() {
                   </Text>
                 </View>
               );
-            return< HireCard item={item} />;
+            return <HireCard item={item} />;
           }}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {

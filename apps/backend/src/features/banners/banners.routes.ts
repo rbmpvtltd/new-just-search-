@@ -2,7 +2,7 @@ import { db, schemas } from "@repo/db";
 import { favourites } from "@repo/db/dist/schema/business.schema";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
-import { publicProcedure, router, visitorProcedure } from "@/utils/trpc";
+import { guestProcedure, publicProcedure, router, visitorProcedure } from "@/utils/trpc";
 import { getBannerData } from "./banners.service";
 
 const business = schemas.business.businessListings;
@@ -16,7 +16,7 @@ export const bannerRouter = router({
       return data;
     }),
 
-  premiumShops: visitorProcedure.query(async ({ ctx }) => {
+  premiumShops: guestProcedure.query(async ({ ctx }) => {
     const data = await db
       .select({
         photo: business.photo,
@@ -61,7 +61,7 @@ export const bannerRouter = router({
         favourites,
         and(
           eq(favourites.businessId, business.id),
-          eq(favourites.userId, ctx.userId),
+          eq(favourites.userId, ctx.userId ?? 0),
         ),
       )
       .leftJoin(business_reviews, eq(business.id, business_reviews.businessId))

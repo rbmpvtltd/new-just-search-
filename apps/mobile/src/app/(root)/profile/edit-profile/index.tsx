@@ -1,4 +1,4 @@
-import UserProfile from "@/features/user/profile/UserProfile";
+import UserProfile from "@/features/profile/UserProfile";
 
 export default function EditProfile() {
   return <UserProfile />;

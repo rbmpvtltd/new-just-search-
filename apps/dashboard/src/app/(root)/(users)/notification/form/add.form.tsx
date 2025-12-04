@@ -1,58 +1,46 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
-import { useMutation } from "@tanstack/react-query";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { notificationInsertSchema } from "@repo/db/dist/schema/user.schema";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
-import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
-// import { bannerSelectSchema } from "@repo/db/dist/schema/not-related.schema";
+const extendedInsertSchema = notificationInsertSchema;
 
-const extendedCategoryInsertSchema = categoryInsertSchema
-  .pick({
-    photo: true,
-    isPopular: true,
-    type: true,
-    title: true,
-    status: true,
-  })
-  .extend({
-    photo: z.any(),
-  });
-
-type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
+type SelectSchema = z.infer<typeof extendedInsertSchema>;
 
 export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
+    <Sheet onOpenChange={setOpen} open={open}>
+      <SheetTrigger asChild>
         <Button>Add Entry</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      </SheetTrigger>
+      <SheetContent className="sm:max-w-[425px] p-4">
         <Suspense fallback={<div> loading ...</div>}>
           {open && <AddForm setOpen={setOpen} />}
         </Suspense>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -62,76 +50,89 @@ interface AddForm {
 function AddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
+  const { data } = useSuspenseQuery(
+    trpc.adminNotificationRouter.add.queryOptions(),
+  );
+
   const { mutate: create } = useMutation(
-    trpc.adminCategoryRouter.create.mutationOptions(),
+    trpc.adminNotificationRouter.create.mutationOptions(),
   );
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CategorySelectSchema>({
-    resolver: zodResolver(extendedCategoryInsertSchema),
+  } = useForm<SelectSchema>({
+    resolver: zodResolver(extendedInsertSchema),
     defaultValues: {
-      photo: "",
-      type: 1,
-      status: false,
-      isPopular: false,
+      description: "",
+      title: "",
+      //city: [],
+      notificationId: data.newNotificationId,
+      //state: [],
+      role: [],
+      status: true,
+      //categoryId: [],
+      //subCategoryId: [],
     },
   });
 
-  const onSubmit = async (data: CategorySelectSchema) => {
-    const files = await uploadToCloudinary([data.photo], "banner");
-    if (!files || !files[0]) {
-      console.error("file uploading to cloudinary failed");
-      return;
-    }
-    create(
-      {
-        ...data,
-        photo: files[0],
+  const onSubmit = async (data: SelectSchema) => {
+    create(data, {
+      onSuccess: () => {
+        const queryClient = getQueryClient();
+        queryClient.invalidateQueries({
+          queryKey: trpc.adminNotificationRouter.list.queryKey(),
+        });
+        setOpen(false);
       },
-      {
-        onSuccess: () => {
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.adminCategoryRouter.list.queryKey(),
-          });
-          setOpen(false);
-        },
-        onError: (e) => {
-          console.error(e);
-        },
+      onError: (e) => {
+        console.error(e);
       },
-    );
+    });
   };
 
-  const formFields: FormFieldProps<CategorySelectSchema>[] = [
+  const formFields: FormFieldProps<SelectSchema>[] = [
     {
       control,
-      label: "Type",
-      name: "type",
+      label: "Role",
+      name: "role",
       placeholder: "Select Type of category",
-      component: "select",
+      component: "checkbox",
       options: [
-        { label: "Business", value: 1 },
-        { label: "Hire", value: 2 },
+        { label: UserRole.all, value: UserRole.all },
+        { label: UserRole.business, value: UserRole.business },
+        { label: UserRole.hire, value: UserRole.hire },
+        { label: UserRole.guest, value: UserRole.guest },
+        { label: UserRole.visiter, value: UserRole.visiter },
       ],
-      error: errors.type?.message,
+      error: errors.role?.message,
     },
+    // {
+    //   control,
+    //   label: "Category",
+    //   name: "categoryId",
+    //   placeholder: "Category",
+    //   component: "select",
+    //   options:
+    //     categories?.map((item) => ({ label: item.label, value: item.value })) ??
+    //     [],
+    //   error: errors.categoryId?.message,
+    // },
     {
       control,
       label: "Title",
       name: "title",
-      placeholder: "eg: garment",
+      placeholder: "eg: Notification Title",
       component: "input",
+      error: errors.title?.message,
     },
     {
       control,
-      label: "Photo",
-      name: "photo",
-      component: "image",
-      error: "",
+      label: "description",
+      name: "description",
+      component: "input",
+      error: errors.description?.message,
     },
     {
       control,
@@ -140,35 +141,28 @@ function AddForm({ setOpen }: AddForm) {
       mainDivClassName: "flex gap-4",
       placeholder: "",
       component: "single-checkbox",
-    },
-    {
-      control,
-      label: "isPopular",
-      name: "isPopular",
-      mainDivClassName: "flex gap-4",
-      placeholder: "",
-      component: "single-checkbox",
+      error: errors.state?.message,
     },
   ];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogHeader>
-        <DialogTitle>Add</DialogTitle>
-      </DialogHeader>
+    <form className="" onSubmit={handleSubmit(onSubmit)}>
+      <SheetHeader>
+        <SheetTitle>Add</SheetTitle>
+      </SheetHeader>
       <div className="grid grid-cols-1 gap-6 ">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
       </div>
-      <DialogFooter className="mt-2">
-        <DialogClose asChild>
+      <SheetFooter className="mt-2">
+        <SheetClose asChild>
           <Button variant="outline">Cancel</Button>
-        </DialogClose>
+        </SheetClose>
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogFooter>
+      </SheetFooter>
     </form>
   );
 }

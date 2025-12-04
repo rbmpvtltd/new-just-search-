@@ -6,6 +6,9 @@ import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-fi
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { DebouncedInput } from "@/components/ui/input-debounced";
+import { MuiltActiveButton } from "../form/active.form";
+import { AddNewEntiry } from "../form/add.form";
+import { MuiltDeleteButton } from "../form/delete.form";
 import { active } from "./data";
 
 interface DataTableToolbarProps<TData> {
@@ -48,11 +51,10 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex items-center gap-2">
-        {/* <MuiltActiveButton /> */}
-        {/* <MuiltPopularButton /> */}
-        {/* <MuiltDeleteButton /> */}
+        <MuiltActiveButton />
+        <MuiltDeleteButton />
         <DataTableViewOptions table={table} />
-        {/* <AddNewEntiry /> */}
+        <AddNewEntiry />
       </div>
     </div>
   );

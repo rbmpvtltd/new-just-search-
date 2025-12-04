@@ -8,11 +8,11 @@ import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
-type Conversation = OutputTrpcType["chat"]["conversationList"] | null;
+type ConversationListType = OutputTrpcType["chat"]["conversationList"] | null;
 export default function ConversationList({
   conversationList,
 }: {
-  conversationList: Conversation;
+  conversationList: ConversationListType;
 }) {
   // const pathname = usePathname();
   // const searchParams = useSearchParams();

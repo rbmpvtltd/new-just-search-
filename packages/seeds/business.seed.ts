@@ -22,10 +22,10 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  // await addBusiness();
-  // await seedFavourites();
-  // await businessesCategories();
-  // await businessesSubcategory();
+  await addBusiness();
+  await seedFavourites();
+  await businessesCategories();
+  await businessesSubcategory();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };

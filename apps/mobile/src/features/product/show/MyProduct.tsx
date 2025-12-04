@@ -29,9 +29,7 @@ export default function MyProductsList() {
       <View className="px-4 mt-4">
         <Pressable
           className="bg-primary py-3 rounded-xl w-full flex-row items-center justify-center shadow-sm"
-          onPress={() =>
-            router.push("/(root)/profile/product/add")
-          }
+          onPress={() => router.push("/(root)/profile/product/add")}
         >
           <Ionicons name="add-circle-outline" size={20} color="#fff" />
           <Text className="text-secondary ml-2 font-semibold">

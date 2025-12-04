@@ -1,20 +1,20 @@
 "use client";
 
-import {
-  InstantSearch,
-  SearchBox,
-  Hits,
-  RefinementList,
-  Configure,
-  RangeInput,
-  ClearRefinements,
-} from "react-instantsearch";
 import { algoliaClient } from "@repo/algolia";
-import React, { useState, useEffect, useRef } from "react";
-import { HireListingCard } from "@/features/hire/show/component/HireListingCard";
-import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
 import Image from "next/image";
 import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ClearRefinements,
+  Configure,
+  Hits,
+  InstantSearch,
+  RangeInput,
+  RefinementList,
+  SearchBox,
+} from "react-instantsearch";
+import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
+import { HireListingCard } from "@/features/hire/show/component/HireListingCard";
 
 function Hit({ hit }: { hit: any }) {
   console.log("hit is ", hit.categoryId);
@@ -196,9 +196,9 @@ export default function AlgoliaSearch() {
             </div>
           </aside>
 
-          <main className="results  flex-1 w-[80%]">
-            <Hits hitComponent={Hit} />
-          </main>
+          {/* <main className="results  flex-1 w-[80%]"> */}
+          {/*   <Hits hitComponent={Hit} /> */}
+          {/* </main> */}
         </div>
       </div>
     </InstantSearch>

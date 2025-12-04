@@ -1,10 +1,10 @@
+import { Stack, useLocalSearchParams } from "expo-router";
+import { Text, View } from "react-native";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { useChatMessages } from "@/query/chatMessages";
 import { maskPhone } from "@/utils/helper";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
 
 export default function () {
   const { chat } = useLocalSearchParams();

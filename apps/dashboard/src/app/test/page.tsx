@@ -1,54 +1,38 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { getQueryClient } from "@/trpc/query-client";
+import type { BaseHit, Hit } from "instantsearch.js";
+import { Check } from "lucide-react";
+import { AlgoliaInfinateList } from "@/components/ui/algolia-list";
+import { cn } from "@/lib/utils";
 
 export default function UserDataComponent() {
-  const queryClient = getQueryClient();
-
-  // Fake API function
-  const fetchUserData = async () => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Return random data to show changes on refetch
-    return {
-      id: Math.floor(Math.random() * 1000),
-      name: `User ${Math.floor(Math.random() * 100)}`,
-      timestamp: new Date().toLocaleTimeString(),
-    };
-  };
-
-  // useQuery with cache key
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["userData"],
-    queryFn: fetchUserData,
-    staleTime: 30000,
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error fetching data!</div>;
-
   return (
-    <div>
-      <h2>User Data:</h2>
-      <p>
-        <strong>ID:</strong> {data?.id}
-      </p>
-      <p>
-        <strong>Name:</strong> {data?.name}
-      </p>
-      <p>
-        <strong>Time:</strong> {data?.timestamp}
-      </p>
-
-      <Button type="button" onClick={() => refetch()}>
-        Refetch Data
-      </Button>
-
-      <Button type="button" onClick={() => queryClient.invalidateQueries()}>
-        Invalidate Cache
-      </Button>
-    </div>
+    <AlgoliaInfinateList
+      className="w-56"
+      searchPlaceHolder="search category"
+      indexName="category"
+      ListComponent={Hitted}
+      estimateSize={20}
+    />
   );
 }
+
+type HitType = Hit<BaseHit> & {
+  title: string;
+  id: string;
+};
+
+const Hitted = ({ hit }: { hit: HitType }) => {
+  return (
+    <div className="px-2">
+      <button
+        type="button"
+        className={cn("hit-item w-full flex justify-between items-center")}
+      >
+        <div className="text-xs text-gray-900 text-start overflow-hidden text-ellipsis whitespace-nowrap hover:overflow-visible">
+          {hit.title || "Untitled"}
+        </div>
+        <Check className="w-3 h-3 text-orange-600" />
+      </button>
+    </div>
+  );
+};

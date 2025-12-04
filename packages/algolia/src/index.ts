@@ -1,15 +1,12 @@
 // packages/algolia/src/serverClient.ts
 import { liteClient as algoliasearch } from "algoliasearch/lite";
-// dotenv.config({ path: path.resolve(__dirname, "../.env") });
-
 
 const algoliaClient = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
   process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY!,
 );
 
-
-export {algoliaClient}
+export { algoliaClient };
 // const record = { objectID: "object-1", name: "test record" };
 
 // Add record to an index

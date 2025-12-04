@@ -1,15 +1,10 @@
 "use client";
 
-import React from "react";
 import Select, {
   type Props as SelectProps,
   type StylesConfig,
 } from "react-select";
-
-type Option = {
-  label: string;
-  value: string | number | boolean;
-};
+import type { Option } from "./multiselect";
 
 const selectStyles: StylesConfig<Option, false> = {
   control: (styles) => ({

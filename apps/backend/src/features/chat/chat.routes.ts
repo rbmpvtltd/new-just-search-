@@ -1,4 +1,3 @@
-import { log, profile } from "node:console";
 import { EventEmitter, on } from "node:events";
 import { db, schemas } from "@repo/db";
 import { chatImages, chatSessions } from "@repo/db/dist/schema/chat.schema";
@@ -6,11 +5,8 @@ import { users } from "@repo/db/dist/schema/auth.schema";
 import { profiles } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError, tracked } from "@trpc/server";
-import { secrets } from "bun";
-import { and, asc, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { and, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
 import z from "zod";
-import { id } from "zod/v4/locales";
 import { protectedProcedure, router } from "@/utils/trpc";
 
 const chatMessages = schemas.chat.chatMessages;
@@ -19,9 +15,25 @@ const ee = new EventEmitter();
 export const chatRouter = router({
   onMessage: protectedProcedure
     .input(
-      z.object({ conversationId: z.number(), messageId: z.string().nullish() }),
+      z.object({
+        conversationId: z.number(),
+        lastMessageId: z.number().optional(),
+      }),
     )
     .subscription(async function* ({ input }) {
+      logger.info("input is from onMessage", { input: input });
+
+      // if (input.lastMessageId) {
+      //   const oldMessages = await db.query.chatMessages.findMany({
+      //     where: (chatMessages, { gt, eq }) =>
+      //       eq(chatMessages.chatSessionId, input.conversationId) &&
+      //       gt(chatMessages.id, Number(input.lastMessageId)),
+      //   });
+      //   for (const msg of oldMessages) {
+      //     yield tracked(String(msg.id), msg);
+      //   }
+      // }
+
       // if (input.messageId) {
       //   const lastMessage = await db.query.messages.findMany({
       //     where: (messages, { gt }) => gt(messages.id, Number(input.messageId)),
@@ -32,6 +44,7 @@ export const chatRouter = router({
       //   }
       // }
       for await (const [msg] of on(ee, `message${input.conversationId}`)) {
+        logger.info("msg is from onMessage", { msg: msg });
         yield msg;
       }
     }),
@@ -249,7 +262,7 @@ export const chatRouter = router({
       return messageList;
     }),
 
-  getDisplayNameAndImage: protectedProcedure
+  getOtherUserDisplayNameAndImage: protectedProcedure
     .input(z.object({ conversationId: z.number() }))
     .query(async ({ ctx, input }) => {
       const session = await db.query.chatSessions.findFirst({
@@ -323,7 +336,6 @@ export const chatRouter = router({
   markAsRead: protectedProcedure
     .input(z.object({ messageId: z.array(z.number()) }))
     .mutation(async ({ ctx, input }) => {
-      logger.info("input is", input);
 
       if (input.messageId.length > 0) {
         await db

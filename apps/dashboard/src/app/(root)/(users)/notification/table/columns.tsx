@@ -25,6 +25,25 @@ function ActionCell({ id }: { id: number }) {
   return <EditBanner id={id} />;
 }
 
+function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
+  const allActive = useTableStore((state) => state.active);
+  const toggleActive = useTableStore((state) => state.toggleActive);
+  const isSelected = allActive.filter((item) => item.id === id)[0];
+  const active = isSelected ? isSelected.isActive : isActive;
+  const handleToggle = () => {
+    toggleActive(id, !active);
+  };
+
+  return (
+    <Checkbox
+      checked={active}
+      onCheckedChange={handleToggle}
+      aria-label="Select all"
+      className="translate-y-0.5"
+    />
+  );
+}
+
 function SelectHeader({ ids }: { ids: number[] }) {
   const select = useTableStore((state) => state.select);
   const addSelect = useTableStore((state) => state.addSelect);
@@ -63,11 +82,13 @@ type Feedback = UnwrapArray<FeedbackArray>;
 
 export const columns: ColumnDef<Feedback>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "notificationId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.original.id}</div>,
+    cell: ({ row }) => (
+      <div className="w-20">{row.original.notificationId}</div>
+    ),
     enableHiding: false,
   },
   {
@@ -92,10 +113,23 @@ export const columns: ColumnDef<Feedback>[] = [
     cell: ({ row }) => row.original.role,
   },
   {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Active" />
+    ),
+    cell: ({ row }) => (
+      <ActiveCell
+        id={row.original.notificationId}
+        isActive={row.original.status ?? false}
+      />
+    ),
+  },
+  {
     accessorKey: "created_at",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
-    cell: ({ row }) => row?.original?.createdAt?.toLocaleDateString() ?? "null",
+    cell: ({ row }) =>
+      row?.original?.created_at?.toLocaleDateString() ?? "null",
   },
 ];

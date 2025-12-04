@@ -72,6 +72,7 @@ export default function AllHireListing() {
       <Stack.Screen
         options={{
           title: "All Searched Hires",
+          
         }}
       />
       <FlatList
