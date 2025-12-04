@@ -7,6 +7,7 @@ import React from "react";
 import { IoMdChatboxes } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
+import { User } from 'lucide-react';
 
 const menuItems = [
   { name: "Home", href: "/" },
@@ -88,16 +89,28 @@ export const HeroHeader = () => {
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 md:w-fit">
                 {authenticated.data?.success && (
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="text-primary flex items-center justify-center"
-                  >
-                    <Link href="/chat">
-                      <IoMdChatboxes size={18} />
-                    </Link>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="text-primary flex items-center justify-center border-2 border-primary"
+                    >
+                      <Link href="/chat">
+                        <IoMdChatboxes size={18} />
+                      </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="text-primary flex items-center justify-center border-2 border-primary"
+                    >
+                      <Link href="/profile">
+                        <User size={18} />
+                      </Link>
+                    </Button>
+                  </div>
                 )}
                 {!authenticated.data?.success && (
                   <>
