@@ -1,8 +1,8 @@
+import BusinessHireLogin from "@/components/forms/businessHireLogin";
+import SignupComponent from "@/components/forms/signup";
 import type React from "react";
 import { useState } from "react";
 import { Pressable, Text } from "react-native";
-import BusinessHireLogin from "../../../components/forms/businessHireLogin";
-import SignupComponent from "../../../components/forms/signup";
 
 const LoginComponent: React.FC = () => {
   const [alreadHaveAc, setAlreadyHaveAc] = useState<boolean>(true);
