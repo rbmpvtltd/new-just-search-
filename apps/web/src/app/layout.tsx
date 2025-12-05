@@ -3,6 +3,7 @@ import { HeroHeader } from "@/components/header";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/trpc/client";
+import ClientWrapper from "./ClientWrapper";
 
 export default function RootLayout({
   children,
@@ -19,11 +20,9 @@ export default function RootLayout({
         ></script>
       </head>
       <body>
-        <TRPCReactProvider>
-          <HeroHeader />
+        <ClientWrapper>
           {children}
-          <Toaster />
-        </TRPCReactProvider>
+        </ClientWrapper>
       </body>
     </html>
   );
