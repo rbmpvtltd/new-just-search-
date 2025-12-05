@@ -1,3 +1,4 @@
+"use client"
 import { type ReactNode, Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Spinner } from "@/components/ui/spinner";
