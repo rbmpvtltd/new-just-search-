@@ -23,7 +23,7 @@ async function PremiumShop() {
       </h1>
       <Carousel opts={{ loop: true }} className="w-full ">
         <CarouselContent className="ml-10">
-          {data?.map((item: any, index: number) => {
+          {data?.map((item, index: number) => {
             console.log(item.isFavourite)
             return (
               <CarouselItem
@@ -63,7 +63,7 @@ async function PremiumShop() {
 
                           {item.subcategories
                             .slice(0, 2)
-                            .map((subcategory:string, index:number) => (
+                            .map((subcategory, index) => (
                               <Badge
                                 variant="destructive"
                                 key={index.toString()}

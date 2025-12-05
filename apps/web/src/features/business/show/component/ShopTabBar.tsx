@@ -21,9 +21,6 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
   const trpc = useTRPC();
   const latitude = Number(singleShop?.latitude?.split(",").shift());
   const longitude = Number(singleShop?.longitude?.split(",").pop());
-  const {data} = useQuery(trpc.auth.verifyauth.queryOptions())
-  
-  console.log("user is =====> authenticated?",data?.success)
 
   const handleClick = () => {
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
