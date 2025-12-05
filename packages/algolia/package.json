@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "bun src/index.ts",
-    "build": "bunx tsc -p tsconfig.json"
+    "build": "bun x tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@types/bun": "latest"
