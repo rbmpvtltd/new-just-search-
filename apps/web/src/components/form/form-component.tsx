@@ -195,7 +195,7 @@ export const FormField = <T extends FieldValues>({
                 />
               );
             case "image":
-              return <CropperComponent onChange={onChange} value={value} />;
+              return <CropperComponent onChange={onChange} value={value ?? ""} />;
             case "editor":
               return (
                 <Editor
