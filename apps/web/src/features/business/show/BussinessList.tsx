@@ -20,6 +20,7 @@ function Hit({ hit }: { hit: any }) {
       rating={hit.rating}
       category={hit.category}
       subcategory={hit.subcategory}
+      shopId={hit.objectID}
     />
   );
 }

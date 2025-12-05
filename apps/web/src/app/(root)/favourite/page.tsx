@@ -35,10 +35,11 @@ async function page() {
 
   return (
     <div>
-      {data?.data?.map((item, i) => (
+      {data?.data?.map((item:any, i:number) => (
         <div key={i.toString()}>
           <BussinessListingCard
             item={item.shop[0]}
+            shopId={item.shop[0].id}
             rating={item.rating}
             category={item.category ?? ""}
             subcategory={item.subcategories}
