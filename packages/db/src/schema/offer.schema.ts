@@ -39,6 +39,7 @@ export const offers = pgTable("offers", {
 });
 
 export const offersInsertSchema = createInsertSchema(offers, {
+  mainImage: z.string().min(1, "Image 1 is required"),
   categoryId: () => z.number().min(1, "Category is required"),
   offerName: () =>
     z.string().min(3, "Offer name should be minimum 3 characters long"),
@@ -56,7 +57,6 @@ export const offersInsertSchema = createInsertSchema(offers, {
     subcategoryId: z
       .array(z.number())
       .min(1, "Select at least one subcategory"),
-    photo: z.string().min(1, "Image 1 is required"),
     image2: z.string().optional(),
     image3: z.string().optional(),
     image4: z.string().optional(),

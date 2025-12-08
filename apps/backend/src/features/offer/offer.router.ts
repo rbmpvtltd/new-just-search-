@@ -86,6 +86,7 @@ export const offerrouter = router({
         .values({
           businessId: business.id,
           offerName: input.offerName,
+          mainImage: input.mainImage,
           offerSlug: slugifyName,
           categoryId: input.categoryId,
           rate: input.rate,
@@ -116,7 +117,6 @@ export const offerrouter = router({
       }
 
       const allPhotos = [
-        input.photo,
         input.image2,
         input.image3,
         input.image4,
@@ -278,7 +278,6 @@ export const offerrouter = router({
       );
 
       const allPhotos = [
-        input.photo,
         input.image2,
         input.image3,
         input.image4,

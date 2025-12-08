@@ -12,8 +12,16 @@ import { businessListings } from "@repo/db/dist/schema/business.schema";
 //   cities,
 //   subcategories,
 // } from "@repo/db/dist/schema/not-related.schema";
-import { offers } from "@repo/db/dist/schema/offer.schema";
+import {
+  offerPhotos,
+  offerSubcategory,
+  offers,
+  offersInsertSchema,
+} from "@repo/db/dist/schema/offer.schema";
+import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
+import slugify from "slugify";
+import z from "zod";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -77,51 +85,110 @@ export const adminOfferRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: adminProcedure.query(async () => {
-    return;
+  add: adminProcedure.query(async ({ ctx }) => {
+    const getBusinessCategories = await db.query.categories.findMany({
+      where: (categories, { eq }) => eq(categories.type, 1),
+    });
+    const users = await db.query.users.findMany({
+      where: (user, { eq }) => eq(user.role, "visiter"),
+      columns: {
+        displayName: true,
+        id: true,
+      },
+    });
+    return {
+      users,
+      getBusinessCategories,
+    };
   }),
-  // create: adminProcedure
-  //   .input(
-  //     categoryInsertSchema.omit({
-  //       slug: true,
-  //     }),
-  //   )
-  //   .mutation(async ({ input }) => {
-  //     const slug = slugify(input.title);
-  //     await db.insert(categories).values({ ...input, slug });
-  //     return { success: true };
-  //   }),
-  // edit: adminProcedure
-  //   .input(
-  //     z.object({
-  //       id: z.number(),
-  //     }),
-  //   )
-  //   .query(async ({ input }) => {
-  //     const data = await db
-  //       .select()
-  //       .from(categories)
-  //       .where(eq(categories.id, input.id));
-  //     return data[0];
-  //   }),
-  // update: adminProcedure
-  //   .input(categoryUpdateSchema)
-  //   .mutation(async ({ input }) => {
-  //     const { id, ...updateData } = input;
-  //     if (!id)
-  //       throw new TRPCError({
-  //         code: "BAD_REQUEST",
-  //         message: "Please pass id field",
-  //       });
-  //     const olddata = (
-  //       await db.select().from(categories).where(eq(categories.id, id))
-  //     )[0];
-  //     if (olddata?.photo && olddata?.photo !== updateData.photo) {
-  //       await cloudinaryDeleteImageByPublicId(olddata.photo);
-  //     }
-  //     await db.update(categories).set(updateData).where(eq(categories.id, id));
-  //     return { success: true };
-  //   }),
+
+  getSubCategories: adminProcedure
+    .input(z.object({ categoryId: z.number() }))
+    .query(async ({ input }) => {
+      const businessSubCategories = await db.query.subcategories.findMany({
+        where: (subcategories, { eq }) =>
+          eq(subcategories.categoryId, input.categoryId),
+      });
+      return businessSubCategories;
+    }),
+
+  create: adminProcedure
+    .input(offersInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
+      const slugifyName = slugify(input.offerName, {
+        lower: true,
+        strict: true,
+      });
+
+      const startDate = new Date();
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 5);
+      const [offer] = await db
+        .insert(offers)
+        .values({
+          businessId: business.id,
+          offerName: input.offerName,
+          mainImage: input.mainImage,
+          offerSlug: slugifyName,
+          categoryId: input.categoryId,
+          rate: input.rate,
+          discountPercent: input.discountPercent,
+          finalPrice: input.finalPrice,
+          offerDescription: input.offerDescription,
+          offerStartDate: startDate,
+          offerEndDate: endDate,
+        })
+        .returning({
+          id: offers.id,
+        });
+
+      if (!offer) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Offer not created",
+        });
+      }
+      const offerId = offer.id;
+      if (input.subcategoryId.length > 0) {
+        await db.insert(offerSubcategory).values(
+          input.subcategoryId.map((subCategoryId) => ({
+            offerId,
+            subcategoryId: Number(subCategoryId),
+          })),
+        );
+      }
+
+      const allPhotos = [
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean); // removes empty or null values
+
+      if (allPhotos.length > 0) {
+        await db.insert(offerPhotos).values(
+          allPhotos.map((photo) => ({
+            offerId,
+            photo,
+          })),
+        );
+      }
+
+      return {
+        success: true,
+        message: "Offer added successfully",
+      };
+    }),
   // multidelete: adminProcedure
   //   .input(
   //     z.object({
