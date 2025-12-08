@@ -93,7 +93,7 @@ export const FormField = <T extends FieldValues>({
   const [_, setPlainText] = useState("");
   return (
     <>
-      <View className="flex-row items-center">
+      <View className="flex-row items-center ml-3">
         {!labelHidden && <LableText title={label} />}
         {required && (
           <Text style={{ color: "red" }} className="ml-1 mt-2">
@@ -105,11 +105,13 @@ export const FormField = <T extends FieldValues>({
       <Controller
         control={control}
         name={name}
-        render={({ field: { onChange, onBlur, value } }) => {
+        render={({ field: { onChange, onBlur, value, ref } }) => {
           switch (component) {
             case "input": {
               return (
                 <Input
+                  ref={ref}
+                  className={`${className} w-[90%] m-auto`}
                   placeholder={placeholder}
                   keyboardType={keyboardType}
                   onBlur={() => {
@@ -142,7 +144,8 @@ export const FormField = <T extends FieldValues>({
             case "datepicker": {
               return (
                 <DatePickerComponent
-                  value={value ?? ""}
+                  className={className}
+                  value={value}
                   onChange={onChange}
                   onBlur={onBlur}
                   mode={mode || "date"}

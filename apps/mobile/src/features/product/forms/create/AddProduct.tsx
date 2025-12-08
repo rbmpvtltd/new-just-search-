@@ -1,10 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
   Alert,
   Keyboard,
   ScrollView,
@@ -21,11 +19,9 @@ import {
 import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 
 type AddProductSchema = z.infer<typeof productInsertSchema>;
 export default function AddProduct() {
-  const token = useAuthStore((state) => state.token);
   const { data } = useSuspenseQuery(trpc.productrouter.add.queryOptions());
   const { mutate } = useMutation(
     trpc.productrouter.addProduct.mutationOptions(),
@@ -80,6 +76,7 @@ export default function AddProduct() {
       {
         onSuccess: (data) => {
           if (data.success) {
+            //TODO Add query client
             Alert.alert(data.message);
           }
           // router.push("/");

@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
@@ -13,17 +14,10 @@ import {
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { trpc } from "@/lib/trpc";
-import { fetchVerifyAuth } from "@/query/auth";
-import { useAuthStore } from "@/store/authStore";
-import { setTokenRole } from "@/utils/secureStore";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
 
 export default function DocumentsForm() {
-  const setAuthStoreToken = useAuthStore((state) => state.setToken);
-  const getAuthStoreToken = useAuthStore((state) => state.token);
-  const setFormValue = useHireFormStore((s) => s.setFormValue);
-
   const prevPage = useHireFormStore((s) => s.prevPage);
   const formValue = useHireFormStore((s) => s.formValue);
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
@@ -42,14 +36,25 @@ export default function DocumentsForm() {
     },
   });
   const onSubmit = async (data: DocumentSchema) => {
-    setFormValue("idProof", data.idProof);
-    setFormValue("idProofPhoto", data.idProofPhoto ?? "");
-    setFormValue("coverLetter", data.coverLetter ?? "");
-    setFormValue("resumePhoto", data.resumePhoto ?? "");
-    setFormValue("aboutYourself", data.aboutYourself ?? "");
-    console.log("Form Value", formValue);
-
-    mutate(formValue, {
+    // setFormValue("idProof", data.idProof);
+    // setFormValue("idProofPhoto", data.idProofPhoto ?? "");
+    // setFormValue("coverLetter", data.coverLetter ?? "");
+    // setFormValue("resumePhoto", data.resumePhoto ?? "");
+    // setFormValue("aboutYourself", data.aboutYourself ?? "");
+    const mergedData = { ...formValue, ...data };
+    const files = await uploadToCloudinary(
+      [data.idProofPhoto, data.resumePhoto],
+      "hire",
+    );
+    const finalData = {
+      ...mergedData,
+      idProofPhoto: files[0] ?? "",
+      resumePhoto: files[1] ?? "",
+    };
+    useHireFormStore.setState((state) => ({
+      formValue: finalData,
+    }));
+    mutate(finalData, {
       onSuccess: async (data) => {
         if (data?.success) {
           // const verifyAuth = await fetchVerifyAuth(getAuthStoreToken);
@@ -58,11 +63,22 @@ export default function DocumentsForm() {
           Alert.alert("listing added successfully");
         }
       },
-      // onError: (error) => {
-      //   if (isTRPCClientError(error)) {
-      //     console.log("Error", error);
-      //   }
-      // },
+      onError: (error) => {
+        console.log("On Error", error.message);
+
+        // const message = Array.isArray(error)
+        //   ? error[0]?.message
+        //   : error.message;
+
+        // console.log("Message", error);
+
+        // Alert.alert("On Error", message[0].message || "Something went wrong");
+
+        if (isTRPCClientError(error)) {
+          Alert.alert("Something went wrong", "Some fields are missing");
+          console.log("Error", error);
+        }
+      },
     });
   };
 
@@ -87,8 +103,9 @@ export default function DocumentsForm() {
       name: "idProofPhoto",
       label: "ID Proof Photo",
       component: "image",
+      placeholder: "Select ID Proof Photo",
       className: "w-[100%]",
-
+      required: false,
       error: errors.idProofPhoto?.message,
     },
     {
@@ -96,7 +113,8 @@ export default function DocumentsForm() {
       name: "coverLetter",
       label: "Cover Letter",
       component: "textarea",
-      className: " mx-aw-[90%] bg-base-200",
+      className: " mx-auto w-[90%] bg-base-200",
+      required: false,
       error: errors.coverLetter?.message,
     },
     {
@@ -104,7 +122,9 @@ export default function DocumentsForm() {
       name: "resumePhoto",
       label: "Resume Photo",
       component: "image",
+      placeholder: "Select Resume Photo",
       className: "w-[100%]",
+      required: false,
       error: errors.resumePhoto?.message?.toString(),
     },
     {
@@ -113,6 +133,7 @@ export default function DocumentsForm() {
       label: "Describe About Yourself",
       component: "textarea",
       className: "mx-auto w-[90%] bg-base-200",
+      required: false,
       error: errors.aboutYourself?.message,
     },
   ];
@@ -129,7 +150,7 @@ export default function DocumentsForm() {
             <FormField key={idx.toString()} {...field} />
           ))}
         </View>
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
           <View className="w-[45%]">
             <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
           </View>

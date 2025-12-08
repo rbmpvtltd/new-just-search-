@@ -3,26 +3,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { businessDetailSchema } from "@repo/db/dist/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
-import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
-import { useTRPC } from "@/trpc/client";
-import type { FormReferenceDataType, UserBusinessListingType } from "..";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { useTRPC } from "@/trpc/client";
+import { useBusinessFormStore } from "../../../shared/store/useCreateBusinessStore";
+import type { EditAdminBusinessType } from "..";
 
-type BusinessDetailSchema = z.infer<typeof businessDetailSchema>;
+const adminBusinessDetailSchema = businessDetailSchema.extend({
+  userId: z.number(),
+});
+type BusinessDetailSchema = z.infer<typeof adminBusinessDetailSchema>;
 export default function BusinessDetail({
-  businessListing,
-  formReferenceData,
+  data,
 }: {
-  businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
+  data: EditAdminBusinessType;
 }) {
   const trpc = useTRPC();
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
@@ -33,31 +34,30 @@ export default function BusinessDetail({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<BusinessDetailSchema>({
-    resolver: zodResolver(businessDetailSchema),
+    resolver: zodResolver(adminBusinessDetailSchema),
     defaultValues: {
-      photo: businessListing?.photo,
-      name: businessListing?.name,
-      categoryId: businessListing?.category.id,
-      subcategoryId: businessListing?.subcategory?.map((item) => item.id),
-      specialities: businessListing?.specialities ?? "",
-      homeDelivery: businessListing?.homeDelivery ?? "",
-      description: businessListing?.description ?? "",
-      image1: businessListing?.businessPhotos[0]?.photo ?? "",
-      image2: businessListing?.businessPhotos[1]?.photo ?? "",
-      image3: businessListing?.businessPhotos[2]?.photo ?? "",
-      image4: businessListing?.businessPhotos[3]?.photo ?? "",
-      image5: businessListing?.businessPhotos[4]?.photo ?? "",
+      userId: data?.business?.userId,
+      photo: data?.business?.photo,
+      name: data?.business?.name,
+      categoryId: data?.category?.categoryId,
+      subcategoryId: data?.subcategories?.map((item) => item.subcategoryId),
+      specialities: data?.business?.specialities ?? "",
+      homeDelivery: data?.business?.homeDelivery ?? "",
+      description: data?.business?.description ?? "",
+      image1: data?.businessPhotos[0]?.photo ?? "",
+      image2: data?.businessPhotos[1]?.photo ?? "",
+      image3: data?.businessPhotos[2]?.photo ?? "",
+      image4: data?.businessPhotos[3]?.photo ?? "",
+      image5: data?.businessPhotos[4]?.photo ?? "",
     },
   });
 
-  const categories = formReferenceData?.getBusinessCategories.map(
-    (item: any) => {
-      return {
-        label: item.title,
-        value: item.id,
-      };
-    },
-  );
+  const categories = data?.getBusinessCategories.map((item) => {
+    return {
+      label: item.title,
+      value: item.id,
+    };
+  });
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
   const { data: subCategories, isLoading } = useQuery(
     trpc.businessrouter.getSubCategories.queryOptions({
@@ -78,7 +78,6 @@ export default function BusinessDetail({
       label: "Business Name",
       name: "name",
       placeholder: "Business Name",
-      disabled: true,
       component: "input",
       error: errors.name?.message,
     },
@@ -88,7 +87,6 @@ export default function BusinessDetail({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
-      disabled: true,
       options:
         categories?.map((item) => ({ label: item.label, value: item.value })) ??
         [],
@@ -203,6 +201,7 @@ export default function BusinessDetail({
       "business",
     );
 
+    setFormValue("userId", data.userId);
     setFormValue("photo", files[0] ?? "");
     setFormValue("name", data.name ?? "");
     setFormValue("categoryId", data.categoryId ?? "");

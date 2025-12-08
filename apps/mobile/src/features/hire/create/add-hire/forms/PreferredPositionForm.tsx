@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { preferredPositionSchema } from "@repo/db/dist/schema/hire.schema";
 import {
   JobDuration,
   JobType,
   WorkShift,
 } from "@repo/db/dist/enum/allEnum.enum";
+import { preferredPositionSchema } from "@repo/db/dist/schema/hire.schema";
 import { useForm } from "react-hook-form";
 import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -34,7 +34,8 @@ export default function PreferredPositionForm() {
       workShift: formValue.workShift ?? "",
       expectedSalaryFrom: formValue.expectedSalaryFrom ?? "",
       expectedSalaryTo: formValue.expectedSalaryTo ?? "",
-      preferredWorkingHours: formValue.preferredWorkingHours ?? "",
+      fromHour: formValue.fromHour ?? "",
+      toHour: formValue.toHour ?? "",
       jobDuration: formValue.jobDuration ?? "",
       availability: formValue.availability ?? "",
       relocate: formValue.relocate ?? "",
@@ -47,10 +48,8 @@ export default function PreferredPositionForm() {
     setFormValue("workShift", data.workShift);
     setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
     setFormValue("expectedSalaryTo", data.expectedSalaryTo ?? "");
-    // setFormValue("from_hour", data.from_hour);
-    // setFormValue("from_period", data.from_period);
-    // setFormValue("to_hour", data.to_hour);
-    // setFormValue("to_period", data.to_period);
+    setFormValue("fromHour", data.fromHour ?? "");
+    setFormValue("toHour", data.toHour ?? "");
     setFormValue("jobDuration", data.jobDuration);
     setFormValue("relocate", data.relocate ?? "");
     setFormValue("availability", data.availability ?? "");
@@ -67,7 +66,6 @@ export default function PreferredPositionForm() {
         label: jobType,
         value: jobType,
       })),
-
       error: errors.jobType?.message,
     },
     {
@@ -75,7 +73,7 @@ export default function PreferredPositionForm() {
       name: "locationPreferred",
       label: "Location Preference",
       component: "input",
-      className: "w-[90%] bg-base-200",
+      required: false,
       placeholder: "e.g. Delhi, Mumbai, Pune, etc.",
       error: errors.locationPreferred?.message,
     },
@@ -97,7 +95,7 @@ export default function PreferredPositionForm() {
       placeholder: "Enter your salary expectation",
       keyboardType: "numeric",
       component: "input",
-      className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.expectedSalaryFrom?.message,
     },
     {
@@ -107,7 +105,7 @@ export default function PreferredPositionForm() {
       placeholder: "Enter your salary expectation",
       keyboardType: "numeric",
       component: "input",
-      className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.expectedSalaryTo?.message,
     },
     {
@@ -124,7 +122,7 @@ export default function PreferredPositionForm() {
     {
       control,
       name: "relocate",
-      label: "relocate?",
+      label: "Relocate?",
       component: "dropdown",
       data: [
         {
@@ -136,6 +134,7 @@ export default function PreferredPositionForm() {
           value: "no",
         },
       ],
+      required: false,
       dropdownPosition: "top",
       placeholder: "Select Option",
       error: errors.relocate?.message,
@@ -145,7 +144,7 @@ export default function PreferredPositionForm() {
       name: "availability",
       label: "Availability for Interview?",
       component: "input",
-      className: "w-[90%] bg-base-200",
+      required: false,
       error: errors.availability?.message,
     },
   ];
@@ -161,87 +160,39 @@ export default function PreferredPositionForm() {
           {formFields.map((field, idx) => (
             <FormField key={field.name} {...field} />
           ))}
-          {/* --- Working Hour From --- */}
-          <View className="w-[90%] mx-auto mt-4">
-            <Text className="text-secondary font-medium mb-2">
+          <View className="w-[90%] mt-4">
+            <Text className="text-secondary ml-4 font-medium">
               Working Hour From
             </Text>
-            {/* <View className="flex-row gap-x-2 ">
-              <View className="flex-1 ">
-                <FormField
-                  control={control}
-                  name="from_hour"
-                  component="dropdown"
-                  data={hours}
-                  className="bg-base-200 rounded-md"
-                  error={errors.from_hour?.message}
-                  label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Hour"
-                />
-              </View>
-              <View className="flex-1">
-                <FormField
-                  control={control}
-                  name="from_period"
-                  component="dropdown"
-                  data={[
-                    { label: "AM", value: "AM" },
-                    { label: "PM", value: "PM" },
-                  ]}
-                  className="bg-base-200 rounded-md"
-                  error={errors.from_period?.message}
-                  label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Period"
-                />
-              </View>
-            </View> */}
-          </View>
-
-          {/* --- Working Hour To --- */}
-          <View className="w-[90%] mx-auto mt-4">
-            <Text className="text-secondary font-medium mb-2">
-              Working Hour To
-            </Text>
-            {/* <View className="flex-row gap-x-2 w-[100%]">
-              <View className="flex-1">
-                <FormField
-                  control={control}
-                  name="to_hour"
-                  component="dropdown"
-                  data={hours}
-                  className="bg-base-200 rounded-md"
-                  error={errors.to_hour?.message}
-                  label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Hour"
-                />
-              </View>
-              <View className="flex-1">
-                <FormField
-                  control={control}
-                  name="to_period"
-                  component="dropdown"
-                  data={[
-                    { label: "AM", value: "AM" },
-                    { label: "PM", value: "PM" },
-                  ]}
-                  className="bg-base-200 w-[35%] rounded-md"
-                  error={errors.to_period?.message}
-                  label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Period"
-                />
-              </View>
-            </View> */}
+            <View className="flex-row mt-4 w-[50%]">
+              {/* <View className="flex"> */}
+              <FormField
+                label=""
+                control={control}
+                name="fromHour"
+                component="datepicker"
+                mode="time"
+                // className="w-[20%] mt-0"
+                required={false}
+                placeholder="Opening Time"
+              />
+              {/* </View> */}
+              {/* <View className="flex"> */}
+              <FormField
+                label=""
+                control={control}
+                name="toHour"
+                component="datepicker"
+                mode="time"
+                className="w-[20%] mt-0"
+                required={false}
+                placeholder="AM/PM"
+              />
+              {/* </View> */}
+            </View>
           </View>
         </View>
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
           <View className="w-[45%]">
             <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
           </View>

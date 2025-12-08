@@ -1,4 +1,8 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 import { useBusinessFormStore } from "../../shared/store/useCreateBusinessStore";
 import AddressDetail from "./forms/AddressDetail";
@@ -10,12 +14,28 @@ export type AddBusinessPageType =
   | OutputTrpcType["businessrouter"]["add"]
   | null;
 
-export default function AddBusinessPage({
-  data,
-}: {
-  data: AddBusinessPageType;
-}) {
+export default function CreateBusinessListing() {
+  const [oprn, setOpen] = useState(true);
+  return oprn ? (
+    <Button onClick={() => setOpen(false)}>add business</Button>
+  ) : (
+    <AddBusinessPage />
+  );
+}
+function AddBusinessPage() {
+  const trpc = useTRPC();
+  const { data, error, isLoading, isError } = useQuery(
+    trpc.businessrouter.add.queryOptions(),
+  );
   const page = useBusinessFormStore((state) => state.page);
+  if (isError) {
+    console.log(error);
+    return <div>Something went wrong</div>;
+  }
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (!data) return <div>Something went wrong</div>;
   const steps = [
     "Business Details",
     "Address Details",

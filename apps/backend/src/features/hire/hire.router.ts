@@ -80,32 +80,14 @@ export const hirerouter = router({
         });
       }
 
-      let existingHire: any = null;
-      try {
-        existingHire = await db.query.hireListing.findFirst({
-          where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
-        });
-      } catch (error) {
-        logger.error("Error in existingHire:", error);
-        return;
-      }
+      const existingHire = await db.query.hireListing.findFirst({
+        where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
+      });
 
-      logger.info("existingHire", existingHire);
       if (existingHire) {
         throw new TRPCError({
           code: "CONFLICT",
           message: "User already have hire listing",
-        });
-      }
-
-      const existingEmail = await db.query.hireListing.findFirst({
-        where: (hireListing, { eq }) =>
-          eq(hireListing.email, String(input.email)),
-      });
-      if (existingEmail) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Email address already exist",
         });
       }
 
@@ -177,6 +159,8 @@ export const hirerouter = router({
           certificates: input.certificates,
           expectedSalaryFrom: input.expectedSalaryFrom,
           expectedSalaryTo: input.expectedSalaryTo,
+          fromHour: input.fromHour,
+          toHour: input.toHour,
           relocate: input.relocate,
           availability: input.availability,
           idProof: input.idProof,
@@ -197,7 +181,6 @@ export const hirerouter = router({
           linkedin: "",
           views: 0,
           isFeature: false,
-          preferredWorkingHours: "",
           status: "Pending",
           website: "",
         })
@@ -314,7 +297,8 @@ export const hirerouter = router({
           certificates: input.certificates,
           expectedSalaryFrom: input.expectedSalaryFrom,
           expectedSalaryTo: input.expectedSalaryTo,
-          preferredWorkingHours: input.preferredWorkingHours,
+          fromHour: input.fromHour,
+          toHour: input.toHour,
           employmentStatus: input.employmentStatus,
           relocate: input.relocate,
           availability: input.availability,

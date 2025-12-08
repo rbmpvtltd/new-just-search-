@@ -88,12 +88,6 @@ export default function PersonalDetailsForm({
     }),
   );
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (cityLoading) {
-    return <div>Loading...</div>;
-  }
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
     {
       control,
@@ -125,6 +119,7 @@ export default function PersonalDetailsForm({
       name: "subcategoryId",
       placeholder: "Select Sub Category",
       component: "multiselect",
+      loading: isLoading,
       section: "profile",
       options: subCategories?.map((item) => ({
         label: item.name,

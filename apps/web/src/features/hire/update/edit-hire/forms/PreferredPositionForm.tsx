@@ -31,15 +31,12 @@ export default function PreferredPositionForm({
     defaultValues: {
       jobType: hireListing?.jobType ?? [],
       locationPreferred: hireListing?.locationPreferred ?? "",
-      relocate: hireListing?.relocate ?? undefined,
+      relocate: hireListing?.relocate ?? "",
       expectedSalaryFrom: hireListing?.expectedSalaryFrom ?? "",
       expectedSalaryTo: hireListing?.expectedSalaryTo ?? "",
       jobDuration: hireListing?.jobDuration ?? [],
-      // fromHour: formValue.fromHour ?? undefined,
-      // fromPeriod: formValue.fromPeriod ?? undefined,
-      // toHour: formValue.toHour ?? undefined,
-      // toPeriod: formValue.toPeriod ?? undefined,
-      preferredWorkingHours: hireListing?.preferredWorkingHours ?? "",
+      fromHour: hireListing?.fromHour ?? "",
+      toHour: hireListing?.toHour ?? "",
       workShift: hireListing?.workShift ?? [],
       availability: hireListing?.availability ?? "",
     },
@@ -52,11 +49,8 @@ export default function PreferredPositionForm({
     setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
     setFormValue("expectedSalaryTo", data.expectedSalaryTo ?? "");
     setFormValue("jobDuration", data.jobDuration ?? "");
-    // setFormValue("fromHour", data.fromHour ?? undefined);
-    // setFormValue("fromPeriod", data.fromPeriod ?? undefined);
-    // setFormValue("toHour", data.toHour ?? undefined);
-    // setFormValue("toPeriod", data.toPeriod ?? undefined);
-    setFormValue("preferredWorkingHours", data.preferredWorkingHours ?? "");
+    setFormValue("fromHour", data.fromHour ?? undefined);
+    setFormValue("toHour", data.toHour ?? undefined);
     setFormValue("workShift", data.workShift ?? "");
     setFormValue("availability", data.availability ?? "");
     nextPage();
@@ -96,25 +90,6 @@ export default function PreferredPositionForm({
                 component="input"
                 required={false}
                 error={errors.locationPreferred?.message}
-              />
-              <FormField
-                type=""
-                control={control}
-                label="Relocate"
-                name="relocate"
-                component="select"
-                options={[
-                  {
-                    label: "Yes",
-                    value: "yes",
-                  },
-                  {
-                    label: "No",
-                    value: "no",
-                  },
-                ]}
-                required={false}
-                error={errors.relocate?.message}
               />
             </div>
             <h3 className="text-base font-medium text-gray-700 mt-3">
@@ -166,78 +141,43 @@ export default function PreferredPositionForm({
                   Perffered Working Hours
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  {/* <FormField
-                        type=""
-                        control={control}
-                        label="From Hour"
-                        name="fromHour"
-                        component="select"
-                        options={[
-                          { label: "1", value: "1" },
-                          { label: "2", value: "2" },
-                          { label: "3", value: "3" },
-                          { label: "4", value: "4" },
-                          { label: "5", value: "5" },
-                          { label: "6", value: "6" },
-                          { label: "7", value: "7" },
-                          { label: "8", value: "8" },
-                          { label: "9", value: "9" },
-                          { label: "10", value: "10" },
-                          { label: "11", value: "11" },
-                          { label: "12", value: "12" },
-                        ]}
-                        required={false}
-                        error={errors.fromHour?.message}
-                      />
-                      <FormField
-                        type=""
-                        control={control}
-                        label="From Period"
-                        name="fromPeriod"
-                        component="select"
-                        options={[
-                          { label: "AM", value: "AM" },
-                          { label: "PM", value: "PM" },
-                        ]}
-                        required={false}
-                        error={errors.fromPeriod?.message}
-                      />
-                      <FormField
-                        type=""
-                        control={control}
-                        label="To Hour"
-                        name="toHour"
-                        component="select"
-                        options={[
-                          { label: "1", value: "1" },
-                          { label: "2", value: "2" },
-                          { label: "3", value: "3" },
-                          { label: "4", value: "4" },
-                          { label: "5", value: "5" },
-                          { label: "6", value: "6" },
-                          { label: "7", value: "7" },
-                          { label: "8", value: "8" },
-                          { label: "9", value: "9" },
-                          { label: "10", value: "10" },
-                          { label: "11", value: "11" },
-                          { label: "12", value: "12" },
-                        ]}
-                        required={false}
-                        error={errors.toHour?.message}
-                      />
-                      <FormField
-                        type=""
-                        control={control}
-                        label="To Period"
-                        name="toPeriod"
-                        component="select"
-                        options={[
-                          { label: "AM", value: "AM" },
-                          { label: "PM", value: "PM" },
-                        ]}
-                        required={false}
-                        error={errors.toPeriod?.message}
-                      /> */}
+                  <FormField
+                    type="time"
+                    control={control}
+                    label="From Hour"
+                    name="fromHour"
+                    component="input"
+                    required={false}
+                    error={errors.fromHour?.message}
+                  />
+                  <FormField
+                    type="time"
+                    control={control}
+                    label="To Hour"
+                    name="toHour"
+                    component="input"
+                    required={false}
+                    error={errors.toHour?.message}
+                  />
+                  <FormField
+                    type=""
+                    control={control}
+                    label="Relocate"
+                    name="relocate"
+                    component="select"
+                    options={[
+                      {
+                        label: "Yes",
+                        value: "yes",
+                      },
+                      {
+                        label: "No",
+                        value: "no",
+                      },
+                    ]}
+                    required={false}
+                    error={errors.relocate?.message}
+                  />
                 </div>
               </div>
             </div>

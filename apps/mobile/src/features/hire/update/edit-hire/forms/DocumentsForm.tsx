@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
@@ -12,7 +13,6 @@ import {
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 import type { UserHireListingType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
@@ -22,8 +22,6 @@ export default function DocumentsForm({
 }: {
   hireListing: UserHireListingType;
 }) {
-  const setAuthStoreToken = useAuthStore((state) => state.setToken);
-  const getAuthStoreToken = useAuthStore((state) => state.token);
   const setFormValue = useHireFormStore((s) => s.setFormValue);
   const prevPage = useHireFormStore((s) => s.prevPage);
   const formValue = useHireFormStore((s) => s.formValue);
@@ -43,14 +41,25 @@ export default function DocumentsForm({
     },
   });
   const onSubmit = async (data: DocumentSchema) => {
-    setFormValue("idProof", data.idProof);
-    setFormValue("idProofPhoto", data.idProofPhoto ?? "");
-    setFormValue("coverLetter", data.coverLetter ?? "");
-    setFormValue("resumePhoto", data.resumePhoto ?? "");
-    setFormValue("aboutYourself", data.aboutYourself ?? "");
-
-    console.log("Form Value", formValue);
-    mutate(formValue, {
+    // setFormValue("idProof", data.idProof);
+    // setFormValue("idProofPhoto", data.idProofPhoto ?? "");
+    // setFormValue("coverLetter", data.coverLetter ?? "");
+    // setFormValue("resumePhoto", data.resumePhoto ?? "");
+    // setFormValue("aboutYourself", data.aboutYourself ?? "");
+    const mergedData = { ...formValue, ...data };
+    const files = await uploadToCloudinary(
+      [data.idProofPhoto, data.resumePhoto],
+      "hire",
+    );
+    const finalData = {
+      ...mergedData,
+      idProofPhoto: files[0] ?? "",
+      resumePhoto: files[1] ?? "",
+    };
+    useHireFormStore.setState((state) => ({
+      formValue: finalData,
+    }));
+    mutate(finalData, {
       onSuccess: async (data) => {
         if (data?.success) {
           // const verifyAuth = await fetchVerifyAuth(getAuthStoreToken);
