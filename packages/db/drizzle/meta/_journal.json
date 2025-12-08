@@ -8,6 +8,13 @@
       "when": 1765169275629,
       "tag": "0000_large_loners",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765192907619,
+      "tag": "0001_rich_skin",
+      "breakpoints": true
     }
   ]
 }
