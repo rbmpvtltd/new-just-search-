@@ -17,12 +17,12 @@ export const dummyImageUrl = "dummyImageUrl";
 (async () => {
   try {
     // Postgres seeding
-    await notRelated();
+    // await notRelated();
     await userSeed();
     await fakeSeed();
     // await businessSeed();
-    await hireSeed();
-    await productSeed();
+    // await hireSeed();
+    // await productSeed();
     // await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();

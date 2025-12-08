@@ -27,11 +27,13 @@ export const offers = pgTable("offers", {
   offerSlug: varchar("offer_slug", { length: 255 }),
   rate: integer("rate").notNull(),
   discountPercent: integer("discount_percent"),
+  mainImage: varchar("main_image", { length: 255 }).notNull(),
   finalPrice: integer("final_price").notNull(),
   offerDescription: text("offer_description").notNull(),
   offerStartDate: timestamp("offer_start_date").notNull(),
   offerEndDate: timestamp("offer_end_date").notNull(),
   reuploadCount: integer("reupload_count").default(0).notNull(),
+  status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

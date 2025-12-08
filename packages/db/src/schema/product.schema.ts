@@ -29,6 +29,7 @@ export const products = pgTable("products", {
   rate: integer("rate").notNull(),
   discountPercent: integer("discount_percent"),
   finalPrice: integer("final_price"),
+  status: boolean("status").notNull().default(true),
   productDescription: text("product_description").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
