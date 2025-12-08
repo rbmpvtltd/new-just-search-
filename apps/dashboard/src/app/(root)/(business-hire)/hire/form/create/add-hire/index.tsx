@@ -7,12 +7,12 @@ import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
 
-export type AddHirePageType = OutputTrpcType["adminHireRouter"]["add"];
+export type AddAdminHireType = OutputTrpcType["adminHireRouter"]["add"];
 export function AddHirePage({
   data,
   setOpen,
 }: {
-  data: AddHirePageType;
+  data: AddAdminHireType;
   setOpen: SetOpen;
 }) {
   const page = useHireFormStore((state) => state.page);

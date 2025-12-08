@@ -10,14 +10,14 @@ import type z from "zod";
 import { FormField } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
-import type { UserHireListingType } from "..";
+import { useHireFormStore } from "../../../shared/store/useCreateHireStore";
+import type { EditAdminHireType } from "..";
 
 type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
 export default function PreferredPositionForm({
-  hireListing,
+  data,
 }: {
-  hireListing: UserHireListingType;
+  data: EditAdminHireType;
 }) {
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const prevPage = useHireFormStore((state) => state.prevPage);
@@ -29,19 +29,19 @@ export default function PreferredPositionForm({
   } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
-      jobType: hireListing?.jobType ?? [],
-      locationPreferred: hireListing?.locationPreferred ?? "",
-      relocate: hireListing?.relocate ?? undefined,
-      expectedSalaryFrom: hireListing?.expectedSalaryFrom ?? "",
-      expectedSalaryTo: hireListing?.expectedSalaryTo ?? "",
-      jobDuration: hireListing?.jobDuration ?? [],
+      jobType: data?.hire?.jobType ?? [],
+      locationPreferred: data?.hire?.locationPreferred ?? "",
+      relocate: data?.hire?.relocate ?? undefined,
+      expectedSalaryFrom: data?.hire?.expectedSalaryFrom ?? "",
+      expectedSalaryTo: data?.hire?.expectedSalaryTo ?? "",
+      jobDuration: data?.hire?.jobDuration ?? [],
       // fromHour: formValue.fromHour ?? undefined,
       // fromPeriod: formValue.fromPeriod ?? undefined,
       // toHour: formValue.toHour ?? undefined,
       // toPeriod: formValue.toPeriod ?? undefined,
-      preferredWorkingHours: hireListing?.preferredWorkingHours ?? "",
-      workShift: hireListing?.workShift ?? [],
-      availability: hireListing?.availability ?? "",
+      preferredWorkingHours: data?.hire?.preferredWorkingHours ?? "",
+      workShift: data?.hire?.workShift ?? [],
+      availability: data?.hire?.availability ?? "",
     },
   });
 

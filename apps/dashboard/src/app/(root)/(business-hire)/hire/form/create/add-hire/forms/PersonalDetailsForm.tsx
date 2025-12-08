@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { useHireFormStore } from "../../../shared/store/useCreateHireStore";
-import type { AddHirePageType } from "..";
+import type { AddAdminHireType } from "..";
 
 export const adminPersonalDetailsHireSchema = personalDetailsHireSchema.extend({
   userId: z.number(),
@@ -26,7 +26,7 @@ type PersonalDetailsSchema = z.infer<typeof adminPersonalDetailsHireSchema>;
 export default function PersonalDetailsForm({
   data,
 }: {
-  data: AddHirePageType;
+  data: AddAdminHireType;
 }) {
   const trpc = useTRPC();
   const nextPage = useHireFormStore((s) => s.nextPage);

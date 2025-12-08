@@ -19,9 +19,9 @@ import {
   jobTypeEnum,
   MaritalStatus,
   maritalStatusEnum,
+  statusEnum,
   WorkShift,
   workShiftEnum,
-  statusEnum,
 } from "../enum/allEnum.enum";
 import {
   categories,

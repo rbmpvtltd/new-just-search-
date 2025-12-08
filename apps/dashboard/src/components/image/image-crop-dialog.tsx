@@ -164,9 +164,15 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
           </select>
         </div>
         <div className="button-area">
-          <Button onClick={handleCancel}>Cancel</Button>
-          <Button onClick={onResetImage}>Reset</Button>
-          <Button onClick={onCrop}>Crop</Button>
+          <Button type="button" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button type="button" onClick={onResetImage}>
+            Reset
+          </Button>
+          <Button type="button" onClick={onCrop}>
+            Crop
+          </Button>
         </div>
       </div>
     </div>

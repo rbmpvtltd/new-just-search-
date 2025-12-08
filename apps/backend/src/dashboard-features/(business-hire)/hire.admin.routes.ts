@@ -6,15 +6,13 @@ import {
   hireInsertSchema,
   hireListing,
   hireSubcategories,
+  hireUpdateSchema,
 } from "@repo/db/dist/schema/hire.schema";
 import {
   categories,
-  categoryInsertSchema,
-  categoryUpdateSchema,
   cities,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
-import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";
@@ -327,30 +325,139 @@ export const adminHireRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+      const getHireCategories = await db.query.categories.findMany({
+        where: (categories, { eq }) => eq(categories.type, 2),
+        columns: {
+          title: true,
+          id: true,
+        },
+      });
+      const getStates = await db.query.states.findMany();
+      const hire = await db.query.hireListing.findFirst({
+        where: (hire, { eq }) => eq(hire.id, input.id),
+      });
+      const category = await db.query.hireCategories.findFirst({
+        where: (hireCategory, { eq }) => eq(hireCategory.hireId, input.id),
+        columns: {
+          categoryId: true,
+        },
+      });
+      const subcategory = await db.query.hireSubcategories.findMany({
+        where: (hireSubCategory, { eq }) =>
+          eq(hireSubCategory.hireId, input.id),
+        columns: {
+          subcategoryId: true,
+        },
+      });
+      return {
+        hire,
+        category,
+        subcategory,
+        getHireCategories,
+        getStates,
+      };
     }),
-  update: adminProcedure
-    .input(categoryUpdateSchema)
-    .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      if (!id)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please pass id field",
-        });
-      const olddata = (
-        await db.select().from(categories).where(eq(categories.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
-      }
-      await db.update(categories).set(updateData).where(eq(categories.id, id));
-      return { success: true };
-    }),
+  update: adminProcedure.input(hireUpdateSchema).mutation(async ({ input }) => {
+    //TODO: delete photo from cloudinary
+    const isHireExists = await db.query.hireListing.findFirst({
+      where: (hireListing, { eq }) =>
+        eq(hireListing.userId, Number(input.userId)),
+    });
+
+    if (!isHireExists) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Hire listing not found",
+      });
+    }
+
+    const updateHire = await db
+      .update(hireListing)
+      .set({
+        name: input.name,
+        photo: input.photo,
+        fatherName: input.fatherName,
+        dob: input.dob,
+        gender: input.gender,
+        maritalStatus: input.maritalStatus,
+        languages: Array.isArray(input.languages)
+          ? input.languages
+          : JSON.parse(input.languages || "[]"),
+        slug: input.name,
+        specialities: input.specialities,
+        description: input.description,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        area: input.area,
+        pincode: input.pincode,
+        state: input.state,
+        city: input.city,
+        email: input.email,
+        mobileNumber: input.mobileNumber,
+        alternativeMobileNumber: input.alternativeMobileNumber,
+        highestQualification: input.highestQualification,
+        workExperienceYear: input.workExperienceYear,
+        workExperienceMonth: input.workExperienceMonth,
+        jobRole: input.jobRole,
+        previousJobRole: input.previousJobRole,
+        skillset: input.skillset,
+        jobType: Array.isArray(input.jobType)
+          ? input.jobType
+          : JSON.parse(input.jobType || "[]"),
+        jobDuration: Array.isArray(input.jobDuration)
+          ? input.jobDuration
+          : JSON.parse(input.jobDuration || "[]"),
+        workShift: Array.isArray(input.workShift)
+          ? input.workShift
+          : JSON.parse(input.workShift || "[]"),
+        locationPreferred: input.locationPreferred,
+        certificates: input.certificates,
+        expectedSalaryFrom: input.expectedSalaryFrom,
+        expectedSalaryTo: input.expectedSalaryTo,
+        preferredWorkingHours: input.preferredWorkingHours,
+        employmentStatus: input.employmentStatus,
+        relocate: input.relocate,
+        availability: input.availability,
+        idProof: input.idProof,
+        idProofPhoto: input.idProofPhoto,
+        coverLetter: input.coverLetter,
+        resumePhoto: input.resumePhoto,
+        aboutYourself: input.aboutYourself,
+      })
+      .where(eq(hireListing.userId, isHireExists.userId));
+
+    // return { updateHire: updateHire };
+    if (!updateHire) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong",
+      });
+    }
+
+    await db
+      .delete(hireSubcategories)
+      .where(eq(hireSubcategories.hireId, isHireExists.id));
+
+    await db.insert(hireSubcategories).values(
+      input.subcategoryId.map((subCategoryId) => ({
+        subcategoryId: subCategoryId,
+        hireId: isHireExists.id,
+      })),
+    );
+
+    await db
+      .delete(hireCategories)
+      .where(eq(hireCategories.hireId, isHireExists.id));
+
+    await db.insert(hireCategories).values({
+      categoryId: input.categoryId,
+      hireId: isHireExists.id,
+    });
+    return {
+      success: true,
+      message: "Hire listing updated successfully",
+    };
+  }),
   multidelete: adminProcedure
     .input(
       z.object({

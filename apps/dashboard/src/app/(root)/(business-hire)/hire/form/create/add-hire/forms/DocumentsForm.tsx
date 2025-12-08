@@ -26,7 +26,10 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
   const formValue = useHireFormStore((state) => state.formValue);
-  const { prevPage, clearPage, setFormValue } = useHireFormStore();
+  const prevPage = useHireFormStore((state) => state.prevPage);
+  const clearPage = useHireFormStore((state) => state.clearPage);
+  const setFormValue = useHireFormStore((state) => state.setFormValue);
+
   const {
     control,
     handleSubmit,
