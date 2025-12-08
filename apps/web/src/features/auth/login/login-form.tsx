@@ -54,8 +54,8 @@ export function LoginForm({
 
   function onSubmit(data: { username: string; password: string }) {
     mutate(data, {
-      onSuccess: (data) => {
-        setToken(data?.session || "");
+      onSuccess:async (data) => {
+        await setToken(data?.session || "");
         setRole(data?.role || "");
       },
     });

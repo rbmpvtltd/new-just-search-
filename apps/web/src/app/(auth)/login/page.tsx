@@ -1,4 +1,5 @@
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
+export const dynamic = "force-dynamic";
 import { LoginForm } from "@/features/auth/login/login-form";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
@@ -37,7 +38,8 @@ export default async function Login() {
         </div>
     }else{
       
-      redirect("/"); // never wrap this in try/catch
+      // redirect("/"); // never wrap this in try/catch
+      console.log("User already logged in, redirecting...");
     }
   }
 
