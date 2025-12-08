@@ -48,8 +48,13 @@ const state = async () => {
   console.log("state migrated successfully!");
 };
 
+type DbCity = {
+  city: string;
+  stateId: number;
+};
 const citie = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM cities");
+  const dbcityvalue: DbCity[] = [];
   for (const row of rows) {
     const [state] = await db
       .select()
@@ -61,18 +66,31 @@ const citie = async () => {
       continue;
     }
 
-    await db.insert(cities).values({
+    dbcityvalue.push({
       city: row.city,
       stateId: state.id,
     });
   }
 
+  await db.insert(cities).values(dbcityvalue);
+
   console.log("Cities migrated successfully!");
 };
 
 // banner
+
+type DbBanner = {
+  mysqlId: number;
+  route: string;
+  photo: string;
+  isActive: boolean;
+  type: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
 export const bannerSeed = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM `banners`");
+  const dbBannerValue: DbBanner[] = [];
   for (const row of rows) {
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
 
@@ -85,7 +103,7 @@ export const bannerSeed = async () => {
       );
     }
 
-    await db.insert(banners).values({
+    dbBannerValue.push({
       mysqlId: row.id,
       route: row.route ?? null,
       photo: bannerPhotoPublicId ?? "",
@@ -95,7 +113,7 @@ export const bannerSeed = async () => {
       updatedAt: row.updated_at,
     });
   }
-
+  await db.insert(banners).values(dbBannerValue);
   console.log(" Banners migrated successfully!");
 };
 
