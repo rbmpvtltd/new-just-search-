@@ -147,10 +147,10 @@ export const notification = pgTable("notification", {
 
 export const notificationInsertSchema = createInsertSchema(notification, {
   role: () => z.array(z.enum(UserRole)),
-  // categoryId: () => z.array(z.number()),
-  // subCategoryId: () => z.array(z.number()),
-  // city: () => z.array(z.number()),
-  // state: () => z.array(z.number()),
+  categoryId: () => z.array(z.number()),
+  subCategoryId: () => z.array(z.number()),
+  city: () => z.array(z.number()),
+  state: () => z.array(z.number()),
 });
 export const notificationUpdateSchema = createUpdateSchema(notification);
 export const notificationSelectSchema = createSelectSchema(notification);

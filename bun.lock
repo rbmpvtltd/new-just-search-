@@ -126,6 +126,7 @@
         "server-only": "^0.0.1",
         "sonner": "^2.0.7",
         "superjson": "^2.2.2",
+        "sweetalert2": "^11.26.3",
         "tailwind-merge": "^3.3.1",
         "tailwindcss": "^4.1.12",
         "vaul": "^1.1.2",

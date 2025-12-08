@@ -1,12 +1,12 @@
 "use client";
 
-import { CldImage } from "next-cloudinary";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CldImage } from "next-cloudinary";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { useTableStore } from "../store";
-import { EditBanner } from "../form/edit.form";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
+import { EditBanner } from "../form/edit.form";
+import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {
   const select = useTableStore((state) => state.select);

@@ -1,8 +1,7 @@
 // features/banners/banners.admin.routes.ts
-import { db } from "@repo/db";
+import { db, type UserRole } from "@repo/db";
 import {
   categories,
-  categoryUpdateSchema,
   cities,
   states,
   subcategories,
@@ -11,21 +10,16 @@ import {
   notification,
   notificationInsertSchema,
 } from "@repo/db/dist/schema/user.schema";
-import { TRPCError } from "@trpc/server";
-import { desc, eq, type InferInsertModel, inArray, sql } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
-import {
-  cloudinaryDeleteImageByPublicId,
-  cloudinaryDeleteImagesByPublicIds,
-} from "@/lib/cloudinary";
 import {
   buildOrderByClause,
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
-import { expandObject } from "@/utils/expandObject";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
+  expandInputDataOfNotification,
   notificationAllowedSortColumns,
   notificationColumns,
   notificationGlobalFilterColumns,
@@ -47,20 +41,7 @@ export const adminNotificationRouter = router({
     );
 
     const offset = input.pagination.pageIndex * input.pagination.pageSize;
-    // const data = await db
-    //   .select({
-    //     notificationId: notification.notificationId,
-    //     title: notification.title,
-    //     description: notification.description,
-    //     role: sql<string>`STRING_AGG(DISTINCT ${notification.role}::text, ', ')`.as(
-    //       "notification_role",
-    //     ),
-    //   })
-    //   .from(notification)
-    //   .groupBy(notification.notificationId)
-    //   .limit(10);
 
-    console.log("where", where);
     const data = await db
       .select({
         // id: sql`min(${notification.id})`.as("id"),
@@ -72,8 +53,32 @@ export const adminNotificationRouter = router({
         role: sql<string>`string_agg(DISTINCT ${notification.role}::text, ', ' ORDER BY ${notification.role}::text)`.as(
           "role",
         ),
+        category: sql<
+          string | null
+        >`string_agg(DISTINCT ${categories.title}, ', ' ORDER BY ${categories.title})`.as(
+          "category",
+        ),
+        subcategories: sql<
+          string | null
+        >`string_agg(DISTINCT ${subcategories.name}, ', ' ORDER BY ${subcategories.name})`.as(
+          "subcategory",
+        ),
+        states: sql<
+          string | null
+        >`string_agg(DISTINCT ${states.name}, ', ' ORDER BY ${states.name})`.as(
+          "state",
+        ),
+        cities: sql<
+          string | null
+        >`string_agg(DISTINCT ${cities.city}, ', ' ORDER BY ${cities.city})`.as(
+          "cities",
+        ),
       })
       .from(notification)
+      .leftJoin(categories, eq(notification.categoryId, categories.id))
+      .leftJoin(subcategories, eq(notification.subCategoryId, subcategories.id))
+      .leftJoin(states, eq(notification.state, states.id))
+      .leftJoin(cities, eq(notification.city, cities.id))
       .where(where)
       .orderBy(orderBy)
       .groupBy(
@@ -161,25 +166,9 @@ export const adminNotificationRouter = router({
   create: adminProcedure
     .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
-      type NotificationInsert = InferInsertModel<typeof notification>;
-      // const expandData = expandObject(input);
-      const data: NotificationInsert[] = [];
-
-      // for (const role of input.categoryId) {
-      //   data.push({ ...input, role });
-      // }
-      if (input.role.includes("all") || input.role.length === 0) {
-        data.push({ ...input, role: "all" });
-      } else {
-        for (const role of input.role) {
-          data.push({ ...input, role });
-        }
-      }
-
-      // for (const state of input.state){
-      //
-      // }
+      const data = expandInputDataOfNotification(input);
       await db.insert(notification).values(data);
+
       return { success: true };
     }),
   edit: adminProcedure
@@ -189,28 +178,76 @@ export const adminNotificationRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+      const lastData = (
+        await db
+          .select({
+            // id: sql`min(${notification.id})`.as("id"),
+            notificationId: notification.notificationId,
+            title: notification.title,
+            description: notification.description,
+            status: notification.status,
+            created_at: notification.createdAt,
+            role: sql<
+              UserRole[]
+            >`ARRAY_AGG(DISTINCT ${notification.role}::text ORDER BY ${notification.role}::text)`.as(
+              "role",
+            ),
+            category: sql<
+              number[]
+            >`ARRAY_AGG(DISTINCT ${notification.categoryId} ORDER BY ${notification.categoryId})`.as(
+              "category",
+            ),
+            subcategories: sql<
+              number[]
+            >`ARRAY_AGG(DISTINCT ${notification.subCategoryId} ORDER BY ${notification.subCategoryId})`.as(
+              "subcategory",
+            ),
+            states: sql<
+              number[]
+            >`ARRAY_AGG(DISTINCT ${notification.state} ORDER BY ${notification.state})`.as(
+              "state",
+            ),
+            cities: sql<
+              number[]
+            >`ARRAY_AGG(DISTINCT ${notification.city} ORDER BY ${notification.city})`.as(
+              "cities",
+            ),
+          })
+          .from(notification)
+          .where(eq(notification.notificationId, input.id))
+          .groupBy(
+            notification.notificationId,
+            notification.title,
+            notification.description,
+            notification.status,
+            notification.createdAt,
+          )
+      )[0];
+
+      const category = await db
+        .select({
+          id: categories.id,
+          name: categories.title,
+        })
+        .from(categories);
+
+      const state = await db
+        .select({
+          id: states.id,
+          name: states.name,
+        })
+        .from(states);
+
+      return { lastData, category, state };
     }),
   update: adminProcedure
-    .input(categoryUpdateSchema)
+    .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      if (!id)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please pass id field",
-        });
-      const olddata = (
-        await db.select().from(categories).where(eq(categories.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
-      }
-      await db.update(categories).set(updateData).where(eq(categories.id, id));
+      await db
+        .delete(notification)
+        .where(eq(notification.notificationId, Number(input.notificationId)));
+      const data = expandInputDataOfNotification(input);
+      await db.insert(notification).values(data);
       return { success: true };
     }),
   multidelete: adminProcedure
@@ -220,21 +257,9 @@ export const adminNotificationRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      //TODO: remove subcategory of these categories;
-      const allSeletedPhoto = await db
-        .select({
-          photo: categories.photo,
-        })
-        .from(categories)
-        .where(inArray(categories.id, input.ids));
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => item.photo),
-      );
-      //TODO: test that subcategory is also deleting
       await db
-        .delete(subcategories)
-        .where(inArray(subcategories.categoryId, input.ids));
-      await db.delete(categories).where(inArray(categories.id, input.ids));
+        .delete(notification)
+        .where(inArray(notification.notificationId, input.ids));
       return { success: true };
     }),
   multiactive: adminProcedure
@@ -250,7 +275,7 @@ export const adminNotificationRouter = router({
       await db
         .update(notification)
         .set({
-          status: sql`CASE ${notification.id} 
+          status: sql`CASE ${notification.notificationId} 
             ${sql.join(
               input.map(
                 (item) =>
@@ -263,7 +288,7 @@ export const adminNotificationRouter = router({
         })
         .where(
           inArray(
-            notification.id,
+            notification.notificationId,
             input.map((item) => item.id),
           ),
         );

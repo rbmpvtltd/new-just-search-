@@ -1,6 +1,5 @@
 // upload-image.tsx
 "use client";
-import { error } from "console";
 import { CldImage } from "next-cloudinary";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ImageCropDialog from "./image-crop-dialog";

@@ -13,7 +13,11 @@ import {
   categories,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
-import { offerPhotos, offerReviews, offers } from "@repo/db/dist/schema/offer.schema";
+import {
+  offerPhotos,
+  offerReviews,
+  offers,
+} from "@repo/db/dist/schema/offer.schema";
 import {
   productInsertSchema,
   productPhotos,
@@ -106,18 +110,6 @@ export const businessrouter = router({
         throw new TRPCError({
           code: "CONFLICT",
           message: "Business already exist",
-        });
-      }
-
-      const existingEmail = await db.query.businessListings.findFirst({
-        where: (businessListings, { eq }) =>
-          eq(businessListings.email, String(input.email)),
-      });
-
-      if (existingEmail) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Email address already exist",
         });
       }
 
