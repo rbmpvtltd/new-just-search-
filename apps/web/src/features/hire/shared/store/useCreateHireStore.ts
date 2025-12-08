@@ -34,10 +34,8 @@ const initialFormValue: CombinedForm = {
   jobType: [],
   workShift: [],
   jobDuration: [],
-  // fromHour: "",
-  // fromPeriod: "",
-  // toHour: "",
-  // toPeriod: "",
+  fromHour: "10:30",
+  toHour: "20:30",
   preferredWorkingHours: "",
   availability: "",
   locationPreferred: "",
@@ -48,8 +46,8 @@ const initialFormValue: CombinedForm = {
   // EducationSchema
   highestQualification: "",
   employmentStatus: "",
-  workExperienceYear: 0,
-  workExperienceMonth: 0,
+  workExperienceYear: NaN,
+  workExperienceMonth: NaN,
   jobRole: "",
   skillset: "",
   previousJobRole: "",
@@ -65,7 +63,7 @@ const initialFormValue: CombinedForm = {
 
   // PersonalDetailsSchema
   photo: "",
-  categoryId: 0,
+  categoryId: NaN,
   subcategoryId: [],
   name: "",
   gender: "Male",
@@ -78,8 +76,8 @@ const initialFormValue: CombinedForm = {
   longitude: "",
   area: "",
   pincode: "",
-  state: 0,
-  city: 0,
+  state: NaN,
+  city: NaN,
   alternativeMobileNumber: "",
   email: "",
 };

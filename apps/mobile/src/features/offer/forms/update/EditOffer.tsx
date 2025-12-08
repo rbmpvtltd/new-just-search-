@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersUpdateSchema } from "@repo/db/dist/schema/offer.schema";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import {
   ActivityIndicator,
+  Alert,
   Keyboard,
   ScrollView,
   Text,
@@ -11,6 +12,7 @@ import {
   View,
 } from "react-native";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
@@ -25,6 +27,7 @@ type EditOfferType = OutputTrpcType["offerrouter"]["edit"] | null;
 export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
   const token = useAuthStore((state) => state.token);
   const { data } = useQuery(trpc.offerrouter.add.queryOptions());
+  const { mutate } = useMutation(trpc.offerrouter.update.mutationOptions());
   const categories = data?.categoryRecord;
   const subCategories = data?.subcategoryRecord;
 
@@ -64,7 +67,31 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
     );
   }
 
-  const onSubmit = async (data: EditOfferSchema) => {};
+  const onSubmit = async (data: EditOfferSchema) => {
+    const file = await uploadToCloudinary(
+      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      "offers",
+    );
+    mutate(
+      {
+        ...data,
+        photo: file[0] ?? "",
+        image2: file[1] ?? "",
+        image3: file[2] ?? "",
+        image4: file[3] ?? "",
+        image5: file[4] ?? "",
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success) {
+            //TODO Add query client
+            Alert.alert(data.message);
+          }
+          // router.push("/");
+        },
+      },
+    );
+  };
 
   const formFields: FormFieldProps<EditOfferSchema>[] = [
     {

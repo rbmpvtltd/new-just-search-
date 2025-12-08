@@ -1,10 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "@repo/db/dist/schema/hire.schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation} from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
-import React from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
@@ -17,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
-import { setRole } from "@/utils/session";
+import { getQueryClient } from "@/trpc/query-client";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
 export default function DocumentsForm() {
@@ -25,7 +24,8 @@ export default function DocumentsForm() {
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
   const formValue = useHireFormStore((state) => state.formValue);
-  const { prevPage, clearPage, setFormValue } = useHireFormStore();
+  const prevPage = useHireFormStore((s) => s.prevPage);
+
   const {
     control,
     handleSubmit,
@@ -43,38 +43,38 @@ export default function DocumentsForm() {
   });
 
   const onSubmit = async (data: DocumentSchema) => {
+    const mergedData = { ...formValue, ...data };
     const files = await uploadToCloudinary(
       [data.idProofPhoto, data.resumePhoto],
       "hire",
     );
-    setFormValue("idProof", data.idProof ?? "");
-    setFormValue("idProofPhoto", files[0] ?? "");
-    setFormValue("coverLetter", data.coverLetter ?? "");
-    setFormValue("resumePhoto", files[1] ?? "");
-    setFormValue("aboutYourself", data.aboutYourself ?? "");
-    // setFormValue("referCode", data.referCode ?? "");
-
-    mutate(formValue, {
-      onSuccess: async (data) => {
-        if (data?.success) {
-          setRole("hire");
-          await Swal.fire({
-            title: data.message,
-            icon: "success",
-            draggable: true,
-          });
-          clearPage();
-          router.push("/");
-        }
-        console.log("success", data);
+    const finalData = {
+      ...mergedData,
+      idProofPhoto: files[0] ?? "",
+      resumePhoto: files[1] ?? "",
+    };
+    useHireFormStore.setState((state) => ({
+      formValue: finalData,
+    }));
+    mutate(finalData, {
+      onSuccess: (data) => {
+        Swal.fire({
+          title: data.message,
+          icon: "success",
+          draggable: true,
+        });
+        const queryClient = getQueryClient();
+        queryClient.invalidateQueries({
+          queryKey: trpc.hirerouter.show.queryKey(),
+        });
+        router.push("/");
       },
       onError: (error) => {
         if (isTRPCClientError(error)) {
           Swal.fire({
+            title: error.message,
             icon: "error",
-            title: "Oops...",
-            text: "Something went wrong!",
-            // footer: '<a href="#">Why do I have this issue?</a>',
+            draggable: true,
           });
           console.error("error,", error.message);
         }
@@ -135,7 +135,6 @@ export default function DocumentsForm() {
       required: false,
       error: errors.aboutYourself?.message,
     },
-   
   ];
   return (
     <div className="min-h-screen p-4">

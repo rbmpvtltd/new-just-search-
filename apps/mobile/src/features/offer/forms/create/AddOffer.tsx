@@ -1,9 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersInsertSchema } from "@repo/db/dist/schema/offer.schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm, useWatch } from "react-hook-form";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
   Alert,
   Keyboard,
   ScrollView,
@@ -24,8 +23,7 @@ import { useAuthStore } from "@/store/authStore";
 
 type AddOfferSchema = z.infer<typeof offersInsertSchema>;
 export default function AddOffer() {
-  const token = useAuthStore((state) => state.token);
-  const { data } = useQuery(trpc.offerrouter.add.queryOptions());
+  const { data } = useSuspenseQuery(trpc.offerrouter.add.queryOptions());
   const { mutate } = useMutation(trpc.offerrouter.addOffer.mutationOptions());
   const categories = data?.categoryRecord;
   const subCategories = data?.subcategoryRecord;

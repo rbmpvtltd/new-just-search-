@@ -13,6 +13,7 @@ type Props = {
   minimumDate?: Date;
   maximumDate?: Date;
   mode: "date" | "time";
+  className?: string;
 };
 
 const DatePickerComponent: React.FC<Props> = ({
@@ -21,6 +22,7 @@ const DatePickerComponent: React.FC<Props> = ({
   onBlur,
   minimumDate,
   maximumDate,
+  className,
   mode,
 }) => {
   const colorScheme = useColorScheme();
@@ -46,7 +48,9 @@ const DatePickerComponent: React.FC<Props> = ({
   }, [value, mode, parsedDate]);
 
   return (
-    <View className="h-14 w-[90%] mx-auto bg-base-200 rounded-md justify-center">
+    <View
+      className={`${className} h-14 w-[90%] mx-auto bg-base-200 rounded-md justify-center items-center`}
+    >
       <Pressable onPress={() => setShowPicker(true)} className="px-4 py-2">
         <Text
           style={{

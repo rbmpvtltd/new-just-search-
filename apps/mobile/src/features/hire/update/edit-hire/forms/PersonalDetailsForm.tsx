@@ -1,14 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uploadOnCloudinary } from "@repo/cloudinary";
-import {
-  personalDetailsHireSchema,
-} from "@repo/db/dist/schema/hire.schema";
+import { Gender, MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
+import { personalDetailsHireSchema } from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { type FieldErrors, useForm, useWatch } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
+import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
   type FormFieldProps,
@@ -31,15 +31,18 @@ export default function PersonalDetailsForm({
 }) {
   const setFormValue = useHireFormStore((s) => s.setFormValue);
   const nextPage = useHireFormStore((s) => s.nextPage);
+  const [detectedCityName, setDetectedCityName] = useState<null | string>(null);
 
   const {
     control,
     handleSubmit,
+    setValue,
+    setFocus,
     formState: { errors, isSubmitting },
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
-      photo: "",
+      photo: hireListing?.photo ?? "",
       name: hireListing?.name ?? "",
       categoryId: hireListing?.categoryId.id ?? 0,
       subcategoryId: hireListing?.subcategoryId.map((item) => item.id) ?? [],
@@ -60,7 +63,7 @@ export default function PersonalDetailsForm({
     },
   });
 
-  const categories = formReferenceData?.getHireCategories.map((item: any) => {
+  const categories = formReferenceData?.getHireCategories.map((item) => {
     return {
       label: item.title,
       value: item.id,
@@ -69,7 +72,7 @@ export default function PersonalDetailsForm({
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
-  const { data: subCategories, isLoading } = useQuery(
+  const { data: subCategories } = useQuery(
     trpc.hirerouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
@@ -83,15 +86,43 @@ export default function PersonalDetailsForm({
   });
 
   const selectedStateId = useWatch({ control, name: "state" });
-
-  const { data: cities, isLoading: cityLoading } = useQuery(
-    trpc.hirerouter.getCities.queryOptions({
-      state: Number(selectedStateId),
+  const {
+    data: cities,
+    isLoading,
+    isFetching,
+  } = useQuery(
+    trpc.businessrouter.getCities.queryOptions({
+      state: selectedStateId,
     }),
   );
 
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isFetching &&
+      cities &&
+      cities.length > 0 &&
+      detectedCityName
+    ) {
+      const matchedCity = cities?.find(
+        (c) => c.city.toLowerCase() === detectedCityName.toLowerCase(),
+      );
+      if (matchedCity && matchedCity.id !== control._formValues.cityId) {
+        setValue("city", matchedCity.id, { shouldValidate: true });
+      }
+    }
+  }, [
+    detectedCityName,
+    control._formValues.cityId,
+    isFetching,
+    isLoading,
+    setValue,
+    cities,
+  ]);
+
   const onSubmit = async (data: PersonalDetailsSchema) => {
-    setFormValue("photo", data.photo ?? "");
+    const file = await uploadToCloudinary([data.photo], "hire");
+    setFormValue("photo", file[0] ?? "");
     setFormValue("name", data.name);
     setFormValue("categoryId", data.categoryId);
     setFormValue("subcategoryId", data.subcategoryId);
@@ -111,15 +142,19 @@ export default function PersonalDetailsForm({
     setFormValue("city", data.city);
     nextPage();
   };
-
+  const onError = (errors: FieldErrors<PersonalDetailsSchema>) => {
+    const fisrtError = Object.keys(errors)[0] as keyof PersonalDetailsSchema;
+    setFocus(fisrtError);
+  };
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
     {
       control,
       name: "photo",
       label: "Profile Image",
       component: "image",
+      placeholder: "Select Image",
       className: "w-[90%]",
-      error: errors.name?.message,
+      error: errors.photo?.message,
     },
     {
       control,
@@ -127,19 +162,18 @@ export default function PersonalDetailsForm({
       label: "Name",
       placeholder: "Enter your Name",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.name?.message,
     },
     {
       control,
       name: "categoryId",
       label: "Applied For",
-      data: [
-        ...(categories ?? []).map((item, index) => ({
-          label: item.label,
-          value: item.value,
-        })),
-      ],
+      data: formReferenceData?.getHireCategories.map((item) => {
+        return {
+          label: item.title,
+          value: item.id,
+        };
+      }),
       component: "dropdown",
       placeholder: "Select Category",
       error: errors.categoryId?.message,
@@ -149,7 +183,7 @@ export default function PersonalDetailsForm({
       name: "subcategoryId",
       label: "Sub Category",
       data: [
-        ...(subCategories ?? []).map((item, index) => ({
+        ...(subCategories ?? []).map((item) => ({
           label: item.name,
           value: item.id,
         })),
@@ -167,7 +201,6 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your Email",
       keyboardType: "email-address",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.email?.message,
     },
     {
@@ -205,7 +238,6 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your Father Name",
       keyboardType: "default",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.fatherName?.message,
     },
     {
@@ -213,7 +245,6 @@ export default function PersonalDetailsForm({
       name: "dob",
       label: "Date of Birth",
       component: "datepicker",
-      className: "w-[90%] bg-base-200",
       error: errors.dob?.message,
     },
     {
@@ -222,10 +253,15 @@ export default function PersonalDetailsForm({
       label: "Languages",
       component: "multiselectdropdown",
       data: [
-        {
-          label: "English",
-          value: "English",
-        },
+        { label: "Hindi", value: "Hindi" },
+        { label: "English", value: "English" },
+        { label: "Punjabi", value: "Punjabi" },
+        { label: "Gujarati", value: "Gujarati" },
+        { label: "Bengali", value: "Bengali" },
+        { label: "Malayalam", value: "Malayalam" },
+        { label: "Kannada", value: "Kannada" },
+        { label: "Tamil", value: "Tamil" },
+        { label: "Other", value: "Other" },
       ],
       dropdownPosition: "top",
       placeholder: "Select Languages",
@@ -238,7 +274,6 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your Mobile Number",
       keyboardType: "numeric",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.mobileNumber?.message,
     },
     {
@@ -248,7 +283,6 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your Alternative Mobile Number",
       keyboardType: "numeric",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.alternativeMobileNumber?.message,
     },
     {
@@ -258,7 +292,6 @@ export default function PersonalDetailsForm({
       placeholder: "e.g. 26.9124",
       keyboardType: "numeric",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.latitude?.message,
     },
     {
@@ -268,7 +301,6 @@ export default function PersonalDetailsForm({
       placeholder: "e.g. 75.7878",
       keyboardType: "numeric",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.longitude?.message,
     },
     {
@@ -278,7 +310,6 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your Address",
       keyboardType: "default",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.area?.message,
     },
     {
@@ -288,7 +319,6 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your Pincode",
       keyboardType: "numeric",
       component: "input",
-      className: "w-[90%] bg-base-200",
       error: errors.pincode?.message,
     },
     {
@@ -298,12 +328,12 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your State",
       component: "dropdown",
       className: "w-[90%] bg-base-200 rounded-lg",
-      data: [
-        ...(states ?? []).map((state) => ({
-          label: state.label,
-          value: state.value,
-        })),
-      ],
+      data: formReferenceData?.getStates.map((item) => {
+        return {
+          label: item.name,
+          value: item.id,
+        };
+      }),
       dropdownPosition: "top",
       error: errors.state?.message,
     },
@@ -325,7 +355,6 @@ export default function PersonalDetailsForm({
     },
   ];
   return (
-    // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
         className="w-[100%]"
@@ -339,50 +368,36 @@ export default function PersonalDetailsForm({
               <FormField {...field} />
               {/* {field.name === "alternativeMobileNumber" && (
                 <LocationAutoDetect
-                  onResult={(data) => {
-                    if (!data.success) {
-                      return;
-                    }
-                    const lat = data.latitude.toString();
-                    const lng = data.longitude.toString();
-                    const pincode = data.postalCode || "";
-                    const cityName = data.city || "";
-                    const stateName = data.region || "";
-                    let area = data.formattedAddress || "";
+                  onResult={(locationData) => {
+                    const formatted = locationData.formattedAddress ?? "";
+                    const parts = formatted.split(",").map((p) => p.trim());
 
-                    if (area.length > 100) {
-                      area = area.slice(0, 99).trim();
-                    }
+                    const lat = locationData.latitude;
+                    const lng = locationData.longitude;
+                    const pincode = locationData.postalCode || "";
+                    const cityName = locationData.city || "";
+                    const stateName = locationData.region || "";
+                    const area = parts.length > 1 ? parts[2] : "";
+                    const street_name = parts.length > 1 ? parts[1] : "";
+                    const landmark = locationData.street || "";
+                    const building_name = parts[0].match(/[A-Za-z]/)
+                      ? parts[0]
+                      : "";
 
-                    const matchedState = cityStateList?.data?.states.find(
-                      (item: any) =>
-                        item.name.toLowerCase() === stateName.toLowerCase(),
+                    const matchedState = formReferenceData?.getStates?.find(
+                      (item) => item?.name === stateName.toLocaleUpperCase(),
                     );
 
-                    const matchedCity = cityStateList?.data?.cities.find(
-                      (item: any) =>
-                        item.city.toLowerCase() == cityName.toLowerCase() &&
-                        item.state_id == matchedState?.id,
-                    );
+                    setDetectedCityName(cityName);
 
-                    const state = matchedState?.id || "";
-                    const city = matchedCity?.id || "";
-
-                    // Set values in react-hook-form
-                    setValue("latitude", lat);
-                    setValue("longitude", lng);
+                    setValue("latitude", String(lat));
+                    setValue("longitude", String(lng));
                     setValue("pincode", pincode);
-                    setValue("city", city);
-                    setValue("state", state);
-                    setValue("area", area);
-
-                    // Also update Zustand store
-                    setFormValue("latitude", lat);
-                    setFormValue("longitude", lng);
-                    setFormValue("pincode", pincode);
-                    setFormValue("city", city);
-                    setFormValue("state", state);
-                    setFormValue("area", area);
+                    setValue("state", matchedState?.id ?? 0);
+                    setValue(
+                      "area",
+                      building_name || area || street_name || landmark,
+                    );
                   }}
                 />
               )} */}
@@ -393,12 +408,11 @@ export default function PersonalDetailsForm({
         <View className="flex-row justify-between w-[35%] self-center mt-6 mb-24">
           <PrimaryButton
             title="Next"
-            onPress={handleSubmit(onSubmit)}
+            onPress={handleSubmit(onSubmit, onError)}
             isLoading={isSubmitting}
           />
         </View>
       </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
-    // </SafeAreaView>
   );
 }

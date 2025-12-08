@@ -151,6 +151,7 @@ export const FormField = <T extends FieldValues>({
                       >
                         <div className="mt-1 flex items-center justify-center">
                           <Checkbox
+                            id={option.value.toString()}
                             className="border-gray-300"
                             checked={
                               Array.isArray(value) &&
@@ -171,7 +172,10 @@ export const FormField = <T extends FieldValues>({
                           />
                         </div>
                         {/* <div className=""> */}
-                        <label htmlFor="" className="text-sm text-gray-700">
+                        <label
+                          htmlFor={option.value.toString()}
+                          className="text-sm text-gray-700"
+                        >
                           {option.label}
                         </label>
                         {/* </div> */}

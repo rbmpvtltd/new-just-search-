@@ -9,9 +9,9 @@ import {
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import type { UserHireListingType } from "..";
-import { Spinner } from "@/components/ui/spinner";
 
 type EducationSchema = z.infer<typeof educationSchema>;
 export default function EducationForm({
@@ -32,8 +32,8 @@ export default function EducationForm({
       highestQualification: hireListing?.highestQualification ?? "",
       skillset: hireListing?.skillset ?? "",
       employmentStatus: hireListing?.employmentStatus ?? "",
-      workExperienceYear: hireListing?.workExperienceYear ?? 0,
-      workExperienceMonth: hireListing?.workExperienceMonth ?? undefined,
+      workExperienceYear: hireListing?.workExperienceYear ?? NaN,
+      workExperienceMonth: hireListing?.workExperienceMonth ?? NaN,
       jobRole: hireListing?.jobRole ?? "",
       previousJobRole: hireListing?.previousJobRole ?? "",
       certificates: hireListing?.certificates ?? "",
@@ -47,7 +47,7 @@ export default function EducationForm({
       name: "highestQualification",
       placeholder: "Highest Qualification",
       component: "select",
-       options: [
+      options: [
         { label: "B.E / B.Tech", value: "b-e / b-tech" },
         { label: "M.E / M.Tech", value: "m-e / m-tech" },
         { label: "M.S Engineering", value: "m-s engineering" },
@@ -173,6 +173,16 @@ export default function EducationForm({
         { label: "3", value: 3 },
         { label: "4", value: 4 },
         { label: "5", value: 5 },
+        { label: "6", value: 6 },
+        { label: "7", value: 7 },
+        { label: "8", value: 8 },
+        { label: "9", value: 9 },
+        { label: "10", value: 10 },
+        { label: "11", value: 11 },
+        { label: "12", value: 12 },
+        { label: "13", value: 13 },
+        { label: "14", value: 14 },
+        { label: "15", value: 15 },
       ],
       error: errors.workExperienceYear?.message,
     },
@@ -231,14 +241,9 @@ export default function EducationForm({
 
   const onSubmit = async (data: EducationSchema) => {
     const files = await uploadToCloudinary([data?.certificates], "hire");
-    setFormValue("highestQualification", data.highestQualification ?? "");
-    setFormValue("skillset", data.skillset ?? "");
-    setFormValue("employmentStatus", data.employmentStatus ?? "");
-    setFormValue("workExperienceYear", data.workExperienceYear ?? "");
-    setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
-    setFormValue("previousJobRole", data.previousJobRole ?? "");
-    setFormValue("jobRole", data.jobRole ?? "");
-    setFormValue("certificates", files[0] ?? "");
+    useHireFormStore.setState((state) => ({
+      formValue: { ...state.formValue, ...data, certificates: files[0] ?? "" },
+    }));
     nextPage();
   };
   return (
@@ -294,10 +299,14 @@ export default function EducationForm({
             disabled={isSubmitting}
             className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-md min-w-[120px]"
           >
-            {isSubmitting ? <>
-            <Spinner/>
-            Loading...
-            </> : "CONTINUE"}
+            {isSubmitting ? (
+              <>
+                <Spinner />
+                Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

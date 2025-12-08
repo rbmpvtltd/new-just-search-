@@ -18,7 +18,7 @@ import { trpc } from "@/lib/trpc";
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail() {
   const router = useRouter();
-  const setFormValue = useBusinessFormStore((s) => s.setFormValue);
+  const clearPage = useBusinessFormStore((s) => s.clearPage);
   const formValue = useBusinessFormStore((s) => s.formValue);
   const prevPage = useBusinessFormStore((s) => s.prevPage);
 
@@ -41,16 +41,22 @@ export default function ContactDetail() {
   });
 
   const onSubmit = (data: ContactDetailSchema) => {
+    const finalData = { ...formValue, ...data };
     useBusinessFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));
 
     mutate(
-      { ...formValue, pincode: formValue.pincode },
+      { ...finalData, pincode: formValue.pincode },
       {
         onSuccess: async (data) => {
           if (data.success) {
+            clearPage();
             Alert.alert(data.message);
+            // const queryClient = getQueryClient();
+            // queryClient.invalidateQueries({
+            //   queryKey: trpc.businessrouter.show.queryKey(),
+            // });
             router.replace("/(root)/profile");
           }
           console.log("Success", data);

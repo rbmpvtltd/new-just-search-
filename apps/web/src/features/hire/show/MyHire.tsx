@@ -45,7 +45,7 @@ export default function MyHire({ data }: { data: MyHireType }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+    <div className="min-h-screen w-full bg-linear-to-br from-gray-100 to-gray-200 p-4">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-4 border-b border-gray-100">
           <h1 className="text-2xl font-bold text-gray-800">My Hire Listing</h1>
@@ -54,13 +54,13 @@ export default function MyHire({ data }: { data: MyHireType }) {
           </p>
         </div>
 
-        <div className="flex sm:flex-row flex-col gap-4 p-2">
-          <div className=" pl-4 flex justify-center">
+        <div className="flex flex-col sm:flex-row gap-6 p-4 sm:p-6">
+          <div className="w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-lg overflow-hidden border shadow-sm bg-gray-50">
             {data.photo ? (
               <CldImage
                 width="640"
                 height="640"
-                className="border rounded "
+                className="w-full h-full object-cover"
                 src={data.photo}
                 alt="cloudinary image not loaded"
               />

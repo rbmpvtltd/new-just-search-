@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import type { UserHireListingType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
@@ -26,7 +27,6 @@ export default function DocumentsForm({
   const trpc = useTRPC();
   const router = useRouter();
   const { mutate } = useMutation(trpc.hirerouter.update.mutationOptions());
-  const setFormValue = useHireFormStore((state) => state.setFormValue);
   const prevPage = useHireFormStore((state) => state.prevPage);
   const formValue = useHireFormStore((state) => state.formValue);
   const {
@@ -45,29 +45,29 @@ export default function DocumentsForm({
   });
 
   const onSubmit = async (data: DocumentSchema) => {
-    // console.log("data", data);
-
+    const mergedData = { ...formValue, ...data };
     const files = await uploadToCloudinary(
       [data.idProofPhoto, data.resumePhoto],
       "hire",
     );
-
-    setFormValue("idProof", data.idProof ?? "");
-    setFormValue("idProofPhoto", files[0] ?? "");
-    setFormValue("coverLetter", data.coverLetter ?? "");
-    setFormValue("resumePhoto", files[1] ?? "");
-    setFormValue("aboutYourself", data.aboutYourself ?? "");
-    // setFormValue("referCode", data.referCode ?? "");
-
-    // console.log("formValue", formValue);
-
-    mutate(formValue, {
+    const finalData = {
+      ...mergedData,
+      idProofPhoto: files[0] ?? "",
+      resumePhoto: files[1] ?? "",
+    };
+    useHireFormStore.setState((state) => ({
+      formValue: finalData,
+    }));
+    mutate(finalData, {
       onSuccess: (data) => {
-        console.log("success", data);
         Swal.fire({
           title: data.message,
           icon: "success",
           draggable: true,
+        });
+        const queryClient = getQueryClient();
+        queryClient.invalidateQueries({
+          queryKey: trpc.hirerouter.show.queryKey(),
         });
         router.push("/");
       },

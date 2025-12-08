@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import EditOffer from "@/features/offer/forms/update/EditOffer";
 import { trpc } from "@/lib/trpc";
 
@@ -18,7 +19,9 @@ export default function CreateOffer() {
   }
   return (
     <View>
-      <EditOffer myOffer={data} />
+      <BoundaryWrapper>
+        <EditOffer myOffer={data} />
+      </BoundaryWrapper>
     </View>
   );
 }

@@ -19,7 +19,6 @@ import {
   offers,
 } from "@repo/db/dist/schema/offer.schema";
 import {
-  productInsertSchema,
   productPhotos,
   productReviews,
   products,
@@ -97,9 +96,16 @@ export const businessrouter = router({
         });
       }
 
-      // const existingHire = await db.query.hireListings.findFirst({
-      //   where: (hireListings, { eq }) => eq(hireListings.userId, ctx.userId),
-      // });
+      const existingHire = await db.query.hireListing.findFirst({
+        where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
+      });
+
+      if (existingHire) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "User already have hire listing",
+        });
+      }
 
       const existingBusiness = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>

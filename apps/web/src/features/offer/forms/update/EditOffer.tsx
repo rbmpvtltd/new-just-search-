@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
@@ -192,6 +193,10 @@ export default function EditOffer({
             title: data.message,
             icon: "success",
             draggable: true,
+          });
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.offerrouter.showOffer.queryKey(),
           });
           // router.push("/");
         },

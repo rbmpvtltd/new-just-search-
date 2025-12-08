@@ -66,14 +66,10 @@ export default function LocationAutoDetect({ onResult, iconOnly }: Props) {
         {isLoading ? (
           <>
             <ActivityIndicator size="small" color="#fff" />
-            <Text className="text-secondary font-semibold ml-2">
-              Detecting...
-            </Text>
+            <Text className="text-white font-semibold ml-2">Detecting...</Text>
           </>
         ) : (
-          <Text className="text-secondary font-semibold">
-            Auto Detect Location
-          </Text>
+          <Text className="text-white font-semibold">Auto Detect Location</Text>
         )}
       </View>
     );

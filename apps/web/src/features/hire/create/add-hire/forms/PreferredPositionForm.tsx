@@ -15,9 +15,10 @@ import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStor
 
 type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
 export default function PreferredPositionForm() {
-  const { page, prevPage, nextPage, setFormValue, formValue } =
-    useHireFormStore();
-
+  const prevPage = useHireFormStore((s) => s.prevPage);
+  const nextPage = useHireFormStore((s) => s.nextPage);
+  const setFormValue = useHireFormStore((s) => s.setFormValue);
+  const formValue = useHireFormStore((s) => s.formValue);
   const {
     control,
     handleSubmit,
@@ -31,30 +32,17 @@ export default function PreferredPositionForm() {
       expectedSalaryFrom: formValue.expectedSalaryFrom ?? "",
       expectedSalaryTo: formValue.expectedSalaryTo ?? "",
       jobDuration: formValue.jobDuration ?? [],
-      // fromHour: formValue.fromHour ?? undefined,
-      // fromPeriod: formValue.fromPeriod ?? undefined,
-      // toHour: formValue.toHour ?? undefined,
-      // toPeriod: formValue.toPeriod ?? undefined,
-      preferredWorkingHours: formValue.preferredWorkingHours ?? "",
+      fromHour: formValue.fromHour ?? "",
+      toHour: formValue.toHour ?? "",
       workShift: formValue.workShift ?? [],
       availability: formValue.availability ?? "",
     },
   });
 
   const onSubmit = (data: PreferredPositionSchema) => {
-    setFormValue("jobType", data.jobType ?? "");
-    setFormValue("locationPreferred", data.locationPreferred ?? "");
-    setFormValue("relocate", data.relocate ?? undefined);
-    setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
-    setFormValue("expectedSalaryTo", data.expectedSalaryTo ?? "");
-    setFormValue("jobDuration", data.jobDuration ?? "");
-    // setFormValue("fromHour", data.fromHour ?? undefined);
-    // setFormValue("fromPeriod", data.fromPeriod ?? undefined);
-    // setFormValue("toHour", data.toHour ?? undefined);
-    // setFormValue("toPeriod", data.toPeriod ?? undefined);
-    setFormValue("preferredWorkingHours", data.preferredWorkingHours ?? "");
-    setFormValue("workShift", data.workShift ?? "");
-    setFormValue("availability", data.availability ?? "");
+    useHireFormStore.setState((state) => ({
+      formValue: { ...state.formValue, ...data },
+    }));
     nextPage();
   };
 
@@ -70,7 +58,7 @@ export default function PreferredPositionForm() {
               Preferred Position
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
               <FormField
                 type=""
                 control={control}
@@ -94,25 +82,6 @@ export default function PreferredPositionForm() {
                 required={false}
                 error={errors.locationPreferred?.message}
               />
-              <FormField
-                type=""
-                control={control}
-                label="Relocate"
-                name="relocate"
-                component="select"
-                options={[
-                  {
-                    label: "Yes",
-                    value: "yes",
-                  },
-                  {
-                    label: "No",
-                    value: "no",
-                  },
-                ]}
-                required={false}
-                error={errors.relocate?.message}
-              />
             </div>
             <h3 className="text-base font-medium text-gray-700 mt-3">
               Expected Salary
@@ -130,6 +99,7 @@ export default function PreferredPositionForm() {
                     required={false}
                     error={errors.expectedSalaryFrom?.message}
                   />
+
                   <FormField
                     type=""
                     control={control}
@@ -162,79 +132,44 @@ export default function PreferredPositionForm() {
                 <h3 className="text-base font-medium text-gray-700">
                   Perffered Working Hours
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  {/* <FormField
-                    type=""
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <FormField
+                    type="time"
                     control={control}
                     label="From Hour"
                     name="fromHour"
-                    component="select"
-                    options={[
-                      { label: "1", value: "1" },
-                      { label: "2", value: "2" },
-                      { label: "3", value: "3" },
-                      { label: "4", value: "4" },
-                      { label: "5", value: "5" },
-                      { label: "6", value: "6" },
-                      { label: "7", value: "7" },
-                      { label: "8", value: "8" },
-                      { label: "9", value: "9" },
-                      { label: "10", value: "10" },
-                      { label: "11", value: "11" },
-                      { label: "12", value: "12" },
-                    ]}
+                    component="input"
                     required={false}
                     error={errors.fromHour?.message}
                   />
                   <FormField
-                    type=""
-                    control={control}
-                    label="From Period"
-                    name="fromPeriod"
-                    component="select"
-                    options={[
-                      { label: "AM", value: "AM" },
-                      { label: "PM", value: "PM" },
-                    ]}
-                    required={false}
-                    error={errors.fromPeriod?.message}
-                  />
-                  <FormField
-                    type=""
+                    type="time"
                     control={control}
                     label="To Hour"
                     name="toHour"
-                    component="select"
-                    options={[
-                      { label: "1", value: "1" },
-                      { label: "2", value: "2" },
-                      { label: "3", value: "3" },
-                      { label: "4", value: "4" },
-                      { label: "5", value: "5" },
-                      { label: "6", value: "6" },
-                      { label: "7", value: "7" },
-                      { label: "8", value: "8" },
-                      { label: "9", value: "9" },
-                      { label: "10", value: "10" },
-                      { label: "11", value: "11" },
-                      { label: "12", value: "12" },
-                    ]}
+                    component="input"
                     required={false}
                     error={errors.toHour?.message}
                   />
                   <FormField
                     type=""
                     control={control}
-                    label="To Period"
-                    name="toPeriod"
+                    label="Relocate"
+                    name="relocate"
                     component="select"
                     options={[
-                      { label: "AM", value: "AM" },
-                      { label: "PM", value: "PM" },
+                      {
+                        label: "Yes",
+                        value: "yes",
+                      },
+                      {
+                        label: "No",
+                        value: "no",
+                      },
                     ]}
                     required={false}
-                    error={errors.toPeriod?.message}
-                  /> */}
+                    error={errors.relocate?.message}
+                  />
                 </div>
               </div>
             </div>

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useHireFormStore } from "../../shared/store/useCreateHireStore";
 import DocumentsForm from "./forms/DocumentsForm";
@@ -24,7 +25,7 @@ export default function CreateHireListing() {
   const [open, setOpen] = useState(false);
 
   return (
-    <View className="bg-white">
+    <View className="bg-white h-full">
       {!open ? (
         <View className="px-4 mt-4">
           <Pressable

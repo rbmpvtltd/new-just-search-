@@ -24,7 +24,7 @@ function AddHirePage() {
   const { data, error, isLoading, isError } = useQuery(
     trpc.hirerouter.add.queryOptions(),
   );
-  const { page } = useHireFormStore();
+  const page = useHireFormStore((s) => s.page);
 
   if (isLoading) {
     return;

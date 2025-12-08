@@ -1,6 +1,7 @@
 import CreateHireListing from "@/features/hire/create/add-hire";
 import MyHire from "@/features/hire/show/MyHire";
 import { trpcServer } from "@/trpc/trpc-server";
+import BoundaryWrapper from "@/utils/BoundaryWrapper";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 import { getRole } from "@/utils/session";
 
@@ -16,6 +17,8 @@ async function MyHireList() {
     trpcServer.hirerouter.show.query(),
   );
 
-  if (!myHire) return <CreateHireListing />;
+  if (!myHire) {
+    return <CreateHireListing />;
+  }
   return <MyHire data={myHire} />;
 }

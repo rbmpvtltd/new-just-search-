@@ -257,6 +257,8 @@ export const adminHireRouter = router({
         certificates: input.certificates,
         expectedSalaryFrom: input.expectedSalaryFrom,
         expectedSalaryTo: input.expectedSalaryTo,
+        fromHour: input.fromHour,
+        toHour: input.toHour,
         relocate: input.relocate,
         availability: input.availability,
         idProof: input.idProof,
@@ -277,7 +279,6 @@ export const adminHireRouter = router({
         linkedin: "",
         views: 0,
         isFeature: false,
-        preferredWorkingHours: "",
         status: "Pending",
         website: "",
       })

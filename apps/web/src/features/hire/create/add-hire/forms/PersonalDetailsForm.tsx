@@ -280,9 +280,9 @@ export default function PersonalDetailsForm({
     {
       control,
       type: "text",
-      label: "area",
+      label: "Area",
       name: "area",
-      placeholder: "area",
+      placeholder: "Area",
       component: "input",
       section: "loction",
       error: errors.area?.message,
