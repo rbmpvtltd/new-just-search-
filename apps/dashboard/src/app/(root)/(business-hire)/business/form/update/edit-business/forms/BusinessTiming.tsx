@@ -9,15 +9,15 @@ import {
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { formatTime, toISOStringTime } from "@/utils/timeFormat";
-import type { UserBusinessListingType } from "..";
+import { useBusinessFormStore } from "../../../shared/store/useCreateBusinessStore";
+import type { EditAdminBusinessType } from "..";
 
 type BusinessTimingSchema = z.infer<typeof businessTimingSchema>;
 export default function BusinessTiming({
-  businessListing,
+  data,
 }: {
-  businessListing: UserBusinessListingType;
+  data: EditAdminBusinessType;
 }) {
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
@@ -29,9 +29,9 @@ export default function BusinessTiming({
   } = useForm<BusinessTimingSchema>({
     resolver: zodResolver(businessTimingSchema),
     defaultValues: {
-      days: businessListing?.days ?? [],
-      fromHour: formatTime(businessListing?.fromHour ?? ""),
-      toHour: formatTime(businessListing?.toHour ?? ""),
+      days: data?.business?.days ?? [],
+      fromHour: formatTime(data?.business?.fromHour ?? ""),
+      toHour: formatTime(data?.business?.toHour ?? ""),
     },
   });
 

@@ -7,6 +7,7 @@ import {
   businessListings,
   businessPhotos,
   businessSubcategories,
+  businessUpdateSchema,
 } from "@repo/db/dist/schema/business.schema";
 import {
   categories,
@@ -285,53 +286,148 @@ export const adminBusinessRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+      const getBusinessCategories = await db.query.categories.findMany({
+        where: (categories, { eq }) => eq(categories.type, 1),
+      });
+
+      const getStates = await db.query.states.findMany();
+      const business = await db.query.businessListings.findFirst({
+        where: (business, { eq }) => eq(business.id, input.id),
+      });
+      const category = await db.query.businessCategories.findFirst({
+        where: (businessCategories, { eq }) =>
+          eq(businessCategories.businessId, input.id),
+        columns: {
+          categoryId: true,
+        },
+      });
+
+      const subcategories = await db.query.businessSubcategories.findMany({
+        where: (businessSubcategories, { eq }) =>
+          eq(businessSubcategories.businessId, input.id),
+        columns: {
+          subcategoryId: true,
+        },
+      });
+      const businessPhotos = await db.query.businessPhotos.findMany({
+        where: (businessPhotos, { eq }) =>
+          eq(businessPhotos.businessId, input.id),
+        columns: {
+          photo: true,
+        },
+      });
+      return {
+        business,
+        category,
+        businessPhotos,
+        subcategories,
+        getBusinessCategories,
+        getStates,
+      };
     }),
   update: adminProcedure
-    .input(categoryUpdateSchema)
+    .input(businessUpdateSchema)
     .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      if (!id)
+      console.log("User id", input.userId);
+
+      const isBusinessExists = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, Number(input.userId)),
+        with: {
+          businessPhotos: true,
+        },
+      });
+
+      if (!isBusinessExists) {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please pass id field",
+          code: "NOT_FOUND",
+          message: "Business listing not found",
         });
-      const olddata = (
-        await db.select().from(categories).where(eq(categories.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
       }
-      await db.update(categories).set(updateData).where(eq(categories.id, id));
-      return { success: true };
-    }),
-  multidelete: adminProcedure
-    .input(
-      z.object({
-        ids: z.array(z.number()),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      //TODO: remove subcategory of these categories;
-      const allSeletedPhoto = await db
-        .select({
-          photo: categories.photo,
+
+      await cloudinaryDeleteImageByPublicId(isBusinessExists?.photo ?? "");
+
+      const updateBusiness = await db
+        .update(businessListings)
+        .set({
+          name: input.name,
+          photo: input.photo,
+          specialities: input.specialities,
+          description: input.description,
+          homeDelivery: input.homeDelivery,
+          latitude: input.latitude,
+          longitude: input.longitude,
+          buildingName: input.buildingName,
+          streetName: input.streetName,
+          area: input.area,
+          landmark: input.landmark,
+          pincode: input.pincode,
+          state: input.state,
+          city: Number(input.city),
+          // schedules: input.schedules,
+          days: input.days,
+          fromHour: input.fromHour,
+          toHour: input.toHour,
+          email: input.email,
+          phoneNumber: input.phoneNumber,
+          whatsappNo: input.whatsappNo,
+          contactPerson: input.contactPerson,
+          ownerNumber: input.ownerNumber,
+          alternativeMobileNumber: input.alternativeMobileNumber,
         })
-        .from(categories)
-        .where(inArray(categories.id, input.ids));
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => item.photo),
-      );
-      //TODO: test that subcategory is also deleting
+        .where(eq(businessListings.userId, isBusinessExists.userId));
+      if (!updateBusiness) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
+
+      if (isBusinessExists?.businessPhotos.length > 0) {
+        const publicIds = isBusinessExists.businessPhotos
+          .map((photo) => photo.photo)
+          .filter((id): id is string => Boolean(id));
+
+        if (publicIds.length > 0) {
+          await cloudinaryDeleteImagesByPublicIds(publicIds);
+        }
+      }
+
       await db
-        .delete(subcategories)
-        .where(inArray(subcategories.categoryId, input.ids));
-      await db.delete(categories).where(inArray(categories.id, input.ids));
-      return { success: true };
+        .delete(businessPhotos)
+        .where(eq(businessPhotos.businessId, isBusinessExists.id));
+
+      await db
+        .delete(businessSubcategories)
+        .where(eq(businessSubcategories.businessId, isBusinessExists.id));
+
+      const allPhotos = [
+        input.image1,
+        input.image2,
+        input.image3,
+        input.image4,
+        input.image5,
+      ].filter(Boolean);
+
+      if (allPhotos.length > 0) {
+        await db.insert(businessPhotos).values(
+          allPhotos.map((photo) => ({
+            businessId: isBusinessExists.id,
+            photo,
+          })),
+        );
+      }
+
+      await db.insert(businessSubcategories).values(
+        input.subcategoryId.map((subCategoryId) => ({
+          subcategoryId: subCategoryId,
+          businessId: isBusinessExists.id,
+        })),
+      );
+      return {
+        success: true,
+        message: "Business listing updated successfully",
+      };
     }),
   multiactive: adminProcedure
     .input(

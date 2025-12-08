@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addressDetailSchema } from "@repo/db/dist/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useRef } from "react";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
@@ -13,26 +13,22 @@ import {
 import LocationAutoDetect from "@/components/LocationAutoDetect";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
-import type { FormReferenceDataType, UserBusinessListingType } from "..";
+import { useBusinessFormStore } from "../../../shared/store/useCreateBusinessStore";
+import type { EditAdminBusinessType } from "..";
 
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({
-  businessListing,
-  formReferenceData,
+  data,
 }: {
-  businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
+  data: EditAdminBusinessType;
 }) {
   const trpc = useTRPC();
   const formValue = useBusinessFormStore((state) => state.formValue);
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
-  const [detectedCityName, setDetectedCityName] = React.useState<null | string>(
-    null,
-  );
+  const [detectedCityName, setDetectedCityName] = useState<null | string>(null);
 
   const {
     control,
@@ -42,19 +38,19 @@ export default function AddressDetail({
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
     defaultValues: {
-      buildingName: businessListing?.buildingName ?? "",
-      streetName: businessListing?.streetName ?? "",
-      area: businessListing?.area ?? "",
-      landmark: businessListing?.landmark ?? "",
-      latitude: businessListing?.latitude ?? "",
-      longitude: businessListing?.longitude ?? "",
-      pincode: businessListing?.pincode,
-      state: businessListing?.state.id,
-      city: businessListing?.city.id,
+      buildingName: data?.business?.buildingName ?? "",
+      streetName: data?.business?.streetName ?? "",
+      area: data?.business?.area ?? "",
+      landmark: data?.business?.landmark ?? "",
+      latitude: data?.business?.latitude ?? "",
+      longitude: data?.business?.longitude ?? "",
+      pincode: data?.business?.pincode,
+      state: data?.business?.state,
+      city: data?.business?.city,
     },
   });
 
-  const states = formReferenceData?.getStates.map((item) => {
+  const states = data?.getStates.map((item) => {
     return {
       label: item.name,
       value: item.id,

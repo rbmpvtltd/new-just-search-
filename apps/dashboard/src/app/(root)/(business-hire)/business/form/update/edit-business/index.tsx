@@ -1,24 +1,20 @@
 "use client";
 import type { OutputTrpcType } from "@/trpc/type";
+import type { SetOpen } from "../../edit.form";
 import { useBusinessFormStore } from "../../shared/store/useCreateBusinessStore";
 import AddressDetail from "./forms/AddressDetail";
 import BusinessDetail from "./forms/BusinessDetail";
 import BusinessTiming from "./forms/BusinessTiming";
 import ContactDetail from "./forms/ContactDetail";
 
-export type UserBusinessListingType =
-  | OutputTrpcType["businessrouter"]["show"]
-  | null;
-
-export type FormReferenceDataType =
-  | OutputTrpcType["businessrouter"]["add"]
-  | null;
+export type EditAdminBusinessType =
+  OutputTrpcType["adminBusinessRouter"]["edit"];
 export default function EditBusinessPage({
-  businessListing,
-  formReferenceData,
+  data,
+  setOpen,
 }: {
-  businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
+  setOpen: SetOpen;
+  data: EditAdminBusinessType;
 }) {
   const page = useBusinessFormStore((state) => state.page);
   const steps = [
@@ -31,30 +27,15 @@ export default function EditBusinessPage({
   const renderForm = () => {
     switch (page) {
       case 0:
-        return (
-          <BusinessDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <BusinessDetail data={data} />;
       case 1:
-        return (
-          <AddressDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <AddressDetail data={data} />;
       case 2:
-        return <BusinessTiming businessListing={businessListing} />;
+        return <BusinessTiming data={data} />;
       case 3:
-        return <ContactDetail businessListing={businessListing} />;
+        return <ContactDetail data={data} setOpen={setOpen} />;
       default:
-        return (
-          <BusinessDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <BusinessDetail data={data} />;
     }
   };
   return (

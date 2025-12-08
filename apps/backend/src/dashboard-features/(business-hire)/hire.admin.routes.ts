@@ -415,7 +415,6 @@ export const adminHireRouter = router({
         certificates: input.certificates,
         expectedSalaryFrom: input.expectedSalaryFrom,
         expectedSalaryTo: input.expectedSalaryTo,
-        preferredWorkingHours: input.preferredWorkingHours,
         employmentStatus: input.employmentStatus,
         relocate: input.relocate,
         availability: input.availability,

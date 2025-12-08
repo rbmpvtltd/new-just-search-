@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import Swal from "sweetalert2";
 import type z from "zod";
 import {
@@ -13,22 +14,28 @@ import {
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
-import { setRole } from "@/utils/session";
-import type { UserBusinessListingType } from "..";
+import { getQueryClient } from "@/trpc/query-client";
+import type { SetOpen } from "../../../edit.form";
+import { useBusinessFormStore } from "../../../shared/store/useCreateBusinessStore";
+import type { EditAdminBusinessType } from "..";
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail({
-  businessListing,
+  data,
+  setOpen,
 }: {
-  businessListing: UserBusinessListingType;
+  setOpen: SetOpen;
+  data: EditAdminBusinessType;
 }) {
   const trpc = useTRPC();
   const router = useRouter();
-  const { mutate } = useMutation(trpc.businessrouter.update.mutationOptions());
+  const { mutate } = useMutation(
+    trpc.adminBusinessRouter.update.mutationOptions(),
+  );
   const formValue = useBusinessFormStore((state) => state.formValue);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
+  const clearPage = useBusinessFormStore((state) => state.clearPage);
 
   const {
     control,
@@ -37,11 +44,11 @@ export default function ContactDetail({
   } = useForm<ContactDetailSchema>({
     resolver: zodResolver(contactDetailSchema),
     defaultValues: {
-      contactPerson: businessListing?.contactPerson ?? "",
-      phoneNumber: businessListing?.phoneNumber ?? "",
-      ownerNumber: businessListing?.ownerNumber ?? "",
-      whatsappNo: businessListing?.whatsappNo ?? "",
-      email: businessListing?.email ?? "",
+      contactPerson: data?.business?.contactPerson ?? "",
+      phoneNumber: data?.business?.phoneNumber ?? "",
+      ownerNumber: data?.business?.ownerNumber ?? "",
+      whatsappNo: data?.business?.whatsappNo ?? "",
+      email: data?.business?.email ?? "",
     },
   });
 
@@ -60,7 +67,6 @@ export default function ContactDetail({
       name: "phoneNumber",
       component: "input",
       placeholder: "Contact Person Number",
-      disabled: true,
       error: errors.phoneNumber?.message,
     },
     {
@@ -99,6 +105,7 @@ export default function ContactDetail({
   ];
 
   const onSubmit = (data: ContactDetailSchema) => {
+    const finalData = { ...formValue, ...data };
     //Store data in Zustand (merge with previous steps)
     useBusinessFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
@@ -111,30 +118,28 @@ export default function ContactDetail({
     // );
 
     mutate(
-      { ...formValue, pincode: formValue.pincode },
+      { ...finalData, pincode: formValue.pincode },
       {
         onSuccess: async (data) => {
           if (data.success) {
-            setRole("business");
-            await Swal.fire({
-              title: data.message,
-              icon: "success",
-              draggable: true,
+            clearPage();
+            toast("success", {
+              description: data.message,
             });
-            // clearPage();
-            router.push("/");
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.adminBusinessRouter.list.queryKey(),
+            });
+            setOpen(false);
           }
           console.log("Success", data);
         },
         onError: (error) => {
           if (isTRPCClientError(error)) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong!",
-              // footer: '<a href="#">Why do I have this issue?</a>',
+            toast.error("Error", {
+              description: error.message,
             });
-            console.error("Error", error.message);
+            console.error("error,", error.message);
           }
         },
       },
