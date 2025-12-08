@@ -1,5 +1,4 @@
-import { trpcServer } from "@/trpc/trpc-server";
-import { asyncHandler } from "@/utils/error/asyncHandler";
+"use client"
 import {
   Carousel,
   CarouselContent,
@@ -13,9 +12,12 @@ import { Badge } from "../../../components/ui/badge";
 import { MdLocationPin } from "react-icons/md";
 import Link from "next/link";
 import Favourite from "../shared/Favourite";
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
 
 async function PremiumShop() {
-  const { data } = await asyncHandler(trpcServer.banners.premiumShops.query());
+  const trpc = useTRPC()
+  const { data } =  useQuery(trpc.banners.premiumShops.queryOptions());
   return (
     <div className="py-4 mt-5">
       <h1 className="text-4xl text-primary font-bold text-center">

@@ -1,4 +1,3 @@
-import React from "react";
 import EditHirePage from "@/features/hire/update/edit-hire";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";

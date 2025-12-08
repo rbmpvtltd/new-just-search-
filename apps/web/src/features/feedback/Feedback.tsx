@@ -2,7 +2,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { feedbackInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
-import { error } from "console";
 import React from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";

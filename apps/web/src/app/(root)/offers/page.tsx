@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 // import {
 //   InstantSearch,
@@ -136,7 +136,6 @@
 //   );
 // }
 
-"use client";
 
 import {
   InstantSearch,

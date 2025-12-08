@@ -1,3 +1,4 @@
+"use client";
 // image-crop-dialog.tsx
 import type React from "react";
 import { useCallback, useState } from "react";

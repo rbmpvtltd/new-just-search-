@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 // import { getPagination } from "@/utils/getPagination";
 // import { HireListingCard } from "./component/HireListingCard";
 // import {
@@ -75,7 +75,6 @@
 //     </div>
 //   );
 // }
-"use client";
 import { getPagination } from "@/utils/getPagination";
 import { HireListingCard } from "./component/HireListingCard";
 import {
