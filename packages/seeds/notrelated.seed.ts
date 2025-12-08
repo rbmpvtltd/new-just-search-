@@ -118,8 +118,21 @@ export const bannerSeed = async () => {
 };
 
 // categories
+
+type DbCategory = {
+  id: number;
+  title: string;
+  slug: string;
+  photo: string;
+  status: boolean;
+  isPopular: boolean;
+  type: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
 export const seedCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM categories");
+  const dbCategoryValue: DbCategory[] = [];
   for (const row of rows) {
     const liveProfileImageUrl = `https://justsearch.net.in/assets/images/categories/${row.photo}`;
     let categoryPhotoPublicId: string | null = null;
@@ -134,8 +147,8 @@ export const seedCategories = async () => {
       console.log("category photo public id", result);
       categoryPhotoPublicId = result ?? null;
 
-      await db.insert(categories).values({
-        id: row.id,
+      dbCategoryValue.push({
+        id: Number(row?.id) ?? 12,
         title: row.title ?? "",
         slug: row.slug ?? "",
         photo: categoryPhotoPublicId ?? "",
@@ -147,11 +160,22 @@ export const seedCategories = async () => {
       });
     }
   }
+  await db.insert(categories).values(dbCategoryValue);
 };
 
 // sub_categories
+type DbSubCategory = {
+  id: number;
+  name: string;
+  slug: string;
+  categoryId: number;
+  status: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
 export const seedSubcategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM sub_categories");
+  const dbSubCategoryValue: DbSubCategory[] = [];
   for (const row of rows) {
     const [category] = await db
       .select()
@@ -168,7 +192,7 @@ export const seedSubcategories = async () => {
       row.slug = row.slug + row.id;
     }
 
-    await db.insert(subcategories).values({
+    dbSubCategoryValue.push({
       id: row.id,
       name: row.name,
       slug: row.slug,
@@ -178,6 +202,7 @@ export const seedSubcategories = async () => {
       updatedAt: row.updated_at,
     });
   }
+  await db.insert(subcategories).values(dbSubCategoryValue);
 
   console.log("Subcategories migrated successfully!");
 };
