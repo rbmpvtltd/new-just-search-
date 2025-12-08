@@ -39,7 +39,7 @@ export default function PreferredPositionForm({
       // fromPeriod: formValue.fromPeriod ?? undefined,
       // toHour: formValue.toHour ?? undefined,
       // toPeriod: formValue.toPeriod ?? undefined,
-      preferredWorkingHours: data?.hire?.preferredWorkingHours ?? "",
+      // preferredWorkingHours: data?.hire?.preferredWorkingHours ?? "",
       workShift: data?.hire?.workShift ?? [],
       availability: data?.hire?.availability ?? "",
     },
@@ -56,7 +56,7 @@ export default function PreferredPositionForm({
     // setFormValue("fromPeriod", data.fromPeriod ?? undefined);
     // setFormValue("toHour", data.toHour ?? undefined);
     // setFormValue("toPeriod", data.toPeriod ?? undefined);
-    setFormValue("preferredWorkingHours", data.preferredWorkingHours ?? "");
+    // setFormValue("preferredWorkingHours", data.preferredWorkingHours ?? "");
     setFormValue("workShift", data.workShift ?? "");
     setFormValue("availability", data.availability ?? "");
     nextPage();

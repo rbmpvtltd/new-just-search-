@@ -225,7 +225,9 @@ export const FormField = <T extends FieldValues>({
               return <Textarea />;
 
             case "image":
-              return <CropperComponent onChange={onChange} value={value} />;
+              return (
+                <CropperComponent onChange={onChange} value={String(value)} />
+              );
 
             default:
               return <div>no component</div>;

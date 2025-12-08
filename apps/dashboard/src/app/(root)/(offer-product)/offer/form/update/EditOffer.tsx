@@ -45,7 +45,7 @@ export default function EditOffer({
       discountPercent: myOffer?.offer?.discountPercent,
       finalPrice: myOffer?.offer?.finalPrice,
       offerDescription: myOffer?.offer?.offerDescription,
-      photo: myOffer?.offer.offerPhotos[0]?.photo || "",
+      mainImage: myOffer?.offer.offerPhotos[0]?.photo || "",
       image2: myOffer?.offer.offerPhotos[1]?.photo || "",
       image3: myOffer?.offer.offerPhotos[2]?.photo || "",
       image4: myOffer?.offer.offerPhotos[3]?.photo || "",
@@ -64,7 +64,7 @@ export default function EditOffer({
       name: "offerName",
       placeholder: "Product Name",
       component: "input",
-      disabled: true,
+      // disabled: true,
       error: errors.offerName?.message,
     },
     {
@@ -103,7 +103,7 @@ export default function EditOffer({
       options: categories
         ? [{ label: categories?.title, value: categories?.id }]
         : [],
-      disabled: true,
+      // disabled: true,
       error: errors.categoryId?.message,
     },
     {
@@ -133,9 +133,9 @@ export default function EditOffer({
   const formFields2: FormFieldProps<EditOfferSchema>[] = [
     {
       control,
-      name: "photo",
+      name: "mainImage",
       component: "image",
-      error: errors.photo?.message,
+      error: errors.mainImage?.message,
     },
     {
       control,

@@ -24,7 +24,6 @@ export default function AddressDetail({
   data: EditAdminBusinessType;
 }) {
   const trpc = useTRPC();
-  const formValue = useBusinessFormStore((state) => state.formValue);
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
