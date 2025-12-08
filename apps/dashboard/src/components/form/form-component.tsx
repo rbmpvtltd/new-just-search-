@@ -1,9 +1,12 @@
+import { useState } from "react";
 import {
   type Control,
   Controller,
   type FieldValues,
   type Path,
 } from "react-hook-form";
+import { Spinner } from "@/components/ui/spinner";
+import Editor from "../dom-components/hello-dom";
 import CropperComponent from "../image/upload-image";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
@@ -14,15 +17,17 @@ import { Textarea } from "../ui/textarea";
 export interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
   type?: string;
-  label: string;
+  label?: string;
   name: Path<T>;
   placeholder?: string;
   className?: string;
   mainDivClassName?: string;
   required?: boolean;
   section?: string;
+  loading?: boolean;
   error?: string;
   options?: Option[] | undefined;
+  labelHidden?: boolean;
   component:
     | "input"
     | "input-slug"
@@ -31,7 +36,8 @@ export interface FormFieldProps<T extends FieldValues> {
     | "checkbox"
     | "single-checkbox"
     | "textarea"
-    | "image";
+    | "image"
+    | "editor";
 }
 
 export const FormField = <T extends FieldValues>({
@@ -40,6 +46,10 @@ export const FormField = <T extends FieldValues>({
   label,
   name,
   placeholder,
+
+  labelHidden = false,
+
+  loading = false,
   className,
   mainDivClassName,
   required = true,
@@ -49,10 +59,11 @@ export const FormField = <T extends FieldValues>({
   component,
   ...props
 }: FormFieldProps<T>) => {
+  const [_, setPlainText] = useState("");
   return (
     <div className={mainDivClassName}>
-      <Label htmlFor={name} className="mb-2 gap-0">
-        {label}
+      <Label htmlFor={name} className="mb-2 gap-0 ">
+        {!labelHidden && label}
         {required && <span className="text-red-500 ">*</span>}
       </Label>
       <Controller
@@ -90,7 +101,24 @@ export const FormField = <T extends FieldValues>({
                 </div>
               );
 
-            case "multiselect":
+            case "multiselect": {
+              if (loading)
+                return (
+                  <div className="">
+                    <MultiSelect
+                      options={options}
+                      // defaultValues={
+                      //   Array.isArray(value)
+                      //     ? options?.filter((opt) => value.includes(opt.value))
+                      //     : []
+                      // }
+                      // onChange={(selected) =>
+                      //   onChange(selected.map((s) => s.value))
+                      // }
+                    />
+                    <Spinner />
+                  </div>
+                );
               return (
                 <MultiSelect
                   options={options}
@@ -104,6 +132,7 @@ export const FormField = <T extends FieldValues>({
                   }
                 />
               );
+            }
 
             case "select":
               return (
@@ -171,6 +200,18 @@ export const FormField = <T extends FieldValues>({
                 />
               );
 
+            case "editor":
+              return (
+                <Editor
+                  value={value}
+                  onChange={(text: string) => {
+                    onChange(text); // ✅ send to react-hook-form
+                    // if (onValueChange) onValueChange(text);
+                  }}
+                  setPlainText={setPlainText}
+                  // setEditorState={setEditorState}
+                />
+              );
             case "textarea":
               return <Textarea />;
 

@@ -2,9 +2,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { notificationInsertSchema } from "@repo/db/dist/schema/user.schema";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { z } from "zod";
 import {
   FormField,
@@ -20,9 +20,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
+import type { OutputTrpcType } from "@/trpc/type";
 
+type AddData = OutputTrpcType["adminNotificationRouter"]["add"];
 const extendedInsertSchema = notificationInsertSchema;
 
 type SelectSchema = z.infer<typeof extendedInsertSchema>;
@@ -36,9 +39,11 @@ export function AddNewEntiry() {
         <Button>Add Entry</Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-[425px] p-4">
-        <Suspense fallback={<div> loading ...</div>}>
-          {open && <AddForm setOpen={setOpen} />}
-        </Suspense>
+        {open && (
+          <Suspense fallback={<div> loading ...</div>}>
+            <GetData setOpen={setOpen} />
+          </Suspense>
+        )}
       </SheetContent>
     </Sheet>
   );
@@ -46,13 +51,25 @@ export function AddNewEntiry() {
 
 interface AddForm {
   setOpen: Dispatch<SetStateAction<boolean>>;
+  data: AddData;
 }
-function AddForm({ setOpen }: AddForm) {
+
+function GetData({ setOpen }: { setOpen: Dispatch<SetStateAction<boolean>> }) {
   const trpc = useTRPC();
 
-  const { data } = useSuspenseQuery(
-    trpc.adminNotificationRouter.add.queryOptions(),
+  const { data, isFetching } = useSuspenseQuery(
+    trpc.adminNotificationRouter.add.queryOptions(undefined, {
+      staleTime: 0,
+    }),
   );
+
+  if (isFetching) return <Spinner />;
+
+  return <AddForm setOpen={setOpen} data={data} />;
+}
+
+function AddForm({ setOpen, data }: AddForm) {
+  const trpc = useTRPC();
 
   const { mutate: create } = useMutation(
     trpc.adminNotificationRouter.create.mutationOptions(),
@@ -67,15 +84,25 @@ function AddForm({ setOpen }: AddForm) {
     defaultValues: {
       description: "",
       title: "",
-      //city: [],
+      city: [],
       notificationId: data.newNotificationId,
-      //state: [],
+      state: [],
       role: [],
       status: true,
-      //categoryId: [],
-      //subCategoryId: [],
+      categoryId: [],
+      subCategoryId: [],
     },
   });
+
+  const selectedCategoryId = useWatch({ control, name: "categoryId" }) ?? [];
+  const { data: subCategories, isLoading: subCategoriesLoading } = useQuery(
+    trpc.utilsRouter.getSubCategories.queryOptions(selectedCategoryId),
+  );
+
+  const selectedStateIds = useWatch({ control, name: "state" }) ?? [];
+  const { data: cities, isLoading: citiesLoading } = useQuery(
+    trpc.utilsRouter.getCities.queryOptions(selectedStateIds),
+  );
 
   const onSubmit = async (data: SelectSchema) => {
     create(data, {
@@ -108,17 +135,50 @@ function AddForm({ setOpen }: AddForm) {
       ],
       error: errors.role?.message,
     },
-    // {
-    //   control,
-    //   label: "Category",
-    //   name: "categoryId",
-    //   placeholder: "Category",
-    //   component: "select",
-    //   options:
-    //     categories?.map((item) => ({ label: item.label, value: item.value })) ??
-    //     [],
-    //   error: errors.categoryId?.message,
-    // },
+    {
+      control,
+      label: "Category",
+      name: "categoryId",
+      placeholder: "Category",
+      component: "multiselect",
+      options:
+        data.category?.map((item) => ({ label: item.name, value: item.id })) ??
+        [],
+      error: errors.categoryId?.message,
+    },
+    {
+      control,
+      label: "Sub Category",
+      name: "subCategoryId",
+      placeholder: "Sub category",
+      component: "multiselect",
+      loading: subCategoriesLoading,
+      options:
+        subCategories?.map((item) => ({ label: item.name, value: item.id })) ??
+        [],
+      error: errors.subCategoryId?.message,
+    },
+    {
+      control,
+      label: "State",
+      name: "state",
+      placeholder: "State",
+      component: "multiselect",
+      options:
+        data.state?.map((item) => ({ label: item.name, value: item.id })) ?? [],
+      error: errors.state?.message,
+    },
+    {
+      control,
+      label: "City",
+      name: "city",
+      placeholder: "City",
+      component: "multiselect",
+      loading: citiesLoading,
+      options:
+        cities?.map((item) => ({ label: item.name, value: item.id })) ?? [],
+      error: errors.city?.message,
+    },
     {
       control,
       label: "Title",
@@ -146,8 +206,9 @@ function AddForm({ setOpen }: AddForm) {
   ];
 
   return (
-    <form className="" onSubmit={handleSubmit(onSubmit)}>
+    <form className="overflow-y-scroll" onSubmit={handleSubmit(onSubmit)}>
       <SheetHeader>
+        <div>{data.newNotificationId}</div>
         <SheetTitle>Add</SheetTitle>
       </SheetHeader>
       <div className="grid grid-cols-1 gap-6 ">
