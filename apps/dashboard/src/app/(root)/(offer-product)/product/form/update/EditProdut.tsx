@@ -1,6 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { offersInsertSchema } from "@repo/db/dist/schema/offer.schema";
+import {
+  productInsertSchema,
+  type productUpdateSchema,
+} from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useForm, useWatch } from "react-hook-form";
@@ -18,47 +21,48 @@ import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
-import type { SetOpen } from "../add.form";
+import type { SetOpen } from "../edit.form";
 
-type AddOfferSchema = z.infer<typeof offersInsertSchema>;
-type AddAdminOfferType = OutputTrpcType["adminOfferRouter"]["add"];
-export default function AddOffer({
-  setOpen,
+type EditProductSchema = z.infer<typeof productUpdateSchema>;
+
+export type EditAdminProductType =
+  | OutputTrpcType["adminProductRouter"]["edit"]
+  | null;
+export default function EditProduct({
   data,
+  setOpen,
 }: {
+  data: EditAdminProductType;
   setOpen: SetOpen;
-  data: AddAdminOfferType;
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
-    trpc.adminOfferRouter.create.mutationOptions(),
+    trpc.adminProductRouter.update.mutationOptions(),
   );
 
   const {
     control,
-    setValue,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
-  } = useForm<AddOfferSchema>({
-    resolver: zodResolver(offersInsertSchema),
+  } = useForm<EditProductSchema>({
+    resolver: zodResolver(productInsertSchema),
     defaultValues: {
-      businessId: NaN,
-      offerName: "",
-      rate: 0,
-      discountPercent: 0,
-      finalPrice: 0,
-      offerDescription: "",
-      mainImage: "",
-      image2: "",
-      image3: "",
-      image4: "",
-      image5: "",
-      categoryId: 0,
-      subcategoryId: [],
+      businessId: data?.product.businessId,
+      productName: data?.product.productName,
+      rate: data?.product.rate,
+      productDescription: data?.product.productDescription,
+      mainImage: data?.product.mainImage ?? "",
+      image2: data?.productPhotos[1]?.photo ?? "",
+      image3: data?.productPhotos[2]?.photo ?? "",
+      image4: data?.productPhotos[3]?.photo ?? "",
+      image5: data?.productPhotos[4]?.photo ?? "",
+      categoryId: data?.product.categoryId,
+      subcategoryId: data?.product.productSubCategories.map(
+        (item) => item.subcategoryId,
+      ),
     },
   });
-  const categories = data?.getBusinessCategories.map((item) => {
+  const categories = data?.getBusinessCategories?.map((item) => {
     return {
       label: item.title,
       value: item.id,
@@ -66,11 +70,11 @@ export default function AddOffer({
   });
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
   const { data: subCategories, isLoading } = useQuery(
-    trpc.adminOfferRouter.getSubCategories.queryOptions({
+    trpc.businessrouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
   );
-  const formFields: FormFieldProps<AddOfferSchema>[] = [
+  const formFields: FormFieldProps<EditProductSchema>[] = [
     {
       control,
       label: "Business Name",
@@ -86,11 +90,11 @@ export default function AddOffer({
     },
     {
       control,
-      label: "Offer Name",
-      name: "offerName",
+      label: "Product Name",
+      name: "productName",
       placeholder: "Product Name",
       component: "input",
-      error: errors.offerName?.message,
+      error: errors.productName?.message,
     },
     {
       control,
@@ -99,38 +103,7 @@ export default function AddOffer({
       placeholder: "Rate",
       type: "number",
       component: "input",
-      onChangeValue: (value) => {
-        if (!value) return;
-        setValue("finalPrice", Number(value));
-      },
       error: errors.rate?.message,
-    },
-    {
-      control,
-      label: "Discount Percent",
-      name: "discountPercent",
-      placeholder: "Discount Percent",
-      component: "input",
-      type: "number",
-      onChangeValue: (value) => {
-        if (!value) return;
-        const discount = parseFloat(String(value));
-        const price = parseFloat((getValues("rate") || 0).toString());
-        const final = (price * (100 - discount)) / 100;
-
-        setValue("discountPercent", discount);
-        setValue("finalPrice", parseFloat(final.toFixed(2)));
-      },
-      error: errors.discountPercent?.message,
-    },
-    {
-      control,
-      label: "Final Price",
-      name: "finalPrice",
-      placeholder: "Final Price",
-      component: "input",
-      type: "number",
-      error: errors.finalPrice?.message,
     },
     {
       control,
@@ -161,32 +134,37 @@ export default function AddOffer({
     {
       control,
       label: "Description",
-      name: "offerDescription",
+      name: "productDescription",
       placeholder: "Description",
       component: "editor",
-      error: errors.offerDescription?.message,
+      error: errors.productDescription?.message,
     },
   ];
-  const formFields2: FormFieldProps<AddOfferSchema>[] = [
+
+  const formFields2: FormFieldProps<EditProductSchema>[] = [
     {
       control,
+      // label: "Product Image",
       name: "mainImage",
-      component: "image",
       required: false,
+      component: "image",
       error: errors.mainImage?.message,
     },
     {
       control,
       type: "",
+      label: "dadasdad",
       name: "image2",
       component: "image",
-      className: "mt-5",
+      className: "mt-10",
       required: false,
+      labelHidden: true,
       error: errors.image2?.message,
     },
     {
       control,
       type: "",
+      // label: "",
       name: "image3",
       component: "image",
       required: false,
@@ -195,6 +173,7 @@ export default function AddOffer({
     {
       control,
       type: "",
+      // label: "",
       name: "image4",
       component: "image",
       required: false,
@@ -203,13 +182,15 @@ export default function AddOffer({
     {
       control,
       type: "",
+      // label: "",
       name: "image5",
       component: "image",
       required: false,
+
       error: errors.image5?.message,
     },
   ];
-  const onSubmit = async (data: AddOfferSchema) => {
+  const onSubmit = async (data: EditProductSchema) => {
     const file = await uploadToCloudinary(
       [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "offers",
@@ -255,12 +236,16 @@ export default function AddOffer({
       >
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              Edit Product
+            </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
               {formFields.map((field) => (
                 <div
                   key={field.name}
                   className={
-                    field.name === "offerDescription" ? "col-span-full" : ""
+                    field.name === "productDescription" ? "col-span-full" : ""
                   }
                 >
                   <FormField {...field} />
@@ -268,10 +253,10 @@ export default function AddOffer({
               ))}
             </div>
             <Label className="mt-3 gap-0 ">
-              Offer Images
+              Product Images
               <span className="text-red-500 ">*</span>
             </Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mt-3">
               {formFields2.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}

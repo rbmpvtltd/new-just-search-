@@ -51,7 +51,6 @@ export const offersInsertSchema = createInsertSchema(offers, {
   .omit({
     offerStartDate: true,
     offerEndDate: true,
-    businessId: true,
   })
   .extend({
     subcategoryId: z

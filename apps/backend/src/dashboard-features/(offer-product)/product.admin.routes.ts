@@ -1,12 +1,12 @@
 import { db } from "@repo/db";
 import { businessListings } from "@repo/db/dist/schema/business.schema";
 import {
-  offerPhotos,
-  offerSubcategory,
-  offers,
-  offersInsertSchema,
-  offersUpdateSchema,
-} from "@repo/db/dist/schema/offer.schema";
+  productInsertSchema,
+  productPhotos,
+  productSubCategories,
+  products,
+  productUpdateSchema,
+} from "@repo/db/dist/schema/product.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import slugify from "slugify";
@@ -18,23 +18,23 @@ import {
 } from "@/lib/tableUtils";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
-  offerAllowedSortColumns,
-  offerColumns,
-  offerGlobalFilterColumns,
-} from "./offer.admin.service";
+  productAllowedSortColumns,
+  productColumns,
+  productGlobalFilterColumns,
+} from "./product.admin.service";
 
-export const adminOfferRouter = router({
+export const adminProductRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
       input.globalFilter,
-      offerColumns,
-      offerGlobalFilterColumns,
+      productColumns,
+      productGlobalFilterColumns,
     );
 
     const orderBy = buildOrderByClause(
       input.sorting,
-      offerAllowedSortColumns,
+      productAllowedSortColumns,
       sql`created_at DESC`,
     );
 
@@ -42,26 +42,26 @@ export const adminOfferRouter = router({
 
     const data = await db
       .select({
-        id: offers.id,
-        photo: offers.mainImage,
-        offerName: offers.offerName,
+        id: products.id,
+        photo: products.mainImage,
+        productName: products.productName,
         businessName: businessListings.name,
-        status: offers.status,
-        expired_at: offers.createdAt,
-        created_at: offers.createdAt,
+        status: products.status,
+        expired_at: products.createdAt,
+        created_at: products.createdAt,
       })
-      .from(offers)
+      .from(products)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
-      .leftJoin(businessListings, eq(businessListings.id, offers.businessId))
+      .leftJoin(businessListings, eq(businessListings.id, products.businessId))
       .offset(offset);
 
     const totalResult = await db
       .select({
-        count: sql<number>`count(distinct ${offers.id})::int`,
+        count: sql<number>`count(distinct ${products.id})::int`,
       })
-      .from(offers)
+      .from(products)
       .where(where);
 
     const total = totalResult[0]?.count ?? 0;
@@ -101,11 +101,11 @@ export const adminOfferRouter = router({
     }),
 
   create: adminProcedure
-    .input(offersInsertSchema)
+    .input(productInsertSchema)
     .mutation(async ({ ctx, input }) => {
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
-          eq(businessListings.id, input.businessId),
+          eq(businessListings.id, Number(input.businessId)),
       });
       if (!business) {
         throw new TRPCError({
@@ -113,44 +113,39 @@ export const adminOfferRouter = router({
           message: "Business not found",
         });
       }
-      const slugifyName = slugify(input.offerName, {
+      const slugifyName = slugify(input.productName, {
         lower: true,
         strict: true,
       });
 
-      const startDate = new Date();
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 5);
-      const [offer] = await db
-        .insert(offers)
+      const [product] = await db
+        .insert(products)
         .values({
-          businessId: business.id,
-          offerName: input.offerName,
           mainImage: input.mainImage,
-          offerSlug: slugifyName,
+          businessId: business.id,
+          productName: input.productName,
+          productSlug: slugifyName,
           categoryId: input.categoryId,
           rate: input.rate,
           discountPercent: input.discountPercent,
           finalPrice: input.finalPrice,
-          offerDescription: input.offerDescription,
-          offerStartDate: startDate,
-          offerEndDate: endDate,
+          productDescription: input.productDescription,
         })
         .returning({
-          id: offers.id,
+          id: products.id,
         });
 
-      if (!offer) {
+      if (!product) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Offer not created",
         });
       }
-      const offerId = offer.id;
+      const productId = product.id;
       if (input.subcategoryId.length > 0) {
-        await db.insert(offerSubcategory).values(
+        await db.insert(productSubCategories).values(
           input.subcategoryId.map((subCategoryId) => ({
-            offerId,
+            productId,
             subcategoryId: Number(subCategoryId),
           })),
         );
@@ -164,9 +159,9 @@ export const adminOfferRouter = router({
       ].filter(Boolean); // removes empty or null values
 
       if (allPhotos.length > 0) {
-        await db.insert(offerPhotos).values(
+        await db.insert(productPhotos).values(
           allPhotos.map((photo) => ({
-            offerId,
+            productId,
             photo,
           })),
         );
@@ -174,34 +169,34 @@ export const adminOfferRouter = router({
 
       return {
         success: true,
-        message: "Offer added successfully",
+        message: "Product added successfully",
       };
     }),
 
   edit: adminProcedure
-    .input(z.object({ offerId: z.number() }))
+    .input(z.object({ productId: z.number() }))
     .query(async ({ input, ctx }) => {
       const getBusinessCategories = await db.query.categories.findMany({
         where: (categories, { eq }) => eq(categories.type, 1),
       });
-      const offer = await db.query.offers.findFirst({
-        where: (offers, { and, eq }) => and(eq(offers.id, input.offerId)),
+      const product = await db.query.products.findFirst({
+        where: (products, { and, eq }) => and(eq(products.id, input.productId)),
         with: {
-          offerPhotos: true,
-          offerSubcategory: true,
+          productPhotos: true,
+          productSubCategories: true,
         },
       });
 
-      if (!offer) {
+      if (!product) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Offer not found or does not belong to this business",
+          message: "Product not found or does not belong to this business",
         });
       }
 
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
-          eq(businessListings.id, offer.businessId),
+          eq(businessListings.id, Number(product.businessId)),
       });
       if (!business) {
         throw new TRPCError({
@@ -230,28 +225,29 @@ export const adminOfferRouter = router({
           subcategoryId: true,
         },
       });
-      const offerPhotos = await db.query.offerPhotos.findMany({
-        where: (offerPhotos, { eq }) => eq(offerPhotos.offerId, input.offerId),
+      const productPhotos = await db.query.productPhotos.findMany({
+        where: (productPhotos, { eq }) =>
+          eq(productPhotos.productId, input.productId),
         columns: {
           photo: true,
         },
       });
       return {
-        offer,
+        product,
         category,
         subcategories,
-        offerPhotos,
+        productPhotos,
         getBusinessCategories,
         allBusinessListings,
       };
     }),
 
   update: adminProcedure
-    .input(offersUpdateSchema)
+    .input(productUpdateSchema)
     .mutation(async ({ input }) => {
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
-          eq(businessListings.id, input.businessId),
+          eq(businessListings.id, Number(input.businessId)),
       });
       if (!business) {
         throw new TRPCError({
@@ -260,46 +256,44 @@ export const adminOfferRouter = router({
         });
       }
 
-      const isOfferExists = await db.query.offers.findFirst({
-        where: (offers, { eq }) =>
-          eq(offers.businessId, Number(input.businessId)),
+      const isProductExists = await db.query.products.findFirst({
+        where: (products, { eq }) =>
+          eq(products.businessId, Number(input.businessId)),
       });
-      if (!isOfferExists) {
+
+      if (!isProductExists) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Offer not found or does not belong to this business",
+          message: "Product not found",
         });
       }
-      const updateOffer = await db
-        .update(offers)
+      const updateProduct = await db
+        .update(products)
         .set({
+          productName: input.productName,
           mainImage: input.mainImage,
-          offerName: input.offerName,
           categoryId: input.categoryId,
           rate: input.rate,
-          discountPercent: input.discountPercent,
-          finalPrice: input.finalPrice,
-          offerDescription: input.offerDescription,
+          productDescription: input.productDescription,
         })
-        .where(eq(offers.id, isOfferExists.id));
+        .where(eq(products.id, isProductExists.id));
 
-      if (!updateOffer) {
+      if (!updateProduct) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Offer not updated",
+          message: "Product not updated",
         });
       }
 
       await db
-        .delete(offerSubcategory)
-        .where(eq(offerSubcategory.offerId, isOfferExists.id));
-      await db.insert(offerSubcategory).values(
+        .delete(productSubCategories)
+        .where(eq(productSubCategories.productId, isProductExists.id));
+      await db.insert(productSubCategories).values(
         input.subcategoryId.map((subCategoryId) => ({
-          offerId: isOfferExists.id,
+          productId: isProductExists.id,
           subcategoryId: Number(subCategoryId),
         })),
       );
-
       const allPhotos = [
         input.image2,
         input.image3,
@@ -308,14 +302,13 @@ export const adminOfferRouter = router({
       ].filter(Boolean); // removes empty or null values
 
       if (allPhotos.length > 0) {
-        await db.insert(offerPhotos).values(
+        await db.insert(productPhotos).values(
           allPhotos.map((photo) => ({
-            offerId: isOfferExists.id,
+            productId: isProductExists.id,
             photo,
           })),
         );
       }
-
       return {
         success: true,
         message: "Offer updated successfully",
