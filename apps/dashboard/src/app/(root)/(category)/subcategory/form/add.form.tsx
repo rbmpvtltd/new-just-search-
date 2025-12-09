@@ -52,7 +52,7 @@ function AddForm({ setOpen }: AddForm) {
     trpc.adminSubcategoryRouter.add.queryOptions(),
   );
   const { mutate: create } = useMutation(
-    trpc.adminCategoryRouter.create.mutationOptions(),
+    trpc.adminSubcategoryRouter.create.mutationOptions(),
   );
 
   const {
@@ -69,11 +69,13 @@ function AddForm({ setOpen }: AddForm) {
   });
 
   const onSubmit = async (data: SubCategorySelectSchema) => {
+    console.log("data", { data });
+
     create(data, {
       onSuccess: () => {
         const queryClient = getQueryClient();
         queryClient.invalidateQueries({
-          queryKey: trpc.adminCategoryRouter.list.queryKey(),
+          queryKey: trpc.adminSubcategoryRouter.list.queryKey(),
         });
         setOpen(false);
       },
@@ -105,7 +107,11 @@ function AddForm({ setOpen }: AddForm) {
       label: "category",
       name: "categoryId",
       placeholder: "",
-      options: [],
+      options:
+        category?.categories.map((item) => ({
+          label: item.title,
+          value: item.id,
+        })) ?? [],
       component: "select",
     },
   ];

@@ -81,19 +81,30 @@ export const adminSubcategoryRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    const categories = db.query.categories.findMany({
+    const categories = await db.query.categories.findMany({
       columns: {
         title: true,
         id: true,
       },
     });
-    return { allcategory: categories };
+    return { categories };
   }),
   create: adminProcedure
     .input(subcategoryInsertSchema)
     .mutation(async ({ input }) => {
-      const slug = slugify(input.name);
-      await db.insert(subcategories).values({ ...input, slug });
+      console.log("Input", input);
+
+      const slug = slugify(input.name, { lower: true });
+      console.log("Slug", { slug });
+
+      const data = await db.insert(subcategories).values({
+        name: input.name,
+        categoryId: input.categoryId,
+        slug: slug,
+        status: input.status,
+      });
+      console.log("data", data);
+
       return { success: true };
     }),
   edit: adminProcedure
