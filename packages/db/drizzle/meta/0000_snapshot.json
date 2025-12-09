@@ -1,5 +1,5 @@
 {
-  "id": "42b8b995-01c9-4c99-a7df-59892562f7be",
+  "id": "a6ed3d71-9c47-488d-9574-c4f091248e9d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -3009,6 +3009,12 @@
           "name": "id",
           "type": "serial",
           "primaryKey": true,
+          "notNull": true
+        },
+        "main_image": {
+          "name": "main_image",
+          "type": "varchar(255)",
+          "primaryKey": false,
           "notNull": true
         },
         "business_id": {

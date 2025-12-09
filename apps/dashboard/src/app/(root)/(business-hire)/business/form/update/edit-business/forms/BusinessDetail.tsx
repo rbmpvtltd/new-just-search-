@@ -122,8 +122,8 @@ export default function BusinessDetail({
       placeholder: "Home Delivery",
       component: "select",
       options: [
-        { label: "Yes", value: true },
-        { label: "No", value: false },
+        { label: "Yes", value: "yes" },
+        { label: "No", value: "no" },
       ],
       required: false,
       error: errors.homeDelivery?.message,

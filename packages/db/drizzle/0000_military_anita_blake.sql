@@ -423,6 +423,7 @@ CREATE TABLE "product_subcategories" (
 --> statement-breakpoint
 CREATE TABLE "products" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"main_image" varchar(255) NOT NULL,
 	"business_id" integer,
 	"category_id" integer NOT NULL,
 	"product_name" varchar(255) NOT NULL,

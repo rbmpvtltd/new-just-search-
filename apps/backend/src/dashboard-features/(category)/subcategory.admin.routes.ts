@@ -5,6 +5,7 @@ import {
   categoryInsertSchema,
   categoryUpdateSchema,
   subcategories,
+  subcategoryInsertSchema,
 } from "@repo/db/dist/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
@@ -80,17 +81,19 @@ export const adminSubcategoryRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    return;
+    const categories = db.query.categories.findMany({
+      columns: {
+        title: true,
+        id: true,
+      },
+    });
+    return { allcategory: categories };
   }),
   create: adminProcedure
-    .input(
-      categoryInsertSchema.omit({
-        slug: true,
-      }),
-    )
+    .input(subcategoryInsertSchema)
     .mutation(async ({ input }) => {
-      const slug = slugify(input.title);
-      await db.insert(categories).values({ ...input, slug });
+      const slug = slugify(input.name);
+      await db.insert(subcategories).values({ ...input, slug });
       return { success: true };
     }),
   edit: adminProcedure

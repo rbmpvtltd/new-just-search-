@@ -1,10 +1,10 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
-import { useMutation } from "@tanstack/react-query";
+import { subcategoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -12,47 +12,33 @@ import {
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
-// import { bannerSelectSchema } from "@repo/db/dist/schema/not-related.schema";
-
-const extendedCategoryInsertSchema = categoryInsertSchema
-  .pick({
-    photo: true,
-    isPopular: true,
-    type: true,
-    title: true,
-    status: true,
-  })
-  .extend({
-    photo: z.any(),
-  });
-
-type CategorySelectSchema = z.infer<typeof extendedCategoryInsertSchema>;
+type SubCategorySelectSchema = z.infer<typeof subcategoryInsertSchema>;
 
 export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
+    <Sheet onOpenChange={setOpen} open={open}>
+      <SheetTrigger asChild>
         <Button>Add Entry</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      </SheetTrigger>
+      <SheetContent className="sm:max-w-[425px]">
         <Suspense fallback={<div> loading ...</div>}>
           {open && <AddForm setOpen={setOpen} />}
         </Suspense>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -62,6 +48,9 @@ interface AddForm {
 function AddForm({ setOpen }: AddForm) {
   const trpc = useTRPC();
 
+  const { data: category } = useQuery(
+    trpc.adminSubcategoryRouter.add.queryOptions(),
+  );
   const { mutate: create } = useMutation(
     trpc.adminCategoryRouter.create.mutationOptions(),
   );
@@ -70,68 +59,38 @@ function AddForm({ setOpen }: AddForm) {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CategorySelectSchema>({
-    resolver: zodResolver(extendedCategoryInsertSchema),
+  } = useForm<SubCategorySelectSchema>({
+    resolver: zodResolver(subcategoryInsertSchema),
     defaultValues: {
-      photo: "",
-      type: 1,
+      categoryId: NaN,
+      name: "",
       status: false,
-      isPopular: false,
     },
   });
 
-  const onSubmit = async (data: CategorySelectSchema) => {
-    const files = await uploadToCloudinary([data.photo], "banner");
-    if (!files || !files[0]) {
-      console.error("file uploading to cloudinary failed");
-      return;
-    }
-    create(
-      {
-        ...data,
-        photo: files[0],
+  const onSubmit = async (data: SubCategorySelectSchema) => {
+    create(data, {
+      onSuccess: () => {
+        const queryClient = getQueryClient();
+        queryClient.invalidateQueries({
+          queryKey: trpc.adminCategoryRouter.list.queryKey(),
+        });
+        setOpen(false);
       },
-      {
-        onSuccess: () => {
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.adminCategoryRouter.list.queryKey(),
-          });
-          setOpen(false);
-        },
-        onError: (e) => {
-          console.error(e);
-        },
+      onError: (e) => {
+        console.error(e);
       },
-    );
+    });
   };
 
-  const formFields: FormFieldProps<CategorySelectSchema>[] = [
+  const formFields: FormFieldProps<SubCategorySelectSchema>[] = [
     {
       control,
-      label: "Type",
-      name: "type",
-      placeholder: "Select Type of category",
-      component: "select",
-      options: [
-        { label: "Business", value: 1 },
-        { label: "Hire", value: 2 },
-      ],
-      error: errors.type?.message,
-    },
-    {
-      control,
-      label: "Title",
-      name: "title",
-      placeholder: "eg: garment",
+      label: "Name",
+      name: "name",
+      placeholder: "eg: name",
       component: "input",
-    },
-    {
-      control,
-      label: "Photo",
-      name: "photo",
-      component: "image",
-      error: "",
+      error: errors.name?.message,
     },
     {
       control,
@@ -143,32 +102,32 @@ function AddForm({ setOpen }: AddForm) {
     },
     {
       control,
-      label: "isPopular",
-      name: "isPopular",
-      mainDivClassName: "flex gap-4",
+      label: "category",
+      name: "categoryId",
       placeholder: "",
-      component: "single-checkbox",
+      options: [],
+      component: "select",
     },
   ];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogHeader>
-        <DialogTitle>Add</DialogTitle>
-      </DialogHeader>
-      <div className="grid grid-cols-1 gap-6 ">
+      <SheetHeader>
+        <SheetTitle>Add</SheetTitle>
+      </SheetHeader>
+      <div className="grid grid-cols-1 gap-6 px-4 ">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
       </div>
-      <DialogFooter className="mt-2">
-        <DialogClose asChild>
+      <SheetFooter className="mt-2">
+        <SheetClose asChild>
           <Button variant="outline">Cancel</Button>
-        </DialogClose>
+        </SheetClose>
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogFooter>
+      </SheetFooter>
     </form>
   );
 }
