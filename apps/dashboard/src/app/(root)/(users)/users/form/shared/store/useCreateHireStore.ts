@@ -1,22 +1,13 @@
-import type {
-  documentSchema,
-  educationSchema,
-  preferredPositionSchema,
-} from "@repo/db/dist/schema/hire.schema";
+import type { usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
+import type { profileInsertSchema } from "@repo/db/dist/schema/user.schema";
 import type z from "zod";
 import { create } from "zustand";
-import type { adminPersonalDetailsHireSchema } from "../../create/add-user/forms/PersonalDetailsForm";
 
-type PersonalDetailsSchema = z.infer<typeof adminPersonalDetailsHireSchema>;
-type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
-type EducationSchema = z.infer<typeof educationSchema>;
-type DocumentSchema = z.infer<typeof documentSchema>;
-export type CombinedForm = PreferredPositionSchema &
-  EducationSchema &
-  DocumentSchema &
-  PersonalDetailsSchema;
+type UserInsertSchema = z.infer<typeof usersInsertSchema>;
+type ProfileSchema = z.infer<typeof profileInsertSchema>;
+export type CombinedForm = ProfileSchema & UserInsertSchema;
 
-type HireFormProps = {
+type UserFormProps = {
   page: number;
   prevPage: () => void;
   nextPage: () => void;
@@ -30,62 +21,31 @@ type HireFormProps = {
 
 // Combined initial value
 const initialFormValue: CombinedForm = {
-  // PreferredPosition
-  jobType: [],
-  workShift: [],
-  jobDuration: [],
-  fromHour: "",
-  // fromPeriod: "",
-  toHour: "",
-  // toPeriod: "",
-  // preferredWorkingHours: "",
-  availability: "",
-  locationPreferred: "",
-  expectedSalaryFrom: "",
-  expectedSalaryTo: "",
-  relocate: "",
-
-  // EducationSchema
-  highestQualification: "",
-  employmentStatus: "",
-  workExperienceYear: 0,
-  workExperienceMonth: 0,
-  jobRole: "",
-  skillset: "",
-  previousJobRole: "",
-  certificates: "",
-
-  // DocumentSchema
-  idProof: "",
-  idProofPhoto: "",
-  coverLetter: "",
-  resumePhoto: "",
-  aboutYourself: "",
-  // referCode: "RBMHORJ00000",
-
-  // PersonalDetailsSchema
+  //user
   userId: NaN,
-  photo: "",
-  categoryId: 0,
-  subcategoryId: [],
-  name: "",
-  gender: "Male",
+  password: "",
+  role: "visiter",
+  googleId: "",
+  status: true,
+  phoneNumber: "",
+  displayName: "",
+  email: "",
+  //profile
+  profileImage: "",
   maritalStatus: "Married",
-  fatherName: "",
   dob: "",
-  languages: [],
-  mobileNumber: "",
-  latitude: "",
-  longitude: "",
   area: "",
   pincode: "",
   state: 0,
   city: 0,
-  alternativeMobileNumber: "",
-  email: "",
+  firstName: "",
+  address: "",
+  lastName: "",
+  occupation: "",
+  salutation: "",
 };
 
-export const useUserFormStore = create<HireFormProps>((set) => ({
+export const useUserFormStore = create<UserFormProps>((set) => ({
   page: 0,
   formValue: initialFormValue,
 

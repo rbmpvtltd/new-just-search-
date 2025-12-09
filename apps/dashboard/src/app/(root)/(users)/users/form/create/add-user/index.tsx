@@ -2,10 +2,8 @@
 import type { OutputTrpcType } from "@/trpc/type";
 import type { SetOpen } from "../../add.form";
 import { useUserFormStore } from "../../shared/store/useCreateHireStore";
-import DocumentsForm from "./forms/DocumentsForm";
-import EducationForm from "./forms/EducationForm";
-import PersonalDetailsForm from "./forms/PersonalDetailsForm";
-import PreferredPositionForm from "./forms/PreferredPositionForm";
+import ProfileForm from "./forms/ProfileForm";
+import UserForm from "./forms/UserForm";
 
 export type AddAdminUserType = OutputTrpcType["adminHireRouter"]["add"];
 export function AddUserPage({
@@ -26,11 +24,11 @@ export function AddUserPage({
   const renderForm = () => {
     switch (page) {
       case 0:
-        return <PersonalDetailsForm data={data} />;
+        return <UserForm data={data} />;
       case 1:
-        return <DocumentsForm setOpen={setOpen} />;
+        return <ProfileForm setOpen={setOpen} />;
       default:
-        return <PersonalDetailsForm data={data} />;
+        return <UserForm data={data} />;
     }
   };
 

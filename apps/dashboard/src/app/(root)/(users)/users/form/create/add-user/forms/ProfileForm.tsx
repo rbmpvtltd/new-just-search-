@@ -1,13 +1,12 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { documentSchema } from "@repo/db/dist/schema/hire.schema";
+import { profileInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Swal from "sweetalert2";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -20,8 +19,11 @@ import { getQueryClient } from "@/trpc/query-client";
 import type { SetOpen } from "../../../add.form";
 import { useUserFormStore } from "../../../shared/store/useCreateHireStore";
 
-type DocumentSchema = z.infer<typeof documentSchema>;
-export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
+const adminProfileInsertSchema = profileInsertSchema.extend({
+  userId: z.number(),
+});
+type ProfileSchema = z.infer<typeof adminProfileInsertSchema>;
+export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
   const router = useRouter();
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
@@ -34,31 +36,30 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<DocumentSchema>({
-    resolver: zodResolver(documentSchema),
+  } = useForm<ProfileSchema>({
+    resolver: zodResolver(adminProfileInsertSchema),
     defaultValues: {
-      idProof: formValue.idProof ?? "",
-      idProofPhoto: formValue.idProofPhoto ?? "",
-      coverLetter: formValue.coverLetter ?? "",
-      resumePhoto: formValue.resumePhoto ?? "",
-      aboutYourself: formValue.aboutYourself ?? "",
-      // referCode: formValue.referCode ?? "RBMHORJ00000",
+      profileImage: "",
+      firstName: "",
+      dob: "",
+      lastName: "",
+      email: "",
+      salutation: "",
+      occupation: "",
+      maritalStatus: "",
+      area: "",
+      pincode: "",
+      city: NaN,
+      state: NaN,
     },
   });
 
-  const onSubmit = async (data: DocumentSchema) => {
-    const finalData = { ...formValue, ...data };
-    const files = await uploadToCloudinary(
-      [data.idProofPhoto, data.resumePhoto],
-      "hire",
-    );
-    setFormValue("idProof", data.idProof ?? "");
-    setFormValue("idProofPhoto", files[0] ?? "");
-    setFormValue("coverLetter", data.coverLetter ?? "");
-    setFormValue("resumePhoto", files[1] ?? "");
-    setFormValue("aboutYourself", data.aboutYourself ?? "");
-    // setFormValue("referCode", data.referCode ?? "");
-
+  const onSubmit = async (data: ProfileSchema) => {
+    const file = await uploadToCloudinary([data.profileImage], "profile");
+    const finalData = {
+      ...data,
+      profileImage: file[0] ?? "",
+    };
     mutate(finalData, {
       onSuccess: async (data) => {
         if (data?.success) {
@@ -85,7 +86,7 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
     });
   };
 
-  const formFields: FormFieldProps<DocumentSchema>[] = [
+  const formFields: FormFieldProps<ProfileSchema>[] = [
     {
       control,
       label: "Id Proof",

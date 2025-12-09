@@ -1,11 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Gender, MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
-import { personalDetailsHireSchema } from "@repo/db/dist/schema/hire.schema";
+import { usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import z from "zod";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -18,16 +18,9 @@ import { useTRPC } from "@/trpc/client";
 import { useUserFormStore } from "../../../shared/store/useCreateHireStore";
 import type { AddAdminUserType } from "..";
 
-export const adminPersonalDetailsHireSchema = personalDetailsHireSchema.extend({
-  userId: z.number(),
-});
-type PersonalDetailsSchema = z.infer<typeof adminPersonalDetailsHireSchema>;
+type UserInsertSchema = z.infer<typeof usersInsertSchema>;
 
-export default function PersonalDetailsForm({
-  data,
-}: {
-  data: AddAdminUserType;
-}) {
+export default function UserForm({ data }: { data: AddAdminUserType }) {
   const trpc = useTRPC();
   const nextPage = useUserFormStore((s) => s.nextPage);
   const formValue = useUserFormStore((s) => s.formValue);
@@ -40,29 +33,9 @@ export default function PersonalDetailsForm({
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<PersonalDetailsSchema>({
-    resolver: zodResolver(adminPersonalDetailsHireSchema),
-    defaultValues: {
-      userId: formValue.userId ?? NaN,
-      name: formValue.name ?? "",
-      photo: formValue.photo ?? "",
-      categoryId: formValue.categoryId ?? "",
-      subcategoryId: formValue.subcategoryId ?? [],
-      gender: formValue.gender ?? "",
-      maritalStatus: formValue.maritalStatus ?? "Others",
-      fatherName: formValue.fatherName ?? "",
-      dob: formValue.dob ?? "",
-      languages: formValue.languages ?? [],
-      mobileNumber: formValue.mobileNumber ?? "",
-      alternativeMobileNumber: formValue.alternativeMobileNumber ?? "",
-      email: formValue.email ?? "",
-      latitude: formValue.latitude ?? "",
-      longitude: formValue.longitude ?? "",
-      area: formValue.area ?? "",
-      pincode: formValue.pincode ?? "",
-      state: formValue.state ?? 0,
-      city: formValue.city ?? 0,
-    },
+  } = useForm<UserInsertSchema>({
+    resolver: zodResolver(usersInsertSchema),
+    defaultValues: {},
   });
 
   const categories = data?.getHireCategories.map((item) => {
@@ -133,7 +106,7 @@ export default function PersonalDetailsForm({
     setValue,
     cities,
   ]);
-  const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
+  const formFields: FormFieldProps<UserInsertSchema>[] = [
     {
       control,
       type: "",
@@ -373,7 +346,7 @@ export default function PersonalDetailsForm({
     },
   ];
 
-  const onSubmit = async (data: PersonalDetailsSchema) => {
+  const onSubmit = async (data: UserInsertSchema) => {
     const files = await uploadToCloudinary([data.photo], "hire");
     setFormValue("userId", data.userId ?? NaN);
     setFormValue("photo", files[0] ?? "");
