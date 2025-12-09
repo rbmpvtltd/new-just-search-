@@ -1,11 +1,11 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { useTableStore } from "../store";
-import { EditBanner } from "../form/edit.form";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
+import { EditBanner } from "../form/edit.form";
+import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {
   const select = useTableStore((state) => state.select);
@@ -23,6 +23,25 @@ function SelectCell({ id }: { id: number }) {
 
 function ActionCell({ id }: { id: number }) {
   return <EditBanner id={id} />;
+}
+
+function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
+  const allActive = useTableStore((state) => state.active);
+  const toggleActive = useTableStore((state) => state.toggleActive);
+  const isSelected = allActive.filter((item) => item.id === id)[0];
+  const active = isSelected ? isSelected.isActive : isActive;
+  const handleToggle = () => {
+    toggleActive(id, !active);
+  };
+
+  return (
+    <Checkbox
+      checked={active}
+      onCheckedChange={handleToggle}
+      aria-label="Select all"
+      className="translate-y-0.5"
+    />
+  );
 }
 
 function SelectHeader({ ids }: { ids: number[] }) {
@@ -115,11 +134,13 @@ export const columns: ColumnDef<Lister>[] = [
     cell: ({ row }) => <div>{row.original.role}</div>,
   },
   {
-    accessorKey: "googleId",
+    accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Google Id" />
+      <DataTableColumnHeader column={column} title="Active" />
     ),
-    cell: ({ row }) => <div>{row.original.googleId}</div>,
+    cell: ({ row }) => (
+      <ActiveCell id={row.original.id} isActive={row.original.status} />
+    ),
   },
   {
     accessorKey: "created_at",

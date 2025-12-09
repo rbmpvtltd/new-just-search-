@@ -9,7 +9,6 @@ import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
-import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

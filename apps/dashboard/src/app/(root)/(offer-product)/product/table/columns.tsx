@@ -81,10 +81,10 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type SubcategoryArray = OutputTrpcType["adminBusinessRouter"]["list"]["data"];
-type Subcategory = UnwrapArray<SubcategoryArray>;
+type ProductArray = OutputTrpcType["adminProductRouter"]["list"]["data"];
+type Product = UnwrapArray<ProductArray>;
 
-export const columns: ColumnDef<Subcategory>[] = [
+export const columns: ColumnDef<Product>[] = [
   {
     id: "select",
     header: ({ table }) => {
@@ -124,55 +124,24 @@ export const columns: ColumnDef<Subcategory>[] = [
       ),
   },
   {
-    accessorKey: "name",
+    accessorKey: "productName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.name || "No Name"}
+        {row.original.productName || "No Name"}
       </div>
     ),
   },
   {
-    accessorKey: "phone",
+    accessorKey: "businessName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone Number" />
+      <DataTableColumnHeader column={column} title="Business Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.phone || "No Name"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "city",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="city name" />
-    ),
-    cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">
-        {row.original.city || "No Name"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "category",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category Name" />
-    ),
-    cell: ({ row }) => (
-      <div className="max-w-40 whitespace-normal">{row.original.category}</div>
-    ),
-  },
-  {
-    accessorKey: "subcategories",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Subcategories Name" />
-    ),
-    cell: ({ row }) => (
-      <div className="max-w-40 whitespace-normal">
-        {row.original.subcategories}
+        {row.original.businessName || "No Name"}
       </div>
     ),
   },
@@ -183,10 +152,16 @@ export const columns: ColumnDef<Subcategory>[] = [
       <DataTableColumnHeader column={column} title="Active" />
     ),
     cell: ({ row }) => (
-      <ActiveCell
-        id={row.original.id}
-        isActive={row.original.status === "Approved"}
-      />
+      <ActiveCell id={row.original.id} isActive={row.original.status} />
+    ),
+  },
+  {
+    accessorKey: "expired_at",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Expired At" />
+    ),
+    cell: ({ row }) => (
+      <div>{row?.original?.expired_at?.toLocaleDateString() ?? "null"}</div>
     ),
   },
   {

@@ -1,6 +1,13 @@
 // auth.schema.ts
 import { sql } from "drizzle-orm";
-import { pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -17,6 +24,7 @@ export const users = pgTable("users", {
   password: text("password"),
   role: userRoleEnum("role").default(UserRole.guest).notNull(),
   googleId: varchar("google_id", { length: 255 }),
+  status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
