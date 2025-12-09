@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Pressable } from "react-native";
 import Colors from "@/constants/Colors";
 import { useDetectLocation } from "@/query/useDetectLocation";
 

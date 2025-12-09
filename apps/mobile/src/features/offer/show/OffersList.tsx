@@ -1,8 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import React from "react";
-import { FlatList, Image, Text, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { FlatList, Image, Text, View,Pressable } from "react-native";
 import { OFFERS_URL } from "@/constants/apis";
 import { apiUrl } from "@/constants/Variable";
 import { useSuspenceData } from "@/query/getAllSuspense";

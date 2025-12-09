@@ -10,8 +10,8 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
+  Pressable
 } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
 import { HIRE_DETAIL_URL } from "@/constants/apis";
 import Colors from "@/constants/Colors";
 import { useSuspenceData } from "@/query/getAllSuspense";

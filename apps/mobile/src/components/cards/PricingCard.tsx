@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Alert, Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Alert, Text, useColorScheme, View,Pressable } from "react-native";
 import RazorpayCheckout from "react-native-razorpay";
 import { queryClient } from "@/lib/trpc";
 import Colors from "@/constants/Colors";

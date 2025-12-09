@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, Platform, useColorScheme } from "react-native";
+import { View, Text, Platform, useColorScheme,Pressable } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Colors from "@/constants/Colors";
-import { Pressable } from "react-native-gesture-handler";
 
 type Props = {
   value: string;

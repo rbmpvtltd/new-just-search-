@@ -187,8 +187,9 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
+  Pressable
 } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+
 import Colors from "@/constants/Colors";
 import { useStartChat } from "@/query/startChat";
 import { useAuthStore } from "@/store/authStore";

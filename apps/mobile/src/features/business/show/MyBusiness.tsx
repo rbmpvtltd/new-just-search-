@@ -1,8 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
-import { Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Text, useColorScheme, View,Pressable } from "react-native";
 import Colors from "@/constants/Colors";
 import { cld } from "@/lib/cloudinary";
 import type { OutputTrpcType } from "@/lib/trpc";

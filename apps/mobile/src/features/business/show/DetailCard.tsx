@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
+  Pressable,
 } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
 import StarRating from "react-native-star-rating-widget";
 import { useToggleWishlist, useWishlist } from "@/query/favorite";
 import { useStartChat } from "@/query/startChat";

@@ -37,7 +37,8 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EAS_BUILD_PROFILE": "production"
+        "EAS_BUILD_PROFILE": "production",
+        "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/"
       }
     }
   },

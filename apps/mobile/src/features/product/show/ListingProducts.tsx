@@ -1,10 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import { FlatList, Image, Text, View } from "react-native";
-import {
-  GestureHandlerRootView,
-  Pressable,
-} from "react-native-gesture-handler";
+import { FlatList, Image, Text, View,Pressable } from "react-native";
 import { LISTING_PRODUCT_LIST_URL } from "@/constants/apis";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import { useStartProductChat } from "@/query/startProductChat";
@@ -31,7 +27,6 @@ function ListingProduct({ shopId }: { shopId: string }) {
       data={data}
       renderItem={(item: {item : ProductType}) => {
         return (
-          <GestureHandlerRootView className="">
             <View className="bg-base-200 rounded-lg w-[90%] shadow-lg  m-4 ">
               <Pressable
                 onPress={() => {
@@ -107,7 +102,6 @@ function ListingProduct({ shopId }: { shopId: string }) {
                 </Pressable>
               </View>
             </View>
-          </GestureHandlerRootView>
         );
       }}
     />

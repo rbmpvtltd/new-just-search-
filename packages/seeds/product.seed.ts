@@ -25,7 +25,7 @@ export const productSeed = async () => {
   await clearAllTablesBusiness();
   await addProduct();
   await addProductReviews();
-  await addRecentViewProduct();
+  // await addRecentViewProduct();
   await addProductSubCategroy();
 };
 

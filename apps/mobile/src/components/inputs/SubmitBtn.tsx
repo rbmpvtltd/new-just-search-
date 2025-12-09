@@ -71,13 +71,10 @@ import {
   type TextStyle,
   useColorScheme,
   View,
+  Pressable,  type PressableProps,
   type ViewStyle,
 } from "react-native";
-import {
-  GestureHandlerRootView,
-  Pressable,
-  type PressableProps,
-} from "react-native-gesture-handler";
+
 import Colors from "@/constants/Colors";
 
 interface PrimaryButtonProps extends Omit<PressableProps, "onPress"> {
@@ -121,7 +118,6 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         : "#fff";
 
   return (
-    <GestureHandlerRootView>
       <Pressable
         onPress={onPress}
         disabled={disabled || isLoading}
@@ -176,7 +172,6 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
           </Text>
         )}
       </Pressable>
-    </GestureHandlerRootView>
   );
 };
 

@@ -1,9 +1,6 @@
 import { router } from "expo-router";
-import { FlatList, Image, Text, View } from "react-native";
-import {
-  GestureHandlerRootView,
-  Pressable,
-} from "react-native-gesture-handler";
+import { FlatList,Pressable, Image, Text, View } from "react-native";
+
 import { LISTING_OFFER_LIST_URL } from "@/constants/apis";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import DataNotFound from "../../../components/ui/DataNotFound";
@@ -30,7 +27,6 @@ export default function ShopOffersList({ listingId }: { listingId: string }) {
       data={data}
       renderItem={(item: { item: OfferType }) => {
         return (
-          <GestureHandlerRootView>
             <Pressable
               onPress={() => {
                 router.push({
@@ -70,7 +66,6 @@ export default function ShopOffersList({ listingId }: { listingId: string }) {
                 </View>
               </View>
             </Pressable>
-          </GestureHandlerRootView>
         );
       }}
     />

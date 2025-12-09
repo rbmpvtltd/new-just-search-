@@ -15,7 +15,7 @@ import Favourite from "../shared/Favourite";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 
-async function PremiumShop() {
+function PremiumShop() {
   const trpc = useTRPC()
   const { data } =  useQuery(trpc.banners.premiumShops.queryOptions());
   return (

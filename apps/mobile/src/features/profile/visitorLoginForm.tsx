@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  isSuccessResponse,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
+// import {
+//   GoogleSignin,
+//   isErrorWithCode,
+//   isSuccessResponse,
+//   statusCodes,
+// } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -23,12 +23,11 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "@/components/inputs/Input";
-import { Pressable } from "react-native-gesture-handler";
 
-GoogleSignin.configure({
-  webClientId:
-    "968676221050-brhretmcqmd0pavpus0rg38vall2fbfp.apps.googleusercontent.com",
-});
+// GoogleSignin.configure({
+//   webClientId:
+//     "968676221050-brhretmcqmd0pavpus0rg38vall2fbfp.apps.googleusercontent.com",
+// });
 
 export default function VisitorLoginForm() {
   const {
@@ -59,47 +58,47 @@ export default function VisitorLoginForm() {
     Alert.alert(response.message);
   };
 
-  const handleGoogleSign = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const response = await GoogleSignin.signIn();
-      if (isSuccessResponse(response) && response.data.idToken) {
-        const data = {
-          name: response.data.user?.name ?? "",
-          email: response.data.user.email,
-          photo: response.data.user?.photo ?? "",
-          id: response.data.user.id,
-        };
-        const res = await loginWithGoogle(data);
-        if (res.success) {
-          setAuthStoreToken(res.token, res.role);
-          await setTokenRole(res.token,res.role);
-          return router.back();
-        } else {
-          Alert.alert("Something went wrong", "Google login failed");
-        }
-      } else {
-        Alert.alert("Something went wrong", "Google login failed");
-      }
-    } catch (error) {
-      if (isErrorWithCode(error)) {
-        switch (error.code) {
-          case statusCodes.IN_PROGRESS:
-            Alert.alert("Sign is in progress");
-            // operation (eg. sign in) already in progress
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            Alert.alert("Play services not available or outdated");
-            // Android only, play services not available or outdated
-            break;
-          default:
-          // some other error happened
-        }
-      } else {
-        Alert.alert("Something went wrong");
-      }
-    }
-  };
+  // const handleGoogleSign = async () => {
+  //   try {
+  //     await GoogleSignin.hasPlayServices();
+  //     const response = await GoogleSignin.signIn();
+  //     if (isSuccessResponse(response) && response.data.idToken) {
+  //       const data = {
+  //         name: response.data.user?.name ?? "",
+  //         email: response.data.user.email,
+  //         photo: response.data.user?.photo ?? "",
+  //         id: response.data.user.id,
+  //       };
+  //       const res = await loginWithGoogle(data);
+  //       if (res.success) {
+  //         setAuthStoreToken(res.token, res.role);
+  //         await setTokenRole(res.token,res.role);
+  //         return router.back();
+  //       } else {
+  //         Alert.alert("Something went wrong", "Google login failed");
+  //       }
+  //     } else {
+  //       Alert.alert("Something went wrong", "Google login failed");
+  //     }
+  //   } catch (error) {
+  //     if (isErrorWithCode(error)) {
+  //       switch (error.code) {
+  //         case statusCodes.IN_PROGRESS:
+  //           Alert.alert("Sign is in progress");
+  //           // operation (eg. sign in) already in progress
+  //           break;
+  //         case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+  //           Alert.alert("Play services not available or outdated");
+  //           // Android only, play services not available or outdated
+  //           break;
+  //         default:
+  //         // some other error happened
+  //       }
+  //     } else {
+  //       Alert.alert("Something went wrong");
+  //     }
+  //   }
+  // };
 
   return (
     <View className="flex-1 justify-center items-center p-4 w-full">
@@ -198,7 +197,7 @@ export default function VisitorLoginForm() {
       </View>
 
       <View className="h-10"></View>
-      <Pressable onPress={handleGoogleSign}>
+      {/* <Pressable onPress={handleGoogleSign}>
         <View className="flex flex-row rounded-lg border-2 border-secondary">
           <View
             style={{
@@ -222,7 +221,7 @@ export default function VisitorLoginForm() {
             </Text>
           </View>
         </View>
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 }

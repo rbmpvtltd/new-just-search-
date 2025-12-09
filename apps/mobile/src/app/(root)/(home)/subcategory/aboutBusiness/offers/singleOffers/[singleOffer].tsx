@@ -1,10 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Alert, Dimensions, Image, ScrollView, Text, View } from "react-native";
-import {
-  GestureHandlerRootView,
-  Pressable,
-} from "react-native-gesture-handler";
+import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View } from "react-native";
+
 import Carousel from "react-native-reanimated-carousel";
 import Review from "@/components/forms/review";
 import { SINGLE_OFFER_URL } from "@/constants/apis";
@@ -60,7 +57,6 @@ export default function TabOneScreen() {
       <ScrollView>
         <View className="flex-1 items-center">
           <View className="flex-1 justify-center gap-4">
-            <GestureHandlerRootView>
               <Carousel
                 loop
                 width={width}
@@ -193,7 +189,6 @@ export default function TabOneScreen() {
                   <Review rating={data?.rating} /> 
                 </View>
               </View>
-            </GestureHandlerRootView>
           </View>
         </View>
       </ScrollView>

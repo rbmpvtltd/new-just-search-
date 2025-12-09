@@ -1,6 +1,5 @@
 import { router } from "expo-router";
-import { FlatList, Text, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { FlatList,Pressable, Text, View } from "react-native";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import DataNotFound from "@/components/ui/DataNotFound";
 import { useProductSession } from "@/query/chat/chatsession.query";
