@@ -141,8 +141,7 @@ export const FormField = <T extends FieldValues>({
               );
             case "checkbox":
               return (
-                // <div className=`${flex gap-3 flex-wrap}`>
-                <div className={`${className} flex gap-3 flex-wrap`}>
+                <div className="flex gap-3 flex-wrap">
                   {options?.map((option) => (
                     <div key={option.value.toString()} className="">
                       <div

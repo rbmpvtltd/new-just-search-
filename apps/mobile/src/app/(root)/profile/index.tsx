@@ -10,8 +10,8 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import LoginComponent from "@/features/user/profile/login";
-import VisitorLoginForm from "@/features/user/profile/visitorLoginForm";
+import LoginComponent from "@/features/profile/login";
+import VisitorLoginForm from "@/features/profile/visitorLoginForm";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Loading } from "@/components/ui/Loading";
 import Colors from "@/constants/Colors";
