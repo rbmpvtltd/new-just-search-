@@ -17,10 +17,7 @@ import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
-import {
-  cloudinaryDeleteImageByPublicId,
-  cloudinaryDeleteImagesByPublicIds,
-} from "@/lib/cloudinary";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -435,8 +432,17 @@ export const adminHireRouter = router({
     }
 
     await db
+      .delete(hireCategories)
+      .where(eq(hireCategories.hireId, isHireExists.id));
+
+    await db
       .delete(hireSubcategories)
       .where(eq(hireSubcategories.hireId, isHireExists.id));
+
+    await db.insert(hireCategories).values({
+      categoryId: input.categoryId,
+      hireId: isHireExists.id,
+    });
 
     await db.insert(hireSubcategories).values(
       input.subcategoryId.map((subCategoryId) => ({
@@ -445,14 +451,6 @@ export const adminHireRouter = router({
       })),
     );
 
-    await db
-      .delete(hireCategories)
-      .where(eq(hireCategories.hireId, isHireExists.id));
-
-    await db.insert(hireCategories).values({
-      categoryId: input.categoryId,
-      hireId: isHireExists.id,
-    });
     return {
       success: true,
       message: "Hire listing updated successfully",

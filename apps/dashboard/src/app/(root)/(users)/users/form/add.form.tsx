@@ -144,18 +144,18 @@ function AddForm({ setOpen }: AddForm) {
       <SheetHeader>
         <SheetTitle>Add</SheetTitle>
       </SheetHeader>
-      <div className="grid grid-cols-1 gap-6 ">
+      <div className="grid grid-cols-1 gap-6 px-4 ">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
       </div>
       <SheetFooter className="mt-2">
-        <SheetClose asChild>
-          <Button variant="outline">Cancel</Button>
-        </SheetClose>
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
+        <SheetClose asChild>
+          <Button variant="outline">Cancel</Button>
+        </SheetClose>
       </SheetFooter>
     </form>
   );

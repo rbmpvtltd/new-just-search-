@@ -401,6 +401,10 @@ export const adminBusinessRouter = router({
         .delete(businessSubcategories)
         .where(eq(businessSubcategories.businessId, isBusinessExists.id));
 
+      await db
+        .delete(businessCategories)
+        .where(eq(businessCategories.businessId, isBusinessExists.id));
+
       const allPhotos = [
         input.image1,
         input.image2,
@@ -417,6 +421,11 @@ export const adminBusinessRouter = router({
           })),
         );
       }
+
+      await db.insert(businessCategories).values({
+        businessId: isBusinessExists.id,
+        categoryId: input.categoryId,
+      });
 
       await db.insert(businessSubcategories).values(
         input.subcategoryId.map((subCategoryId) => ({

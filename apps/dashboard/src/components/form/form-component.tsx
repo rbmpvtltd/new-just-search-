@@ -209,7 +209,8 @@ export const FormField = <T extends FieldValues>({
                 />
               );
 
-            case "editor":
+            case "editor": {
+              console.log("value", value);
               return (
                 <Editor
                   value={value}
@@ -221,6 +222,7 @@ export const FormField = <T extends FieldValues>({
                   // setEditorState={setEditorState}
                 />
               );
+            }
             case "textarea":
               return <Textarea />;
 
