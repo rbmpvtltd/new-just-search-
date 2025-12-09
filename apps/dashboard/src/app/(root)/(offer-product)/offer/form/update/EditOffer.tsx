@@ -2,7 +2,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersUpdateSchema } from "@repo/db/dist/schema/offer.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import Swal from "sweetalert2";
 import type z from "zod";
 import {
@@ -16,55 +18,79 @@ import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
+import type { SetOpen } from "../edit.form";
 
 type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
 
-type FormReferenceDataType = OutputTrpcType["offerrouter"]["add"] | null;
-type OfferTypeSchema = OutputTrpcType["offerrouter"]["edit"] | null;
+type EditAdminOfferType = OutputTrpcType["adminOfferRouter"]["edit"] | null;
 export default function EditOffer({
-  myOffer,
-  formReferenceData,
+  data,
+  setOpen,
 }: {
-  myOffer: OfferTypeSchema;
-  formReferenceData: FormReferenceDataType;
+  data: EditAdminOfferType;
+  setOpen: SetOpen;
 }) {
   const trpc = useTRPC();
-  const { mutate } = useMutation(trpc.offerrouter.update.mutationOptions());
-  const categories = formReferenceData?.categoryRecord;
-  const subCategories = formReferenceData?.subcategoryRecord;
+  const { mutate } = useMutation(
+    trpc.adminOfferRouter.update.mutationOptions(),
+  );
   const {
     control,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<EditOfferSchema>({
     resolver: zodResolver(offersUpdateSchema),
     defaultValues: {
-      offerName: myOffer?.offer.offerName,
-      rate: myOffer?.offer?.rate,
-      discountPercent: myOffer?.offer?.discountPercent,
-      finalPrice: myOffer?.offer?.finalPrice,
-      offerDescription: myOffer?.offer?.offerDescription,
-      mainImage: myOffer?.offer.offerPhotos[0]?.photo || "",
-      image2: myOffer?.offer.offerPhotos[1]?.photo || "",
-      image3: myOffer?.offer.offerPhotos[2]?.photo || "",
-      image4: myOffer?.offer.offerPhotos[3]?.photo || "",
-      image5: myOffer?.offer.offerPhotos[4]?.photo || "",
-      categoryId: myOffer?.offer.categoryId,
-      subcategoryId: myOffer?.offer.offerSubcategory.map(
+      businessId: data?.offer.businessId,
+      offerName: data?.offer.offerName,
+      rate: data?.offer?.rate,
+      discountPercent: data?.offer?.discountPercent,
+      finalPrice: data?.offer?.finalPrice,
+      offerDescription: data?.offer?.offerDescription,
+      mainImage: data?.offer.mainImage || "",
+      image2: data?.offerPhotos[1]?.photo || "",
+      image3: data?.offerPhotos[2]?.photo || "",
+      image4: data?.offerPhotos[3]?.photo || "",
+      image5: data?.offerPhotos[4]?.photo || "",
+      categoryId: data?.offer.categoryId,
+      subcategoryId: data?.offer.offerSubcategory.map(
         (item) => item.subcategoryId,
       ),
     },
   });
 
+  const categories = data?.getBusinessCategories?.map((item) => {
+    return {
+      label: item.title,
+      value: item.id,
+    };
+  });
+  const selectedCategoryId = useWatch({ control, name: "categoryId" });
+  const { data: subCategories, isLoading } = useQuery(
+    trpc.businessrouter.getSubCategories.queryOptions({
+      categoryId: selectedCategoryId,
+    }),
+  );
   const formFields: FormFieldProps<EditOfferSchema>[] = [
+    {
+      control,
+      label: "Business Name",
+      name: "businessId",
+      placeholder: "Business name",
+      component: "select",
+      options:
+        data?.allBusinessListings?.map((item) => ({
+          label: ` ${item.name ?? "unknown"}  , id  ${item.id}`,
+          value: item.id,
+        })) ?? [],
+      error: errors.businessId?.message,
+    },
     {
       control,
       label: "Product Name",
       name: "offerName",
       placeholder: "Product Name",
       component: "input",
-      // disabled: true,
       error: errors.offerName?.message,
     },
     {
@@ -100,10 +126,9 @@ export default function EditOffer({
       name: "categoryId",
       placeholder: "Category",
       component: "select",
-      options: categories
-        ? [{ label: categories?.title, value: categories?.id }]
-        : [],
-      // disabled: true,
+      options:
+        categories?.map((item) => ({ label: item.label, value: item.value })) ??
+        [],
       error: errors.categoryId?.message,
     },
     {
@@ -112,6 +137,7 @@ export default function EditOffer({
       name: "subcategoryId",
       placeholder: "Sub Category",
       component: "multiselect",
+      loading: isLoading,
       options:
         subCategories?.map((item) => ({
           label: item.name,
@@ -171,34 +197,40 @@ export default function EditOffer({
       error: errors.image5?.message,
     },
   ];
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: EditOfferSchema) => {
     const file = await uploadToCloudinary(
-      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "offers",
     );
     mutate(
       {
         ...data,
-        photo: file[0],
+        mainImage: file[0] ?? "",
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",
         image5: file[4] ?? "",
-        offerSlug: myOffer?.offer.offerSlug,
       },
       {
         onSuccess: (data) => {
-          console.log("success", data);
-          Swal.fire({
-            title: data.message,
-            icon: "success",
-            draggable: true,
-          });
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.offerrouter.showOffer.queryKey(),
-          });
-          // router.push("/");
+          if (data.success) {
+            toast("success", {
+              description: data.message,
+            });
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.adminOfferRouter.list.queryKey(),
+            });
+            setOpen(false);
+          }
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            toast.error("Error", {
+              description: error.message,
+            });
+            console.error("error,", error.message);
+          }
         },
       },
     );
@@ -211,10 +243,6 @@ export default function EditOffer({
       >
         <div className="p-8 space-y-8">
           <div className="p-6 shadow rounded-xl bg-white">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Edit Offer
-            </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
               {formFields.map((field) => (
                 <div
@@ -250,13 +278,6 @@ export default function EditOffer({
             ) : (
               "SUBMIT"
             )}
-          </Button>
-          <Button
-            onClick={() => console.log(getValues())}
-            type="button"
-            className="bg-gray-500 hover:bg-gray-700 font-bold"
-          >
-            Get Values
           </Button>
         </div>
       </form>

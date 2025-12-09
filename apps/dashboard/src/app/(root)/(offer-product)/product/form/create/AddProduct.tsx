@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { offersInsertSchema } from "@repo/db/dist/schema/offer.schema";
+import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useForm, useWatch } from "react-hook-form";
@@ -20,35 +20,32 @@ import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 import type { SetOpen } from "../add.form";
 
-type AddOfferSchema = z.infer<typeof offersInsertSchema>;
-type AddAdminOfferType = OutputTrpcType["adminOfferRouter"]["add"];
-export default function AddOffer({
-  setOpen,
+type AddProductSchema = z.infer<typeof productInsertSchema>;
+
+type AddAdminOfferType = OutputTrpcType["adminProductRouter"]["add"] | null;
+export default function AddProduct({
   data,
+  setOpen,
 }: {
-  setOpen: SetOpen;
   data: AddAdminOfferType;
+  setOpen: SetOpen;
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
-    trpc.adminOfferRouter.create.mutationOptions(),
+    trpc.adminProductRouter.create.mutationOptions(),
   );
 
   const {
     control,
-    setValue,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
-  } = useForm<AddOfferSchema>({
-    resolver: zodResolver(offersInsertSchema),
+  } = useForm<AddProductSchema>({
+    resolver: zodResolver(productInsertSchema),
     defaultValues: {
       businessId: NaN,
-      offerName: "",
+      productName: "",
       rate: 0,
-      discountPercent: 0,
-      finalPrice: 0,
-      offerDescription: "",
+      productDescription: "",
       mainImage: "",
       image2: "",
       image3: "",
@@ -70,7 +67,7 @@ export default function AddOffer({
       categoryId: selectedCategoryId,
     }),
   );
-  const formFields: FormFieldProps<AddOfferSchema>[] = [
+  const formFields: FormFieldProps<AddProductSchema>[] = [
     {
       control,
       label: "Business Name",
@@ -86,11 +83,11 @@ export default function AddOffer({
     },
     {
       control,
-      label: "Offer Name",
-      name: "offerName",
+      label: "Product Name",
+      name: "productName",
       placeholder: "Product Name",
       component: "input",
-      error: errors.offerName?.message,
+      error: errors.productName?.message,
     },
     {
       control,
@@ -99,38 +96,7 @@ export default function AddOffer({
       placeholder: "Rate",
       type: "number",
       component: "input",
-      onChangeValue: (value) => {
-        if (!value) return;
-        setValue("finalPrice", Number(value));
-      },
       error: errors.rate?.message,
-    },
-    {
-      control,
-      label: "Discount Percent",
-      name: "discountPercent",
-      placeholder: "Discount Percent",
-      component: "input",
-      type: "number",
-      onChangeValue: (value) => {
-        if (!value) return;
-        const discount = parseFloat(String(value));
-        const price = parseFloat((getValues("rate") || 0).toString());
-        const final = (price * (100 - discount)) / 100;
-
-        setValue("discountPercent", discount);
-        setValue("finalPrice", parseFloat(final.toFixed(2)));
-      },
-      error: errors.discountPercent?.message,
-    },
-    {
-      control,
-      label: "Final Price",
-      name: "finalPrice",
-      placeholder: "Final Price",
-      component: "input",
-      type: "number",
-      error: errors.finalPrice?.message,
     },
     {
       control,
@@ -161,32 +127,37 @@ export default function AddOffer({
     {
       control,
       label: "Description",
-      name: "offerDescription",
+      name: "productDescription",
       placeholder: "Description",
       component: "editor",
-      error: errors.offerDescription?.message,
+      error: errors.productDescription?.message,
     },
   ];
-  const formFields2: FormFieldProps<AddOfferSchema>[] = [
+
+  const formFields2: FormFieldProps<AddProductSchema>[] = [
     {
       control,
+      // label: "Product Image",
       name: "mainImage",
-      component: "image",
       required: false,
+      component: "image",
       error: errors.mainImage?.message,
     },
     {
       control,
       type: "",
+      label: "dadasdad",
       name: "image2",
       component: "image",
-      className: "mt-5",
+      className: "mt-10",
       required: false,
+      labelHidden: true,
       error: errors.image2?.message,
     },
     {
       control,
       type: "",
+      // label: "",
       name: "image3",
       component: "image",
       required: false,
@@ -195,6 +166,7 @@ export default function AddOffer({
     {
       control,
       type: "",
+      // label: "",
       name: "image4",
       component: "image",
       required: false,
@@ -203,21 +175,24 @@ export default function AddOffer({
     {
       control,
       type: "",
+      // label: "",
       name: "image5",
       component: "image",
       required: false,
+
       error: errors.image5?.message,
     },
   ];
-  const onSubmit = async (data: AddOfferSchema) => {
+
+  const onSubmit = async (data: any) => {
     const file = await uploadToCloudinary(
       [data.mainImage, data.image2, data.image3, data.image4, data.image5],
-      "offers",
+      "products",
     );
     mutate(
       {
         ...data,
-        mainImage: file[0] ?? "",
+        mainImage: file[0],
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",
@@ -231,7 +206,7 @@ export default function AddOffer({
             });
             const queryClient = getQueryClient();
             queryClient.invalidateQueries({
-              queryKey: trpc.adminOfferRouter.list.queryKey(),
+              queryKey: trpc.adminProductRouter.list.queryKey(),
             });
             setOpen(false);
           }
@@ -260,7 +235,7 @@ export default function AddOffer({
                 <div
                   key={field.name}
                   className={
-                    field.name === "offerDescription" ? "col-span-full" : ""
+                    field.name === "productDescription" ? "col-span-full" : ""
                   }
                 >
                   <FormField {...field} />
@@ -268,7 +243,7 @@ export default function AddOffer({
               ))}
             </div>
             <Label className="mt-3 gap-0 ">
-              Offer Images
+              Product Images
               <span className="text-red-500 ">*</span>
             </Label>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-3">

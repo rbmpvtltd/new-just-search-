@@ -208,9 +208,10 @@ CREATE TABLE "hire_listing" (
 	"location_preferred" varchar(255),
 	"certificates" text,
 	"work_shift" "work_shift"[] NOT NULL,
+	"from_hour" varchar(100),
+	"to_hour" varchar(100),
 	"expected_salary_from" varchar(100),
 	"expected_salary_to" varchar(100),
-	"preferred_working_hours" varchar(100),
 	"relocate" varchar,
 	"availability" varchar(255),
 	"id_proof" varchar NOT NULL,
@@ -319,11 +320,13 @@ CREATE TABLE "offers" (
 	"offer_slug" varchar(255),
 	"rate" integer NOT NULL,
 	"discount_percent" integer,
+	"main_image" varchar(255) NOT NULL,
 	"final_price" integer NOT NULL,
 	"offer_description" text NOT NULL,
 	"offer_start_date" timestamp NOT NULL,
 	"offer_end_date" timestamp NOT NULL,
 	"reupload_count" integer DEFAULT 0 NOT NULL,
+	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -427,6 +430,7 @@ CREATE TABLE "products" (
 	"rate" integer NOT NULL,
 	"discount_percent" integer,
 	"final_price" integer,
+	"status" boolean DEFAULT true NOT NULL,
 	"product_description" text NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()

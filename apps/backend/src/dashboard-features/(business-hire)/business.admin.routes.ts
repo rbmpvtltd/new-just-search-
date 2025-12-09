@@ -328,8 +328,6 @@ export const adminBusinessRouter = router({
   update: adminProcedure
     .input(businessUpdateSchema)
     .mutation(async ({ input }) => {
-      console.log("User id", input.userId);
-
       const isBusinessExists = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.userId, Number(input.userId)),

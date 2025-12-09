@@ -18,6 +18,7 @@ import { categories, subcategories } from "./not-related.schema";
 // 1.products
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
+  mainImage: varchar("main_image", { length: 255 }).notNull(),
   businessId: integer("business_id").references(() => businessListings.id, {
     onDelete: "cascade",
   }),
@@ -36,6 +37,7 @@ export const products = pgTable("products", {
 });
 
 export const productInsertSchema = createInsertSchema(products, {
+  mainImage: z.string().min(1, "Photo is required"),
   productName: () => z.string().min(3, "Product name is required"),
   categoryId: () => z.number().min(1, "Category is required"),
   rate: () => z.number().min(1, "Rate is required"),
@@ -43,19 +45,17 @@ export const productInsertSchema = createInsertSchema(products, {
     z
       .string()
       .min(3, "Product description should be minimum 3 characters long"),
-})
-  .omit({ businessId: true })
-  .extend({
-    subcategoryId: z
-      .array(z.number())
-      .min(1, "Select at least one subcategory"),
-    photo: z.string().min(1, "Photo is required"),
-    image2: z.string().optional(),
-    image3: z.string().optional(),
-    image4: z.string().optional(),
-    image5: z.string().optional(),
-  });
+}).extend({
+  subcategoryId: z.array(z.number()).min(1, "Select at least one subcategory"),
+  image2: z.string().optional(),
+  image3: z.string().optional(),
+  image4: z.string().optional(),
+  image5: z.string().optional(),
+});
 
+export const productUpdateSchema = productInsertSchema.extend({
+  offerSlug: z.string().optional(),
+});
 //  2.PRODUCT PHOTOS TABLE
 export const productPhotos = pgTable("product_photos", {
   id: serial("id").primaryKey(),
