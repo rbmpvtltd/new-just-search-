@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import { setRole } from "@/utils/session";
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
@@ -23,7 +24,6 @@ export default function ContactDetail() {
   const router = useRouter();
   const { mutate } = useMutation(trpc.businessrouter.create.mutationOptions());
   const formValue = useBusinessFormStore((state) => state.formValue);
-  const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
   const clearPage = useBusinessFormStore((state) => state.clearPage);
 
@@ -90,22 +90,27 @@ export default function ContactDetail() {
   ];
 
   const onSubmit = (data: ContactDetailSchema) => {
+    const finalData = { ...formValue, ...data };
     useBusinessFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));
 
     mutate(
-      { ...formValue, pincode: formValue.pincode },
+      { ...finalData, pincode: formValue.pincode },
       {
         onSuccess: async (data) => {
           if (data.success) {
             setRole("business");
+            clearPage();
             await Swal.fire({
               title: data.message,
               icon: "success",
               draggable: true,
             });
-            clearPage();
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.businessrouter.show.queryKey(),
+            });
             router.push("/");
           }
           console.log("Success", data);

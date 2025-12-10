@@ -20,19 +20,17 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
     trpc.businessrouter.delete.mutationOptions({
       onSuccess: async (data) => {
         if (data.success) {
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.hirerouter.show.queryKey(),
-          });
-
           await Swal.fire({
             title: "Deleted!",
             icon: "success",
             draggable: true,
           });
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.hirerouter.show.queryKey(),
+          });
+          router.push("/");
         }
-        router.push("/");
-        console.log("deleted");
       },
       onError: (err) => {
         console.error(err);

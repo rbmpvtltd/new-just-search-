@@ -1,4 +1,5 @@
 import "server-only"; // <-- ensure this file cannot be imported from the client
+import type { AppRouter } from "@repo/types"; // file no 2
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import {
@@ -6,7 +7,6 @@ import {
   type TRPCQueryOptions,
 } from "@trpc/tanstack-react-query";
 import superjson from "superjson";
-import type { AppRouter } from "@repo/types"; // file no 2
 import { getToken } from "@/utils/session";
 import { getTrpcUrl } from "./helper";
 import { getQueryClient } from "./query-client";
@@ -14,7 +14,6 @@ import { getQueryClient } from "./query-client";
 // IMPORTANT: Create a stable getter for the query client that
 //            will return the same client during the same request.
 
-console.log("trpc url is", getTrpcUrl());
 export const trpc = createTRPCOptionsProxy<AppRouter>({
   client: createTRPCClient({
     links: [

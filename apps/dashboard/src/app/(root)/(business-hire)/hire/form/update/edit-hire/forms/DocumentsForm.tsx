@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import Swal from "sweetalert2";
 import type z from "zod";
 import {
@@ -13,22 +14,27 @@ import {
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
-import type { UserHireListingType } from "..";
+import { getQueryClient } from "@/trpc/query-client";
+import type { SetOpen } from "../../../edit.form";
+import { useHireFormStore } from "../../../shared/store/useCreateHireStore";
+import type { EditAdminHireType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
 export default function DocumentsForm({
-  hireListing,
+  data,
+  setOpen,
 }: {
-  hireListing: UserHireListingType;
+  data: EditAdminHireType;
+  setOpen: SetOpen;
 }) {
   const trpc = useTRPC();
-  const router = useRouter();
-  const { mutate } = useMutation(trpc.hirerouter.update.mutationOptions());
+  const { mutate } = useMutation(trpc.adminHireRouter.update.mutationOptions());
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const prevPage = useHireFormStore((state) => state.prevPage);
   const formValue = useHireFormStore((state) => state.formValue);
+  const clearPage = useHireFormStore((state) => state.clearPage);
+
   const {
     control,
     handleSubmit,
@@ -36,11 +42,11 @@ export default function DocumentsForm({
   } = useForm<DocumentSchema>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
-      idProof: hireListing?.idProof ?? "",
-      idProofPhoto: hireListing?.idProofPhoto ?? "",
-      coverLetter: hireListing?.coverLetter ?? "",
-      resumePhoto: hireListing?.resumePhoto ?? "",
-      aboutYourself: hireListing?.aboutYourself ?? "",
+      idProof: data?.hire?.idProof ?? "",
+      idProofPhoto: data?.hire?.idProofPhoto ?? "",
+      coverLetter: data?.hire?.coverLetter ?? "",
+      resumePhoto: data?.hire?.resumePhoto ?? "",
+      aboutYourself: data?.hire?.aboutYourself ?? "",
     },
   });
 
@@ -59,24 +65,33 @@ export default function DocumentsForm({
     setFormValue("aboutYourself", data.aboutYourself ?? "");
     // setFormValue("referCode", data.referCode ?? "");
 
-    // console.log("formValue", formValue);
+    const newData = {
+      ...data,
+      idProofPhoto: files[0] ?? "",
+      resumePhoto: files[1] ?? "",
+    };
+    const finalData = { ...formValue, ...newData };
+    console.log("finalData", finalData);
 
-    mutate(formValue, {
-      onSuccess: (data) => {
+    mutate(finalData, {
+      onSuccess: async (data) => {
+        if (data?.success) {
+          clearPage();
+          toast("success", {
+            description: data.message,
+          });
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.adminHireRouter.list.queryKey(),
+          });
+          setOpen(false);
+        }
         console.log("success", data);
-        Swal.fire({
-          title: data.message,
-          icon: "success",
-          draggable: true,
-        });
-        router.push("/");
       },
-      onError: (error) => {
+      onError: async (error) => {
         if (isTRPCClientError(error)) {
-          Swal.fire({
-            title: error.message,
-            icon: "error",
-            draggable: true,
+          toast.error("Error", {
+            description: error.message,
           });
           console.error("error,", error.message);
         }

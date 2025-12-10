@@ -1,5 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,20 +10,19 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
-import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import { categoryInsertSchema } from "@repo/db/dist/schema/not-related.schema";
 
 const extendedCategoryInsertSchema = categoryInsertSchema
   .pick({
@@ -43,16 +43,16 @@ export function EditBanner({ id }: { id: number }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
+    <Sheet onOpenChange={setOpen} open={open}>
+      <SheetTrigger asChild>
         <Button>Edit</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      </SheetTrigger>
+      <SheetContent className="sm:max-w-[425px]">
         <BoundaryWrapper>
           {open && <BannerEditForm id={id} setOpen={setOpen} />}
         </BoundaryWrapper>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -174,22 +174,22 @@ function BannerEditForm({ id, setOpen }: EditForm) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogHeader>
-        <DialogTitle>Edit</DialogTitle>
-      </DialogHeader>
-      <div className="grid grid-cols-1 gap-6">
+      <SheetHeader>
+        <SheetTitle>Edit</SheetTitle>
+      </SheetHeader>
+      <div className="grid grid-cols-1 gap-6 px-4">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
       </div>
-      <DialogFooter className="mt-2">
-        <DialogClose asChild>
+      <SheetFooter className="mt-2">
+        <SheetClose asChild>
           <Button variant="outline">Cancel</Button>
-        </DialogClose>
+        </SheetClose>
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogFooter>
+      </SheetFooter>
     </form>
   );
 }

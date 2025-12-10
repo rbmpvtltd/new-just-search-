@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
+import { getQueryClient } from "@/trpc/query-client";
 
 type AddProductSchema = z.infer<typeof productInsertSchema>;
 
@@ -155,8 +156,6 @@ export default function AddProduct({
   ];
 
   const onSubmit = async (data: any) => {
-    console.log("Data", data);
-
     const file = await uploadToCloudinary(
       [data.photo, data.image2, data.image3, data.image4, data.image5],
       "products",
@@ -177,6 +176,10 @@ export default function AddProduct({
             title: data.message,
             icon: "success",
             draggable: true,
+          });
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.productrouter.showProduct.queryKey(),
           });
           // router.push("/");
         },

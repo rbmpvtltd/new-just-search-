@@ -28,6 +28,7 @@ export interface FormFieldProps<T extends FieldValues> {
   error?: string;
   options?: Option[] | undefined;
   labelHidden?: boolean;
+  onChangeValue?: (value: string | undefined | null) => void;
   component:
     | "input"
     | "input-slug"
@@ -57,6 +58,7 @@ export const FormField = <T extends FieldValues>({
   error,
   options,
   component,
+  onChangeValue,
   ...props
 }: FormFieldProps<T>) => {
   const [_, setPlainText] = useState("");
@@ -76,9 +78,16 @@ export const FormField = <T extends FieldValues>({
                 <Input
                   type={type}
                   name={name}
-                  className={className}
+                  className={`h-[41px] ${className}`}
                   placeholder={placeholder}
-                  onChange={onChange}
+                  onChange={(e) => {
+                    onChange(
+                      type === "number"
+                        ? Number(e.target.value)
+                        : e.target.value,
+                    );
+                    if (onChangeValue) onChangeValue(e.target.value);
+                  }}
                   onBlur={onBlur}
                   value={value}
                   {...props}
@@ -200,7 +209,8 @@ export const FormField = <T extends FieldValues>({
                 />
               );
 
-            case "editor":
+            case "editor": {
+              console.log("value", value);
               return (
                 <Editor
                   value={value}
@@ -212,11 +222,14 @@ export const FormField = <T extends FieldValues>({
                   // setEditorState={setEditorState}
                 />
               );
+            }
             case "textarea":
               return <Textarea />;
 
             case "image":
-              return <CropperComponent onChange={onChange} value={value} />;
+              return (
+                <CropperComponent onChange={onChange} value={String(value)} />
+              );
 
             default:
               return <div>no component</div>;

@@ -9,16 +9,12 @@ import {
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
-import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
-import type { UserHireListingType } from "..";
 import { Spinner } from "@/components/ui/spinner";
+import { useHireFormStore } from "../../../shared/store/useCreateHireStore";
+import type { EditAdminHireType } from "..";
 
 type EducationSchema = z.infer<typeof educationSchema>;
-export default function EducationForm({
-  hireListing,
-}: {
-  hireListing: UserHireListingType;
-}) {
+export default function EducationForm({ data }: { data: EditAdminHireType }) {
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const nextPage = useHireFormStore((state) => state.nextPage);
   const prevPage = useHireFormStore((state) => state.prevPage);
@@ -29,14 +25,14 @@ export default function EducationForm({
   } = useForm<EducationSchema>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      highestQualification: hireListing?.highestQualification ?? "",
-      skillset: hireListing?.skillset ?? "",
-      employmentStatus: hireListing?.employmentStatus ?? "",
-      workExperienceYear: hireListing?.workExperienceYear ?? 0,
-      workExperienceMonth: hireListing?.workExperienceMonth ?? undefined,
-      jobRole: hireListing?.jobRole ?? "",
-      previousJobRole: hireListing?.previousJobRole ?? "",
-      certificates: hireListing?.certificates ?? "",
+      highestQualification: data?.hire?.highestQualification ?? "",
+      skillset: data?.hire?.skillset ?? "",
+      employmentStatus: data?.hire?.employmentStatus ?? "",
+      workExperienceYear: data?.hire?.workExperienceYear ?? 0,
+      workExperienceMonth: data?.hire?.workExperienceMonth ?? undefined,
+      jobRole: data?.hire?.jobRole ?? "",
+      previousJobRole: data?.hire?.previousJobRole ?? "",
+      certificates: data?.hire?.certificates ?? "",
     },
   });
 
@@ -47,7 +43,7 @@ export default function EducationForm({
       name: "highestQualification",
       placeholder: "Highest Qualification",
       component: "select",
-       options: [
+      options: [
         { label: "B.E / B.Tech", value: "b-e / b-tech" },
         { label: "M.E / M.Tech", value: "m-e / m-tech" },
         { label: "M.S Engineering", value: "m-s engineering" },
@@ -294,10 +290,14 @@ export default function EducationForm({
             disabled={isSubmitting}
             className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-md min-w-[120px]"
           >
-            {isSubmitting ? <>
-            <Spinner/>
-            Loading...
-            </> : "CONTINUE"}
+            {isSubmitting ? (
+              <>
+                <Spinner />
+                Loading...
+              </>
+            ) : (
+              "CONTINUE"
+            )}
           </Button>
         </div>
       </form>

@@ -1,6 +1,7 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { users } from "@repo/db/dist/schema/auth.schema";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
   categoryInsertSchema,
@@ -78,14 +79,9 @@ export const adminUsersRouter = router({
     return;
   }),
   create: adminProcedure
-    .input(
-      categoryInsertSchema.omit({
-        slug: true,
-      }),
-    )
+    .input(usersInsertSchema)
     .mutation(async ({ input }) => {
-      const slug = slugify(input.title);
-      await db.insert(categories).values({ ...input, slug });
+      await db.insert(users).values(input);
       return { success: true };
     }),
   edit: adminProcedure

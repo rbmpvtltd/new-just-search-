@@ -92,6 +92,7 @@ export const productrouter = router({
       const [product] = await db
         .insert(schemas.product.products)
         .values({
+          mainImage: input.mainImage,
           businessId: business.id,
           productName: input.productName,
           productSlug: slugifyName,
@@ -122,7 +123,6 @@ export const productrouter = router({
       }
 
       const allPhotos = [
-        input.photo,
         input.image2,
         input.image3,
         input.image4,
@@ -238,6 +238,7 @@ export const productrouter = router({
         .update(schemas.product.products)
         .set({
           productName: input.productName,
+          mainImage: input.mainImage,
           categoryId: input.categoryId,
           rate: input.rate,
           productDescription: input.productDescription,
@@ -266,7 +267,6 @@ export const productrouter = router({
         })),
       );
       const allPhotos = [
-        input.photo,
         input.image2,
         input.image3,
         input.image4,

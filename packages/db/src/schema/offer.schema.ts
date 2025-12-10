@@ -27,16 +27,19 @@ export const offers = pgTable("offers", {
   offerSlug: varchar("offer_slug", { length: 255 }),
   rate: integer("rate").notNull(),
   discountPercent: integer("discount_percent"),
+  mainImage: varchar("main_image", { length: 255 }).notNull(),
   finalPrice: integer("final_price").notNull(),
   offerDescription: text("offer_description").notNull(),
   offerStartDate: timestamp("offer_start_date").notNull(),
   offerEndDate: timestamp("offer_end_date").notNull(),
   reuploadCount: integer("reupload_count").default(0).notNull(),
+  status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const offersInsertSchema = createInsertSchema(offers, {
+  mainImage: z.string().min(1, "Image 1 is required"),
   categoryId: () => z.number().min(1, "Category is required"),
   offerName: () =>
     z.string().min(3, "Offer name should be minimum 3 characters long"),
@@ -48,13 +51,11 @@ export const offersInsertSchema = createInsertSchema(offers, {
   .omit({
     offerStartDate: true,
     offerEndDate: true,
-    businessId: true,
   })
   .extend({
     subcategoryId: z
       .array(z.number())
       .min(1, "Select at least one subcategory"),
-    photo: z.string().min(1, "Image 1 is required"),
     image2: z.string().optional(),
     image3: z.string().optional(),
     image4: z.string().optional(),

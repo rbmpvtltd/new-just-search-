@@ -3,19 +3,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addressDetailSchema } from "@repo/db/dist/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
+import LocationAutoDetect from "@/components/LocationAutoDetect";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
 import type { AddBusinessPageType } from "..";
-import LocationAutoDetect from "@/components/LocationAutoDetect";
 
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
@@ -24,10 +24,12 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
+  const [detectedCityName, setDetectedCityName] = useState<null | string>(null);
 
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
@@ -51,13 +53,39 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     };
   });
   const selectedStateId = useWatch({ control, name: "state" });
-  const { data: cities, isLoading } = useQuery({
-    ...trpc.businessrouter.getCities.queryOptions({
+  const {
+    data: cities,
+    isLoading,
+    isFetching,
+  } = useQuery(
+    trpc.businessrouter.getCities.queryOptions({
       state: selectedStateId,
     }),
-    enabled: !!selectedStateId,
-    placeholderData: (prev) => prev,
-  });
+  );
+
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isFetching &&
+      cities &&
+      cities.length > 0 &&
+      detectedCityName
+    ) {
+      const matchedCity = cities?.find(
+        (c) => c.city.toLowerCase() === detectedCityName.toLowerCase(),
+      );
+      if (matchedCity && matchedCity.id !== control._formValues.cityId) {
+        setValue("city", matchedCity.id, { shouldValidate: true });
+      }
+    }
+  }, [
+    detectedCityName,
+    control._formValues.cityId,
+    isFetching,
+    isLoading,
+    setValue,
+    cities,
+  ]);
 
   const formFields: FormFieldProps<AddressDetailSchema>[] = [
     {
@@ -176,7 +204,34 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
               <LocationAutoDetect
                 onResult={(data) => {
                   console.log("Detected:", data);
-                  // set form values or call setValue("city", data.city)
+                  const formatted = data.formattedAddress ?? "";
+                  const parts = formatted.split(",").map((p) => p.trim());
+                  const lat = data.latitude;
+                  const long = data.longitude;
+                  const pincode = data.postalCode || "";
+                  const cityName = data.city || "";
+                  const stateName = data.region || "";
+                  const area = data.name || "";
+                  const street_name = data.street || "";
+                  const landmark = data.street || "";
+                  const building_name = parts[0]?.match(/[A-Za-z]/)
+                    ? parts[0]
+                    : "";
+
+                  const matchedState = states?.find(
+                    (item) => item.label === stateName.toLocaleUpperCase(),
+                  );
+
+                  setDetectedCityName(cityName);
+
+                  setValue("buildingName", building_name ?? "");
+                  setValue("streetName", street_name ?? "");
+                  setValue("area", area ?? "");
+                  setValue("landmark", landmark ?? "");
+                  setValue("latitude", String(lat));
+                  setValue("longitude", String(long));
+                  setValue("pincode", pincode ?? "");
+                  setValue("state", matchedState?.value ?? 0);
                 }}
               />
             </div>

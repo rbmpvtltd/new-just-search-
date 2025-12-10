@@ -21,13 +21,11 @@ export default function ContactDetail({
 }: {
   businessListing: UserBusinessListingType;
 }) {
-  console.log("Contact ", businessListing);
-
   const router = useRouter();
-  const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const formValue = useBusinessFormStore((s) => s.formValue);
   const prevPage = useBusinessFormStore((s) => s.prevPage);
   const setPage = useBusinessFormStore((s) => s.setPage);
+  const clearPage = useBusinessFormStore((s) => s.clearPage);
 
   const { mutate } = useMutation(trpc.businessrouter.update.mutationOptions());
   const {
@@ -46,18 +44,20 @@ export default function ContactDetail({
   });
 
   const onSubmit = async (data: ContactDetailSchema) => {
+    const finalData = { ...formValue, ...data };
     useBusinessFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));
 
     mutate(
-      { ...formValue, pincode: formValue.pincode },
+      { ...finalData, pincode: formValue.pincode },
       {
         onSuccess: async (data) => {
           if (data.success) {
+            setPage(0);
+            clearPage();
             Alert.alert(data.message);
             router.replace("/(root)/profile");
-            setPage(0);
           }
           console.log("Success", data);
         },

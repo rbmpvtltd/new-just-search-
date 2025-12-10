@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 type AddOfferSchema = z.infer<typeof offersInsertSchema>;
@@ -194,11 +195,14 @@ export default function AddOffer({
       },
       {
         onSuccess: (data) => {
-          console.log("success", data);
           Swal.fire({
             title: data.message,
             icon: "success",
             draggable: true,
+          });
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.offerrouter.showOffer.queryKey(),
           });
           // router.push("/");
         },

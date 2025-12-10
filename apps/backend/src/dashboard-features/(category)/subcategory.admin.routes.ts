@@ -5,6 +5,8 @@ import {
   categoryInsertSchema,
   categoryUpdateSchema,
   subcategories,
+  subcategoryInsertSchema,
+  subcategoryupdateschema,
 } from "@repo/db/dist/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
@@ -80,34 +82,47 @@ export const adminSubcategoryRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    return;
+    const categories = await db.query.categories.findMany({
+      columns: {
+        title: true,
+        id: true,
+      },
+    });
+    return { categories };
   }),
   create: adminProcedure
-    .input(
-      categoryInsertSchema.omit({
-        slug: true,
-      }),
-    )
+    .input(subcategoryInsertSchema)
     .mutation(async ({ input }) => {
-      const slug = slugify(input.title);
-      await db.insert(categories).values({ ...input, slug });
+      console.log("Input", input);
+
+      const slug = slugify(input.name, { lower: true });
+      console.log("Slug", { slug });
+      try {
+        const data = await db.insert(subcategories).values({
+          ...input,
+          slug: slug,
+        });
+        console.log("data", data);
+      } catch (error) {
+        console.log(error);
+      }
+
       return { success: true };
     }),
-  edit: adminProcedure
-    .input(
-      z.object({
-        id: z.number(),
-      }),
-    )
-    .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
-    }),
+  edit: adminProcedure.input(z.number()).query(async ({ input }) => {
+    const data = (
+      await db.select().from(subcategories).where(eq(subcategories.id, input))
+    )[0];
+    const categories = await db.query.categories.findMany({
+      columns: {
+        title: true,
+        id: true,
+      },
+    });
+    return { data, categories };
+  }),
   update: adminProcedure
-    .input(categoryUpdateSchema)
+    .input(subcategoryupdateschema)
     .mutation(async ({ input }) => {
       const { id, ...updateData } = input;
       if (!id)
@@ -115,13 +130,10 @@ export const adminSubcategoryRouter = router({
           code: "BAD_REQUEST",
           message: "Please pass id field",
         });
-      const olddata = (
-        await db.select().from(categories).where(eq(categories.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
-      }
-      await db.update(categories).set(updateData).where(eq(categories.id, id));
+      await db
+        .update(subcategories)
+        .set(updateData)
+        .where(eq(subcategories.id, id));
       return { success: true };
     }),
   multidelete: adminProcedure

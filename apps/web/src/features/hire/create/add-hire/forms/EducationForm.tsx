@@ -16,7 +16,6 @@ type EducationSchema = z.infer<typeof educationSchema>;
 export default function EducationForm() {
   const nextPage = useHireFormStore((state) => state.nextPage);
   const prevPage = useHireFormStore((state) => state.prevPage);
-  const setFormValue = useHireFormStore((state) => state.setFormValue);
   const formValue = useHireFormStore((state) => state.formValue);
 
   const {
@@ -170,6 +169,16 @@ export default function EducationForm() {
         { label: "3", value: 3 },
         { label: "4", value: 4 },
         { label: "5", value: 5 },
+        { label: "6", value: 6 },
+        { label: "7", value: 7 },
+        { label: "8", value: 8 },
+        { label: "9", value: 9 },
+        { label: "10", value: 10 },
+        { label: "11", value: 11 },
+        { label: "12", value: 12 },
+        { label: "13", value: 13 },
+        { label: "14", value: 14 },
+        { label: "15", value: 15 },
       ],
       error: errors.workExperienceYear?.message,
     },
@@ -227,14 +236,10 @@ export default function EducationForm() {
   ];
   const onSubmit = async (data: EducationSchema) => {
     const files = await uploadToCloudinary([data?.certificates], "hire");
-    setFormValue("highestQualification", data.highestQualification ?? "");
-    setFormValue("skillset", data.skillset ?? "");
-    setFormValue("employmentStatus", data.employmentStatus ?? "");
-    setFormValue("workExperienceYear", data.workExperienceYear ?? "");
-    setFormValue("workExperienceMonth", data.workExperienceMonth ?? "");
-    setFormValue("previousJobRole", data.previousJobRole ?? "");
-    setFormValue("jobRole", data.jobRole ?? "");
-    setFormValue("certificates", files[0] ?? "");
+
+    useHireFormStore.setState((state) => ({
+      formValue: { ...state.formValue, ...data, certificates: files[0] ?? "" },
+    }));
     nextPage();
   };
   return (

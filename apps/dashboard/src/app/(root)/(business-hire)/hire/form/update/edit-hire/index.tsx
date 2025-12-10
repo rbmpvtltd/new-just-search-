@@ -1,19 +1,19 @@
 "use client";
 import type { OutputTrpcType } from "@/trpc/type";
+import type { SetOpen } from "../../edit.form";
 import { useHireFormStore } from "../../shared/store/useCreateHireStore";
 import DocumentsForm from "./forms/DocumentsForm";
 import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
 
-export type UserHireListingType = OutputTrpcType["hirerouter"]["show"] | null;
-export type FormReferenceDataType = OutputTrpcType["hirerouter"]["add"] | null;
+export type EditAdminHireType = OutputTrpcType["adminHireRouter"]["edit"];
 export default function EditHirePage({
-  hireListing,
-  formReferenceData,
+  data,
+  setOpen,
 }: {
-  hireListing: UserHireListingType;
-  formReferenceData: FormReferenceDataType;
+  data: EditAdminHireType;
+  setOpen: SetOpen;
 }) {
   const { page } = useHireFormStore();
   const steps = [
@@ -26,25 +26,15 @@ export default function EditHirePage({
   const renderForm = () => {
     switch (page) {
       case 0:
-        return (
-          <PersonalDetailsForm
-            hireListing={hireListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <PersonalDetailsForm data={data} />;
       case 1:
-        return <EducationForm hireListing={hireListing} />;
+        return <EducationForm data={data} />;
       case 2:
-        return <PreferredPositionForm hireListing={hireListing} />;
+        return <PreferredPositionForm data={data} />;
       case 3:
-        return <DocumentsForm hireListing={hireListing} />;
+        return <DocumentsForm data={data} setOpen={setOpen} />;
       default:
-        return (
-          <PersonalDetailsForm
-            hireListing={hireListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <PersonalDetailsForm data={data} />;
     }
   };
 

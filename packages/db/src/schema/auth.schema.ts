@@ -1,6 +1,19 @@
 // auth.schema.ts
 import { sql } from "drizzle-orm";
-import { pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
+import z from "zod";
 import { UserRole, userRoleEnum } from "../enum/allEnum.enum";
 
 export const users = pgTable("users", {
@@ -11,6 +24,13 @@ export const users = pgTable("users", {
   password: text("password"),
   role: userRoleEnum("role").default(UserRole.guest).notNull(),
   googleId: varchar("google_id", { length: 255 }),
+  status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
+
+export const usersInsertSchema = createInsertSchema(users).extend({
+  role: z.enum(UserRole),
+});
+export const usersUpdateSchema = createUpdateSchema(users);
+export const usersSelectSchema = createSelectSchema(users);

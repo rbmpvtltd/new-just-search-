@@ -3,66 +3,62 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Gender, MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { personalDetailsHireSchema } from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
-import LocationAutoDetect from "@/components/LocationAutoDetect";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
-import type { FormReferenceDataType, UserHireListingType } from "..";
+import { useHireFormStore } from "../../../shared/store/useCreateHireStore";
+import type { EditAdminHireType } from "..";
 
-type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
+const adminPersonalDetailsHireSchema = personalDetailsHireSchema.extend({
+  userId: z.number(),
+});
+type PersonalDetailsSchema = z.infer<typeof adminPersonalDetailsHireSchema>;
 
 export default function PersonalDetailsForm({
-  hireListing,
-  formReferenceData,
+  data,
 }: {
-  hireListing: UserHireListingType;
-  formReferenceData: FormReferenceDataType;
+  data: EditAdminHireType;
 }) {
   const trpc = useTRPC();
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const nextPage = useHireFormStore((state) => state.nextPage);
-  const [detectedCityName, setDetectedCityName] = React.useState<null | string>(
-    null,
-  );
 
   const {
     control,
-    setValue,
     handleSubmit,
     formState: { isSubmitting },
   } = useForm<PersonalDetailsSchema>({
-    resolver: zodResolver(personalDetailsHireSchema),
+    resolver: zodResolver(adminPersonalDetailsHireSchema),
     defaultValues: {
-      photo: hireListing?.photo ?? "",
-      name: hireListing?.name ?? "",
-      categoryId: hireListing?.categoryId.id,
-      subcategoryId: hireListing?.subcategoryId.map((item) => item.id) ?? [],
-      gender: hireListing?.gender ?? undefined,
-      maritalStatus: hireListing?.maritalStatus ?? undefined,
-      fatherName: hireListing?.fatherName ?? "",
-      dob: hireListing?.dob ?? "",
-      languages: hireListing?.languages ?? [],
-      mobileNumber: hireListing?.mobileNumber ?? "",
-      alternativeMobileNumber: hireListing?.alternativeMobileNumber ?? "",
-      email: hireListing?.email ?? "",
-      latitude: hireListing?.latitude ?? "",
-      longitude: hireListing?.longitude ?? "",
-      area: hireListing?.area ?? "",
-      pincode: hireListing?.pincode ?? "",
-      state: hireListing?.state.id ?? undefined,
-      city: hireListing?.city.id ?? undefined,
+      userId: data.hire?.userId,
+      photo: data?.hire?.photo ?? "",
+      name: data?.hire?.name ?? "",
+      categoryId: data?.category?.categoryId,
+      subcategoryId: data?.subcategory.map((item) => item.subcategoryId),
+      gender: data?.hire?.gender ?? undefined,
+      maritalStatus: data?.hire?.maritalStatus ?? undefined,
+      fatherName: data?.hire?.fatherName ?? "",
+      dob: data?.hire?.dob ?? "",
+      languages: data?.hire?.languages ?? [],
+      mobileNumber: data?.hire?.mobileNumber ?? "",
+      alternativeMobileNumber: data?.hire?.alternativeMobileNumber ?? "",
+      email: data?.hire?.email ?? "",
+      latitude: data?.hire?.latitude ?? "",
+      longitude: data?.hire?.longitude ?? "",
+      area: data?.hire?.area ?? "",
+      pincode: data?.hire?.pincode ?? "",
+      state: data?.hire?.state,
+      city: data?.hire?.city,
     },
   });
-  const categories = formReferenceData?.getHireCategories.map((item) => {
+  const categories = data.getHireCategories.map((item) => {
     return {
       label: item.title,
       value: item.id,
@@ -77,7 +73,7 @@ export default function PersonalDetailsForm({
     }),
   );
 
-  const states = formReferenceData?.getStates.map((item) => {
+  const states = data.getStates.map((item) => {
     return {
       label: item.name,
       value: item.id,
@@ -92,12 +88,6 @@ export default function PersonalDetailsForm({
     }),
   );
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (cityLoading) {
-    return <div>Loading...</div>;
-  }
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
     {
       control,
@@ -116,7 +106,6 @@ export default function PersonalDetailsForm({
       placeholder: "Applied For",
       component: "select",
       section: "profile",
-      disabled: true,
       options: categories?.map((item) => ({
         label: item.label,
         value: Number(item.value),
@@ -130,6 +119,7 @@ export default function PersonalDetailsForm({
       name: "subcategoryId",
       placeholder: "Select Sub Category",
       component: "multiselect",
+      loading: isLoading,
       section: "profile",
       options: subCategories?.map((item) => ({
         label: item.name,
@@ -315,6 +305,7 @@ export default function PersonalDetailsForm({
 
   const onSubmit = async (data: PersonalDetailsSchema) => {
     const files = await uploadToCloudinary([data.photo], "hire");
+    setFormValue("userId", data.userId);
     setFormValue("photo", files[0] ?? "");
     setFormValue("name", data.name ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
@@ -355,45 +346,10 @@ export default function PersonalDetailsForm({
             </div>
 
             <div className="md:col-span-2 lg:col-span-3 mt-10">
-              <p className="mt-3 text-sm text-gray-500 italic mb-4">
-                Your latitude and longitude will only be used to improve
-                location-based services and will remain confidential. This
-                information will not be shared publicly.
-              </p>
               <div className="flex items-end justify-between mb-4">
                 <h3 className="text-md font-medium text-gray-700">
                   Location Details
                 </h3>
-
-                <div className="flex items-end justify-between mb-4 ">
-                  <LocationAutoDetect
-                    onResult={(data) => {
-                      const formatted = data.formattedAddress ?? "";
-                      const parts = formatted
-                        .split(",")
-                        .map((part) => part.trim());
-                      const lat = data.latitude;
-                      const long = data.longitude;
-                      const pincode = data.postalCode || "";
-                      const cityName = data.city || "";
-                      const stateName = data.region || "";
-                      const area = parts[0]?.match(/[A-Za-z]/)
-                        ? parts[0]
-                        : formatted;
-                      const matchedState = states?.find(
-                        (state) =>
-                          state.label === stateName.toLocaleUpperCase(),
-                      );
-                      setDetectedCityName(cityName);
-
-                      setValue("latitude", String(lat));
-                      setValue("longitude", String(long));
-                      setValue("area", area);
-                      setValue("pincode", pincode);
-                      setValue("state", matchedState?.value ?? 0);
-                    }}
-                  />
-                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

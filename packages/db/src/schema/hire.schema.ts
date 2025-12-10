@@ -19,9 +19,9 @@ import {
   jobTypeEnum,
   MaritalStatus,
   maritalStatusEnum,
+  statusEnum,
   WorkShift,
   workShiftEnum,
-  statusEnum,
 } from "../enum/allEnum.enum";
 import {
   categories,
@@ -84,9 +84,10 @@ export const hireListing = pgTable("hire_listing", {
   locationPreferred: varchar("location_preferred", { length: 255 }),
   certificates: text("certificates"),
   workShift: workShiftEnum("work_shift").array().notNull(),
+  fromHour: varchar("from_hour", { length: 100 }),
+  toHour: varchar("to_hour", { length: 100 }),
   expectedSalaryFrom: varchar("expected_salary_from", { length: 100 }),
   expectedSalaryTo: varchar("expected_salary_to", { length: 100 }),
-  preferredWorkingHours: varchar("preferred_working_hours", { length: 100 }),
   relocate: varchar("relocate"),
   availability: varchar("availability", { length: 255 }),
   idProof: varchar("id_proof").notNull(),
@@ -99,7 +100,7 @@ export const hireListing = pgTable("hire_listing", {
 });
 
 export const hireInsertSchema = createInsertSchema(hireListing, {
-  // photo: () => z.string().min(1, "Photo is required"),
+  photo: () => z.string().min(1, "Photo is required"),
   name: () => z.string().min(3, "Name should be minimum 3 characters long"),
   fatherName: () =>
     z.string().min(3, "Name should be minimum 3 characters long"),
@@ -202,10 +203,11 @@ export const preferredPositionSchema = hireInsertSchema.pick({
   workShift: true,
   expectedSalaryFrom: true,
   expectedSalaryTo: true,
-  preferredWorkingHours: true,
   jobDuration: true,
   relocate: true,
   availability: true,
+  fromHour: true,
+  toHour: true,
 });
 
 export const documentSchema = hireInsertSchema.pick({

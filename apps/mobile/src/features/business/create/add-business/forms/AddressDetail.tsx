@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addressDetailSchema } from "@repo/db/dist/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -18,11 +18,11 @@ import { type OutputTrpcType, trpc } from "@/lib/trpc";
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 type AddBusinessPAgeType = OutputTrpcType["businessrouter"]["add"] | null;
 export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
+  const [detectedCityName, setDetectedCityName] = useState<null | string>(null);
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const formValue = useBusinessFormStore((s) => s.formValue);
   const nextPage = useBusinessFormStore((s) => s.nextPage);
   const prevPage = useBusinessFormStore((s) => s.prevPage);
-  const locationCityName = useRef<null | string>(null);
   const {
     control,
     handleSubmit,
@@ -50,16 +50,39 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
   });
   const selectedStateId = useWatch({ control, name: "state" });
 
-  const { data: cities, isLoading } = useQuery(
+  const {
+    data: cities,
+    isLoading,
+    isFetching,
+  } = useQuery(
     trpc.businessrouter.getCities.queryOptions({
       state: selectedStateId,
     }),
   );
 
-  if (!cities || cities?.length <= 0) {
-    const cityId = locationCityName.current;
-    setValue("city", Number(cityId));
-  }
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isFetching &&
+      cities &&
+      cities.length > 0 &&
+      detectedCityName
+    ) {
+      const matchedCity = cities?.find(
+        (c) => c.city.toLowerCase() === detectedCityName.toLowerCase(),
+      );
+      if (matchedCity && matchedCity.id !== control._formValues.cityId) {
+        setValue("city", matchedCity.id, { shouldValidate: true });
+      }
+    }
+  }, [
+    detectedCityName,
+    control._formValues.cityId,
+    isFetching,
+    isLoading,
+    setValue,
+    cities,
+  ]);
 
   const onSubmit = (data: AddressDetailSchema) => {
     setFormValue("buildingName", data.buildingName ?? "");
@@ -190,27 +213,20 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
               const building_name = parts[0].match(/[A-Za-z]/) ? parts[0] : "";
 
               const matchedState = states?.find(
-                (item: any) => item?.label === stateName.toLocaleUpperCase(),
+                (item) => item?.label === stateName.toLocaleUpperCase(),
               );
 
-              locationCityName.current = cityName;
-
-              // const matchedCity = cities?.find(
-              //   (item: any) =>
-              //     item?.city === cityName &&
-              //     item.stateId === matchedState?.value,
-              // );
-
-              const state = matchedState?.value || 0;
-              // const city = matchedCity?.id ?? 0;
+              setDetectedCityName(cityName);
 
               setValue("latitude", String(lat));
               setValue("longitude", String(lng));
               setValue("pincode", pincode);
-              // setValue("city", city);
-              setValue("state", state);
+              setValue("state", matchedState?.value ?? 0);
               setValue("area", area);
-              setValue("buildingName", building_name);
+              setValue(
+                "buildingName",
+                building_name ? building_name : street_name,
+              );
               setValue("streetName", street_name);
               setValue("landmark", landmark);
             }}

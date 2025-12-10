@@ -54,7 +54,9 @@ const subcategories = pgTable("subcategories", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-const subcategoryInsertSchema = createInsertSchema(subcategories);
+const subcategoryInsertSchema = createInsertSchema(subcategories).omit({
+  slug: true,
+});
 const subcategoryupdateschema = createUpdateSchema(subcategories);
 const subcategoryselectschema = createSelectSchema(subcategories);
 

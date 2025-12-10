@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
   Alert,
@@ -27,13 +27,8 @@ export default function EditProduct({
 }: {
   myProduct: EditProductType;
 }) {
-  const token = useAuthStore((state) => state.token);
-  const { data, error, isLoading, isError } = useQuery(
-    trpc.productrouter.add.queryOptions(),
-  );
-  const { mutate } = useMutation(
-    trpc.productrouter.addProduct.mutationOptions(),
-  );
+  const { data } = useSuspenseQuery(trpc.productrouter.add.queryOptions());
+  const { mutate } = useMutation(trpc.productrouter.update.mutationOptions());
 
   const categories = data?.categoryRecord;
   const subCategories = data?.subcategoryRecord;
@@ -86,6 +81,7 @@ export default function EditProduct({
       {
         onSuccess: (data) => {
           if (data.success) {
+            //TODO Add query client
             Alert.alert(data.message);
           }
           // router.push("/");

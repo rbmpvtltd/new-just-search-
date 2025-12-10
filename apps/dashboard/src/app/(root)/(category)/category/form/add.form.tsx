@@ -12,14 +12,14 @@ import {
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 
@@ -43,16 +43,16 @@ export function AddNewEntiry() {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
+    <Sheet onOpenChange={setOpen} open={open}>
+      <SheetTrigger asChild>
         <Button>Add Entry</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      </SheetTrigger>
+      <SheetContent className="sm:max-w-[425px]">
         <Suspense fallback={<div> loading ...</div>}>
           {open && <AddForm setOpen={setOpen} />}
         </Suspense>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -153,22 +153,22 @@ function AddForm({ setOpen }: AddForm) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogHeader>
-        <DialogTitle>Add</DialogTitle>
-      </DialogHeader>
+      <SheetHeader>
+        <SheetTitle>Add</SheetTitle>
+      </SheetHeader>
       <div className="grid grid-cols-1 gap-6 ">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
       </div>
-      <DialogFooter className="mt-2">
-        <DialogClose asChild>
+      <SheetFooter className="mt-2">
+        <SheetClose asChild>
           <Button variant="outline">Cancel</Button>
-        </DialogClose>
+        </SheetClose>
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting " : "Save changes"}
         </Button>
-      </DialogFooter>
+      </SheetFooter>
     </form>
   );
 }

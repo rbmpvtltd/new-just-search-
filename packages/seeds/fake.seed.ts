@@ -236,7 +236,7 @@ const seedFakeBusiness = async (userId: number) => {
         slug: "fake",
         photo: "fake",
         specialities: "fake",
-        description: "fake",
+        description: '<p dir="ltr"><span>fake</span></p>',
         homeDelivery: "no",
         latitude: "26.2389",
         longitude: "73.0243",

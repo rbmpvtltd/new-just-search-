@@ -1,6 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { sql as dbsql, eq } from "drizzle-orm";
 import {
   banners,
   categories,
@@ -203,6 +203,14 @@ export const seedSubcategories = async () => {
     });
   }
   await db.insert(subcategories).values(dbSubCategoryValue);
+
+  await db.execute(
+    dbsql`SELECT setval(
+        'subcategories_id_seq',
+        COALESCE((SELECT MAX(id) + 1 FROM subcategories), 1),
+        false
+      );`,
+  );
 
   console.log("Subcategories migrated successfully!");
 };

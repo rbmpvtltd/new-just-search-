@@ -55,6 +55,8 @@ export const profiles = pgTable("profiles", {
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
 
+export const profileInsertSchema = createInsertSchema(profiles);
+
 export const userUpdateSchema = createUpdateSchema(profiles).extend({
   maritalStatus: z.enum(MaritalStatus),
 });
