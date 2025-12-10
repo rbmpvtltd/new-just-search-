@@ -15,6 +15,7 @@ CREATE TABLE "users" (
 	"password" text,
 	"role" "user_role" DEFAULT 'guest' NOT NULL,
 	"google_id" varchar(255),
+	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT NOW(),
 	"updated_at" timestamp DEFAULT NOW()
 );
@@ -269,6 +270,13 @@ CREATE TABLE "cities" (
 	"state_id" integer NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "occupation" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "states" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL
@@ -501,7 +509,7 @@ CREATE TABLE "profiles" (
 	"last_name" varchar(100),
 	"email" varchar(255),
 	"dob" date,
-	"occupation" varchar(100),
+	"occupation" integer,
 	"marital_status" "marital_status",
 	"address" varchar(255),
 	"pincode" varchar(10),

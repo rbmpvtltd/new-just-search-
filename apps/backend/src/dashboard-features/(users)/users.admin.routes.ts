@@ -1,16 +1,17 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
-  categoryInsertSchema,
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
+import {
+  profileInsertSchema,
+  profiles,
+} from "@repo/db/dist/schema/user.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
@@ -76,13 +77,57 @@ export const adminUsersRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    return;
+    const states = await db.query.states.findMany();
+    const occupation = await db.query.occupation.findMany();
+    return { states, occupation };
   }),
   create: adminProcedure
-    .input(usersInsertSchema)
+    .input(
+      usersInsertSchema.extend(
+        profileInsertSchema.omit({ userId: true }).shape,
+      ),
+    )
     .mutation(async ({ input }) => {
-      await db.insert(users).values(input);
-      return { success: true };
+      console.log("we are here");
+      const userData = usersInsertSchema.parse(input);
+      const profileData = profileInsertSchema
+        .omit({ userId: true })
+        .parse(input);
+
+      const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
+        where: (user, { eq, or }) =>
+          or(
+            eq(user.email, String(userData.email)),
+            eq(user.phoneNumber, String(userData.phoneNumber)),
+          ),
+      });
+      if (isEmailOrPhoneNumberExist) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Email already exists",
+        });
+      }
+
+      const newUserData = (
+        await db.insert(users).values(userData).returning()
+      )[0];
+      if (!newUserData?.id) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong in creating user",
+        });
+      }
+
+      // try {
+      await db.insert(profiles).values({
+        ...profileData,
+        userId: newUserData?.id,
+      });
+      // } catch (error) {
+      //   console.log(error);
+      // }
+
+      return { success: true, message: "Profile created successfully" };
     }),
   edit: adminProcedure
     .input(

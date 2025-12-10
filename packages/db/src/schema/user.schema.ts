@@ -39,9 +39,8 @@ export const profiles = pgTable("profiles", {
   salutation: varchar("salutation", { length: 100 }),
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
-  email: varchar("email", { length: 255 }),
   dob: date("dob"),
-  occupation: varchar("occupation", { length: 100 }),
+  occupation: integer("occupation"),
   maritalStatus: maritalStatusEnum("marital_status"),
   address: varchar("address", { length: 255 }),
   pincode: varchar("pincode", { length: 10 }),
@@ -55,7 +54,9 @@ export const profiles = pgTable("profiles", {
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
 
-export const profileInsertSchema = createInsertSchema(profiles);
+export const profileInsertSchema = createInsertSchema(profiles).extend({
+  maritalStatus: z.enum(MaritalStatus),
+});
 
 export const userUpdateSchema = createUpdateSchema(profiles).extend({
   maritalStatus: z.enum(MaritalStatus),

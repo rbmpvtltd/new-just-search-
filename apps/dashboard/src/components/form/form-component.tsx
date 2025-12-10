@@ -6,9 +6,11 @@ import {
   type Path,
 } from "react-hook-form";
 import { Spinner } from "@/components/ui/spinner";
+import { denormalizeDate, normalizeDate } from "@/utils/normalizeDate";
 import Editor from "../dom-components/hello-dom";
 import CropperComponent from "../image/upload-image";
 import { Checkbox } from "../ui/checkbox";
+import { DatePicker } from "../ui/date-picker";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { MultiSelect, type Option } from "../ui/multiselect";
@@ -35,6 +37,7 @@ export interface FormFieldProps<T extends FieldValues> {
     | "multiselect"
     | "select"
     | "checkbox"
+    | "calendar"
     | "single-checkbox"
     | "textarea"
     | "image"
@@ -151,6 +154,16 @@ export const FormField = <T extends FieldValues>({
                   value={options?.find((item) => item.value === value) || null}
                   onChange={(selectedItem) => onChange(selectedItem?.value)}
                   {...props}
+                />
+              );
+            case "calendar":
+              return (
+                <DatePicker
+                  value={denormalizeDate(value)}
+                  onChange={(e) => {
+                    console.log(e);
+                    onChange(normalizeDate(e));
+                  }}
                 />
               );
             case "checkbox":
