@@ -10,7 +10,7 @@ import {
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useUserFormStore } from "../../../shared/store/useCreateHireStore";
+import { useUserFormStore } from "../../../shared/store/useCreateSalesmanStore";
 import type { EditAdminUserType } from "..";
 
 type UserInsertSchema = z.infer<typeof usersInsertSchema>;

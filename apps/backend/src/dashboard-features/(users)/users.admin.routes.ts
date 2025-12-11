@@ -1,22 +1,24 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
+import {
+  users,
+  usersInsertSchema,
+  usersUpdateSchema,
+} from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
-  categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
 import {
   profileInsertSchema,
   profiles,
+  profileUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
-import {
-  cloudinaryDeleteImageByPublicId,
-  cloudinaryDeleteImagesByPublicIds,
-} from "@/lib/cloudinary";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -118,14 +120,10 @@ export const adminUsersRouter = router({
         });
       }
 
-      // try {
       await db.insert(profiles).values({
         ...profileData,
         userId: newUserData?.id,
       });
-      // } catch (error) {
-      //   console.log(error);
-      // }
 
       return { success: true, message: "Profile created successfully" };
     }),
@@ -136,29 +134,74 @@ export const adminUsersRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+      const getStates = await db.query.states.findMany();
+      const getOccupation = await db.query.occupation.findMany();
+      const userData = await db.query.users.findFirst({
+        where: (user, { eq }) => eq(user.id, input.id),
+      });
+
+      const profileData = await db.query.profiles.findFirst({
+        where: (profile, { eq }) => eq(profile.userId, Number(userData?.id)),
+      });
+
+      return { userData, profileData, getStates, getOccupation };
     }),
   update: adminProcedure
-    .input(categoryUpdateSchema)
+    .input(usersUpdateSchema.extend(profileUpdateSchema.shape))
     .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      if (!id)
+      const userData = usersUpdateSchema.parse(input);
+      const profileData = profileUpdateSchema
+        .omit({ userId: true })
+        .parse(input);
+
+      const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
+        where: (user, { and, eq, or, ne }) =>
+          and(
+            or(
+              eq(user.email, String(userData.email)),
+              eq(user.phoneNumber, String(userData.phoneNumber)),
+            ),
+            ne(user.id, Number(userData.id)),
+          ),
+      });
+
+      if (isEmailOrPhoneNumberExist) {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please pass id field",
+          code: "CONFLICT",
+          message: "Email already exists",
         });
-      const olddata = (
-        await db.select().from(categories).where(eq(categories.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
       }
-      await db.update(categories).set(updateData).where(eq(categories.id, id));
-      return { success: true };
+      const isProfileExists = await db.query.profiles.findFirst({
+        where: (profile, { eq }) => eq(profile.id, Number(profileData?.id)),
+      });
+
+      if (!isProfileExists) {
+        const newUserData = (
+          await db.insert(users).values(userData).returning()
+        )[0];
+        if (!newUserData?.id) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong in creating user",
+          });
+        }
+      } else {
+        await db
+          .update(users)
+          .set({
+            ...userData,
+          })
+          .where(eq(users.id, Number(userData.id)));
+      }
+
+      await db
+        .update(profiles)
+        .set({
+          ...profileData,
+        })
+        .where(eq(profiles.userId, Number(userData.id)));
+
+      return { success: true, message: "Profile updated successfully" };
     }),
   multidelete: adminProcedure
     .input(

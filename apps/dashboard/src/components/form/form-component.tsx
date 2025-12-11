@@ -27,10 +27,12 @@ export interface FormFieldProps<T extends FieldValues> {
   required?: boolean;
   section?: string;
   loading?: boolean;
+  disabled?: boolean;
   error?: string;
   options?: Option[] | undefined;
   labelHidden?: boolean;
   onChangeValue?: (value: string | undefined | null) => void;
+  defaultValue?: string;
   component:
     | "input"
     | "input-slug"
@@ -50,9 +52,8 @@ export const FormField = <T extends FieldValues>({
   label,
   name,
   placeholder,
-
+  disabled = false,
   labelHidden = false,
-
   loading = false,
   className,
   mainDivClassName,
@@ -60,6 +61,7 @@ export const FormField = <T extends FieldValues>({
   section,
   error,
   options,
+  defaultValue,
   component,
   onChangeValue,
   ...props
@@ -79,6 +81,8 @@ export const FormField = <T extends FieldValues>({
             case "input":
               return (
                 <Input
+                  defaultValue={defaultValue}
+                  disabled={disabled}
                   type={type}
                   name={name}
                   className={`h-[41px] ${className}`}

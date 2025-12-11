@@ -1,5 +1,4 @@
 "use client";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { type Dispatch, type SetStateAction, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,8 +7,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
-import { useTRPC } from "@/trpc/client";
 import { AddUserPage } from "./create/add-user";
 
 export function AddNewEntiry() {
@@ -38,16 +35,5 @@ export function AddNewEntiry() {
 export type SetOpen = Dispatch<SetStateAction<boolean>>;
 
 function GetData({ setOpen }: { setOpen: SetOpen }) {
-  // function GetData() {
-  const trpc = useTRPC();
-
-  const { data, isFetching } = useSuspenseQuery(
-    trpc.adminHireRouter.add.queryOptions(undefined, {
-      staleTime: 0,
-    }),
-  );
-
-  if (isFetching) return <Spinner />;
-
-  return <AddUserPage data={data} setOpen={setOpen} />;
+  return <AddUserPage setOpen={setOpen} />;
 }

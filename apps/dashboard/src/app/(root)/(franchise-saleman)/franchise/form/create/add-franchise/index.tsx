@@ -1,22 +1,22 @@
 "use client";
 import type { SetOpen } from "../../add.form";
-import { useUserFormStore } from "../../shared/store/useCreateHireStore";
+import { useFranchiseFormStore } from "../../shared/store/useCreateFranchiseStore";
+import FranchiseForm from "./forms/FranchiseForm";
 import ProfileForm from "./forms/ProfileForm";
 import UserForm from "./forms/UserForm";
-export function AddUserPage({
-  setOpen,
-}: {
-  setOpen: SetOpen;
-}) {
-  const page = useUserFormStore((state) => state.page);
-  const steps = ["User Form", "Profile Form"];
+
+export function AddFranchisePage({ setOpen }: { setOpen: SetOpen }) {
+  const page = useFranchiseFormStore((state) => state.page);
+  const steps = ["User Form", "Profile Form", "Franchise Form"];
 
   const renderForm = () => {
     switch (page) {
       case 0:
         return <UserForm />;
       case 1:
-        return <ProfileForm setOpen={setOpen} />;
+        return <ProfileForm />;
+      case 2:
+        return <FranchiseForm setOpen={setOpen} />;
       default:
         return <UserForm />;
     }

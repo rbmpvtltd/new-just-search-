@@ -1,22 +1,26 @@
 "use client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
 import type { SetOpen } from "../../add.form";
-import { useUserFormStore } from "../../shared/store/useCreateHireStore";
+import { useSalesmanFormStore } from "../../shared/store/useCreateSalesmanStore";
 import ProfileForm from "./forms/ProfileForm";
+import SalesmanForm from "./forms/SalesmanForm";
 import UserForm from "./forms/UserForm";
-export function AddUserPage({
-  setOpen,
-}: {
-  setOpen: SetOpen;
-}) {
-  const page = useUserFormStore((state) => state.page);
-  const steps = ["User Form", "Profile Form"];
+
+export function AddSalesmanPage({ setOpen }: { setOpen: SetOpen }) {
+  const trpc = useTRPC();
+  const { data } = useSuspenseQuery(trpc.adminSalemanRouter.add.queryOptions());
+  const page = useSalesmanFormStore((state) => state.page);
+  const steps = ["User Form", "Profile Form", "Salesman Form"];
 
   const renderForm = () => {
     switch (page) {
       case 0:
         return <UserForm />;
       case 1:
-        return <ProfileForm setOpen={setOpen} />;
+        return <ProfileForm data={data} />;
+      case 2:
+        return <SalesmanForm data={data} setOpen={setOpen} />;
       default:
         return <UserForm />;
     }

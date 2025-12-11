@@ -1,12 +1,19 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { users } from "@repo/db/dist/schema/auth.schema";
+import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
   categoryInsertSchema,
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
+import {
+  franchiseInsertSchema,
+  franchises,
+  profileInsertSchema,
+  profiles,
+} from "@repo/db/dist/schema/user.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";
@@ -48,7 +55,7 @@ export const adminFranchiseRouter = router({
 
     const data = await db
       .select()
-      .from(users)
+      .from(franchises)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
@@ -60,7 +67,7 @@ export const adminFranchiseRouter = router({
       .select({
         count: sql<number>`count(distinct ${users.id})::int`,
       })
-      .from(users)
+      .from(franchises)
       // .leftJoin(categories, eq(subcategories.categoryId, categories.id))
       .where(where);
 
@@ -75,18 +82,65 @@ export const adminFranchiseRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    return;
+    const states = await db.query.states.findMany();
+    const occupation = await db.query.occupation.findMany();
+    return { states, occupation };
   }),
   create: adminProcedure
     .input(
-      categoryInsertSchema.omit({
-        slug: true,
-      }),
+      usersInsertSchema
+        .omit({ role: true })
+        .extend(profileInsertSchema.omit({ userId: true }).shape)
+        .extend(franchiseInsertSchema.omit({ userId: true }).shape),
     )
     .mutation(async ({ input }) => {
-      const slug = slugify(input.title);
-      await db.insert(categories).values({ ...input, slug });
-      return { success: true };
+      console.log("we are here");
+      const userData = usersInsertSchema.omit({ role: true }).parse(input);
+      const profileData = profileInsertSchema
+        .omit({ userId: true })
+        .parse(input);
+      const franchiseData = franchiseInsertSchema
+        .omit({ userId: true })
+        .parse(input);
+
+      const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
+        where: (user, { eq, or }) =>
+          or(
+            eq(user.email, String(userData.email)),
+            eq(user.phoneNumber, String(userData.phoneNumber)),
+          ),
+      });
+      if (isEmailOrPhoneNumberExist) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Email already exists",
+        });
+      }
+
+      const newUserData = (
+        await db
+          .insert(users)
+          .values({ ...userData, role: "franchises" })
+          .returning()
+      )[0];
+      if (!newUserData?.id) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong in creating user",
+        });
+      }
+
+      await db.insert(profiles).values({
+        ...profileData,
+        userId: newUserData?.id,
+      });
+
+      await db.insert(franchises).values({
+        ...franchiseData,
+        userId: newUserData?.id,
+      });
+
+      return { success: true, message: "Franchise created successfully" };
     }),
   edit: adminProcedure
     .input(
@@ -95,29 +149,84 @@ export const adminFranchiseRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+      logger.info("input is", { input: input });
+      const getStates = await db.query.states.findMany();
+      const getOccupation = await db.query.occupation.findMany();
+      const userData = await db.query.users.findFirst({
+        where: (user, { eq }) => eq(user.id, input.id),
+      });
+      logger.info("userData is", { userData: userData });
+      const profileData = await db.query.profiles.findFirst({
+        where: (profile, { eq }) => eq(profile.userId, Number(userData?.id)),
+      });
+      logger.info("profileData is", { profileData: profileData });
+      const franchiseData = await db.query.franchises.findFirst({
+        where: (franchise, { eq }) =>
+          eq(franchise.userId, Number(userData?.id)),
+      });
+      return { userData, profileData, getStates, getOccupation, franchiseData };
     }),
   update: adminProcedure
-    .input(categoryUpdateSchema)
+    .input(
+      usersInsertSchema
+        .omit({ role: true })
+        .extend(profileInsertSchema.omit({ userId: true }).shape)
+        .extend(franchiseInsertSchema.omit({ userId: true }).shape),
+    )
     .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      if (!id)
+      console.log("we are here");
+      const userData = usersInsertSchema.omit({ role: true }).parse(input);
+      const profileData = profileInsertSchema
+        .omit({ userId: true })
+        .parse(input);
+      const franchiseData = franchiseInsertSchema
+        .omit({ userId: true })
+        .parse(input);
+
+      const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
+        where: (user, { and, eq, or, ne }) =>
+          and(
+            or(
+              eq(user.email, String(userData.email)),
+              eq(user.phoneNumber, String(userData.phoneNumber)),
+            ),
+            ne(user.id, Number(userData.id)),
+          ),
+      });
+      if (isEmailOrPhoneNumberExist) {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please pass id field",
+          code: "CONFLICT",
+          message: "Email already exists",
         });
-      const olddata = (
-        await db.select().from(categories).where(eq(categories.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
       }
-      await db.update(categories).set(updateData).where(eq(categories.id, id));
-      return { success: true };
+      const isProfileExists = await db.query.profiles.findFirst({
+        where: (profile, { eq }) => eq(profile.id, Number(profileData?.id)),
+      });
+
+      if (!isProfileExists) {
+        const newUserData = (
+          await db.insert(users).values(userData).returning()
+        )[0];
+        if (!newUserData?.id) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong in creating user",
+          });
+        }
+      } else {
+        await db
+          .update(users)
+          .set({
+            ...userData,
+          })
+          .where(eq(users.id, Number(userData.id)));
+      }
+
+      await db.update(franchises).set({
+        ...franchiseData,
+      });
+
+      return { success: true, message: "Franchise updated successfully" };
     }),
   multidelete: adminProcedure
     .input(

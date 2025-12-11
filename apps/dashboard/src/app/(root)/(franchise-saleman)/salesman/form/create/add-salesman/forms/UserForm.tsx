@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import { useForm } from "react-hook-form";
 import type z from "zod";
@@ -10,27 +9,28 @@ import {
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useUserFormStore } from "../../../shared/store/useCreateHireStore";
-import type { EditAdminUserType } from "..";
+import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 
-type UserInsertSchema = z.infer<typeof usersInsertSchema>;
+export const adminAddUserInsertSchema = usersInsertSchema.omit({
+  role: true,
+});
+type UserInsertSchema = z.infer<typeof adminAddUserInsertSchema>;
 
-export default function UserForm({ data }: { data: EditAdminUserType }) {
-  const nextPage = useUserFormStore((s) => s.nextPage);
-  const formValue = useUserFormStore((s) => s.formValue);
+export default function UserForm() {
+  const nextPage = useSalesmanFormStore((s) => s.nextPage);
+  const formValue = useSalesmanFormStore((s) => s.formValue);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<UserInsertSchema>({
-    resolver: zodResolver(usersInsertSchema),
+    resolver: zodResolver(adminAddUserInsertSchema),
     defaultValues: {
-      displayName: data.userData?.displayName,
-      email: data.userData?.email,
-      password: data.userData?.password,
-      phoneNumber: data.userData?.phoneNumber,
-      role: data.userData?.role,
-      status: data.userData?.status,
+      displayName: formValue.displayName,
+      email: formValue.email,
+      password: formValue.password,
+      phoneNumber: formValue.phoneNumber,
+      status: formValue.status,
     },
   });
 
@@ -66,22 +66,7 @@ export default function UserForm({ data }: { data: EditAdminUserType }) {
       name: "password",
       placeholder: "Enter Users Login Password",
       component: "input",
-      disabled: true,
       error: errors.email?.message,
-    },
-    {
-      control,
-      label: "Role",
-      name: "role",
-      placeholder: "Select Type of category",
-      component: "select",
-      options: [
-        { label: UserRole.business, value: UserRole.business },
-        { label: UserRole.hire, value: UserRole.hire },
-        { label: UserRole.guest, value: UserRole.guest },
-        { label: UserRole.visiter, value: UserRole.visiter },
-      ],
-      error: errors.role?.message,
     },
     {
       control,
@@ -95,7 +80,7 @@ export default function UserForm({ data }: { data: EditAdminUserType }) {
   ];
 
   const onSubmit = async (data: UserInsertSchema) => {
-    useUserFormStore.setState((state) => ({
+    useSalesmanFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));
     nextPage();

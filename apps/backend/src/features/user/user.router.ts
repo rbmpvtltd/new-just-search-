@@ -2,8 +2,8 @@ import { db, schemas } from "@repo/db";
 import {
   account_delete_request,
   feedbackInsertSchema,
+  profileUpdateSchema,
   requestAccountsInsertSchema,
-  userUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
@@ -27,22 +27,22 @@ export const userRouter = router({
     }),
   update: protectedProcedure
     .input(
-      userUpdateSchema.omit({
+      profileUpdateSchema.omit({
         userId: true,
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const existingEmail = await db.query.users.findFirst({
-        where: (users, { eq, and }) =>
-          and(eq(users.email, String(input.email)), ne(users.id, ctx.userId)),
-      });
+      // const existingEmail = await db.query.users.findFirst({
+      //   where: (users, { eq, and }) =>
+      //     and(eq(users.email, String(input.email)), ne(users.id, ctx.userId)),
+      // });
 
-      if (existingEmail) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Something went wrong, Email already exits",
-        });
-      }
+      // if (existingEmail) {
+      //   throw new TRPCError({
+      //     code: "CONFLICT",
+      //     message: "Something went wrong, Email already exits",
+      //   });
+      // }
       const isStateExists = await db.query.states.findFirst({
         where: (states, { eq }) => eq(states.id, Number(input.state)),
       });
@@ -79,7 +79,6 @@ export const userRouter = router({
           lastName: input.lastName,
           occupation: input.occupation,
           dob: input.dob,
-          email: input.email,
           maritalStatus: input.maritalStatus,
           area: input.area,
           address: input.address,
@@ -99,7 +98,6 @@ export const userRouter = router({
             lastName: input.lastName,
             occupation: input.occupation,
             maritalStatus: input.maritalStatus,
-            email: input.email,
             address: input.area,
             dob: input.dob,
             area: input.area,

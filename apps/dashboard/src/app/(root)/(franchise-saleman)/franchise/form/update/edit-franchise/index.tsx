@@ -1,24 +1,36 @@
 "use client";
-import type { SetOpen } from "../../add.form";
-import { useUserFormStore } from "../../shared/store/useCreateHireStore";
+import type { OutputTrpcType } from "@/trpc/type";
+import type { SetOpen } from "../../edit.form";
+import { useFranchiseFormStore } from "../../shared/store/useCreateFranchiseStore";
+import FranchiseForm from "./forms/FranchiseForm";
 import ProfileForm from "./forms/ProfileForm";
 import UserForm from "./forms/UserForm";
-export function AddUserPage({
+
+export type EditAdminFranchiseType =
+  OutputTrpcType["adminFranchiseRouter"]["edit"];
+
+export function EditFranchisePage({
+  id,
+  data,
   setOpen,
 }: {
+  id: number;
+  data: EditAdminFranchiseType;
   setOpen: SetOpen;
 }) {
-  const page = useUserFormStore((state) => state.page);
-  const steps = ["User Form", "Profile Form"];
+  const page = useFranchiseFormStore((state) => state.page);
+  const steps = ["User Form", "Profile Form", "Franchise Form"];
 
   const renderForm = () => {
     switch (page) {
       case 0:
-        return <UserForm />;
+        return <UserForm data={data} />;
       case 1:
-        return <ProfileForm setOpen={setOpen} />;
+        return <ProfileForm data={data} />;
+      case 2:
+        return <FranchiseForm data={data} setOpen={setOpen} />;
       default:
-        return <UserForm />;
+        return <UserForm data={data} />;
     }
   };
 
