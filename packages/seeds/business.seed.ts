@@ -26,7 +26,7 @@ export const businessSeed = async () => {
   await seedFavourites();
   await businessesCategories();
   await businessesSubcategory();
-  // await BusinessReviews();
+  await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 

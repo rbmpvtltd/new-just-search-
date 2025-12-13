@@ -410,7 +410,7 @@ CREATE TABLE "product_reviews" (
 	"message" text NOT NULL,
 	"rate" integer,
 	"view" boolean DEFAULT false NOT NULL,
-	"status" "status" DEFAULT 'Pending',
+	"status" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );

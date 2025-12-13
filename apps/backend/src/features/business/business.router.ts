@@ -8,6 +8,7 @@ import {
   businessSubcategories,
   businessUpdateSchema,
   favourites,
+  insertBusinessReviewSchema,
 } from "@repo/db/dist/schema/business.schema";
 import {
   categories,
@@ -40,6 +41,7 @@ import {
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
+import { createReview, reviewExist } from "./business.service";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -856,17 +858,30 @@ export const businessrouter = router({
       ctx: { userId: ctx.userId },
     };
   }),
-  businessReview : publicProcedure.input(z.object({
-    businessId : z.number(),
-    userId : z.number(),
-    message : z.string(),
-    rating : z.number()
-  })).mutation(async ({input})=>{
-    const {businessId,userId,message,rating} = input;
-    console.log("businessId is:",businessId)
-    console.log("userId is:",userId)
-    console.log("message is:",message)
-    console.log("rating is:",rating)
+  businessReview: protectedProcedure
+    .input(insertBusinessReviewSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { businessId, message, rate } = input;
+      const { userId } = ctx;
 
-  })
+      const isReviewExist = await reviewExist(businessId, userId);
+      console.log("review exist status is==>", isReviewExist);
+      if (isReviewExist) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You've already submitted review on that business",
+        });
+      }
+      await createReview(userId, businessId, rate ?? 0, message ?? "");
+
+      return { success: true, message: "Review Has Been Submitted" };
+    }),
+  ReviewSubmitted: protectedProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { businessId } = input;
+      const { userId } = ctx;
+      const isSubmitted = await reviewExist(businessId, userId);
+      return { submitted: isSubmitted };
+    }),
 });

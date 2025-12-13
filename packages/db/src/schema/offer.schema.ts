@@ -94,7 +94,25 @@ export const offerReviews = pgTable("offer_reviews", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
+export const insertOfferReviewSchema = createInsertSchema(offerReviews, {
+  offerId: () => z.number().positive("Business ID is required"),
+  name: () =>
+    z
+      .string()
+      .min(3, "Name Must Be Constain 3 Characters")
+      .max(255, "Too Long Name"),
+  message: () =>
+    z
+      .string()
+      .min(10, "Review must be at least 10 characters")
+      .max(500, "Review must not exceed 500 characters"),
+  rate: () => z.number().min(1).max(5, "Rating must be between 1 and 5"),
+  email: () => z.email().min(8, "Email Must Be Contain 8 Characters").max(500),
+  view: () => z.boolean(),
+  status: () => z.boolean(),
+}).omit({
+  userId: true,
+});
 // 4. OfferSubcategory
 export const offerSubcategory = pgTable("offer_subcagtegorys", {
   id: serial("id").primaryKey(),

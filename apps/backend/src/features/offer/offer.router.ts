@@ -1,5 +1,6 @@
 import { db, schemas } from "@repo/db";
 import {
+  insertOfferReviewSchema,
   offers,
   offersInsertSchema,
   offersUpdateSchema,
@@ -9,7 +10,14 @@ import { eq } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
-import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
+import {
+  businessProcedure,
+  protectedProcedure,
+  publicProcedure,
+  router,
+  visitorProcedure,
+} from "@/utils/trpc";
+import { createOfferReview, offerReviewExist } from "./offer.service";
 
 export const offerrouter = router({
   add: businessProcedure.query(async ({ ctx }) => {
@@ -324,4 +332,36 @@ export const offerrouter = router({
 
       return { success: true };
     }),
+  createOfferReview: protectedProcedure
+    .input(
+      insertOfferReviewSchema
+    )
+    .mutation(async ({ input,ctx }) => {
+      const { email, message, name, offerId, rate, status, view } = input;
+      const {userId} = ctx
+      const reviewExist = await offerReviewExist(userId, offerId, email ?? "");
+      if (reviewExist) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You've already submitted review on that offer",
+        });
+      }
+      const data = await createOfferReview(
+        userId,
+        offerId,
+        rate ?? 0,
+        message ?? "",
+        name ?? "",
+        email ?? "",
+        status,
+        view,
+      );
+      return { success: true, data: data };
+    }),
+    offerReviewSubmitted : protectedProcedure.input(z.object({offerId:z.number()})).query(async ({input,ctx})=>{
+      const {offerId} = input;
+      const {userId} = ctx
+      const submitted = await offerReviewExist(userId,offerId)
+      return {submitted:submitted}
+    })
 });

@@ -86,9 +86,29 @@ export const productReviews = pgTable("product_reviews", {
 
   rate: integer("rate"),
   view: boolean("view").default(false).notNull(),
-  status: statusEnum("status").default("Pending"),
+  status: boolean("status").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+export const insertProductReviewSchema = createInsertSchema(productReviews, {
+  productId : () => z.number().positive("product ID is required"),
+  businessId : ()=> z.number().positive("business ID is required"),
+  name: () =>
+    z
+      .string()
+      .min(3, "Name Must Be Constain 3 Characters")
+      .max(255, "Too Long Name"),
+  message: () =>
+    z
+      .string()
+      .min(10, "Review must be at least 10 characters")
+      .max(500, "Review must not exceed 500 characters").optional(),
+  rate: () => z.number().min(1).max(5, "Rating must be between 1 and 5").optional(),
+  email: () => z.email().min(8, "Email Must Be Contain 8 Characters").max(500),
+  view: () => z.boolean(),
+  status: () => z.boolean(),
+}).omit({
+  userId: true,
 });
 
 // 4. recent_views_product
