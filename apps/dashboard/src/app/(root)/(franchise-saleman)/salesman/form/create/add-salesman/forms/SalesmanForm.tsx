@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { salesmenInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
+import next from "next";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -18,9 +19,11 @@ import { getQueryClient } from "@/trpc/query-client";
 import type { SetOpen } from "../../../add.form";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 import type { AddAdminSalesmanType } from "./ProfileForm";
-import next from "next";
 
-type SalesmanInsertSchema = z.infer<typeof salesmenInsertSchema>;
+const adminSalesmenInsertSchema = salesmenInsertSchema.omit({
+  userId: true,
+});
+type SalesmanInsertSchema = z.infer<typeof adminSalesmenInsertSchema>;
 
 export default function SalesmanForm({
   data,
@@ -43,17 +46,14 @@ export default function SalesmanForm({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<SalesmanInsertSchema>({
-    resolver: zodResolver(salesmenInsertSchema),
+    resolver: zodResolver(adminSalesmenInsertSchema),
     defaultValues: {
       franchiseId: formValue.franchiseId,
       referCode: formValue.referCode,
     },
   });
   const franchiseId = useWatch({ control, name: "franchiseId" });
-  const {
-    data: dataReferCode,
-    isLoading,
-  } = useQuery(
+  const { data: dataReferCode, isLoading } = useQuery(
     trpc.adminSalemanRouter.getReferCode.queryOptions({
       franchiseId: Number(franchiseId),
     }),

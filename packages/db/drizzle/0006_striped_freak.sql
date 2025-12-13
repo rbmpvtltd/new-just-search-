@@ -1,1 +1,0 @@
-ALTER TABLE "plans" RENAME COLUMN "price_color" TO "plan_color";

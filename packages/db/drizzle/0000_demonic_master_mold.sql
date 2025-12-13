@@ -3,6 +3,7 @@ CREATE TYPE "public"."job_duration" AS ENUM('Day', 'Week', 'Month', 'Year');--> 
 CREATE TYPE "public"."job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
 CREATE TYPE "public"."marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
 CREATE TYPE "public"."notification_enum" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
+CREATE TYPE "public"."plan_period" AS ENUM('daily', 'weekly', 'monthly', 'yearly');--> statement-breakpoint
 CREATE TYPE "public"."send_by_role" AS ENUM('Admin', 'User');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('Pending', 'Approved', 'Rejected');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
@@ -169,7 +170,7 @@ CREATE TABLE "hire_listing" (
 	"dob" date,
 	"gender" "gender" NOT NULL,
 	"marital_status" "marital_status" NOT NULL,
-	"language" varchar(255)[] NOT NULL,
+	"language" integer[] NOT NULL,
 	"slug" varchar(255),
 	"specialities" text,
 	"description" text,
@@ -195,7 +196,7 @@ CREATE TABLE "hire_listing" (
 	"twitter" varchar(255),
 	"linkedin" varchar(255),
 	"views" integer DEFAULT 0,
-	"highest_qualification" varchar(255) NOT NULL,
+	"highest_qualification" integer NOT NULL,
 	"employment_status" varchar(255),
 	"work_experience_year" integer,
 	"work_experience_month" integer,
@@ -215,7 +216,7 @@ CREATE TABLE "hire_listing" (
 	"expected_salary_to" varchar(100),
 	"relocate" varchar,
 	"availability" varchar(255),
-	"id_proof" varchar NOT NULL,
+	"id_proof" integer NOT NULL,
 	"id_proof_photo" varchar(500),
 	"resume" varchar(500),
 	"resume_photo" varchar(500),
@@ -389,16 +390,15 @@ CREATE TABLE "plan_attributes" (
 --> statement-breakpoint
 CREATE TABLE "plans" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"title" varchar(255) NOT NULL,
-	"subtitle" varchar(255),
-	"plan_type" integer,
-	"price" numeric,
-	"prev_price" numeric,
-	"price_color" varchar(50) NOT NULL,
-	"post_limit" integer,
+	"name" varchar(255) NOT NULL,
+	"identifier" varchar(255) NOT NULL,
+	"period" "plan_period" NOT NULL,
+	"interval" integer NOT NULL,
+	"role" "user_role" DEFAULT 'guest' NOT NULL,
+	"amount" integer,
+	"plan_color" varchar(50) NOT NULL,
 	"product_limit" integer,
 	"offer_limit" integer,
-	"post_duration" integer,
 	"offer_duration" integer,
 	"max_offer_per_day" integer,
 	"status" boolean DEFAULT true,
@@ -406,10 +406,10 @@ CREATE TABLE "plans" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "transactions" (
+CREATE TABLE "user_current_plan" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"amount" numeric NOT NULL,
-	"transactions_no" varchar(255) NOT NULL,
+	"plan_id" integer NOT NULL,
+	"user_id" integer NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -417,10 +417,12 @@ CREATE TABLE "transactions" (
 CREATE TABLE "user_subscriptions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
-	"subscription_number" varchar(255) NOT NULL,
-	"transaction_id" integer NOT NULL,
 	"plans_id" integer NOT NULL,
-	"price" integer NOT NULL,
+	"plan_identifier" varchar(255),
+	"subscription_number" varchar(255) NOT NULL,
+	"transaction_number" varchar(255) NOT NULL,
+	"amount" integer NOT NULL,
+	"currency" varchar,
 	"expiry_date" integer NOT NULL,
 	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now(),
@@ -591,8 +593,9 @@ ALTER TABLE "offers" ADD CONSTRAINT "offers_category_id_categories_id_fk" FOREIG
 ALTER TABLE "recent_views_offers" ADD CONSTRAINT "recent_views_offers_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recent_views_offers" ADD CONSTRAINT "recent_views_offers_offer_id_offers_id_fk" FOREIGN KEY ("offer_id") REFERENCES "public"."offers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "plan_attributes" ADD CONSTRAINT "plan_attributes_plan_id_plans_id_fk" FOREIGN KEY ("plan_id") REFERENCES "public"."plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_current_plan" ADD CONSTRAINT "user_current_plan_plan_id_plans_id_fk" FOREIGN KEY ("plan_id") REFERENCES "public"."plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_current_plan" ADD CONSTRAINT "user_current_plan_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_subscriptions" ADD CONSTRAINT "user_subscriptions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_subscriptions" ADD CONSTRAINT "user_subscriptions_transaction_id_transactions_id_fk" FOREIGN KEY ("transaction_id") REFERENCES "public"."transactions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_subscriptions" ADD CONSTRAINT "user_subscriptions_plans_id_plans_id_fk" FOREIGN KEY ("plans_id") REFERENCES "public"."plans"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_photos" ADD CONSTRAINT "product_photos_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_reviews" ADD CONSTRAINT "product_reviews_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

@@ -4,7 +4,7 @@ import { adminHireRouter } from "./dashboard-features/(business-hire)/hire.admin
 import { adminCategoryRouter } from "./dashboard-features/(category)/category.admin.routes";
 import { adminSubcategoryRouter } from "./dashboard-features/(category)/subcategory.admin.routes";
 import { adminFranchiseRouter } from "./dashboard-features/(franchise-saleman)/franchise.admin.routes";
-import { adminSalemanRouter } from "./dashboard-features/(franchise-saleman)/saleman.admin.routes";
+import { adminSalemanRouter } from "./dashboard-features/(franchise-saleman)/salesman.admin.routes";
 import { adminOfferRouter } from "./dashboard-features/(offer-product)/offer.admin.routes";
 import { adminProductRouter } from "./dashboard-features/(offer-product)/product.admin.routes";
 import { adminDeleteRequestRouter } from "./dashboard-features/(users)/deleteRequest.admin.routes";

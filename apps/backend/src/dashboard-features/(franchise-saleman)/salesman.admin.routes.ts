@@ -1,9 +1,7 @@
-// features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
 import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
-  categoryInsertSchema,
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
@@ -14,10 +12,9 @@ import {
   salesmen,
   salesmenInsertSchema,
 } from "@repo/db/dist/schema/user.schema";
-import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { eq, inArray, sql } from "drizzle-orm";
-import slugify from "slugify";
+import { desc, eq, inArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
@@ -34,7 +31,7 @@ import {
   usersColumns,
   usersGlobalFilterColumns,
 } from "./franchise.admin.service";
-import { generateReferCode } from "./saleman.admin.service";
+import { generateReferCode } from "./salesman.admin.service";
 
 export const adminSalemanRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
@@ -48,20 +45,30 @@ export const adminSalemanRouter = router({
     const orderBy = buildOrderByClause(
       input.sorting,
       usersAllowedSortColumns,
-      sql`created_at DESC`,
+      desc(salesmen.createdAt),
     );
 
     // const orderBy = sql`created_at DESC`;
 
     const offset = input.pagination.pageIndex * input.pagination.pageSize;
 
+    const franchiseUser = alias(users, "franchise_user");
+    const salesmanUser = alias(users, "salesman_user");
     const data = await db
-      .select()
+      .select({
+        id: salesmen.id,
+        franchise_name: franchiseUser.displayName,
+        refer_code: salesmen.referCode,
+        salesman_name: salesmanUser.displayName,
+        created_at: salesmen.createdAt,
+      })
       .from(salesmen)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
-      // .leftJoin(categories, eq(subcategories.categoryId, categories.id))
+      .leftJoin(franchises, eq(franchises.id, salesmen.franchiseId))
+      .leftJoin(franchiseUser, eq(franchises.userId, franchiseUser.id))
+      .leftJoin(salesmanUser, eq(salesmen.userId, salesmanUser.id))
       .offset(offset);
 
     // PostgreSQL returns `bigint` for count → cast to number
@@ -70,7 +77,6 @@ export const adminSalemanRouter = router({
         count: sql<number>`count(distinct ${users.id})::int`,
       })
       .from(users)
-      // .leftJoin(categories, eq(subcategories.categoryId, categories.id))
       .where(where);
 
     const total = totalResult[0]?.count ?? 0;
@@ -121,7 +127,11 @@ export const adminSalemanRouter = router({
       usersInsertSchema
         .omit({ role: true })
         .extend(profileInsertSchema.omit({ userId: true }).shape)
-        .extend(salesmenInsertSchema.extend({ nextNumber: z.number() }).shape),
+        .extend(
+          salesmenInsertSchema
+            .omit({ userId: true })
+            .extend({ nextNumber: z.number() }).shape,
+        ),
     )
     .mutation(async ({ input }) => {
       const userData = usersInsertSchema.omit({ role: true }).parse(input);
@@ -130,6 +140,7 @@ export const adminSalemanRouter = router({
         .parse(input);
       const salesmenData = salesmenInsertSchema
         .extend({ nextNumber: z.number() })
+        .omit({ userId: true })
         .parse(input);
 
       const franchise = await db.query.franchises.findFirst({
@@ -169,6 +180,7 @@ export const adminSalemanRouter = router({
 
       await db.insert(salesmen).values({
         ...salesmenData,
+        userId: newUserData?.id,
         franchiseId: Number(franchise?.id),
       });
 

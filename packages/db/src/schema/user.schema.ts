@@ -112,10 +112,12 @@ export const franchises = pgTable("franchises", {
 export const franchiseInsertSchema = createInsertSchema(franchises);
 export const franchiseUpdateSchema = createUpdateSchema(franchises);
 
-
 // 5. salesmen
 export const salesmen = pgTable("salesmen", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   franchiseId: integer("franchise_id")
     .notNull()
     .references(() => franchises.id, { onDelete: "cascade" }),

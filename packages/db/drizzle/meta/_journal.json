@@ -5,43 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765542470804,
-      "tag": "0000_thankful_doctor_spectrum",
+      "when": 1765606271114,
+      "tag": "0000_demonic_master_mold",
       "breakpoints": true
     },
     {
-      "idx": 2,
+      "idx": 1,
       "version": "7",
-      "when": 1765442815496,
-      "tag": "0002_fresh_legion",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1765451837781,
-      "tag": "0003_sharp_darkstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1765452371604,
-      "tag": "0004_condemned_grim_reaper",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1765452472995,
-      "tag": "0005_omniscient_senator_kelly",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1765452556970,
-      "tag": "0006_striped_freak",
+      "when": 1765607494144,
+      "tag": "0001_crazy_killmonger",
       "breakpoints": true
     }
   ]

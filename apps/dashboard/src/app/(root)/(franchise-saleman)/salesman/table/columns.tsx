@@ -83,22 +83,33 @@ export const columns: ColumnDef<Lister>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "franchiseId",
+    accessorKey: "franchise_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Franchise ID" />
+      <DataTableColumnHeader column={column} title="Franchise Name" />
     ),
     cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">
-        {row.original.franchiseId || "No Name"}
+      <div className="max-w-50 truncate">
+        {row.original.franchise_name || "No Name"}
       </div>
     ),
   },
   {
-    accessorKey: "referCode",
+    accessorKey: "salesman_name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Salesman Name" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-50 truncate">
+        {row.original.salesman_name || "No Name"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "refer_code",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Refer Code" />
     ),
-    cell: ({ row }) => <div>{row.original.referCode}</div>,
+    cell: ({ row }) => <div>{row.original.refer_code}</div>,
   },
 
   {
@@ -107,13 +118,13 @@ export const columns: ColumnDef<Lister>[] = [
       <DataTableColumnHeader column={column} title="Created" />
     ),
     cell: ({ row }) => (
-      <div>{row?.original?.createdAt?.toLocaleDateString() ?? "null"}</div>
+      <div>{row?.original?.created_at?.toLocaleDateString() ?? "null"}</div>
     ),
   },
   {
     id: "action",
     header: () => <div className="text-center">Action</div>,
-    cell: ({ row }) => <ActionCell id={row.original.franchiseId} />,
+    cell: ({ row }) => <ActionCell id={row.original.id} />,
     enableSorting: false,
     enableHiding: false,
   },

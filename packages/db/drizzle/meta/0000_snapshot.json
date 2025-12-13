@@ -1,5 +1,5 @@
 {
-  "id": "1920d72f-7cc5-4750-9102-4284f139760c",
+  "id": "3c07ae23-1c09-4f0d-93c4-fd5e21c95781",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1177,7 +1177,7 @@
         },
         "language": {
           "name": "language",
-          "type": "varchar(255)[]",
+          "type": "integer[]",
           "primaryKey": false,
           "notNull": true
         },
@@ -1336,7 +1336,7 @@
         },
         "highest_qualification": {
           "name": "highest_qualification",
-          "type": "varchar(255)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1456,7 +1456,7 @@
         },
         "id_proof": {
           "name": "id_proof",
-          "type": "varchar",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -2686,47 +2686,48 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "subtitle": {
-          "name": "subtitle",
+        "identifier": {
+          "name": "identifier",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "plan_type": {
-          "name": "plan_type",
+        "period": {
+          "name": "period",
+          "type": "plan_period",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "interval": {
+          "name": "interval",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "user_role",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'guest'"
+        },
+        "amount": {
+          "name": "amount",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "price": {
-          "name": "price",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "prev_price": {
-          "name": "prev_price",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "price_color": {
-          "name": "price_color",
+        "plan_color": {
+          "name": "plan_color",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
-        },
-        "post_limit": {
-          "name": "post_limit",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         },
         "product_limit": {
           "name": "product_limit",
@@ -2736,12 +2737,6 @@
         },
         "offer_limit": {
           "name": "offer_limit",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "post_duration": {
-          "name": "post_duration",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -2788,8 +2783,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.transactions": {
-      "name": "transactions",
+    "public.user_current_plan": {
+      "name": "user_current_plan",
       "schema": "",
       "columns": {
         "id": {
@@ -2798,15 +2793,15 @@
           "primaryKey": true,
           "notNull": true
         },
-        "amount": {
-          "name": "amount",
-          "type": "numeric",
+        "plan_id": {
+          "name": "plan_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "transactions_no": {
-          "name": "transactions_no",
-          "type": "varchar(255)",
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -2826,7 +2821,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_current_plan_plan_id_plans_id_fk": {
+          "name": "user_current_plan_plan_id_plans_id_fk",
+          "tableFrom": "user_current_plan",
+          "tableTo": "plans",
+          "columnsFrom": [
+            "plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "user_current_plan_user_id_users_id_fk": {
+          "name": "user_current_plan_user_id_users_id_fk",
+          "tableFrom": "user_current_plan",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -2849,29 +2871,41 @@
           "primaryKey": false,
           "notNull": true
         },
-        "subscription_number": {
-          "name": "subscription_number",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "transaction_id": {
-          "name": "transaction_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
         "plans_id": {
           "name": "plans_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "price": {
-          "name": "price",
+        "plan_identifier": {
+          "name": "plan_identifier",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subscription_number": {
+          "name": "subscription_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transaction_number": {
+          "name": "transaction_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         },
         "expiry_date": {
           "name": "expiry_date",
@@ -2909,19 +2943,6 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "user_subscriptions_transaction_id_transactions_id_fk": {
-          "name": "user_subscriptions_transaction_id_transactions_id_fk",
-          "tableFrom": "user_subscriptions",
-          "tableTo": "transactions",
-          "columnsFrom": [
-            "transaction_id"
           ],
           "columnsTo": [
             "id"
@@ -3077,10 +3098,10 @@
         },
         "status": {
           "name": "status",
-          "type": "status",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'Pending'"
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -4006,6 +4027,16 @@
         "franchises",
         "admin",
         "all"
+      ]
+    },
+    "public.plan_period": {
+      "name": "plan_period",
+      "schema": "public",
+      "values": [
+        "daily",
+        "weekly",
+        "monthly",
+        "yearly"
       ]
     },
     "public.send_by_role": {

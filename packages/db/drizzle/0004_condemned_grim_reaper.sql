@@ -1,1 +1,0 @@
-ALTER TABLE "plans" ALTER COLUMN "price" SET DATA TYPE integer;

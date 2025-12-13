@@ -1,6 +1,6 @@
 {
-  "id": "589ccf1c-d748-4ba5-aabc-233dc8a0b3bc",
-  "prevId": "a46e8689-4bc3-46ca-81c6-d59b3ce88b5c",
+  "id": "9c37e7e3-4bbf-47ee-b9e3-ed2b1b4715c9",
+  "prevId": "3c07ae23-1c09-4f0d-93c4-fd5e21c95781",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1177,7 +1177,7 @@
         },
         "language": {
           "name": "language",
-          "type": "varchar(255)[]",
+          "type": "integer[]",
           "primaryKey": false,
           "notNull": true
         },
@@ -1336,7 +1336,7 @@
         },
         "highest_qualification": {
           "name": "highest_qualification",
-          "type": "varchar(255)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1456,7 +1456,7 @@
         },
         "id_proof": {
           "name": "id_proof",
-          "type": "varchar",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1861,8 +1861,164 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.documents": {
+      "name": "documents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.highest_qualification": {
+      "name": "highest_qualification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.languages": {
+      "name": "languages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.occupation": {
       "name": "occupation",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.salutation": {
+      "name": "salutation",
       "schema": "",
       "columns": {
         "id": {
@@ -2530,8 +2686,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
@@ -2542,6 +2698,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "period": {
+          "name": "period",
+          "type": "plan_period",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "interval": {
+          "name": "interval",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "role": {
           "name": "role",
           "type": "user_role",
@@ -2549,14 +2717,14 @@
           "notNull": true,
           "default": "'guest'"
         },
-        "price": {
-          "name": "price",
-          "type": "numeric",
+        "amount": {
+          "name": "amount",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "price_color": {
-          "name": "price_color",
+        "plan_color": {
+          "name": "plan_color",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
@@ -2709,6 +2877,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "plan_identifier": {
+          "name": "plan_identifier",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "subscription_number": {
           "name": "subscription_number",
           "type": "varchar(255)",
@@ -2721,8 +2895,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "price": {
-          "name": "price",
+        "amount": {
+          "name": "amount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -2924,10 +3098,10 @@
         },
         "status": {
           "name": "status",
-          "type": "status",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'Pending'"
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -3394,15 +3568,15 @@
           "primaryKey": false,
           "notNull": false
         },
-        "status": {
-          "name": "status",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
         "employee_limit": {
           "name": "employee_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "last_assign_code": {
+          "name": "last_assign_code",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -3683,12 +3857,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "area": {
-          "name": "area",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -3767,13 +3935,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "status": {
-          "name": "status",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -3801,7 +3962,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         },
         "salesmen_franchise_id_franchises_id_fk": {
@@ -3885,6 +4046,16 @@
         "franchises",
         "admin",
         "all"
+      ]
+    },
+    "public.plan_period": {
+      "name": "plan_period",
+      "schema": "public",
+      "values": [
+        "daily",
+        "weekly",
+        "monthly",
+        "yearly"
       ]
     },
     "public.send_by_role": {
