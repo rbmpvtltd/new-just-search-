@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
-import { businessProcedure, router, visitorProcedure } from "@/utils/trpc";
+import { businessProcedure, router } from "@/utils/trpc";
 
 export const offerrouter = router({
   add: businessProcedure.query(async ({ ctx }) => {
@@ -305,7 +305,7 @@ export const offerrouter = router({
         id: z.number(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       // return { success: true};
       const allSeletedPhoto = await db.query.offerPhotos.findMany({
         where: (offerPhotos, { eq }) => eq(offerPhotos.offerId, input.id),

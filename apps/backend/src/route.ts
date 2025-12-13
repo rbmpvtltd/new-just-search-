@@ -12,6 +12,7 @@ import { adminFeedbackRouter } from "./dashboard-features/(users)/feedback.admin
 import { adminNotificationRouter } from "./dashboard-features/(users)/notification.admin.routes";
 import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
 import { adminUtilsRouter } from "./dashboard-features/utils/util.admin.routes";
+
 import { authRouter } from "./features/auth/auth.router";
 import { bannerRouter } from "./features/banners/banners.routes";
 import { businessrouter } from "./features/business/business.router";
@@ -21,12 +22,12 @@ import { helpAndSupportRouter } from "./features/helpAndSupport/helpAndSupport.r
 import { hirerouter } from "./features/hire/hire.router";
 import { categoryRouter } from "./features/mainContent/category.route";
 import { offerrouter } from "./features/offer/offer.router";
+import { planRouter } from "./features/plans/plan.router";
 import { productrouter } from "./features/product/product.router";
 import { utilsRouter } from "./features/routeUtils/utils.route";
 import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
-// import { cloudinaryRouter } from "./lib/cloudinary";
 import { mergeRouters, router } from "./utils/trpc";
 
 const usersRouter = router({
@@ -43,6 +44,7 @@ const usersRouter = router({
   productrouter,
   helpAndSupportRouter,
   testRouter,
+  planRouter,
   utilsRouter,
 });
 
