@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765606271114,
-      "tag": "0000_demonic_master_mold",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1765607494144,
-      "tag": "0001_crazy_killmonger",
+      "when": 1765616684518,
+      "tag": "0000_rare_boom_boom",
       "breakpoints": true
     }
   ]

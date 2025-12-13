@@ -1,21 +1,21 @@
 // features/banners/banners.admin.routes.ts
+
+import { profile } from "node:console";
+import { EventEmitter, on } from "node:events";
 import { db } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import {
+  chatTokenMessages,
+  chatTokenSessions,
+} from "@repo/db/dist/schema/help-and-support.schema";
 import {
   categories,
-  categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
-import {
-  notification,
-  notificationInsertSchema,
-} from "@repo/db/dist/schema/user.schema";
-import { TRPCError } from "@trpc/server";
-import { desc, eq, inArray, sql } from "drizzle-orm";
+import { notification, profiles } from "@repo/db/dist/schema/user.schema";
+import { eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
-import {
-  cloudinaryDeleteImageByPublicId,
-  cloudinaryDeleteImagesByPublicIds,
-} from "@/lib/cloudinary";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -28,7 +28,9 @@ import {
   notificationGlobalFilterColumns,
 } from "./notification.admin.service";
 
-export const adminNotificationRouter = router({
+const ee = new EventEmitter();
+
+export const adminHelpAndSupportRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
@@ -49,7 +51,7 @@ export const adminNotificationRouter = router({
 
     const data = await db
       .select()
-      .from(notification)
+      .from(chatTokenSessions)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
@@ -57,9 +59,9 @@ export const adminNotificationRouter = router({
 
     const totalResult = await db
       .select({
-        count: sql<number>`count(distinct ${notification.id})::int`,
+        count: sql<number>`count(distinct ${chatTokenSessions.id})::int`,
       })
-      .from(notification)
+      .from(chatTokenSessions)
       // .leftJoin(categories, eq(subcategories.categoryId, categories.id))
       .where(where);
 
@@ -73,55 +75,106 @@ export const adminNotificationRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: adminProcedure.query(async () => {
-    const lastNotificationId = (
-      await db
-        .select({
-          notification_id: notification.notificationId,
-        })
-        .from(notification)
-        .orderBy(desc(notification.notificationId))
-        .limit(1)
-    )[0]?.notification_id;
-    const newNotificationId = Number(lastNotificationId ?? 0) + 1;
-    return { newNotificationId };
-  }),
-  create: adminProcedure
-    .input(notificationInsertSchema)
-    .mutation(async ({ input }) => {
-      // await db.insert(notification).values(input);
-      return { success: true };
+
+  onMessage: adminProcedure
+    .input(z.object({ chatTokenSessionId: z.number() }))
+    .subscription(async function* ({ input }) {
+      for await (const [msg] of on(
+        ee,
+        `helpAndSupportMessage${input.chatTokenSessionId}`,
+      )) {
+        yield msg;
+      }
     }),
-  edit: adminProcedure
+  sendMessage: adminProcedure
     .input(
       z.object({
-        id: z.number(),
+        message: z.string(),
+        chatTokenSessionId: z.number(),
       }),
     )
-    .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+    .mutation(async ({ ctx, input }) => {
+      const [newMessage] = await db
+        .insert(chatTokenMessages)
+        .values({
+          message: input.message,
+          sendByRole: "Admin",
+          chatTokenSessionsId: input.chatTokenSessionId,
+        })
+        .returning();
+      ee.emit(`helpAndSupportMessage${input.chatTokenSessionId}`, newMessage);
+      return {
+        success: true,
+        message: "Message sent successfully",
+        data: newMessage,
+      };
     }),
-  update: adminProcedure
-    .input(categoryUpdateSchema)
-    .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      if (!id)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please pass id field",
-        });
-      const olddata = (
-        await db.select().from(categories).where(eq(categories.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
+  add: adminProcedure
+    .input(z.object({ chatTokenSessionId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const message = await db.query.chatTokenMessages.findMany({
+        where: (chatTokenMessages, { eq }) =>
+          eq(chatTokenMessages.chatTokenSessionsId, input.chatTokenSessionId),
+        orderBy: (chatTokenMessages, { asc }) => [asc(chatTokenMessages.id)],
+      });
+
+      return message;
+    }),
+
+  getUser: adminProcedure
+    .input(z.object({ chatTokenSessionId: z.number() }))
+    .query(async ({ input }) => {
+      const token = await db.query.chatTokenSessions.findFirst({
+        where: (chatTokenSessions, { eq }) =>
+          eq(chatTokenSessions.id, input.chatTokenSessionId),
+      });
+
+      const user = await db
+        .select({
+          displayName: users.displayName,
+          profileImage: profiles.profileImage,
+        })
+        .from(users)
+        .where(eq(users.id, Number(token?.userId)))
+        .leftJoin(profiles, eq(profiles.userId, users.id));
+
+      return user;
+    }),
+
+  markAsRead: adminProcedure
+    .input(z.object({ messageId: z.array(z.number()) }))
+    .mutation(async ({ input, ctx }) => {
+      if (input.messageId.length > 0) {
+        await db
+          .update(chatTokenMessages)
+          .set({ isRead: true })
+          .where(inArray(chatTokenMessages.id, input.messageId));
       }
-      await db.update(categories).set(updateData).where(eq(categories.id, id));
-      return { success: true };
+
+      return {
+        success: true,
+        message: "Message marked as read successfully",
+      };
+    }),
+
+  changeStatus: adminProcedure
+    .input(z.object({ chatTokenSessionId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const token = await db.query.chatTokenSessions.findFirst({
+        where: (chatTokenSessions, { eq }) =>
+          eq(chatTokenSessions.id, input.chatTokenSessionId),
+      });
+      if (token) {
+        await db
+          .update(chatTokenSessions)
+          .set({ status: 0 })
+          .where(eq(chatTokenSessions.id, input.chatTokenSessionId));
+      }
+      return {
+        token,
+        success: true,
+        message: "Status changed successfully",
+      };
     }),
   multidelete: adminProcedure
     .input(

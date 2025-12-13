@@ -56,7 +56,7 @@ export default function HelpAndSupport() {
     });
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gray-100 min-h-screen w-full">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"

@@ -9,6 +9,7 @@ import { adminOfferRouter } from "./dashboard-features/(offer-product)/offer.adm
 import { adminProductRouter } from "./dashboard-features/(offer-product)/product.admin.routes";
 import { adminDeleteRequestRouter } from "./dashboard-features/(users)/deleteRequest.admin.routes";
 import { adminFeedbackRouter } from "./dashboard-features/(users)/feedback.admin.routes";
+import { adminHelpAndSupportRouter } from "./dashboard-features/(users)/help-and-support.admin.routes";
 import { adminNotificationRouter } from "./dashboard-features/(users)/notification.admin.routes";
 import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
 import { adminUtilsRouter } from "./dashboard-features/utils/util.admin.routes";
@@ -63,6 +64,7 @@ const adminRouter = router({
   adminOfferRouter,
   adminProductRouter,
   adminUtilsRouter,
+  adminHelpAndSupportRouter,
 });
 
 export const appRouter = mergeRouters(usersRouter, adminRouter);

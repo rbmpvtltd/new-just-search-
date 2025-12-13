@@ -1,5 +1,5 @@
 import { db } from "@repo/db";
-import { PlanPeriod, UserRole } from "@repo/db/dist/enum/allEnum.enum";
+// import { PlanPeriod, UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { plans, plansInsertSchema } from "@repo/db/dist/schema/plan.schema";
 import z from "zod";
 import { adminProcedure, router } from "@/utils/trpc";
@@ -12,7 +12,7 @@ z.object({
   currency: z.string().default("INR"),
   description: z.string(),
   interval: z.number(),
-  period: z.enum(PlanPeriod),
+  // period: z.enum(PlanPeriod),
 });
 export const planRouter = router({
   createPlan: adminProcedure
@@ -23,7 +23,7 @@ export const planRouter = router({
         currency: z.string().default("INR"),
         description: z.string(),
         interval: z.number(),
-        period: z.enum(PlanPeriod),
+        // period: z.enum(PlanPeriod),
       }),
     )
     .mutation(async ({ input }) => {

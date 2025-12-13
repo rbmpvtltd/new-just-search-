@@ -31,7 +31,7 @@ export const helpAndSupportRouter = router({
       logger.info("Token", { token: token });
       //check status
       const status = await db.query.chatTokenSessions.findFirst({
-        where: (chatTokenSessions, { eq }) => eq(chatTokenSessions.status, 0),
+        where: (chatTokenSessions, { eq }) => eq(chatTokenSessions.status, 1),
       });
 
       //Token already exists
@@ -48,7 +48,7 @@ export const helpAndSupportRouter = router({
       const [chatTokenSessionsId] = await db
         .insert(schemas.help_and_support.chatTokenSessions)
         .values({
-          status: 0,
+          status: 1,
           tokenNumber: token,
           subject: input.subject,
           userId: ctx.userId,
