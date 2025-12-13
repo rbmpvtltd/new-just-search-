@@ -1,14 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
-import {
-  profileInsertSchema,
-  profileUpdateSchema,
-} from "@repo/db/dist/schema/user.schema";
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { isTRPCClientError } from "@trpc/client";
+import { profileInsertSchema } from "@repo/db/dist/schema/user.schema";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
-import { toast } from "sonner";
 import type z from "zod";
 import {
   FormField,
@@ -18,99 +13,55 @@ import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
-import { getQueryClient } from "@/trpc/query-client";
-import type { SetOpen } from "../../../edit.form";
-import { useUserFormStore } from "../../../shared/store/useCreateSalesmanStore";
-import type { EditAdminUserType } from "..";
+import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
+import type { EditAdminSalesmanType } from "..";
 
-export const adminEditProfileInsertSchema = profileUpdateSchema.omit({
+export const adminAddProfileInsertSchema = profileInsertSchema.omit({
   userId: true,
 });
-type ProfileSchema = z.infer<typeof adminEditProfileInsertSchema>;
-export default function ProfileForm({
-  id,
-  data,
-  setOpen,
-}: {
-  id: number;
-  data: EditAdminUserType;
-  setOpen: SetOpen;
-}) {
+type ProfileSchema = z.infer<typeof adminAddProfileInsertSchema>;
+export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
   const trpc = useTRPC();
-  const { mutate } = useMutation(
-    trpc.adminUsersRouter.update.mutationOptions(),
-  );
-  const formValue = useUserFormStore((state) => state.formValue);
-  const prevPage = useUserFormStore((state) => state.prevPage);
-  const clearPage = useUserFormStore((state) => state.clearPage);
-
+  const prevPage = useSalesmanFormStore((state) => state.prevPage);
+  const nextPage = useSalesmanFormStore((state) => state.nextPage);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ProfileSchema>({
-    resolver: zodResolver(adminEditProfileInsertSchema),
+    resolver: zodResolver(adminAddProfileInsertSchema),
     defaultValues: {
-      address: data?.profileData?.address ?? "",
-      profileImage: data?.profileData?.profileImage ?? "",
-      firstName: data?.profileData?.firstName ?? "",
-      dob: data?.profileData?.dob ?? null,
-      lastName: data?.profileData?.lastName ?? "",
-      salutation: data?.profileData?.salutation ?? "",
-      occupation: data?.profileData?.occupation ?? null,
-      maritalStatus: data?.profileData?.maritalStatus ?? "Married",
-      area: data?.profileData?.area ?? "",
-      pincode: data?.profileData?.pincode ?? "",
-      city: data?.profileData?.city ?? NaN,
-      state: data?.profileData?.state ?? NaN,
+      address: data.profileData?.address ?? "",
+      profileImage: data.profileData?.profileImage ?? "",
+      firstName: data.profileData?.firstName ?? "",
+      dob: data.profileData?.dob ?? null,
+      lastName: data.profileData?.lastName ?? "",
+      salutation: data.profileData?.salutation ?? "",
+      occupation: data.profileData?.occupation ?? null,
+      maritalStatus: data.profileData?.maritalStatus ?? "Married",
+      area: data.profileData?.area ?? "",
+      pincode: data.profileData?.pincode ?? "",
+      city: data.profileData?.city ?? NaN,
+      state: data.profileData?.state ?? NaN,
     },
   });
 
   const selectedState = useWatch({ control, name: "state" });
 
-  // const { data: } = useSuspenseQuery(trpc.adminUsersRouter.add.queryOptions());
+  const { data: addData } = useSuspenseQuery(
+    trpc.adminUsersRouter.add.queryOptions(),
+  );
   const { data: cities, isLoading } = useQuery(
     trpc.adminUtilsRouter.getCities.queryOptions({
-      state: Number(selectedState),
+      state: selectedState,
     }),
   );
   const onSubmit = async (data: ProfileSchema) => {
     const file = await uploadToCloudinary([data.profileImage], "profile");
-    const finalData = {
-      ...formValue,
-      ...data,
-      profileImage: file[0] ?? "",
-    };
-    mutate(
-      { ...finalData, id },
-      {
-        onSuccess: async (data) => {
-          if (data?.success) {
-            clearPage();
-            toast("success", {
-              description: data.message,
-            });
-            const queryClient = getQueryClient();
-            queryClient.invalidateQueries({
-              queryKey: trpc.adminUsersRouter.list.queryKey(),
-            });
-            queryClient.invalidateQueries({
-              queryKey: trpc.adminUsersRouter.edit.queryKey(),
-            });
-            setOpen(false);
-          }
-          console.log("success", data);
-        },
-        onError: async (error) => {
-          if (isTRPCClientError(error)) {
-            toast.error("Error", {
-              description: error.message,
-            });
-            console.error("error,", error);
-          }
-        },
-      },
-    );
+    useSalesmanFormStore.setState((state) => ({
+      formValue: { ...state.formValue, ...data, profileImage: file[0] ?? "" },
+    }));
+    nextPage();
   };
 
   const formFields: FormFieldProps<ProfileSchema>[] = [
@@ -172,7 +123,7 @@ export default function ProfileForm({
       placeholder: "Occupation",
       required: false,
       component: "select",
-      options: data.getOccupation.map((item) => ({
+      options: addData.occupation.map((item) => ({
         label: item.name,
         value: item.id,
       })),
@@ -217,7 +168,7 @@ export default function ProfileForm({
       required: false,
       component: "select",
       options:
-        data.getStates.map((state) => ({
+        addData.states.map((state) => ({
           label: state.name,
           value: state.id,
         })) ?? [],
@@ -264,15 +215,16 @@ export default function ProfileForm({
           </Button>
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-700 font-bold"
+            disabled={isSubmitting}
+            className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-md min-w-[120px]"
           >
             {isSubmitting ? (
               <>
-                {" "}
-                <Spinner /> Submitting...{" "}
+                <Spinner />
+                Loading...
               </>
             ) : (
-              "SUBMIT"
+              "CONTINUE"
             )}
           </Button>
         </div>

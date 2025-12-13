@@ -54,10 +54,6 @@ export const businessrouter = router({
       getBusinessCategories,
       getStates,
     };
-    // const user = await db.query.users.findFirst({
-    //   where: (user, { eq }) => eq(user.id, ctx.userId),
-    // });
-    // return user;
   }),
 
   getSubCategories: visitorProcedure
@@ -66,6 +62,10 @@ export const businessrouter = router({
       const businessSubCategories = await db.query.subcategories.findMany({
         where: (subcategories, { eq }) =>
           eq(subcategories.categoryId, input.categoryId),
+        columns: {
+          id: true,
+          name: true,
+        },
       });
       return businessSubCategories;
     }),
@@ -239,6 +239,58 @@ export const businessrouter = router({
       return { success: true, message: "Business created successfully" };
     }),
 
+  edit: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const getBusinessCategories = await db.query.categories.findMany({
+        where: (categories, { eq }) => eq(categories.type, 1),
+        columns: {
+          title: true,
+          id: true,
+        },
+      });
+
+      const getStates = await db.query.states.findMany();
+      const business = await db.query.businessListings.findFirst({
+        where: (business, { eq }) => eq(business.id, input.id),
+      });
+      logger.info("business", { business: business });
+      const category = await db.query.businessCategories.findFirst({
+        where: (businessCategories, { eq }) =>
+          eq(businessCategories.businessId, input.id),
+        columns: {
+          categoryId: true,
+        },
+      });
+
+      const subcategories = await db.query.businessSubcategories.findMany({
+        where: (businessSubcategories, { eq }) =>
+          eq(businessSubcategories.businessId, input.id),
+        columns: {
+          subcategoryId: true,
+        },
+      });
+      const businessPhotos = await db.query.businessPhotos.findMany({
+        where: (businessPhotos, { eq }) =>
+          eq(businessPhotos.businessId, input.id),
+        columns: {
+          photo: true,
+        },
+      });
+      return {
+        business,
+        category,
+        businessPhotos,
+        subcategories,
+        getBusinessCategories,
+        getStates,
+      };
+    }),
+
   update: businessProcedure
     .input(businessUpdateSchema)
     .mutation(async ({ ctx, input }) => {
@@ -374,95 +426,8 @@ export const businessrouter = router({
         message: "Business not found",
       });
     }
-    logger.info("business", { business: business });
-
-    if (!business?.city) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "City not found",
-      });
-    }
-
-    const cityRecord = await db.query.cities.findFirst({
-      where: (cities, { eq }) => eq(cities.id, business.city),
-      columns: { id: true, city: true },
-    });
-
-    if (!cityRecord) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "City Record not found",
-      });
-    }
-
-    if (!business?.state) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "State not found",
-      });
-    }
-
-    const stateRecord = await db.query.states.findFirst({
-      where: (states, { eq }) => eq(states.id, business.state),
-      columns: { id: true, name: true },
-    });
-
-    if (!stateRecord) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "State record not found",
-      });
-    }
-
-    const businessCategoryRecord = await db.query.businessCategories.findFirst({
-      where: (businessCategories, { eq }) =>
-        eq(businessCategories.businessId, business.id),
-    });
-
-    if (!businessCategoryRecord?.categoryId) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Category not found",
-      });
-    }
-
-    const categoryRecord = await db.query.categories.findFirst({
-      where: (categories, { eq }) =>
-        eq(categories.id, businessCategoryRecord.categoryId),
-      columns: { id: true, title: true },
-    });
-    if (!categoryRecord) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Category Record not found",
-      });
-    }
-
-    const businessSubcategoryRecords =
-      await db.query.businessSubcategories.findMany({
-        where: (businessSubcategories, { eq }) =>
-          eq(businessSubcategories.businessId, business.id),
-      });
-
-    const subcategoryIds = businessSubcategoryRecords.map(
-      (item) => item.subcategoryId,
-    );
-
-    if (subcategoryIds.length === 0) {
-      logger.info("No subcategories found for this business", subcategoryIds);
-    }
-
-    const subcategoryRecords = await db.query.subcategories.findMany({
-      where: (subcategories, { inArray }) =>
-        inArray(subcategories.id, subcategoryIds),
-      columns: { id: true, name: true },
-    });
     return {
-      ...business,
-      city: cityRecord,
-      state: stateRecord,
-      category: categoryRecord,
-      subcategory: subcategoryRecords,
+      business,
       success: true,
     };
   }),
@@ -856,17 +821,20 @@ export const businessrouter = router({
       ctx: { userId: ctx.userId },
     };
   }),
-  businessReview : publicProcedure.input(z.object({
-    businessId : z.number(),
-    userId : z.number(),
-    message : z.string(),
-    rating : z.number()
-  })).mutation(async ({input})=>{
-    const {businessId,userId,message,rating} = input;
-    console.log("businessId is:",businessId)
-    console.log("userId is:",userId)
-    console.log("message is:",message)
-    console.log("rating is:",rating)
-
-  })
+  businessReview: publicProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+        userId: z.number(),
+        message: z.string(),
+        rating: z.number(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { businessId, userId, message, rating } = input;
+      console.log("businessId is:", businessId);
+      console.log("userId is:", userId);
+      console.log("message is:", message);
+      console.log("rating is:", rating);
+    }),
 });

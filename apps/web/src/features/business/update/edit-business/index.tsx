@@ -7,18 +7,13 @@ import BusinessTiming from "./forms/BusinessTiming";
 import ContactDetail from "./forms/ContactDetail";
 
 export type UserBusinessListingType =
-  | OutputTrpcType["businessrouter"]["show"]
+  | OutputTrpcType["businessrouter"]["edit"]
   | null;
 
-export type FormReferenceDataType =
-  | OutputTrpcType["businessrouter"]["add"]
-  | null;
 export default function EditBusinessPage({
   businessListing,
-  formReferenceData,
 }: {
   businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
 }) {
   const page = useBusinessFormStore((state) => state.page);
   const steps = [
@@ -31,30 +26,15 @@ export default function EditBusinessPage({
   const renderForm = () => {
     switch (page) {
       case 0:
-        return (
-          <BusinessDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <BusinessDetail businessListing={businessListing} />;
       case 1:
-        return (
-          <AddressDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <AddressDetail businessListing={businessListing} />;
       case 2:
         return <BusinessTiming businessListing={businessListing} />;
       case 3:
         return <ContactDetail businessListing={businessListing} />;
       default:
-        return (
-          <BusinessDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <BusinessDetail businessListing={businessListing} />;
     }
   };
   return (

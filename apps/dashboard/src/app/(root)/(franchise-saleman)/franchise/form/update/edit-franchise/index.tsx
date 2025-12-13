@@ -28,7 +28,7 @@ export function EditFranchisePage({
       case 1:
         return <ProfileForm data={data} />;
       case 2:
-        return <FranchiseForm data={data} setOpen={setOpen} />;
+        return <FranchiseForm data={data} setOpen={setOpen} id={id} />;
       default:
         return <UserForm data={data} />;
     }

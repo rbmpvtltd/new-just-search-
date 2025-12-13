@@ -1,6 +1,10 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
+import {
+  users,
+  usersInsertSchema,
+  usersUpdateSchema,
+} from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
   categoryInsertSchema,
@@ -10,8 +14,10 @@ import {
 import {
   franchiseInsertSchema,
   franchises,
+  franchiseUpdateSchema,
   profileInsertSchema,
   profiles,
+  profileUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
@@ -149,17 +155,14 @@ export const adminFranchiseRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      logger.info("input is", { input: input });
       const getStates = await db.query.states.findMany();
       const getOccupation = await db.query.occupation.findMany();
       const userData = await db.query.users.findFirst({
         where: (user, { eq }) => eq(user.id, input.id),
       });
-      logger.info("userData is", { userData: userData });
       const profileData = await db.query.profiles.findFirst({
         where: (profile, { eq }) => eq(profile.userId, Number(userData?.id)),
       });
-      logger.info("profileData is", { profileData: profileData });
       const franchiseData = await db.query.franchises.findFirst({
         where: (franchise, { eq }) =>
           eq(franchise.userId, Number(userData?.id)),
@@ -174,15 +177,14 @@ export const adminFranchiseRouter = router({
         .extend(franchiseInsertSchema.omit({ userId: true }).shape),
     )
     .mutation(async ({ input }) => {
-      console.log("we are here");
-      const userData = usersInsertSchema.omit({ role: true }).parse(input);
-      const profileData = profileInsertSchema
+      const userData = usersUpdateSchema.omit({ role: true }).parse(input);
+      const profileData = profileUpdateSchema
         .omit({ userId: true })
         .parse(input);
-      const franchiseData = franchiseInsertSchema
+      const franchiseData = franchiseUpdateSchema
         .omit({ userId: true })
         .parse(input);
-
+      logger.info("input is", { userData: userData });
       const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
         where: (user, { and, eq, or, ne }) =>
           and(
@@ -193,38 +195,65 @@ export const adminFranchiseRouter = router({
             ne(user.id, Number(userData.id)),
           ),
       });
+
       if (isEmailOrPhoneNumberExist) {
         throw new TRPCError({
           code: "CONFLICT",
           message: "Email already exists",
         });
       }
-      const isProfileExists = await db.query.profiles.findFirst({
-        where: (profile, { eq }) => eq(profile.id, Number(profileData?.id)),
-      });
 
-      if (!isProfileExists) {
-        const newUserData = (
-          await db.insert(users).values(userData).returning()
-        )[0];
-        if (!newUserData?.id) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong in creating user",
-          });
-        }
-      } else {
-        await db
-          .update(users)
-          .set({
-            ...userData,
-          })
-          .where(eq(users.id, Number(userData.id)));
-      }
+      //TODO : Update the code
 
-      await db.update(franchises).set({
-        ...franchiseData,
-      });
+      // if (!isProfileExists) {
+      //   const newUserData = (
+      //     await db.insert(users).values(userData).returning()
+      //   )[0];
+      //   if (!newUserData?.id) {
+      //     throw new TRPCError({
+      //       code: "INTERNAL_SERVER_ERROR",
+      //       message: "Something went wrong in creating user",
+      //     });
+      //   }
+      // } else {
+
+      await db
+        .update(users)
+        .set({
+          ...userData,
+        })
+        .where(eq(users.id, Number(userData.id)));
+      logger.info("Franchise data is", { profileData: profileData });
+      logger.info("Franchise data is", { franchiseData: franchiseData });
+
+      await db
+        .update(profiles)
+        .set({
+          profileImage: profileData.profileImage,
+          salutation: profileData.salutation,
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          dob: profileData.dob,
+          occupation: profileData.occupation,
+          maritalStatus: profileData.maritalStatus,
+          address: profileData.address,
+          area: profileData.area,
+          city: profileData.city,
+          pincode: profileData.pincode,
+          state: profileData.state,
+        })
+        .where(eq(profiles.userId, Number(userData.id)));
+
+      // }
+      await db
+        .update(franchises)
+        .set({
+          gstNo: franchiseData.gstNo,
+          referPrifixed: franchiseData.referPrifixed,
+          lastAssignCode: franchiseData.lastAssignCode,
+          employeeLimit: Number(franchiseData.employeeLimit),
+        })
+        .where(eq(franchises.userId, Number(userData.id)));
 
       return { success: true, message: "Franchise updated successfully" };
     }),

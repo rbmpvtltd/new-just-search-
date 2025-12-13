@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import { setRole } from "@/utils/session";
 import type { UserBusinessListingType } from "..";
 
@@ -37,11 +38,11 @@ export default function ContactDetail({
   } = useForm<ContactDetailSchema>({
     resolver: zodResolver(contactDetailSchema),
     defaultValues: {
-      contactPerson: businessListing?.contactPerson ?? "",
-      phoneNumber: businessListing?.phoneNumber ?? "",
-      ownerNumber: businessListing?.ownerNumber ?? "",
-      whatsappNo: businessListing?.whatsappNo ?? "",
-      email: businessListing?.email ?? "",
+      contactPerson: businessListing?.business?.contactPerson ?? "",
+      phoneNumber: businessListing?.business?.phoneNumber ?? "",
+      ownerNumber: businessListing?.business?.ownerNumber ?? "",
+      whatsappNo: businessListing?.business?.whatsappNo ?? "",
+      email: businessListing?.business?.email ?? "",
     },
   });
 
@@ -115,11 +116,14 @@ export default function ContactDetail({
       {
         onSuccess: async (data) => {
           if (data.success) {
-            setRole("business");
             await Swal.fire({
               title: data.message,
               icon: "success",
               draggable: true,
+            });
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.businessrouter.show.queryKey(),
             });
             // clearPage();
             router.push("/");

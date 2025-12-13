@@ -36,14 +36,18 @@ export default function DocumentsForm({
   } = useForm<DocumentSchema>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
-      idProof: hireListing?.idProof ?? "",
-      idProofPhoto: hireListing?.idProofPhoto ?? "",
-      coverLetter: hireListing?.coverLetter ?? "",
-      resumePhoto: hireListing?.resumePhoto ?? "",
-      aboutYourself: hireListing?.aboutYourself ?? "",
+      idProof: hireListing?.hire?.idProof ?? "",
+      idProofPhoto: hireListing?.hire?.idProofPhoto ?? "",
+      coverLetter: hireListing?.hire?.coverLetter ?? "",
+      resumePhoto: hireListing?.hire?.resumePhoto ?? "",
+      aboutYourself: hireListing?.hire?.aboutYourself ?? "",
     },
   });
-
+  const storeFormValue = () => {
+    useHireFormStore.setState((state) => ({
+      formValue: { ...state.formValue },
+    }));
+  };
   const onSubmit = async (data: DocumentSchema) => {
     const mergedData = { ...formValue, ...data };
     const files = await uploadToCloudinary(
@@ -166,7 +170,10 @@ export default function DocumentsForm({
         </div>
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
-            onClick={prevPage}
+            onClick={() => {
+              storeFormValue();
+              prevPage();
+            }}
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             PREVIOUS

@@ -1,7 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
-import { usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
+import { usersUpdateSchema } from "@repo/db/dist/schema/auth.schema";
 import { useForm } from "react-hook-form";
 import type z from "zod";
 import {
@@ -10,27 +9,28 @@ import {
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useUserFormStore } from "../../../shared/store/useCreateSalesmanStore";
-import type { EditAdminUserType } from "..";
+import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
+import type { EditAdminSalesmanType } from "..";
 
-type UserInsertSchema = z.infer<typeof usersInsertSchema>;
+export const adminAddUserUpdateSchema = usersUpdateSchema.omit({
+  role: true,
+});
+type UserInsertSchema = z.infer<typeof adminAddUserUpdateSchema>;
 
-export default function UserForm({ data }: { data: EditAdminUserType }) {
-  const nextPage = useUserFormStore((s) => s.nextPage);
-  const formValue = useUserFormStore((s) => s.formValue);
+export default function UserForm({ data }: { data: EditAdminSalesmanType }) {
+  const nextPage = useSalesmanFormStore((s) => s.nextPage);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<UserInsertSchema>({
-    resolver: zodResolver(usersInsertSchema),
+    resolver: zodResolver(adminAddUserUpdateSchema),
     defaultValues: {
-      displayName: data.userData?.displayName,
-      email: data.userData?.email,
-      password: data.userData?.password,
-      phoneNumber: data.userData?.phoneNumber,
-      role: data.userData?.role,
-      status: data.userData?.status,
+      displayName: data.userData?.displayName ?? "",
+      email: data.userData?.email ?? "",
+      password: data.userData?.password ?? "",
+      phoneNumber: data.userData?.phoneNumber ?? "",
+      status: data.userData?.status ?? true,
     },
   });
 
@@ -71,20 +71,6 @@ export default function UserForm({ data }: { data: EditAdminUserType }) {
     },
     {
       control,
-      label: "Role",
-      name: "role",
-      placeholder: "Select Type of category",
-      component: "select",
-      options: [
-        { label: UserRole.business, value: UserRole.business },
-        { label: UserRole.hire, value: UserRole.hire },
-        { label: UserRole.guest, value: UserRole.guest },
-        { label: UserRole.visiter, value: UserRole.visiter },
-      ],
-      error: errors.role?.message,
-    },
-    {
-      control,
       label: "Active",
       name: "status",
       mainDivClassName: "flex gap-4",
@@ -95,7 +81,7 @@ export default function UserForm({ data }: { data: EditAdminUserType }) {
   ];
 
   const onSubmit = async (data: UserInsertSchema) => {
-    useUserFormStore.setState((state) => ({
+    useSalesmanFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));
     nextPage();

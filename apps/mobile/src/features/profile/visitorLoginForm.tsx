@@ -7,13 +7,9 @@ import {
 } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Alert,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Pressable } from "react-native-gesture-handler";
+import Input from "@/components/inputs/Input";
 import { loginWithGoogle } from "@/query/google-login";
 import { fetchVisitorData, sendVisitorOtp } from "@/query/sendVisitorOtp";
 import {
@@ -22,8 +18,6 @@ import {
 } from "@/schemas/loginSchema";
 import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
-import Input from "../../../components/inputs/Input";
-import { Pressable } from "react-native-gesture-handler";
 
 GoogleSignin.configure({
   webClientId:
@@ -46,14 +40,13 @@ export default function VisitorLoginForm() {
   });
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
 
-
   const [mobile_no, otp] = watch(["mobile_no", "otp"]);
 
   const onVisitorSubmit = async (data: LoginVisitorFormData) => {
     const response = await fetchVisitorData(data);
     if (response.success) {
       setAuthStoreToken(response.token, response.role);
-      await setTokenRole(response.token,response.role);
+      await setTokenRole(response.token, response.role);
       return router.back();
     }
     Alert.alert(response.message);
@@ -73,7 +66,7 @@ export default function VisitorLoginForm() {
         const res = await loginWithGoogle(data);
         if (res.success) {
           setAuthStoreToken(res.token, res.role);
-          await setTokenRole(res.token,res.role);
+          await setTokenRole(res.token, res.role);
           return router.back();
         } else {
           Alert.alert("Something went wrong", "Google login failed");

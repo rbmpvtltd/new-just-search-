@@ -36,7 +36,6 @@ const initialFormValue: CombinedForm = {
   jobDuration: [],
   fromHour: "10:30",
   toHour: "20:30",
-  preferredWorkingHours: "",
   availability: "",
   locationPreferred: "",
   expectedSalaryFrom: "",

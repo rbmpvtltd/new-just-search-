@@ -1,29 +1,39 @@
 "use client";
+import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 import type { SetOpen } from "../../edit.form";
-import { useUserFormStore } from "../../shared/store/useCreateSalesmanStore";
+import { useSalesmanFormStore } from "../../shared/store/useCreateSalesmanStore";
 import ProfileForm from "./forms/ProfileForm";
+import SalesmanForm from "./forms/SalesmanForm";
 import UserForm from "./forms/UserForm";
 
-export type EditAdminUserType = OutputTrpcType["adminUsersRouter"]["edit"];
-export function EditUserPage({
+export type EditAdminSalesmanType =
+  OutputTrpcType["adminSalemanRouter"]["edit"];
+
+export function EditSalesmanPage({
   id,
   data,
   setOpen,
 }: {
   id: number;
-  data: EditAdminUserType;
+  data: EditAdminSalesmanType;
   setOpen: SetOpen;
 }) {
-  const page = useUserFormStore((state) => state.page);
-  const steps = ["User Form", "Profile Form"];
+  console.log("Data Salesman", data);
+  console.log("Data Salesman id---------", id);
+
+  const trpc = useTRPC();
+  const page = useSalesmanFormStore((state) => state.page);
+  const steps = ["User Form", "Profile Form", "Salesman Form"];
 
   const renderForm = () => {
     switch (page) {
       case 0:
         return <UserForm data={data} />;
       case 1:
-        return <ProfileForm data={data} setOpen={setOpen} id={id} />;
+        return <ProfileForm data={data} />;
+      case 2:
+        return <SalesmanForm data={data} setOpen={setOpen} />;
       default:
         return <UserForm data={data} />;
     }

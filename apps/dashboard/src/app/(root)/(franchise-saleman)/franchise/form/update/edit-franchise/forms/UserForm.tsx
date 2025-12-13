@@ -81,6 +81,7 @@ export default function UserForm({ data }: { data: EditAdminFranchiseType }) {
   ];
 
   const onSubmit = async (data: UserInsertSchema) => {
+    console.log("data", data);
     useFranchiseFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));

@@ -49,7 +49,6 @@ export const profiles = pgTable("profiles", {
     .notNull()
     .references(() => cities.id),
   // website: varchar("website", { length: 255 }), TODO: Ask About this Akki sir
-  area: varchar("area", { length: 100 }),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
@@ -111,6 +110,8 @@ export const franchises = pgTable("franchises", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 export const franchiseInsertSchema = createInsertSchema(franchises);
+export const franchiseUpdateSchema = createUpdateSchema(franchises);
+
 
 // 5. salesmen
 export const salesmen = pgTable("salesmen", {

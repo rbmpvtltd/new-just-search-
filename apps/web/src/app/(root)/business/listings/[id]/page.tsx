@@ -11,6 +11,8 @@ async function Subcategory({
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;  
+  console.log("Id", params);
+  
 
   return (
     <BussinessList categoryId={Number(id)}/>

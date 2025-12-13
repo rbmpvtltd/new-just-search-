@@ -10,11 +10,11 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import LoginComponent from "@/features/user/profile/login";
-import VisitorLoginForm from "@/features/user/profile/visitorLoginForm";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Loading } from "@/components/ui/Loading";
 import Colors from "@/constants/Colors";
+import LoginComponent from "@/features/profile/login";
+import VisitorLoginForm from "@/features/profile/visitorLoginForm";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
 import { useAuthStore } from "@/store/authStore";
@@ -121,9 +121,9 @@ export default function TabOneScreen() {
                       {role}
                     </Text>
 
-                    <Text className="w-full mx-2 text-secondary-content text-[16px] ">
+                    {/* <Text className="w-full mx-2 text-secondary-content text-[16px] ">
                       {userData?.email ? userData.email : `+91 1234567890`}
-                    </Text>
+                    </Text> */}
                   </View>
                 </View>
               </View>
@@ -140,8 +140,8 @@ export default function TabOneScreen() {
                     Address :
                   </Text>
                   <Text className="text-secondary break-words w-[200px]">
-                    {userData?.area
-                      ? userData.area
+                    {userData?.address
+                      ? userData.address
                       : (userData?.address ?? "No Address")}
                   </Text>
                 </View>

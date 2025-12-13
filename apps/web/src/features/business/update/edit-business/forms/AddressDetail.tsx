@@ -15,15 +15,13 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
-import type { FormReferenceDataType, UserBusinessListingType } from "..";
+import type { UserBusinessListingType } from "..";
 
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({
   businessListing,
-  formReferenceData,
 }: {
   businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
   const formValue = useBusinessFormStore((state) => state.formValue);
@@ -42,19 +40,19 @@ export default function AddressDetail({
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
     defaultValues: {
-      buildingName: businessListing?.buildingName ?? "",
-      streetName: businessListing?.streetName ?? "",
-      area: businessListing?.area ?? "",
-      landmark: businessListing?.landmark ?? "",
-      latitude: businessListing?.latitude ?? "",
-      longitude: businessListing?.longitude ?? "",
-      pincode: businessListing?.pincode,
-      state: businessListing?.state.id,
-      city: businessListing?.city.id,
+      buildingName: businessListing?.business?.buildingName ?? "",
+      streetName: businessListing?.business?.streetName ?? "",
+      area: businessListing?.business?.area ?? "",
+      landmark: businessListing?.business?.landmark ?? "",
+      latitude: businessListing?.business?.latitude ?? "",
+      longitude: businessListing?.business?.longitude ?? "",
+      pincode: businessListing?.business?.pincode,
+      state: businessListing?.business?.state,
+      city: businessListing?.business?.city,
     },
   });
 
-  const states = formReferenceData?.getStates.map((item) => {
+  const states = businessListing?.getStates.map((item) => {
     return {
       label: item.name,
       value: item.id,

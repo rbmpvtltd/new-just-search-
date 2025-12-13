@@ -16,16 +16,14 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
-import type { FormReferenceDataType, UserHireListingType } from "..";
+import type { UserHireListingType } from "..";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 
 export default function PersonalDetailsForm({
   hireListing,
-  formReferenceData,
 }: {
   hireListing: UserHireListingType;
-  formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
   const setFormValue = useHireFormStore((state) => state.setFormValue);
@@ -38,37 +36,31 @@ export default function PersonalDetailsForm({
     control,
     setValue,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
-      photo: hireListing?.photo ?? "",
-      name: hireListing?.name ?? "",
-      categoryId: hireListing?.categoryId.id,
-      subcategoryId: hireListing?.subcategoryId.map((item) => item.id) ?? [],
-      gender: hireListing?.gender ?? undefined,
-      maritalStatus: hireListing?.maritalStatus ?? undefined,
-      fatherName: hireListing?.fatherName ?? "",
-      dob: hireListing?.dob ?? "",
-      languages: hireListing?.languages ?? [],
-      mobileNumber: hireListing?.mobileNumber ?? "",
-      alternativeMobileNumber: hireListing?.alternativeMobileNumber ?? "",
-      email: hireListing?.email ?? "",
-      latitude: hireListing?.latitude ?? "",
-      longitude: hireListing?.longitude ?? "",
-      area: hireListing?.area ?? "",
-      pincode: hireListing?.pincode ?? "",
-      state: hireListing?.state.id ?? undefined,
-      city: hireListing?.city.id ?? undefined,
+      photo: hireListing?.hire?.photo ?? "",
+      name: hireListing?.hire?.name ?? "",
+      categoryId: hireListing?.category?.categoryId,
+      subcategoryId:
+        hireListing?.subcategory.map((item) => item.subcategoryId) ?? [],
+      gender: hireListing?.hire?.gender ?? undefined,
+      maritalStatus: hireListing?.hire?.maritalStatus ?? undefined,
+      fatherName: hireListing?.hire?.fatherName ?? "",
+      dob: hireListing?.hire?.dob ?? "",
+      languages: hireListing?.hire?.languages ?? [],
+      mobileNumber: hireListing?.hire?.mobileNumber ?? "",
+      alternativeMobileNumber: hireListing?.hire?.alternativeMobileNumber ?? "",
+      email: hireListing?.hire?.email ?? "",
+      latitude: hireListing?.hire?.latitude ?? "",
+      longitude: hireListing?.hire?.longitude ?? "",
+      area: hireListing?.hire?.area ?? "",
+      pincode: hireListing?.hire?.pincode ?? "",
+      state: hireListing?.hire?.state ?? undefined,
+      city: hireListing?.hire?.city ?? undefined,
     },
   });
-  const categories = formReferenceData?.getHireCategories.map((item) => {
-    return {
-      label: item.title,
-      value: item.id,
-    };
-  });
-
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
   const { data: subCategories, isLoading } = useQuery(
@@ -77,7 +69,7 @@ export default function PersonalDetailsForm({
     }),
   );
 
-  const states = formReferenceData?.getStates.map((item) => {
+  const states = hireListing?.getStates.map((item) => {
     return {
       label: item.name,
       value: item.id,
@@ -103,10 +95,10 @@ export default function PersonalDetailsForm({
       control,
       label: "Profile Image",
       name: "photo",
-      placeholder: "Upload your photo",
+      placeholder: "Select your photo",
       component: "image",
       section: "profile",
-      error: "",
+      error: errors.photo?.message,
     },
     {
       control,
@@ -117,11 +109,11 @@ export default function PersonalDetailsForm({
       component: "select",
       section: "profile",
       disabled: true,
-      options: categories?.map((item) => ({
-        label: item.label,
-        value: Number(item.value),
+      options: hireListing?.getHireCategories?.map((item) => ({
+        label: item.title,
+        value: item.id,
       })),
-      error: "",
+      error: errors.categoryId?.message,
     },
     {
       control,
@@ -135,7 +127,7 @@ export default function PersonalDetailsForm({
         label: item.name,
         value: Number(item.id),
       })),
-      error: "",
+      error: errors.subcategoryId?.message,
     },
     {
       control,
@@ -144,9 +136,8 @@ export default function PersonalDetailsForm({
       name: "name",
       placeholder: "Full Name",
       component: "input",
-      className: "",
       section: "profile",
-      error: "",
+      error: errors.fatherName?.message,
     },
     {
       control,
@@ -160,7 +151,7 @@ export default function PersonalDetailsForm({
         label: item,
         value: item,
       })),
-      error: "",
+      error: errors.gender?.message,
     },
     {
       control,
@@ -176,7 +167,7 @@ export default function PersonalDetailsForm({
           value: item,
         };
       }),
-      error: "",
+      error: errors.maritalStatus?.message,
     },
     {
       control,
@@ -186,7 +177,7 @@ export default function PersonalDetailsForm({
       placeholder: "Father's Name",
       component: "input",
       section: "profile",
-      error: "",
+      error: errors.fatherName?.message,
     },
     {
       control,
@@ -196,7 +187,7 @@ export default function PersonalDetailsForm({
       placeholder: "Date of Birth",
       component: "input",
       section: "profile",
-      error: "",
+      error: errors.dob?.message,
     },
     {
       control,
@@ -207,12 +198,17 @@ export default function PersonalDetailsForm({
       component: "multiselect",
       section: "profile",
       options: [
-        { value: "English", label: "English" },
-        { value: "Hindi", label: "Hindi" },
-        { value: "Telugu", label: "Telugu" },
-        { value: "Punjabi", label: "Punjabi" },
+        { label: "Hindi", value: "Hindi" },
+        { label: "English", value: "English" },
+        { label: "Punjabi", value: "Punjabi" },
+        { label: "Gujarati", value: "Gujarati" },
+        { label: "Bengali", value: "Bengali" },
+        { label: "Malayalam", value: "Malayalam" },
+        { label: "Kannada", value: "Kannada" },
+        { label: "Tamil", value: "Tamil" },
+        { label: "Other", value: "Other" },
       ],
-      error: "",
+      error: errors.languages?.message,
     },
     {
       control,
@@ -222,7 +218,7 @@ export default function PersonalDetailsForm({
       placeholder: "Mobile Number",
       component: "input",
       section: "profile",
-      error: "",
+      error: errors.mobileNumber?.message,
     },
     {
       control,
@@ -233,7 +229,7 @@ export default function PersonalDetailsForm({
       component: "input",
       required: false,
       section: "profile",
-      error: "",
+      error: errors.alternativeMobileNumber?.message,
     },
     {
       control,
@@ -244,7 +240,7 @@ export default function PersonalDetailsForm({
       component: "input",
       required: false,
       section: "profile",
-      error: "",
+      error: errors.email?.message,
     },
     {
       control,
@@ -254,7 +250,7 @@ export default function PersonalDetailsForm({
       placeholder: "Latitude",
       section: "loction",
       component: "input",
-      error: "",
+      error: errors.latitude?.message,
     },
     {
       control,
@@ -264,17 +260,17 @@ export default function PersonalDetailsForm({
       placeholder: "Longitude",
       component: "input",
       section: "loction",
-      error: "",
+      error: errors.longitude?.message,
     },
     {
       control,
       type: "text",
-      label: "Address",
+      label: "Area",
       name: "area",
-      placeholder: "Address",
+      placeholder: "Area",
       component: "input",
       section: "loction",
-      error: "",
+      error: errors.area?.message,
     },
     {
       control,
@@ -284,7 +280,7 @@ export default function PersonalDetailsForm({
       placeholder: "Pincode",
       component: "input",
       section: "loction",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
@@ -295,9 +291,11 @@ export default function PersonalDetailsForm({
       component: "select",
       section: "loction",
       options:
-        states?.map((state) => ({ label: state.label, value: state.value })) ??
-        [],
-      error: "",
+        states?.map((state) => ({
+          label: state.label,
+          value: state.value,
+        })) ?? [],
+      error: errors.state?.message,
     },
     {
       control,
@@ -307,9 +305,10 @@ export default function PersonalDetailsForm({
       placeholder: "Select City",
       component: "select",
       section: "loction",
+      loading: cityLoading,
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: "",
+      error: errors.city?.message,
     },
   ];
 

@@ -57,7 +57,7 @@ export const adminSalemanRouter = router({
 
     const data = await db
       .select()
-      .from(users)
+      .from(salesmen)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
@@ -184,11 +184,35 @@ export const adminSalemanRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+      const getStates = await db.query.states.findMany();
+      const getOccupation = await db.query.occupation.findMany();
+      const getFranchise = await db.query.users.findMany({
+        where: (user, { eq }) => eq(user.role, "franchises"),
+      });
+      const franchiseData = await db.query.franchises.findFirst({
+        where: (franchise, { eq }) => eq(franchise.id, Number(input?.id)),
+      });
+
+      const userData = await db.query.users.findFirst({
+        where: (user, { eq }) => eq(user.id, 8),
+      });
+      const profileData = await db.query.profiles.findFirst({
+        where: (profile, { eq }) => eq(profile.userId, Number(userData?.id)),
+      });
+
+      const salesmanData = await db.query.salesmen.findFirst({
+        where: (salesman, { eq }) =>
+          eq(salesman.franchiseId, Number(input?.id)),
+      });
+      return {
+        userData,
+        profileData,
+        getStates,
+        getOccupation,
+        salesmanData,
+        franchiseData,
+        getFranchise,
+      };
     }),
   update: adminProcedure
     .input(categoryUpdateSchema)

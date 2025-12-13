@@ -66,6 +66,31 @@ const occupation = pgTable("occupation", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+const salutation = pgTable("salutation", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+const languages = pgTable("languages", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+const documents = pgTable("documents", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+const highestQualification = pgTable("highest_qualification", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 const banners = pgTable("banners", {
   id: serial("id").primaryKey(),
@@ -89,7 +114,11 @@ export {
   categories,
   subcategories,
   banners,
+  documents,
+  languages,
+  salutation,
   occupation,
+  highestQualification,
   bannerInsertSchema,
   bannerSelectSchema,
   bannerUpdateSchema,

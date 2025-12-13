@@ -6,14 +6,11 @@ import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
 
-export type UserHireListingType = OutputTrpcType["hirerouter"]["show"] | null;
-export type FormReferenceDataType = OutputTrpcType["hirerouter"]["add"] | null;
+export type UserHireListingType = OutputTrpcType["hirerouter"]["edit"] | null;
 export default function EditHirePage({
   hireListing,
-  formReferenceData,
 }: {
   hireListing: UserHireListingType;
-  formReferenceData: FormReferenceDataType;
 }) {
   const { page } = useHireFormStore();
   const steps = [
@@ -26,12 +23,7 @@ export default function EditHirePage({
   const renderForm = () => {
     switch (page) {
       case 0:
-        return (
-          <PersonalDetailsForm
-            hireListing={hireListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <PersonalDetailsForm hireListing={hireListing} />;
       case 1:
         return <EducationForm hireListing={hireListing} />;
       case 2:
@@ -39,12 +31,7 @@ export default function EditHirePage({
       case 3:
         return <DocumentsForm hireListing={hireListing} />;
       default:
-        return (
-          <PersonalDetailsForm
-            hireListing={hireListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <PersonalDetailsForm hireListing={hireListing} />;
     }
   };
 

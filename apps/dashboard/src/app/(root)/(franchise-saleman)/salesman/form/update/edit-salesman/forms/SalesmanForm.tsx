@@ -1,9 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { franchiseInsertSchema } from "@repo/db/dist/schema/user.schema";
-import { useMutation } from "@tanstack/react-query";
+import { salesmenInsertSchema } from "@repo/db/dist/schema/user.schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import { useForm } from "react-hook-form";
+import next from "next";
+import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
 import {
@@ -15,88 +17,91 @@ import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { SetOpen } from "../../../edit.form";
-import { useFranchiseFormStore } from "../../../shared/store/useCreateFranchiseStore";
-import type { EditAdminFranchiseType } from "..";
+import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
+import type { EditAdminSalesmanType } from "..";
 
-export const adminAddFranchiseInsertSchema = franchiseInsertSchema.omit({
-  userId: true,
-});
-type FranchiseInsertSchema = z.infer<typeof adminAddFranchiseInsertSchema>;
+type SalesmanInsertSchema = z.infer<typeof salesmenInsertSchema>;
 
-export default function FranchiseForm({
-  id,
+export default function SalesmanForm({
   data,
   setOpen,
 }: {
-  id: number;
-  data: EditAdminFranchiseType;
+  data: EditAdminSalesmanType;
   setOpen: SetOpen;
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
-    trpc.adminFranchiseRouter.update.mutationOptions(),
+    trpc.adminSalemanRouter.create.mutationOptions(),
   );
-  const formValue = useFranchiseFormStore((s) => s.formValue);
-  const prevPage = useFranchiseFormStore((s) => s.prevPage);
-  const clearPage = useFranchiseFormStore((s) => s.clearPage);
+  const formValue = useSalesmanFormStore((s) => s.formValue);
+  const prevPage = useSalesmanFormStore((s) => s.prevPage);
+  const clearPage = useSalesmanFormStore((s) => s.clearPage);
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
-  } = useForm<FranchiseInsertSchema>({
-    resolver: zodResolver(adminAddFranchiseInsertSchema),
+  } = useForm<SalesmanInsertSchema>({
+    resolver: zodResolver(salesmenInsertSchema),
     defaultValues: {
-      gstNo: data.franchiseData?.gstNo ?? "",
-      referPrifixed: data.franchiseData?.referPrifixed ?? "",
-      employeeLimit: data.franchiseData?.employeeLimit ?? NaN,
+      franchiseId: data.salesmanData?.franchiseId,
+      referCode: data.salesmanData?.referCode,
     },
   });
+  const franchiseId = useWatch({ control, name: "franchiseId" });
+  const { data: dataReferCode, isLoading } = useQuery(
+    trpc.adminSalemanRouter.getReferCode.queryOptions({
+      franchiseId: Number(franchiseId),
+    }),
+  );
 
-  const formFields: FormFieldProps<FranchiseInsertSchema>[] = [
+  useEffect(() => {
+    if (dataReferCode?.newReferCode) {
+      reset((prev) => {
+        if (prev.referCode === dataReferCode.newReferCode) return prev;
+        return { ...prev, referCode: dataReferCode.newReferCode };
+      });
+    }
+  }, [dataReferCode, reset]);
+
+  const formFields: FormFieldProps<SalesmanInsertSchema>[] = [
     {
       control,
-      label: "GST No",
-      name: "gstNo",
-      placeholder: "Enter GST No",
-      component: "input",
-      error: errors.gstNo?.message,
-    },
-    {
-      control,
-      type: "number",
-      label: "Employee Limit",
-      name: "employeeLimit",
-      placeholder: "Limit of Employee",
-      component: "input",
-      error: errors.employeeLimit?.message,
+      label: "Franchise Name",
+      name: "franchiseId",
+      placeholder: "Enter Franchise Name",
+      component: "select",
+      options:
+        data?.getFranchise?.map((franchise) => ({
+          label: franchise?.displayName ?? "",
+          value: franchise?.id,
+        })) ?? [],
+      error: errors.franchiseId?.message,
     },
     {
       control,
       label: "Refer Code",
-      name: "referPrifixed",
+      name: "referCode",
       placeholder: "Enter Refer Code",
       component: "input",
-      error: errors.referPrifixed?.message,
+      loading: isLoading,
+      error: errors.referCode?.message,
     },
   ];
 
-  const onSubmit = async (data: FranchiseInsertSchema) => {
-    useFranchiseFormStore.setState((state) => ({
+  const onSubmit = async (data: SalesmanInsertSchema) => {
+    useSalesmanFormStore.setState((state) => ({
       formValue: {
         ...state.formValue,
         ...data,
-        employeeLimit: Number(data.employeeLimit),
       },
     }));
     const finalData = {
       ...formValue,
       ...data,
     };
-
-    console.log("Final data", finalData);
-
     mutate(
-      { ...finalData, id },
+      { ...finalData, nextNumber: Number(dataReferCode?.nextNumber) },
       {
         onSuccess: async (data) => {
           if (data?.success) {
@@ -106,7 +111,7 @@ export default function FranchiseForm({
             });
             const queryClient = getQueryClient();
             queryClient.invalidateQueries({
-              queryKey: trpc.adminFranchiseRouter.list.queryKey(),
+              queryKey: trpc.adminSalemanRouter.list.queryKey(),
             });
             setOpen(false);
           }
