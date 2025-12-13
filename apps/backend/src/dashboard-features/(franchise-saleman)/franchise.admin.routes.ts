@@ -237,7 +237,7 @@ export const adminFranchiseRouter = router({
           occupation: profileData.occupation,
           maritalStatus: profileData.maritalStatus,
           address: profileData.address,
-          area: profileData.area,
+          // area: profileData.area,
           city: profileData.city,
           pincode: profileData.pincode,
           state: profileData.state,
