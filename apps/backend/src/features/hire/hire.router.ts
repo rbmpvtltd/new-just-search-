@@ -25,11 +25,18 @@ export const hirerouter = router({
       where: (categories, { eq }) => eq(categories.type, 2),
     });
 
+    const getDocuments = await db.query.documents.findMany();
+    const getHighestQualification =
+      await db.query.highestQualification.findMany();
+    const getLanguages = await db.query.languages.findMany();
     const getStates = await db.query.states.findMany();
 
     return {
-      getHireCategories,
       getStates,
+      getLanguages,
+      getDocuments,
+      getHireCategories,
+      getHighestQualification,
     };
   }),
 
@@ -224,19 +231,46 @@ export const hirerouter = router({
       };
     }),
 
-  edit: hireProcedure.query(async ({ ctx }) => {
-    const hire = await db.query.hireListing.findFirst({
-      where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
-    });
-
-    if (!hire) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Hire listing not found",
+  edit: hireProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const getHireCategories = await db.query.categories.findMany({
+        where: (categories, { eq }) => eq(categories.type, 2),
+        columns: {
+          title: true,
+          id: true,
+        },
       });
-    }
-    return hire;
-  }),
+      const getStates = await db.query.states.findMany();
+      const hire = await db.query.hireListing.findFirst({
+        where: (hire, { eq }) => eq(hire.id, input.id),
+      });
+
+      const category = await db.query.hireCategories.findFirst({
+        where: (hireCategory, { eq }) => eq(hireCategory.hireId, input.id),
+        columns: {
+          categoryId: true,
+        },
+      });
+      const subcategory = await db.query.hireSubcategories.findMany({
+        where: (hireSubCategory, { eq }) =>
+          eq(hireSubCategory.hireId, input.id),
+        columns: {
+          subcategoryId: true,
+        },
+      });
+      return {
+        hire,
+        category,
+        subcategory,
+        getHireCategories,
+        getStates,
+      };
+    }),
 
   update: hireProcedure
     .input(hireUpdateSchema)

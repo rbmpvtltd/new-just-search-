@@ -30,16 +30,16 @@ export default function PreferredPositionForm({
   } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
-      jobType: hireListing?.jobType ?? [],
-      locationPreferred: hireListing?.locationPreferred ?? "",
-      relocate: hireListing?.relocate ?? "",
-      expectedSalaryFrom: hireListing?.expectedSalaryFrom ?? "",
-      expectedSalaryTo: hireListing?.expectedSalaryTo ?? "",
-      jobDuration: hireListing?.jobDuration ?? [],
-      fromHour: hireListing?.fromHour ?? "",
-      toHour: hireListing?.toHour ?? "",
-      workShift: hireListing?.workShift ?? [],
-      availability: hireListing?.availability ?? "",
+      jobType: hireListing?.hire?.jobType ?? [],
+      locationPreferred: hireListing?.hire?.locationPreferred ?? "",
+      relocate: hireListing?.hire?.relocate ?? "",
+      expectedSalaryFrom: hireListing?.hire?.expectedSalaryFrom ?? "",
+      expectedSalaryTo: hireListing?.hire?.expectedSalaryTo ?? "",
+      jobDuration: hireListing?.hire?.jobDuration ?? [],
+      fromHour: hireListing?.hire?.fromHour ?? "",
+      toHour: hireListing?.hire?.toHour ?? "",
+      workShift: hireListing?.hire?.workShift ?? [],
+      availability: hireListing?.hire?.availability ?? "",
     },
   });
 

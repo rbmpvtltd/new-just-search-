@@ -1,3 +1,4 @@
+import { db } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
 
 export const usersColumns = {
@@ -19,3 +20,21 @@ export const usersAllowedSortColumns = [
   // "status",
   // "created_at",
 ];
+
+export const generateReferCode = async (
+  lastAssignCode: number,
+  prifix: string,
+): Promise<{ newReferCode: string; nextNumber: number }> => {
+  const nextNumber = lastAssignCode + 1;
+  const fullCode = nextNumber.toString().padStart(4, "0");
+  const newReferCode = `${prifix}${fullCode}`;
+
+  const isNewReferCodeExist = await db.query.salesmen.findFirst({
+    where: (salesman, { eq }) => eq(salesman.referCode, newReferCode),
+  });
+
+  if (isNewReferCodeExist) {
+    return generateReferCode(nextNumber, prifix);
+  }
+  return { newReferCode, nextNumber };
+};

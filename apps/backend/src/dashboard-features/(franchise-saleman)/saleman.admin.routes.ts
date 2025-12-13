@@ -1,12 +1,20 @@
 // features/banners/banners.admin.routes.ts
 import { db } from "@repo/db";
-import { users } from "@repo/db/dist/schema/auth.schema";
+import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
   categoryInsertSchema,
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
+import {
+  franchises,
+  profileInsertSchema,
+  profiles,
+  salesmen,
+  salesmenInsertSchema,
+} from "@repo/db/dist/schema/user.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import slugify from "slugify";
@@ -26,6 +34,7 @@ import {
   usersColumns,
   usersGlobalFilterColumns,
 } from "./franchise.admin.service";
+import { generateReferCode } from "./saleman.admin.service";
 
 export const adminSalemanRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
@@ -48,7 +57,7 @@ export const adminSalemanRouter = router({
 
     const data = await db
       .select()
-      .from(users)
+      .from(salesmen)
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
@@ -75,18 +84,98 @@ export const adminSalemanRouter = router({
     };
   }),
   add: adminProcedure.query(async () => {
-    return;
+    const states = await db.query.states.findMany();
+    const occupation = await db.query.occupation.findMany();
+    const franchise = await db.query.users.findMany({
+      columns: {
+        displayName: true,
+        id: true,
+      },
+      where: (user, { eq }) => eq(user.role, "franchises"),
+    });
+
+    return { states, occupation, franchise };
   }),
+  getReferCode: adminProcedure
+    .input(z.object({ franchiseId: z.number() }))
+    .query(async ({ input }) => {
+      const franchise = await db.query.franchises.findFirst({
+        where: (franchise, { eq }) => eq(franchise.userId, input.franchiseId),
+        columns: {
+          referPrifixed: true,
+          lastAssignCode: true,
+        },
+      });
+      if (!franchise)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Franchise not found",
+        });
+      const prifix = franchise.referPrifixed;
+      const lastAssignCode = franchise.lastAssignCode;
+      const code = await generateReferCode(lastAssignCode, prifix);
+      return code;
+    }),
   create: adminProcedure
     .input(
-      categoryInsertSchema.omit({
-        slug: true,
-      }),
+      usersInsertSchema
+        .omit({ role: true })
+        .extend(profileInsertSchema.omit({ userId: true }).shape)
+        .extend(salesmenInsertSchema.extend({ nextNumber: z.number() }).shape),
     )
     .mutation(async ({ input }) => {
-      const slug = slugify(input.title);
-      await db.insert(categories).values({ ...input, slug });
-      return { success: true };
+      const userData = usersInsertSchema.omit({ role: true }).parse(input);
+      const profileData = profileInsertSchema
+        .omit({ userId: true })
+        .parse(input);
+      const salesmenData = salesmenInsertSchema
+        .extend({ nextNumber: z.number() })
+        .parse(input);
+
+      const franchise = await db.query.franchises.findFirst({
+        where: (franchise, { eq }) => eq(franchise.userId, input.franchiseId),
+      });
+      const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
+        where: (user, { eq, or }) =>
+          or(
+            eq(user.email, String(userData.email)),
+            eq(user.phoneNumber, String(userData.phoneNumber)),
+          ),
+      });
+      if (isEmailOrPhoneNumberExist) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Email already exists",
+        });
+      }
+
+      const newUserData = (
+        await db
+          .insert(users)
+          .values({ ...userData, role: "salesman" })
+          .returning()
+      )[0];
+      if (!newUserData?.id) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong in creating user",
+        });
+      }
+
+      await db.insert(profiles).values({
+        ...profileData,
+        userId: newUserData?.id,
+      });
+
+      await db.insert(salesmen).values({
+        ...salesmenData,
+        franchiseId: Number(franchise?.id),
+      });
+
+      await db.update(franchises).set({
+        lastAssignCode: Number(salesmenData.nextNumber),
+      });
+      return { success: true, message: "Salesmen created successfully" };
     }),
   edit: adminProcedure
     .input(
@@ -95,11 +184,35 @@ export const adminSalemanRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.id, input.id));
-      return data[0];
+      const getStates = await db.query.states.findMany();
+      const getOccupation = await db.query.occupation.findMany();
+      const getFranchise = await db.query.users.findMany({
+        where: (user, { eq }) => eq(user.role, "franchises"),
+      });
+      const franchiseData = await db.query.franchises.findFirst({
+        where: (franchise, { eq }) => eq(franchise.id, Number(input?.id)),
+      });
+
+      const userData = await db.query.users.findFirst({
+        where: (user, { eq }) => eq(user.id, 8),
+      });
+      const profileData = await db.query.profiles.findFirst({
+        where: (profile, { eq }) => eq(profile.userId, Number(userData?.id)),
+      });
+
+      const salesmanData = await db.query.salesmen.findFirst({
+        where: (salesman, { eq }) =>
+          eq(salesman.franchiseId, Number(input?.id)),
+      });
+      return {
+        userData,
+        profileData,
+        getStates,
+        getOccupation,
+        salesmanData,
+        franchiseData,
+        getFranchise,
+      };
     }),
   update: adminProcedure
     .input(categoryUpdateSchema)

@@ -107,7 +107,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
   dob: () => z.string().min(1, "Date of birth is required"),
   mobileNumber: () =>
     z.string().min(10, "Mobile number should be minimum 10 characters long"),
-  languages: () => z.array(z.string()).min(1, "Select at least one language"),
+  languages: () => z.array(z.number()).min(1, "Select at least one language"),
   latitude: () =>
     z.string().refine(
       (val) => {
@@ -130,7 +130,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
   state: () => z.number().min(1, "State is required"),
 
   highestQualification: () =>
-    z.string().min(1, "Highest qualification is required"),
+    z.number().min(1, "Highest qualification is required"),
   employmentStatus: () => z.string().min(1, "Employment status is required"),
   certificates: () => z.string().optional(),
 
@@ -138,7 +138,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
     z.number().min(1, "Work experience year is required"),
   jobRole: () => z.string().min(1, "Job role is required"),
 
-  idProof: () => z.string().min(1, "ID proof is required"),
+  idProof: () => z.number().min(1, "ID proof is required"),
   city: () => z.number().min(1, "City is required"),
   jobType: () => z.array(z.enum(JobType)).min(1, "Job type is required"),
   workShift: () => z.array(z.enum(WorkShift)).min(1, "Work shift is required"),

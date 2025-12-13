@@ -11,7 +11,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { useUserFormStore } from "./shared/store/useCreateHireStore";
-import EditHirePage from "./update/edit-hire";
+import { EditUserPage } from "./update/edit-hire";
 
 export function EditEntiry({ id }: { id: number }) {
   const [open, setOpen] = useState(false);
@@ -30,7 +30,7 @@ export function EditEntiry({ id }: { id: number }) {
         <Button>Edit</Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-[425px] lg:max-w-[80%] w-full p-4">
-        <SheetTitle>Edit Hire Listing</SheetTitle>
+        <SheetTitle>Edit User</SheetTitle>
         {open && (
           <Suspense fallback={<div> loading ...</div>}>
             <div className="overflow-y-scroll">
@@ -49,9 +49,9 @@ export type SetOpen = (bool: boolean) => void;
 function GetData({ setOpen, id }: { setOpen: SetOpen; id: number }) {
   // function GetData() {
   const trpc = useTRPC();
-
+  console.log("id", id);
   const { data, isFetching } = useSuspenseQuery(
-    trpc.adminHireRouter.edit.queryOptions(
+    trpc.adminUsersRouter.edit.queryOptions(
       { id },
       {
         staleTime: 0,
@@ -61,5 +61,5 @@ function GetData({ setOpen, id }: { setOpen: SetOpen; id: number }) {
 
   if (isFetching) return <Spinner />;
 
-  return <EditHirePage data={data} setOpen={setOpen} />;
+  return <EditUserPage data={data} setOpen={setOpen} id={id} />;
 }

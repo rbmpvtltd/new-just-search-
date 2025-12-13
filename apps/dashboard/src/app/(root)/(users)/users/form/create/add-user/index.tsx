@@ -1,12 +1,13 @@
 "use client";
-import type { OutputTrpcType } from "@/trpc/type";
 import type { SetOpen } from "../../add.form";
 import { useUserFormStore } from "../../shared/store/useCreateHireStore";
 import ProfileForm from "./forms/ProfileForm";
 import UserForm from "./forms/UserForm";
-
-export type AddAdminUserType = OutputTrpcType["adminHireRouter"]["add"];
-export function AddUserPage({ setOpen }: { setOpen: SetOpen }) {
+export function AddUserPage({
+  setOpen,
+}: {
+  setOpen: SetOpen;
+}) {
   const page = useUserFormStore((state) => state.page);
   const steps = ["User Form", "Profile Form"];
 

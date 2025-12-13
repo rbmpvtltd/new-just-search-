@@ -22,6 +22,7 @@ export default function PreferredPositionForm() {
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
@@ -203,7 +204,29 @@ export default function PreferredPositionForm() {
 
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4 bg-gray-50">
           <Button
-            onClick={prevPage}
+            onClick={() => {
+              const currentData = getValues();
+              setFormValue("jobType", currentData.jobType);
+              setFormValue(
+                "locationPreferred",
+                currentData.locationPreferred ?? "",
+              );
+              setFormValue("relocate", currentData.relocate ?? undefined);
+              setFormValue(
+                "expectedSalaryFrom",
+                currentData.expectedSalaryFrom ?? "",
+              );
+              setFormValue(
+                "expectedSalaryTo",
+                currentData.expectedSalaryTo ?? "",
+              );
+              setFormValue("jobDuration", currentData.jobDuration ?? "");
+              setFormValue("fromHour", currentData.fromHour ?? undefined);
+              setFormValue("toHour", currentData.toHour ?? undefined);
+              setFormValue("workShift", currentData.workShift ?? "");
+              setFormValue("availability", currentData.availability ?? "");
+              prevPage();
+            }}
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             PREVIOUS

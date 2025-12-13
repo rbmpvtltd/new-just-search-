@@ -29,14 +29,14 @@ export default function EducationForm({
   } = useForm<EducationSchema>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      highestQualification: hireListing?.highestQualification ?? "",
-      skillset: hireListing?.skillset ?? "",
-      employmentStatus: hireListing?.employmentStatus ?? "",
-      workExperienceYear: hireListing?.workExperienceYear ?? NaN,
-      workExperienceMonth: hireListing?.workExperienceMonth ?? NaN,
-      jobRole: hireListing?.jobRole ?? "",
-      previousJobRole: hireListing?.previousJobRole ?? "",
-      certificates: hireListing?.certificates ?? "",
+      highestQualification: hireListing?.hire?.highestQualification ?? "",
+      skillset: hireListing?.hire?.skillset ?? "",
+      employmentStatus: hireListing?.hire?.employmentStatus ?? "",
+      workExperienceYear: hireListing?.hire?.workExperienceYear ?? NaN,
+      workExperienceMonth: hireListing?.hire?.workExperienceMonth ?? NaN,
+      jobRole: hireListing?.hire?.jobRole ?? "",
+      previousJobRole: hireListing?.hire?.previousJobRole ?? "",
+      certificates: hireListing?.hire?.certificates ?? "",
     },
   });
 

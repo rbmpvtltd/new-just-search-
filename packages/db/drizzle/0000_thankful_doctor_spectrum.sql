@@ -270,7 +270,35 @@ CREATE TABLE "cities" (
 	"state_id" integer NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "documents" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "highest_qualification" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "languages" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "occupation" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "salutation" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -477,8 +505,8 @@ CREATE TABLE "franchises" (
 	"user_id" integer NOT NULL,
 	"refer_prifixed" varchar(255) NOT NULL,
 	"gst_no" varchar(50),
-	"status" boolean DEFAULT true NOT NULL,
 	"employee_limit" integer DEFAULT 0 NOT NULL,
+	"last_assign_code" integer DEFAULT 0 NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "franchises_gst_no_unique" UNIQUE("gst_no")
@@ -507,7 +535,6 @@ CREATE TABLE "profiles" (
 	"salutation" varchar(100),
 	"first_name" varchar(100),
 	"last_name" varchar(100),
-	"email" varchar(255),
 	"dob" date,
 	"occupation" integer,
 	"marital_status" "marital_status",
@@ -515,17 +542,14 @@ CREATE TABLE "profiles" (
 	"pincode" varchar(10),
 	"state" integer NOT NULL,
 	"city" integer NOT NULL,
-	"area" varchar(100),
 	"created_at" timestamp DEFAULT NOW(),
 	"updated_at" timestamp DEFAULT NOW()
 );
 --> statement-breakpoint
 CREATE TABLE "salesmen" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
 	"franchise_id" integer NOT NULL,
 	"refer_code" varchar(255) NOT NULL,
-	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "salesmen_refer_code_unique" UNIQUE("refer_code")
@@ -588,5 +612,4 @@ ALTER TABLE "notification" ADD CONSTRAINT "notification_category_id_categories_i
 ALTER TABLE "notification" ADD CONSTRAINT "notification_sub_category_id_subcategories_id_fk" FOREIGN KEY ("sub_category_id") REFERENCES "public"."subcategories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_franchise_id_franchises_id_fk" FOREIGN KEY ("franchise_id") REFERENCES "public"."franchises"("id") ON DELETE cascade ON UPDATE no action;

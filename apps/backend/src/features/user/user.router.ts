@@ -2,19 +2,25 @@ import { db, schemas } from "@repo/db";
 import {
   account_delete_request,
   feedbackInsertSchema,
+  profileUpdateSchema,
   requestAccountsInsertSchema,
-  userUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
-import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { eq, ne } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import z from "zod";
 import { protectedProcedure, router } from "@/utils/trpc";
 
 export const userRouter = router({
-  add: protectedProcedure.query(async ({ ctx }) => {
+  edit: protectedProcedure.query(async ({ ctx }) => {
     const getStates = await db.query.states.findMany();
-    return { getStates };
+    const getOccupations = await db.query.occupation.findMany();
+    const getSlutation = await db.query.salutation.findMany();
+
+    const profile = await db.query.profiles.findFirst({
+      where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
+    });
+    const role = ctx.role;
+    return { getStates, profile, role, getOccupations, getSlutation };
   }),
 
   getCities: protectedProcedure
@@ -27,22 +33,11 @@ export const userRouter = router({
     }),
   update: protectedProcedure
     .input(
-      userUpdateSchema.omit({
+      profileUpdateSchema.omit({
         userId: true,
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const existingEmail = await db.query.users.findFirst({
-        where: (users, { eq, and }) =>
-          and(eq(users.email, String(input.email)), ne(users.id, ctx.userId)),
-      });
-
-      if (existingEmail) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Something went wrong, Email already exits",
-        });
-      }
       const isStateExists = await db.query.states.findFirst({
         where: (states, { eq }) => eq(states.id, Number(input.state)),
       });
@@ -69,7 +64,6 @@ export const userRouter = router({
         where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
       });
 
-      logger.info("profileExists", profileExists);
       if (!profileExists) {
         const createUser = await db.insert(schemas.user.profiles).values({
           userId: ctx.userId,
@@ -79,16 +73,13 @@ export const userRouter = router({
           lastName: input.lastName,
           occupation: input.occupation,
           dob: input.dob,
-          email: input.email,
           maritalStatus: input.maritalStatus,
-          area: input.area,
           address: input.address,
           pincode: input.pincode,
           city: input.city ?? 0,
           state: input.state ?? 0,
         });
       } else {
-        logger.info("indside update ", input);
         const updateProfile = await db
           .update(schemas.user.profiles)
           .set({
@@ -99,10 +90,8 @@ export const userRouter = router({
             lastName: input.lastName,
             occupation: input.occupation,
             maritalStatus: input.maritalStatus,
-            email: input.email,
-            address: input.area,
+            address: input.address,
             dob: input.dob,
-            area: input.area,
             pincode: input.pincode,
             city: input.city,
             state: input.state,

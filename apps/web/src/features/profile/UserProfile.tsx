@@ -5,7 +5,7 @@ import {
   userUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
-import { userUpdateSchema } from "@repo/db/dist/schema/user.schema";
+import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
@@ -22,42 +22,31 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-type UserProfile = OutputTrpcType["userRouter"]["getUserProfile"] | null;
-type FormReferenceDataType = OutputTrpcType["userRouter"]["add"] | null;
 
-type UserUpdateSchema = z.infer<typeof userUpdateSchema>;
-export default function UserProfile({
-  user,
-  formReferenceData,
-}: {
-  user: UserProfile;
-  formReferenceData: FormReferenceDataType;
-}) {
-  console.log("USer profile data", user);
+type UserProfile = OutputTrpcType["userRouter"]["edit"] | null;
 
+type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
+export default function UserProfile({ user }: { user: UserProfile }) {
   const trpc = useTRPC();
   const router = useRouter();
   const {
     control,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<UserUpdateSchema>({
-    resolver: zodResolver(userUpdateSchema),
+    resolver: zodResolver(profileUpdateSchema),
     defaultValues: {
-      profileImage: user?.profileImage ?? "",
-      firstName: user?.firstName ?? "",
-      dob: user?.dob ?? "",
-      lastName: user?.lastName ?? "",
-      email: user?.email ?? "",
-      salutation: user?.salutation ?? "",
-      occupation: user?.occupation ?? "",
-      maritalStatus: user?.maritalStatus ?? "Married",
-      area: user?.area ?? "",
-      pincode: user?.pincode ?? "",
-      city: user?.city ?? 0,
-      state: user?.state ?? 0,
+      profileImage: user?.profile?.profileImage ?? "",
+      salutation: user?.profile?.salutation ?? "",
+      firstName: user?.profile?.firstName ?? "",
+      lastName: user?.profile?.lastName ?? "",
+      dob: user?.profile?.dob ?? "",
+      occupation: user?.profile?.occupation ?? null,
+      maritalStatus: user?.profile?.maritalStatus ?? "Married",
+      address: user?.profile?.address ?? "",
+      pincode: user?.profile?.pincode ?? "",
+      city: user?.profile?.city ?? 0,
+      state: user?.profile?.state ?? 0,
     },
   });
   const { mutate } = useMutation(trpc.userRouter.update.mutationOptions());
@@ -90,7 +79,7 @@ export default function UserProfile({
     });
   };
 
-  const states = formReferenceData?.getStates.map((item: any) => {
+  const states = user?.getStates?.map((item) => {
     return {
       label: item.name,
       value: item.id,
@@ -108,16 +97,6 @@ export default function UserProfile({
   const formFields: FormFieldProps<UserUpdateSchema>[] = [
     {
       control,
-      label: "Email",
-      name: "email",
-      placeholder: "Email",
-      required: false,
-      component: "input",
-      error: "",
-    },
-    {
-      control,
-      // type: "date",
       label: "Date of Birth",
       name: "dob",
       placeholder: "Date of Birth",
@@ -132,23 +111,12 @@ export default function UserProfile({
       placeholder: "Occupation",
       required: false,
       component: "select",
-      options: [
-        { label: "Employed", value: "Employed" },
-        { label: "Unemployed", value: "Unemployed" },
-        { label: "Farmer", value: "Farmer" },
-        { label: "Media", value: "Media" },
-        { label: "Business Man", value: "Business Man" },
-        { label: "Sports", value: "Sports" },
-        { label: "Armed forces", value: "Armed forces" },
-        { label: "Government Service", value: "Government Service" },
-        { label: "CA", value: "CA" },
-        { label: "Doctor", value: "Doctor" },
-        { label: "Lawyer", value: "Lawyer" },
-        { label: "Retired", value: "Retired" },
-        { label: "Student", value: "Student" },
-        { label: "Clerk", value: "Clerk" },
-        { label: "Others", value: "Others" },
-      ],
+      options: user?.getOccupations?.map((item) => {
+        return {
+          label: item.name,
+          value: item.id,
+        };
+      }),
     },
     {
       control,
@@ -166,9 +134,9 @@ export default function UserProfile({
     },
     {
       control,
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Address",
+      name: "address",
+      placeholder: "Enter Address",
       required: false,
       component: "input",
       error: "",
@@ -231,8 +199,8 @@ export default function UserProfile({
 
           <div className="text-center md:text-left space-y-1">
             <h2 className="text-2xl font-bold">
-              {user?.firstName
-                ? `${user?.firstName} ${user?.lastName ?? ""}`
+              {user?.profile?.firstName
+                ? `${user?.profile?.firstName} ${user?.profile?.lastName ?? ""}`
                 : "User Name"}
             </h2>
             <p className="text-muted-foreground">
@@ -251,11 +219,12 @@ export default function UserProfile({
                 name="salutation"
                 required={false}
                 component="select"
-                options={[
-                  { label: "Mr", value: "Mr" },
-                  { label: "Mrs", value: "Mrs" },
-                  { label: "Ms", value: "Ms" },
-                ]}
+                options={user?.getSlutation.map((item) => {
+                  return {
+                    label: item.name,
+                    value: item.name,
+                  };
+                })}
               />
               <FormField
                 control={control}
@@ -295,18 +264,6 @@ export default function UserProfile({
               "Save"
             )}
           </Button>
-          {/* <Button
-            type="button"
-            onClick={() =>
-              console.log(
-                normalizeDate(
-                  "Date Fri Oct 17 2025 00:00:00 GMT+0530 (India Standard Time)",
-                ),
-              )
-            }
-          >
-            DEBUG VALUES
-          </Button> */}
         </div>
       </form>
     </div>

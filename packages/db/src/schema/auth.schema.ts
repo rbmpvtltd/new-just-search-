@@ -32,5 +32,7 @@ export const users = pgTable("users", {
 export const usersInsertSchema = createInsertSchema(users).extend({
   role: z.enum(UserRole),
 });
-export const usersUpdateSchema = createUpdateSchema(users);
+export const usersUpdateSchema = createUpdateSchema(users).extend({
+  role: z.enum(UserRole),
+});
 export const usersSelectSchema = createSelectSchema(users);

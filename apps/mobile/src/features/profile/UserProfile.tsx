@@ -1,15 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
-import { userUpdateSchema } from "@repo/db/dist/schema/user.schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import {
-  ActivityIndicator,
   Alert,
   Keyboard,
   KeyboardAvoidingView,
-  Text,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -23,44 +20,28 @@ import {
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { trpc } from "@/lib/trpc";
 
-type UserUpdateSchema = z.infer<typeof userUpdateSchema>;
+type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
 export default function UserProfile() {
-  //   const [loadingLocation, setLoadingLocation] = useState(false);
-  const {
-    data: formReferenceData,
-    error: addError,
-    isLoading: addLoading,
-    isError: addIsError,
-  } = useQuery(trpc.userRouter.add.queryOptions());
-
-  const {
-    data: userData,
-    isLoading: userDataLoading,
-    isError: userDataIsError,
-    error: userDataError,
-  } = useQuery(trpc.userRouter.getUserProfile.queryOptions());
-
-  const router = useRouter();
+  const { data } = useSuspenseQuery(trpc.userRouter.edit.queryOptions());
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<UserUpdateSchema>({
-    resolver: zodResolver(userUpdateSchema),
+    resolver: zodResolver(profileUpdateSchema),
     defaultValues: {
-      profileImage: userData?.profileImage ?? "",
-      firstName: userData?.firstName ?? "",
-      dob: userData?.dob ?? "",
-      lastName: userData?.lastName ?? "",
-      email: userData?.email ?? "",
-      salutation: userData?.salutation ?? "",
-      occupation: userData?.occupation ?? "",
-      maritalStatus: userData?.maritalStatus ?? "Married",
-      area: userData?.area ?? "",
-      pincode: userData?.pincode ?? "",
-      city: userData?.city ?? 0,
-      state: userData?.state ?? 0,
+      profileImage: data?.profile?.profileImage ?? "",
+      firstName: data?.profile?.firstName ?? "",
+      dob: data?.profile?.dob ?? "",
+      lastName: data?.profile?.lastName ?? "",
+      salutation: data?.profile?.salutation ?? "",
+      occupation: data?.profile?.occupation ?? NaN,
+      maritalStatus: data?.profile?.maritalStatus ?? "Married",
+      address: data?.profile?.address ?? "",
+      pincode: data?.profile?.pincode ?? "",
+      city: data?.profile?.city ?? 0,
+      state: data?.profile?.state ?? 0,
     },
   });
 
@@ -82,7 +63,7 @@ export default function UserProfile() {
     });
   };
 
-  const states = formReferenceData?.getStates.map((item: any) => {
+  const states = data?.getStates.map((item: any) => {
     return {
       label: item.name,
       value: item.id,
@@ -92,33 +73,10 @@ export default function UserProfile() {
   const selectedStateId = useWatch({ control, name: "state" });
 
   const { data: cities, isLoading } = useQuery(
-    trpc.hirerouter.getCities.queryOptions({
+    trpc.userRouter.getCities.queryOptions({
       state: Number(selectedStateId),
     }),
   );
-  if (addLoading || userDataLoading) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text className="text-gray-600 mt-3">Preparing form...</Text>
-      </View>
-    );
-  }
-
-  if (addIsError || userDataIsError) {
-    const message =
-      addError?.message ||
-      userDataError?.message ||
-      "Unable to fetch data. Please try again later.";
-    return (
-      <View className="flex-1 items-center justify-center py-10 px-6">
-        <Text className="text-red-600 text-center font-semibold mb-2">
-          Something went wrong
-        </Text>
-        <Text className="text-gray-500 text-sm text-center">{message}</Text>
-      </View>
-    );
-  }
 
   const formFields: FormFieldProps<UserUpdateSchema>[] = [
     {
@@ -165,16 +123,6 @@ export default function UserProfile() {
     },
     {
       control,
-      label: "Email",
-      name: "email",
-      placeholder: "Email",
-      component: "input",
-      required: false,
-      className: "mx-auto w-[90%]",
-      error: errors.email?.message,
-    },
-    {
-      control,
       label: "Date of Birth",
       name: "dob",
       placeholder: "Date of Birth",
@@ -188,23 +136,12 @@ export default function UserProfile() {
       name: "occupation",
       placeholder: "Occupation",
       component: "dropdown",
-      data: [
-        { label: "Employed", value: "Employed" },
-        { label: "Unemployed", value: "Unemployed" },
-        { label: "Farmer", value: "Farmer" },
-        { label: "Media", value: "Media" },
-        { label: "Business Man", value: "Business Man" },
-        { label: "Sports", value: "Sports" },
-        { label: "Armed forces", value: "Armed forces" },
-        { label: "Government Service", value: "Government Service" },
-        { label: "CA", value: "CA" },
-        { label: "Doctor", value: "Doctor" },
-        { label: "Lawyer", value: "Lawyer" },
-        { label: "Retired", value: "Retired" },
-        { label: "Student", value: "Student" },
-        { label: "Clerk", value: "Clerk" },
-        { label: "Others", value: "Others" },
-      ],
+      data: data.getOccupations.map((item: any) => {
+        return {
+          label: item.name,
+          value: item.name,
+        };
+      }),
       required: false,
       error: errors.occupation?.message,
     },
@@ -225,13 +162,13 @@ export default function UserProfile() {
     },
     {
       control,
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Adaddress",
+      name: "address",
+      placeholder: "Adaddress",
       component: "input",
       className: "mx-auto w-[90%]",
       required: false,
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,

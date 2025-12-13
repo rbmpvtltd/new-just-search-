@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "@repo/db/dist/schema/hire.schema";
-import { useMutation} from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -17,18 +17,22 @@ import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
+import { setRole } from "@/utils/session";
+import type { AddHirePageType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
-export default function DocumentsForm() {
+export default function DocumentsForm({ data }: { data: AddHirePageType }) {
   const router = useRouter();
   const trpc = useTRPC();
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
   const formValue = useHireFormStore((state) => state.formValue);
+  const setFormValue = useHireFormStore((state) => state.setFormValue);
   const prevPage = useHireFormStore((s) => s.prevPage);
-
+  const clearPage = useHireFormStore((s) => s.clearPage);
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<DocumentSchema>({
     resolver: zodResolver(documentSchema),
@@ -41,6 +45,7 @@ export default function DocumentsForm() {
       // referCode: formValue.referCode ?? "RBMHORJ00000",
     },
   });
+  console.log("GetValue", getValues());
 
   const onSubmit = async (data: DocumentSchema) => {
     const mergedData = { ...formValue, ...data };
@@ -58,6 +63,8 @@ export default function DocumentsForm() {
     }));
     mutate(finalData, {
       onSuccess: (data) => {
+        setRole("hire");
+        clearPage();
         Swal.fire({
           title: data.message,
           icon: "success",
@@ -89,13 +96,10 @@ export default function DocumentsForm() {
       name: "idProof",
       placeholder: "Id Proof",
       component: "select",
-      options: [
-        { label: "Aadhar Card", value: "Aadhar Card" },
-        { label: "Pan Card", value: "Pan Card" },
-        { label: "Voter Id Card", value: "Voter Id Card" },
-        { label: "Driving License", value: "Driving License" },
-        { label: "Others", value: "Others" },
-      ],
+      options: data.getDocuments.map((item) => ({
+        label: item.name,
+        value: item.name,
+      })),
       error: errors.idProof?.message,
     },
     {
@@ -112,7 +116,7 @@ export default function DocumentsForm() {
       label: "Cover Letter",
       name: "coverLetter",
       placeholder: "",
-      component: "textarea",
+      component: "input",
       required: false,
       error: errors.coverLetter?.message,
     },
@@ -156,8 +160,20 @@ export default function DocumentsForm() {
         </div>
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
-            onClick={prevPage}
-            type="submit"
+            onClick={async () => {
+              const currentData = getValues();
+              const files = await uploadToCloudinary(
+                [currentData?.idProofPhoto, currentData?.resumePhoto],
+                "hire",
+              );
+              setFormValue("idProof", formValue.idProof ?? "");
+              setFormValue("idProofPhoto", files[0] ?? "");
+              setFormValue("coverLetter", formValue.coverLetter ?? "");
+              setFormValue("resumePhoto", files[1] ?? "");
+              setFormValue("aboutYourself", formValue.aboutYourself ?? "");
+              prevPage();
+            }}
+            type="button"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             PREVIOUS

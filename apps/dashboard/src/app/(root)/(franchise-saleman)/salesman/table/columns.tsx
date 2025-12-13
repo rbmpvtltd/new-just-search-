@@ -1,11 +1,11 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { useTableStore } from "../store";
-import { EditBanner } from "../form/edit.form";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
+import { EditEntiry } from "../form/edit.form";
+import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {
   const select = useTableStore((state) => state.select);
@@ -22,7 +22,7 @@ function SelectCell({ id }: { id: number }) {
 }
 
 function ActionCell({ id }: { id: number }) {
-  return <EditBanner id={id} />;
+  return <EditEntiry id={id} />;
 }
 
 function SelectHeader({ ids }: { ids: number[] }) {
@@ -58,7 +58,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type ListerArray = OutputTrpcType["adminUsersRouter"]["list"]["data"];
+type ListerArray = OutputTrpcType["adminSalemanRouter"]["list"]["data"];
 type Lister = UnwrapArray<ListerArray>;
 
 export const columns: ColumnDef<Lister>[] = [
@@ -83,44 +83,24 @@ export const columns: ColumnDef<Lister>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "franchiseId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Display Name" />
+      <DataTableColumnHeader column={column} title="Franchise ID" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.displayName || "No Name"}
+        {row.original.franchiseId || "No Name"}
       </div>
     ),
   },
   {
-    accessorKey: "phoneNumber",
+    accessorKey: "referCode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone Number" />
+      <DataTableColumnHeader column={column} title="Refer Code" />
     ),
-    cell: ({ row }) => <div>{row.original.phoneNumber}</div>,
+    cell: ({ row }) => <div>{row.original.referCode}</div>,
   },
-  {
-    accessorKey: "email",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
-    ),
-    cell: ({ row }) => <div>{row.original.email}</div>,
-  },
-  {
-    accessorKey: "role",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Role" />
-    ),
-    cell: ({ row }) => <div>{row.original.role}</div>,
-  },
-  {
-    accessorKey: "googleId",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Google Id" />
-    ),
-    cell: ({ row }) => <div>{row.original.googleId}</div>,
-  },
+
   {
     accessorKey: "created_at",
     header: ({ column }) => (
@@ -133,7 +113,7 @@ export const columns: ColumnDef<Lister>[] = [
   {
     id: "action",
     header: () => <div className="text-center">Action</div>,
-    cell: ({ row }) => <ActionCell id={row.original.id} />,
+    cell: ({ row }) => <ActionCell id={row.original.franchiseId} />,
     enableSorting: false,
     enableHiding: false,
   },

@@ -49,7 +49,6 @@ export const profiles = pgTable("profiles", {
     .notNull()
     .references(() => cities.id),
   // website: varchar("website", { length: 255 }), TODO: Ask About this Akki sir
-  area: varchar("area", { length: 100 }),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),
 });
@@ -58,7 +57,7 @@ export const profileInsertSchema = createInsertSchema(profiles).extend({
   maritalStatus: z.enum(MaritalStatus),
 });
 
-export const userUpdateSchema = createUpdateSchema(profiles).extend({
+export const profileUpdateSchema = createUpdateSchema(profiles).extend({
   maritalStatus: z.enum(MaritalStatus),
 });
 
@@ -96,6 +95,7 @@ export const feedbacks = pgTable("feedbacks", {
 export const feedbackInsertSchema = createInsertSchema(feedbacks, {
   feedbackType: z.array(z.string()).min(1, "Please select at least one option"),
 }).omit({ userId: true });
+
 // 4. franchises
 export const franchises = pgTable("franchises", {
   id: serial("id").primaryKey(),
@@ -104,26 +104,27 @@ export const franchises = pgTable("franchises", {
     .references(() => users.id),
   referPrifixed: varchar("refer_prifixed", { length: 255 }).notNull(),
   gstNo: varchar("gst_no", { length: 50 }).unique(),
-  status: boolean("status").notNull().default(true),
   employeeLimit: integer("employee_limit").notNull().default(0),
+  lastAssignCode: integer("last_assign_code").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+export const franchiseInsertSchema = createInsertSchema(franchises);
+export const franchiseUpdateSchema = createUpdateSchema(franchises);
+
 
 // 5. salesmen
 export const salesmen = pgTable("salesmen", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
   franchiseId: integer("franchise_id")
     .notNull()
     .references(() => franchises.id, { onDelete: "cascade" }),
   referCode: varchar("refer_code", { length: 255 }).notNull().unique(),
-  status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const salesmenInsertSchema = createInsertSchema(salesmen);
 
 export const notification = pgTable("notification", {
   id: serial("id").primaryKey(),

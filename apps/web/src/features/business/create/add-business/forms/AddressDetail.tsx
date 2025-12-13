@@ -106,7 +106,6 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     },
     {
       control,
-
       label: "Area",
       name: "area",
       placeholder: "Area",

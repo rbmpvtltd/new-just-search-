@@ -10,19 +10,17 @@ import {
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
-import type { FormReferenceDataType, UserBusinessListingType } from "..";
-import { Label } from "@/components/ui/label";
+import type { UserBusinessListingType } from "..";
 
 type BusinessDetailSchema = z.infer<typeof businessDetailSchema>;
 export default function BusinessDetail({
   businessListing,
-  formReferenceData,
 }: {
   businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
@@ -35,13 +33,15 @@ export default function BusinessDetail({
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
     defaultValues: {
-      photo: businessListing?.photo,
-      name: businessListing?.name,
-      categoryId: businessListing?.category.id,
-      subcategoryId: businessListing?.subcategory?.map((item) => item.id),
-      specialities: businessListing?.specialities ?? "",
-      homeDelivery: businessListing?.homeDelivery ?? "",
-      description: businessListing?.description ?? "",
+      photo: businessListing?.business?.photo,
+      name: businessListing?.business?.name,
+      categoryId: businessListing?.category?.categoryId,
+      subcategoryId: businessListing?.subcategories.map(
+        (item) => item.subcategoryId,
+      ),
+      specialities: businessListing?.business?.specialities ?? "",
+      homeDelivery: businessListing?.business?.homeDelivery ?? "",
+      description: businessListing?.business?.description ?? "",
       image1: businessListing?.businessPhotos[0]?.photo ?? "",
       image2: businessListing?.businessPhotos[1]?.photo ?? "",
       image3: businessListing?.businessPhotos[2]?.photo ?? "",
@@ -50,14 +50,6 @@ export default function BusinessDetail({
     },
   });
 
-  const categories = formReferenceData?.getBusinessCategories.map(
-    (item: any) => {
-      return {
-        label: item.title,
-        value: item.id,
-      };
-    },
-  );
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
   const { data: subCategories, isLoading } = useQuery(
     trpc.businessrouter.getSubCategories.queryOptions({
@@ -90,8 +82,10 @@ export default function BusinessDetail({
       component: "select",
       disabled: true,
       options:
-        categories?.map((item) => ({ label: item.label, value: item.value })) ??
-        [],
+        businessListing?.getBusinessCategories?.map((item) => ({
+          label: item.title,
+          value: item.id,
+        })) ?? [],
       error: errors.categoryId?.message,
     },
     {
@@ -185,6 +179,7 @@ export default function BusinessDetail({
       label: "",
       name: "image5",
       component: "image",
+      className: "align-center",
       required: false,
       error: "",
     },
@@ -245,7 +240,7 @@ export default function BusinessDetail({
               Shop Images
               {/* <span className="text-red-500 ">*</span> */}
             </Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mt-3 justify-items-center">
               {formFields2.map((field) => (
                 <FormField labelHidden key={field.name} {...field} />
               ))}

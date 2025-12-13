@@ -1,16 +1,16 @@
 "use client";
 
-import {
-  InstantSearch,
-  SearchBox,
-  Hits,
-  RefinementList,
-  Configure,
-  ClearRefinements,
-  Pagination,
-} from "react-instantsearch";
 import { algoliaClient } from "@repo/algolia";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  ClearRefinements,
+  Configure,
+  Hits,
+  InstantSearch,
+  Pagination,
+  RefinementList,
+  SearchBox,
+} from "react-instantsearch";
 import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
 
 function Hit({ hit }: { hit: any }) {
@@ -38,7 +38,7 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
       },
       () => {
         console.log("Location permission denied");
-      }
+      },
     );
   }, []);
 
@@ -57,7 +57,7 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
         />
 
         <button
-        type="button"
+          type="button"
           onClick={() => setShowFilters(!showFilters)}
           className="lg:hidden w-full mb-4 px-4 py-2 bg-primary text-white rounded-lg font-semibold"
         >
@@ -89,7 +89,8 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
               <h3 className="font-bold text-xl lg:text-2xl">Filters</h3>
               <ClearRefinements
                 classNames={{
-                  button: "text-xs lg:text-sm px-2 py-1 border rounded bg-primary text-white",
+                  button:
+                    "text-xs lg:text-sm px-2 py-1 border rounded bg-primary text-white",
                 }}
               />
             </div>
@@ -106,9 +107,12 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
-                  searchBox: "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
                 }}
               />
             </div>
@@ -117,21 +121,25 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
               <h4 className="font-bold mb-2 text-sm lg:text-base">Rating</h4>
               <RefinementList
                 attribute="rating"
-                limit={2}                
+                limit={2}
                 searchablePlaceholder="Search Rating"
                 showMore={true}
                 classNames={{
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
                 }}
               />
             </div>
 
             <div className="mb-6">
-              <h4 className="font-bold mb-2 text-sm lg:text-base">Subcategories</h4>
+              <h4 className="font-bold mb-2 text-sm lg:text-base">
+                Subcategories
+              </h4>
               <RefinementList
                 attribute="subcategories"
                 limit={2}
@@ -142,9 +150,12 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
-                  searchBox: "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
                 }}
               />
             </div>

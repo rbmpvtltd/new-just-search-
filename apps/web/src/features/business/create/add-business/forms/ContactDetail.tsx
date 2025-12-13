@@ -89,6 +89,11 @@ export default function ContactDetail() {
     // },
   ];
 
+  const storeFormValue = () => {
+    useBusinessFormStore.setState((state) => ({
+      formValue: { ...state.formValue },
+    }));
+  };
   const onSubmit = (data: ContactDetailSchema) => {
     const finalData = { ...formValue, ...data };
     useBusinessFormStore.setState((state) => ({
@@ -150,11 +155,15 @@ export default function ContactDetail() {
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
             type="submit"
-            onClick={prevPage}
+            onClick={() => {
+              storeFormValue();
+              prevPage();
+            }}
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             PREVIOUS
           </Button>
+
           <Button
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"

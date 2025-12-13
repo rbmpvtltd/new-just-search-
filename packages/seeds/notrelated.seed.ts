@@ -1,11 +1,17 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { occupation } from "@repo/db/dist/schema/not-related.schema";
+import {
+  highestQualification,
+  languages,
+  occupation,
+  salutation,
+} from "@repo/db/dist/schema/not-related.schema";
 import { sql as dbsql, eq } from "drizzle-orm";
 import {
   banners,
   categories,
   cities,
+  documents,
   states,
   subcategories,
 } from "../db/src/schema/not-related.schema";
@@ -22,6 +28,10 @@ export const notRelated = async () => {
   await seedCategories();
   await seedSubcategories();
   await seedOccupation();
+  await seedDocuments();
+  await seedHighestQualification();
+  await seedSalutation();
+  await seedLanguages();
 };
 
 export const clearAllTablesNotRelated = async () => {
@@ -32,7 +42,12 @@ export const clearAllTablesNotRelated = async () => {
   await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE occupation RESTART IDENTITY CASCADE;`);
-
+  await db.execute(`TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE TABLE highest_qualification RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(`TRUNCATE TABLE salutation RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE languages RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
 
@@ -242,4 +257,145 @@ export const seedOccupation = async () => {
     })),
   );
   console.log("occupation migrated successfully!");
+};
+
+export const seedDocuments = async () => {
+  const rows = [
+    "Aadhar Card",
+    "Pan Card",
+    "Voter Id Card",
+    "Driving License",
+    "Others",
+  ];
+  await db.insert(documents).values(
+    rows.map((item) => ({
+      name: item,
+    })),
+  );
+  console.log("documents migrated successfully!");
+};
+
+export const seedHighestQualification = async () => {
+  const rows = [
+    "B.E / B.Tech",
+    "M.E / M.Tech",
+    "M.S Engineering",
+    "M.Eng (Hons)",
+    "B.Eng (Hons)",
+    "Engineering Diploma",
+    "AE",
+    "AET",
+    "B.Plan",
+    "B.Arch",
+    "B.Tech L.L.B.",
+    "B.L.L.B.",
+    "CSE",
+    "IT",
+    "M.Plan",
+    "M.Arch",
+    "M.Tech L.L.B.",
+    "M.L.L.B.",
+    "B.A",
+    "B.A (Hons)",
+    "M.A",
+    "M.A (Hons)",
+    "M.Phil",
+    "B.Sc",
+    "B.Sc (Hons)",
+    "M.Sc",
+    "M.Sc (Hons)",
+    "M.Lib.I.Sc",
+    "M.Lib.Sc",
+    "B.Lib.I.Sc",
+    "B.Lib.Sc",
+    "B.Com",
+    "M.Com",
+    "B.Com (Hons)",
+    "M.Com (Hons)",
+    "CA / CPA",
+    "CFA",
+    "CS",
+    "BBM",
+    "BCM",
+    "BBA",
+    "MBA",
+    "MBA (Finance)",
+    "Executive MBA",
+    "PGDM",
+    "PGDBM",
+    "PGDCA",
+    "CPT",
+    "CIA",
+    "ICWA",
+    "MFC",
+    "MFM",
+    "BFIA",
+    "BBS",
+    "BIBF",
+    "BIT",
+    "BCA",
+    "B.Sc IT",
+    "B.Sc Computer Science",
+    "PGDCA",
+    "ADCA",
+    "DCA",
+    "DOEACC",
+    "NIIT",
+    "J.J.T.I",
+    "D. Pharma",
+    "B. Pharma",
+    "M. Pharma",
+    "LL.B",
+    "LL.M",
+    "Diploma",
+    "Monograph",
+    "Doctorate",
+    "Associate",
+    "High School",
+    "Less than High School",
+    "Diploma in Trade School",
+    "Uneducated",
+    "5th Pass",
+    "8th Pass",
+    "10th Pass",
+    "10+2 Pass",
+  ];
+
+  await db.insert(highestQualification).values(
+    rows.map((item) => ({
+      name: item,
+    })),
+  );
+  console.log("highestQualification migrated successfully!");
+};
+
+export const seedSalutation = async () => {
+  const rows = ["Mr.", "Ms.", "Mrs."];
+  await db.insert(salutation).values(
+    rows.map((item) => ({
+      name: item,
+    })),
+  );
+  console.log("salutation migrated successfully!");
+};
+
+export const seedLanguages = async () => {
+  const rows = [
+    "Hindi",
+    "English",
+    "Punjabi",
+    "Gujarati",
+    "Bengali",
+    "Malayalam",
+    "Kannada",
+    "Tamil",
+    "Other",
+  ];
+
+  await db.insert(languages).values(
+    rows.map((item) => ({
+      name: item,
+    })),
+  );
+  console.log("languages migrated successfully!");
 };
