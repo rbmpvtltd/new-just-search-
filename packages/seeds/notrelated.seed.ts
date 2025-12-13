@@ -1,5 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
+import { occupation } from "@repo/db/dist/schema/not-related.schema";
 import { sql as dbsql, eq } from "drizzle-orm";
 import {
   banners,
@@ -20,6 +21,7 @@ export const notRelated = async () => {
   await bannerSeed();
   await seedCategories();
   await seedSubcategories();
+  await seedOccupation();
 };
 
 export const clearAllTablesNotRelated = async () => {
@@ -29,6 +31,7 @@ export const clearAllTablesNotRelated = async () => {
   await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE occupation RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };
@@ -213,4 +216,30 @@ export const seedSubcategories = async () => {
   );
 
   console.log("Subcategories migrated successfully!");
+};
+
+export const seedOccupation = async () => {
+  const rows = [
+    "Employed",
+    "Unemployed",
+    "Farmer",
+    "Media",
+    "Business Man",
+    "Sports",
+    "Armed forces",
+    "Government Service",
+    "CA",
+    "Doctor",
+    "Lawyer",
+    "Retired",
+    "Student",
+    "Clerk",
+    "Others",
+  ];
+  await db.insert(occupation).values(
+    rows.map((item) => ({
+      name: item,
+    })),
+  );
+  console.log("occupation migrated successfully!");
 };

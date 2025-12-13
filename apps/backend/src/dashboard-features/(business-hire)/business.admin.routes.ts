@@ -11,7 +11,6 @@ import {
 } from "@repo/db/dist/schema/business.schema";
 import {
   categories,
-  categoryUpdateSchema,
   cities,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";

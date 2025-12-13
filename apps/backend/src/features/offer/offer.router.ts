@@ -313,7 +313,7 @@ export const offerrouter = router({
         id: z.number(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       // return { success: true};
       const allSeletedPhoto = await db.query.offerPhotos.findMany({
         where: (offerPhotos, { eq }) => eq(offerPhotos.offerId, input.id),

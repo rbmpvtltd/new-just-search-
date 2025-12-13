@@ -1,5 +1,5 @@
 {
-  "id": "a6ed3d71-9c47-488d-9574-c4f091248e9d",
+  "id": "3c0ba3bd-9c1a-4c2a-806b-51c164a0714d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -50,6 +50,13 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         },
         "created_at": {
           "name": "created_at",
@@ -1854,6 +1861,45 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.occupation": {
+      "name": "occupation",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.states": {
       "name": "states",
       "schema": "",
@@ -3606,7 +3652,7 @@
         },
         "occupation": {
           "name": "occupation",
-          "type": "varchar(100)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },

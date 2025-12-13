@@ -1,6 +1,6 @@
 {
-  "id": "a46e8689-4bc3-46ca-81c6-d59b3ce88b5c",
-  "prevId": "3c0ba3bd-9c1a-4c2a-806b-51c164a0714d",
+  "id": "589ccf1c-d748-4ba5-aabc-233dc8a0b3bc",
+  "prevId": "a46e8689-4bc3-46ca-81c6-d59b3ce88b5c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2536,26 +2536,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "subtitle": {
-          "name": "subtitle",
+        "identifier": {
+          "name": "identifier",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "plan_type": {
-          "name": "plan_type",
-          "type": "integer",
+        "role": {
+          "name": "role",
+          "type": "user_role",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'guest'"
         },
         "price": {
           "name": "price",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "prev_price": {
-          "name": "prev_price",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -2566,12 +2561,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "post_limit": {
-          "name": "post_limit",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "product_limit": {
           "name": "product_limit",
           "type": "integer",
@@ -2580,12 +2569,6 @@
         },
         "offer_limit": {
           "name": "offer_limit",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "post_duration": {
-          "name": "post_duration",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -2632,8 +2615,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.transactions": {
-      "name": "transactions",
+    "public.user_current_plan": {
+      "name": "user_current_plan",
       "schema": "",
       "columns": {
         "id": {
@@ -2642,15 +2625,15 @@
           "primaryKey": true,
           "notNull": true
         },
-        "amount": {
-          "name": "amount",
-          "type": "numeric",
+        "plan_id": {
+          "name": "plan_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "transactions_no": {
-          "name": "transactions_no",
-          "type": "varchar(255)",
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -2670,7 +2653,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_current_plan_plan_id_plans_id_fk": {
+          "name": "user_current_plan_plan_id_plans_id_fk",
+          "tableFrom": "user_current_plan",
+          "tableTo": "plans",
+          "columnsFrom": [
+            "plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "user_current_plan_user_id_users_id_fk": {
+          "name": "user_current_plan_user_id_users_id_fk",
+          "tableFrom": "user_current_plan",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -2693,21 +2703,21 @@
           "primaryKey": false,
           "notNull": true
         },
+        "plans_id": {
+          "name": "plans_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "subscription_number": {
           "name": "subscription_number",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "transaction_id": {
-          "name": "transaction_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "plans_id": {
-          "name": "plans_id",
-          "type": "integer",
+        "transaction_number": {
+          "name": "transaction_number",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
@@ -2716,6 +2726,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         },
         "expiry_date": {
           "name": "expiry_date",
@@ -2753,19 +2769,6 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "user_subscriptions_transaction_id_transactions_id_fk": {
-          "name": "user_subscriptions_transaction_id_transactions_id_fk",
-          "tableFrom": "user_subscriptions",
-          "tableTo": "transactions",
-          "columnsFrom": [
-            "transaction_id"
           ],
           "columnsTo": [
             "id"

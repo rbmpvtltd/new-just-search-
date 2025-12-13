@@ -1,10 +1,10 @@
 import type { usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
-import type { profileInsertSchema } from "@repo/db/dist/schema/user.schema";
 import type z from "zod";
 import { create } from "zustand";
+import type { adminAddProfileInsertSchema } from "../../create/add-user/forms/ProfileForm";
 
 type UserInsertSchema = z.infer<typeof usersInsertSchema>;
-type ProfileSchema = z.infer<typeof profileInsertSchema>;
+type ProfileSchema = z.infer<typeof adminAddProfileInsertSchema>;
 export type CombinedForm = ProfileSchema & UserInsertSchema;
 
 type UserFormProps = {
@@ -22,7 +22,7 @@ type UserFormProps = {
 // Combined initial value
 const initialFormValue: CombinedForm = {
   //user
-  userId: NaN,
+  // userId: NaN,
   password: "",
   role: "visiter",
   googleId: "",
@@ -33,7 +33,7 @@ const initialFormValue: CombinedForm = {
   //profile
   profileImage: "",
   maritalStatus: "Married",
-  dob: "",
+  dob: null,
   area: "",
   pincode: "",
   state: 0,
@@ -41,7 +41,7 @@ const initialFormValue: CombinedForm = {
   firstName: "",
   address: "",
   lastName: "",
-  occupation: "",
+  occupation: null,
   salutation: "",
 };
 

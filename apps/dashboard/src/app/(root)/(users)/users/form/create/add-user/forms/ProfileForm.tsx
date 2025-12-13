@@ -1,12 +1,12 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { profileInsertSchema } from "@repo/db/dist/schema/user.schema";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
+import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -19,34 +19,34 @@ import { getQueryClient } from "@/trpc/query-client";
 import type { SetOpen } from "../../../add.form";
 import { useUserFormStore } from "../../../shared/store/useCreateHireStore";
 
-const adminProfileInsertSchema = profileInsertSchema.extend({
-  userId: z.number(),
+export const adminAddProfileInsertSchema = profileInsertSchema.omit({
+  userId: true,
 });
-type ProfileSchema = z.infer<typeof adminProfileInsertSchema>;
+type ProfileSchema = z.infer<typeof adminAddProfileInsertSchema>;
 export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
-  const router = useRouter();
   const trpc = useTRPC();
-  const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
+  const { mutate } = useMutation(
+    trpc.adminUsersRouter.create.mutationOptions(),
+  );
   const formValue = useUserFormStore((state) => state.formValue);
   const prevPage = useUserFormStore((state) => state.prevPage);
   const clearPage = useUserFormStore((state) => state.clearPage);
-  const setFormValue = useUserFormStore((state) => state.setFormValue);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ProfileSchema>({
-    resolver: zodResolver(adminProfileInsertSchema),
+    resolver: zodResolver(adminAddProfileInsertSchema),
     defaultValues: {
+      address: "",
       profileImage: "",
       firstName: "",
-      dob: "",
+      dob: null,
       lastName: "",
-      email: "",
       salutation: "",
-      occupation: "",
-      maritalStatus: "",
+      occupation: null,
+      maritalStatus: "Married",
       area: "",
       pincode: "",
       city: NaN,
@@ -54,9 +54,18 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
     },
   });
 
+  const selectedState = useWatch({ control, name: "state" });
+
+  const { data } = useSuspenseQuery(trpc.adminUsersRouter.add.queryOptions());
+  const { data: cities, isLoading } = useQuery(
+    trpc.adminUtilsRouter.getCities.queryOptions({
+      state: selectedState,
+    }),
+  );
   const onSubmit = async (data: ProfileSchema) => {
     const file = await uploadToCloudinary([data.profileImage], "profile");
     const finalData = {
+      ...formValue,
       ...data,
       profileImage: file[0] ?? "",
     };
@@ -69,7 +78,7 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
           });
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.adminHireRouter.list.queryKey(),
+            queryKey: trpc.adminUsersRouter.list.queryKey(),
           });
           setOpen(false);
         }
@@ -89,55 +98,122 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
   const formFields: FormFieldProps<ProfileSchema>[] = [
     {
       control,
-      label: "Id Proof",
-      name: "idProof",
-      placeholder: "Id Proof",
+      name: "profileImage",
+      label: "Photo",
+      component: "image",
+      required: false,
+      className: "mx-auto w-[90%]",
+    },
+    {
+      control,
+      name: "salutation",
+      label: "Title",
       component: "select",
       options: [
-        { label: "Aadhar Card", value: "Aadhar Card" },
-        { label: "Pan Card", value: "Pan Card" },
-        { label: "Voter Id Card", value: "Voter Id Card" },
-        { label: "Driving License", value: "Driving License" },
-        { label: "Others", value: "Others" },
+        { label: "Mr", value: "Mr" },
+        { label: "Ms", value: "Ms" },
+        { label: "Mrs", value: "Mrs" },
       ],
-      error: errors.idProof?.message,
+      placeholder: "Select Title",
+      error: errors.salutation?.message,
     },
     {
       control,
-      type: "",
-      label: "Id Proof Photo",
-      name: "idProofPhoto",
-      placeholder: "Upload your photo",
-      component: "image",
-      error: errors.idProofPhoto?.message,
-    },
-    {
-      control,
-      label: "Cover Letter",
-      name: "coverLetter",
-      placeholder: "",
-      component: "textarea",
+      name: "firstName",
+      label: "First Name",
+      placeholder: "Enter your First Name",
+      component: "input",
       required: false,
-      error: errors.coverLetter?.message,
+      className: "w-[90%] bg-base-200",
+      error: errors.firstName?.message,
     },
     {
       control,
-      type: "",
-      label: "Resume/CV",
-      name: "resumePhoto",
-      placeholder: "",
-      component: "image",
+      name: "lastName",
+      label: "Last Name",
+      placeholder: "Enter your Last Name",
+      component: "input",
       required: false,
-      error: errors.resumePhoto?.message,
+      className: "w-[90%] bg-base-200",
+      error: errors.lastName?.message,
     },
     {
       control,
-      label: "Describe About Yourself",
-      name: "aboutYourself",
-      placeholder: "",
-      component: "textarea",
+      // type: "date",
+      label: "Date of Birth",
+      name: "dob",
+      placeholder: "Date of Birth",
       required: false,
-      error: errors.aboutYourself?.message,
+      component: "calendar",
+      error: "",
+    },
+    {
+      control,
+      label: "Occupation",
+      name: "occupation",
+      placeholder: "Occupation",
+      required: false,
+      component: "select",
+      options: data.occupation.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
+    },
+    {
+      control,
+      label: "Marital Status",
+      name: "maritalStatus",
+      placeholder: "Marital Status",
+      required: false,
+      component: "select",
+      options: Object.values(MaritalStatus).map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      }),
+    },
+    {
+      control,
+      label: "Area",
+      name: "area",
+      placeholder: "Area",
+      required: false,
+      component: "input",
+      error: "",
+    },
+    {
+      control,
+      label: "Pincode",
+      name: "pincode",
+      placeholder: "Pincode",
+      required: false,
+      component: "input",
+      error: "",
+    },
+    {
+      control,
+      label: "State",
+      name: "state",
+      placeholder: "State",
+      required: false,
+      component: "select",
+      options:
+        data.states.map((state) => ({ label: state.name, value: state.id })) ??
+        [],
+      error: "",
+    },
+    {
+      control,
+      label: "City",
+      name: "city",
+      placeholder: "City",
+      required: false,
+      component: "select",
+      loading: isLoading,
+      options:
+        cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
+      error: "",
     },
   ];
   return (
@@ -152,7 +228,7 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
               Documents
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {formFields.map((field, index) => (
+              {formFields.map((field) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>

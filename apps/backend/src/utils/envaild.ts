@@ -19,6 +19,8 @@ const env = cleanEnv(process.env, {
   BCRYPT_SALT: num({
     default: 10,
   }),
+  RAZOR_PAY_KEY_ID: str(),
+  RAZOR_PAY_KEY_SECRET: str(),
 });
 
 export default env;

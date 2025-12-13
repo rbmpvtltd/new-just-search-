@@ -71,4 +71,15 @@ export const SendByRole = {
 } as const;
 export const sendByRoleEnum = pgEnum("send_by_role", SendByRole);
 
+// Plan
+
+export const PlanPeriod = {
+  daily: "daily",
+  weekly: "weekly",
+  monthly: "monthly",
+  yearly: "yearly",
+} as const;
+
+export const planPeriodEnum = pgEnum("plan_period", PlanPeriod);
+
 // export const languagesEnum = pgEnum("hire_languages", Languages);

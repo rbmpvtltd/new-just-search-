@@ -60,6 +60,13 @@ const subcategoryInsertSchema = createInsertSchema(subcategories).omit({
 const subcategoryupdateschema = createUpdateSchema(subcategories);
 const subcategoryselectschema = createSelectSchema(subcategories);
 
+const occupation = pgTable("occupation", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 const banners = pgTable("banners", {
   id: serial("id").primaryKey(),
   mysqlId: integer("mysql_id"),
@@ -82,6 +89,7 @@ export {
   categories,
   subcategories,
   banners,
+  occupation,
   bannerInsertSchema,
   bannerSelectSchema,
   bannerUpdateSchema,

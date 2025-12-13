@@ -1,6 +1,7 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db, schemas } from "@repo/db";
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { occupation } from "@repo/db/dist/schema/not-related.schema";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
@@ -104,6 +105,21 @@ export const seedUsers = async () => {
     if (row.marital_status === "others") {
       row.marital_status = "Others";
     }
+
+    let occupationId = null;
+    if (row.occupation) {
+      console.log("we get occupation", row.occupation);
+      const occupationRow = row.occupation as string;
+      const occupationData = await db.query.occupation.findFirst({
+        where: (occupation, { eq, or, ilike }) =>
+          or(
+            eq(occupation.name, occupationRow.toLowerCase()),
+            ilike(occupation.name, `%${occupationRow.toLowerCase()}%`),
+          ),
+      });
+      occupationId = occupationData?.id;
+      console.log("occupationId is", occupationId);
+    }
     // 5 Insert profile
     const profileData = {
       userId: insertedUser!.id,
@@ -114,7 +130,7 @@ export const seedUsers = async () => {
       address: row.address ?? "null",
       dob: row.dob ?? null,
       maritalStatus: row.marital_status ?? null,
-      occupation: row.occupation ?? null,
+      occupation: occupationId,
       state: row.state ?? 19,
       website: row.website ?? null,
       area: row.area ?? null,

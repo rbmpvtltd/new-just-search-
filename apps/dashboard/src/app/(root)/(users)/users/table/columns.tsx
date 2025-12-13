@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
-import { EditBanner } from "../form/edit.form";
+import { EditEntiry } from "../form/edit.form";
 import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {
@@ -22,7 +22,7 @@ function SelectCell({ id }: { id: number }) {
 }
 
 function ActionCell({ id }: { id: number }) {
-  return <EditBanner id={id} />;
+  return <EditEntiry id={id} />;
 }
 
 function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {

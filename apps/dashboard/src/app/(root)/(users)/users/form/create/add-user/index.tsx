@@ -6,36 +6,25 @@ import ProfileForm from "./forms/ProfileForm";
 import UserForm from "./forms/UserForm";
 
 export type AddAdminUserType = OutputTrpcType["adminHireRouter"]["add"];
-export function AddUserPage({
-  data,
-  setOpen,
-}: {
-  data: AddAdminUserType;
-  setOpen: SetOpen;
-}) {
+export function AddUserPage({ setOpen }: { setOpen: SetOpen }) {
   const page = useUserFormStore((state) => state.page);
-  const steps = [
-    "Personal Details",
-    "Education",
-    "Preferred Position",
-    "Documents",
-  ];
+  const steps = ["User Form", "Profile Form"];
 
   const renderForm = () => {
     switch (page) {
       case 0:
-        return <UserForm data={data} />;
+        return <UserForm />;
       case 1:
         return <ProfileForm setOpen={setOpen} />;
       default:
-        return <UserForm data={data} />;
+        return <UserForm />;
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-4 relative">
       <div className="mb-6">
-        <div className="flex justify-between mb-2">
+        <div className="flex justify-around mb-2">
           {steps.map((label, index) => (
             <div
               key={label}
