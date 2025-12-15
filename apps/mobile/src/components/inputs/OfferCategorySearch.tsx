@@ -31,12 +31,14 @@ interface CategorySearchProps {
   onSelect: (category: string) => void;
   placeholder?: string;
   onBlur?: () => void; // Add onBlur prop
+  className?: string;
 }
 
 const OfferCategorySearch: React.FC<CategorySearchProps> = ({
   onSelect,
   placeholder,
   onBlur,
+  className
 }) => {
   const city = useCityStore((state) => state.city);
   const colorScheme = useColorScheme();
@@ -72,7 +74,7 @@ const OfferCategorySearch: React.FC<CategorySearchProps> = ({
   };
 
   return (
-    <View className="w-[65%] mx-2 relative">
+    <View className={`mx-2 relative ${className}`}>
       <TextInput
         placeholder={placeholder}
         value={query}

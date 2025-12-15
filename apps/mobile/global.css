@@ -5,7 +5,7 @@
 :root {
 	--base-100: #fff;
 	--base-200: #f5f5f5;
-	--base-300: oklch(92% 0 0);
+	--base-300: #dadada;
 	--base-content: oklch(20% 0 0);
 	--primary: #ff7821;
 	--primary-content: #fee8eb;
@@ -27,7 +27,7 @@
 .dark {
 	--base-100: #000;
 	--base-200: #202838;
-	--base-300: oklch(92% 0 0);
+	--base-300: #252b33;
 	--base-content: oklch(20% 0 0);
 	--primary: #ba4e0c;
 	--primary-content: #fee8eb;

@@ -61,37 +61,97 @@ export default function OfferSearchForm({ bgColor }: { bgColor?: string }) {
   };
 
   return (
-    <View
-      className={`w-[100%] bg-base-200 h-auto py-1 px-4 gap-6 rounded-md ${bgColor}`}
+   <View
+      className={`w-full bg-base-200 rounded-2xl shadow-lg overflow-hidden ${bgColor}`}
+      style={{
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+        elevation: 8,
+      }}
     >
-      <CitySearch onSelect={handleCitySelect} placeholder="Enter a Location" />
-      {errors.location && <ErrorText title={errors.location.message} />}
-      <View className="flex-row items-start justify-center w-[100%]">
-        <OfferCategorySearch
-          onSelect={handleCategorySelect}
-          placeholder="Search Best Offers"
-        />
-        <View className="w-[30%]">
-          <PrimaryButton
-            isLoading={isSubmitting}
-            title="Search"
-            loadingText="Sear..."
+
+      {/* Form Content */}
+      <View className="px-3 py-2 gap-2">
+        {/* Location Input */}
+        <View>
+         
+          <View
+            className="rounded-xl overflow-hidden"
             style={{
-              backgroundColor: isSubmitting
-                ? Colors[colorScheme ?? "light"]["error-content"]
-                : Colors[colorScheme ?? "light"].primary,
-              width: "100%",
-              padding: 12,
-              borderRadius: 8,
-              marginLeft: "auto",
-              marginRight: "auto",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
             }}
-            disabled={isSubmitting}
-            onPress={onSearch}
-          />
+          >
+            <CitySearch onSelect={handleCitySelect} placeholder="Enter your location" />
+          </View>
+          {errors.location && (
+            <View className="mt-1 ml-1">
+              <ErrorText title={errors.location.message} />
+            </View>
+          )}
+        </View>
+
+        {/* Category Input with Search Button */}
+        <View>
+          
+          <View className="flex-row items-start gap-2">
+            <View
+              className="flex-1 rounded-xl overflow-hidden"
+              style={{
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.05,
+                shadowRadius: 4,
+                elevation: 2,
+              }}
+            >
+              <OfferCategorySearch
+                onSelect={handleCategorySelect}
+                placeholder="What service do you need?"
+                className="flex-1 mx-0"
+              />
+            </View>
+            
+            <View
+              className="rounded-xl overflow-hidden"
+              style={{
+                shadowColor: Colors[colorScheme ?? "light"].primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 4,
+              }}
+            >
+              <PrimaryButton
+                isLoading={isSubmitting}
+                title="Search"
+                loadingText="Searching..."
+                style={{
+                  backgroundColor: isSubmitting
+                    ? Colors[colorScheme ?? "light"]["error-content"]
+                    : Colors[colorScheme ?? "light"].primary,
+                  paddingHorizontal: 24,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  minWidth: 100,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                disabled={isSubmitting || !location || !category}
+                onPress={onSearch}
+              />
+            </View>
+          </View>
+          {errors.category && (
+            <View className="mt-1 ml-1">
+              <ErrorText title={errors.category.message} />
+            </View>
+          )}
         </View>
       </View>
     </View>

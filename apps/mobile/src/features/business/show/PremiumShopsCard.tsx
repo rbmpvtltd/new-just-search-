@@ -231,7 +231,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
           >
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="chatbox-ellipses" color={"white"} />
-              <Text className="text-secondary font-semibold text-sm">
+              <Text className="text-white font-semibold text-sm">
                 Chat Now
               </Text>
             </View>
@@ -243,7 +243,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
           <Pressable onPress={() => dialPhone(shop?.phoneNumber ?? "")}>
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="call" color={"white"} />
-              <Text className="text-secondary font-semibold text-sm">
+              <Text className="text-white font-semibold text-sm">
                 Contact Now
               </Text>
             </View>
@@ -255,7 +255,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
           <Pressable onPress={() => openInGoogleMaps(String(latitude), String(longitude))}>
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="location" color={"white"} />
-              <Text className="text-secondary font-semibold text-sm">
+              <Text className="text-white font-semibold text-sm">
                 Get Direction
               </Text>
             </View>

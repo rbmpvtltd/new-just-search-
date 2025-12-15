@@ -1,4 +1,3 @@
-import type React from "react";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -86,7 +85,7 @@ const CitySearch: React.FC<CitySearchProps> = ({
     <View className="w-full relative">
       {/* input + icon wrapper */}
 
-      <View className="relative">
+      <View className="relative w-full  ">
         <TextInput
           placeholder={placeholder}
           value={query}
@@ -95,8 +94,8 @@ const CitySearch: React.FC<CitySearchProps> = ({
           className="bg-base-100 h-[50px] rounded-t-lg rounded-b-sm text-[16px] text-secondary"
         />
 
-        <View className="absolute right-3 top-4 -translate-y-1/4">
-          <LocationAutoDetect onResult={handleAutoDetect} iconOnly />
+        <View className="absolute right-3 top-4">
+          <LocationAutoDetect className=" m-0 p-0" onResult={handleAutoDetect} iconOnly />
         </View>
       </View>
 
