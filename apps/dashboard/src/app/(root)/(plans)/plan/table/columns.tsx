@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
-import { EditEntiry } from "../form/edit.form";
+import { EditEntiry } from "../../plan/form/edit.form";
 import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {
@@ -77,7 +77,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type ListerArray = OutputTrpcType["adminUsersRouter"]["list"]["data"];
+type ListerArray = OutputTrpcType["adminPlanRouter"]["list"]["data"];
 type Lister = UnwrapArray<ListerArray>;
 
 export const columns: ColumnDef<Lister>[] = [
@@ -104,34 +104,55 @@ export const columns: ColumnDef<Lister>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Display Name" />
+      <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.displayName || "No Name"}
+        {row.original.name || "No Name"}
       </div>
     ),
   },
   {
-    accessorKey: "phoneNumber",
+    accessorKey: "amount",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone Number" />
+      <DataTableColumnHeader column={column} title="Price" />
     ),
-    cell: ({ row }) => <div>{row.original.phoneNumber}</div>,
+    cell: ({ row }) => <div>{row.original.amount}</div>,
   },
   {
-    accessorKey: "email",
+    accessorKey: "period",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
+      <DataTableColumnHeader column={column} title="Period" />
     ),
-    cell: ({ row }) => <div>{row.original.email}</div>,
+    cell: ({ row }) => <div>{row.original.period}</div>,
   },
   {
-    accessorKey: "role",
+    accessorKey: "features",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Role" />
+      <DataTableColumnHeader column={column} title="Max Offer Per Day" />
     ),
-    cell: ({ row }) => <div>{row.original.role}</div>,
+    cell: ({ row }) => <div>{row.original.features?.maxOfferPerDay}</div>,
+  },
+  {
+    accessorKey: "features",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Offer Duration" />
+    ),
+    cell: ({ row }) => <div>{row.original.features?.offerDuration}</div>,
+  },
+  {
+    accessorKey: "features",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Offer Limit" />
+    ),
+    cell: ({ row }) => <div>{row.original.features?.offerLimit}</div>,
+  },
+  {
+    accessorKey: "features",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Product Limit" />
+    ),
+    cell: ({ row }) => <div>{row.original.features?.productLimit}</div>,
   },
   {
     accessorKey: "status",
@@ -139,7 +160,10 @@ export const columns: ColumnDef<Lister>[] = [
       <DataTableColumnHeader column={column} title="Active" />
     ),
     cell: ({ row }) => (
-      <ActiveCell id={row.original.id} isActive={row.original.status} />
+      <ActiveCell
+        id={row.original.id}
+        isActive={row.original.status ?? false}
+      />
     ),
   },
   {

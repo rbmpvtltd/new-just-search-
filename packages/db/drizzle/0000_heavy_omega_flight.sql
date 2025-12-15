@@ -382,7 +382,7 @@ CREATE TABLE "recent_views_offers" (
 CREATE TABLE "plan_attributes" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"plan_id" integer NOT NULL,
-	"name" json NOT NULL,
+	"name" varchar NOT NULL,
 	"is_available" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
@@ -396,11 +396,9 @@ CREATE TABLE "plans" (
 	"interval" integer NOT NULL,
 	"role" "user_role" DEFAULT 'guest' NOT NULL,
 	"amount" integer,
+	"currency" varchar(50) DEFAULT 'INR',
 	"plan_color" varchar(50) NOT NULL,
-	"product_limit" integer,
-	"offer_limit" integer,
-	"offer_duration" integer,
-	"max_offer_per_day" integer,
+	"features" jsonb NOT NULL,
 	"status" boolean DEFAULT true,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
@@ -410,6 +408,7 @@ CREATE TABLE "user_current_plan" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"plan_id" integer NOT NULL,
 	"user_id" integer NOT NULL,
+	"features" jsonb NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -424,6 +423,7 @@ CREATE TABLE "user_subscriptions" (
 	"amount" integer NOT NULL,
 	"currency" varchar,
 	"expiry_date" integer NOT NULL,
+	"features" jsonb NOT NULL,
 	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),

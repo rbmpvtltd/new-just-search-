@@ -7,7 +7,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
 import {
   PlanPeriod,
@@ -69,6 +69,8 @@ export const planAttributes = pgTable("plan_attributes", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const planAttributesInsertSchema = createInsertSchema(planAttributes);
 
 // 3. transactions
 export const userCurrentPlan = pgTable("user_current_plan", {

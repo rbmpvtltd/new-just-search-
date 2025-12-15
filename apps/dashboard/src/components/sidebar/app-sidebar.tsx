@@ -61,6 +61,21 @@ const data = {
         },
       ],
     },
+    {
+      title: "Plans Master",
+      url: "#",
+      icon: BookOpen,
+      items: [
+        {
+          title: "Plans",
+          url: "/plan",
+        },
+        {
+          title: "Attributes",
+          url: "/attributes",
+        },
+      ],
+    },
   ],
 
   documents: [

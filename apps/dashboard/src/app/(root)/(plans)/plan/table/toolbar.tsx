@@ -6,11 +6,11 @@ import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-fi
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { DebouncedInput } from "@/components/ui/input-debounced";
+import { MuiltActiveButton } from "../../plan/form/active.form";
+import { AddNewEntiry } from "../../plan/form/add.form";
+import { MuiltDeleteButton } from "../../plan/form/delete.form";
+import { MuiltPopularButton } from "../../plan/form/popular.form";
 import { active } from "./data";
-import { MuiltDeleteButton } from "../form/delete.form";
-import { MuiltActiveButton } from "../form/active.form";
-import { MuiltPopularButton } from "../form/popular.form";
-import { AddNewEntiry } from "../form/add.form";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;

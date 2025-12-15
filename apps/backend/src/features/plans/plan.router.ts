@@ -1,7 +1,14 @@
+import { db } from "@repo/db";
 import { PlanPeriod } from "@repo/db/dist/enum/allEnum.enum";
-import { plansInsertSchema } from "@repo/db/dist/schema/plan.schema";
+import {
+  planAttributes,
+  plans,
+  plansInsertSchema,
+} from "@repo/db/dist/schema/plan.schema";
+import { eq, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import z from "zod";
-import { adminProcedure, router } from "@/utils/trpc";
+import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
 
 // import { razorpayInstance } from "./plan.service";
 
@@ -14,6 +21,37 @@ z.object({
   // period: z.enum(PlanPeriod),
 });
 export const planRouter = router({
+  list: protectedProcedure.query(async () => {
+    const data = await db
+      .select({
+        id: plans.id,
+        title: plans.name,
+        attribute: sql<{ name: string; isAvailable: boolean }[]>`
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'name', ${planAttributes.name},
+            'isAvailable', ${planAttributes.isAvailable}
+          )
+        ) FILTER (WHERE ${planAttributes.id} IS NOT NULL),
+        '[]'
+      )
+    `,
+        role: plans.role,
+        amount: plans.amount,
+        currency: plans.currency,
+        planColor: plans.planColor,
+        status: plans.status,
+        features: plans.features,
+        createdAt: plans.createdAt,
+        updatedAt: plans.updatedAt,
+      })
+      .from(plans)
+      .leftJoin(planAttributes, eq(plans.id, planAttributes.planId))
+      .groupBy(plans.id);
+
+    return data;
+  }),
   createPlan: adminProcedure
     .input(
       plansInsertSchema.extend({
@@ -54,17 +92,17 @@ export const planRouter = router({
       // });
       // return;
     }),
-  createSusbription: adminProcedure
-    .input(z.object({ planId: z.string(), userId: z.number() }))
-    .mutation(async ({ input }) => {
-      const { planId } = input;
-      // TODO: uncommit this It was commited to avoid temp error
-      // const response = await razorpayInstance.subscriptions.create({
-      //   plan_id: planId,
-      //   customer_notify: 1,
-      //   total_count: 1,
-      //   // customer_id: userId,
-      // });
-      // console.log(response);
-    }),
+  // createSusbription: adminProcedure
+  //   .input(z.object(planId: z.string(), userId: z.number() ))
+  //   .mutation(async (input ) => {
+  //     const { planId } = input;
+  //     // TODO: uncommit this It was commited to avoid temp error
+  //     // const response = await razorpayInstance.subscriptions.create({
+  //     //   plan_id: planId,
+  //     //   customer_notify: 1,
+  //     //   total_count: 1,
+  //     //   // customer_id: userId,
+  //     // });
+  //     // console.log(response);
+  //   }),
 });

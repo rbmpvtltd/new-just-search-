@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765616684518,
-      "tag": "0000_rare_boom_boom",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1765634571411,
-      "tag": "0002_handy_toad",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1765635999530,
-      "tag": "0003_sloppy_maddog",
+      "when": 1765776271640,
+      "tag": "0000_heavy_omega_flight",
       "breakpoints": true
     }
   ]

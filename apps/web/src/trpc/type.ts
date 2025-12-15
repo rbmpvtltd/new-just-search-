@@ -1,5 +1,7 @@
 import type { AppRouter } from "@repo/types";
-import type { inferRouterOutputs , inferRouterInputs } from "@trpc/server";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
-export type OutputTrpcType = inferRouterOutputs<AppRouter>
-export type InputTrpcType = inferRouterInputs<AppRouter>
+export type OutputTrpcType = inferRouterOutputs<AppRouter>;
+export type InputTrpcType = inferRouterInputs<AppRouter>;
+
+export type UnwrapArray<T> = T extends (infer U)[] ? U : never;

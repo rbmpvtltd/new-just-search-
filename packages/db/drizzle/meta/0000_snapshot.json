@@ -1,5 +1,5 @@
 {
-  "id": "6519ff35-e02d-459d-a47e-8d1911d5e172",
+  "id": "55fcec1d-b373-43f9-8fc6-a3f0fb88f131",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -2628,7 +2628,7 @@
         },
         "name": {
           "name": "name",
-          "type": "json",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -2723,35 +2723,24 @@
           "primaryKey": false,
           "notNull": false
         },
+        "currency": {
+          "name": "currency",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'INR'"
+        },
         "plan_color": {
           "name": "plan_color",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
         },
-        "product_limit": {
-          "name": "product_limit",
-          "type": "integer",
+        "features": {
+          "name": "features",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
-        },
-        "offer_limit": {
-          "name": "offer_limit",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "offer_duration": {
-          "name": "offer_duration",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "max_offer_per_day": {
-          "name": "max_offer_per_day",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "status": {
           "name": "status",
@@ -2802,6 +2791,12 @@
         "user_id": {
           "name": "user_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "features": {
+          "name": "features",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
@@ -2910,6 +2905,12 @@
         "expiry_date": {
           "name": "expiry_date",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "features": {
+          "name": "features",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
