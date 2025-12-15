@@ -14,6 +14,7 @@ import { adminNotificationRouter } from "./dashboard-features/(users)/notificati
 import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
 import { adminAttributesRouter } from "./dashboard-features/plan/attibutes.admin.routes";
 import { adminPlanRouter } from "./dashboard-features/plan/plan.admin.routes";
+import { razorpayRouter } from "./dashboard-features/plan/razorpay.routes";
 import { adminUtilsRouter } from "./dashboard-features/utils/util.admin.routes";
 
 import { authRouter } from "./features/auth/auth.router";
@@ -31,7 +32,7 @@ import { utilsRouter } from "./features/routeUtils/utils.route";
 import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
-import { mergeRouters, router } from "./utils/trpc";
+import { mergeRouters, openProcedure, openRouter, router } from "./utils/trpc";
 
 const usersRouter = router({
   auth: authRouter,
@@ -69,6 +70,10 @@ const adminRouter = router({
   adminUtilsRouter,
   adminHelpAndSupportRouter,
   adminAttributesRouter,
+});
+
+export const openAppRouter = openRouter({
+  razorpay: razorpayRouter,
 });
 
 export const appRouter = mergeRouters(usersRouter, adminRouter);

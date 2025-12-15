@@ -9,13 +9,12 @@ import cors from "cors";
 import { eq } from "drizzle-orm";
 import express from "express";
 import jwt from "jsonwebtoken";
-import { appRouter } from "./route";
+import { appRouter, openAppRouter } from "./route";
 import { createContext } from "./utils/context";
 
 const app = express();
 
-app.get("/", (req, res) => {
-  console.log("hi21");
+app.get("/", (_, res) => {
   return res.send("hello");
 });
 app.use(
@@ -23,6 +22,17 @@ app.use(
   createExpressMiddleware({
     router: appRouter,
     createContext, // TODO: add rate limiter
+    middleware: cors({ origin: "*" }),
+    onError: (opts) => {
+      logger.error(opts.error.code);
+    },
+  }),
+);
+
+app.use(
+  "/api",
+  createExpressMiddleware({
+    router: openAppRouter,
     middleware: cors({ origin: "*" }),
     onError: (opts) => {
       logger.error(opts.error.code);

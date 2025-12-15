@@ -22,10 +22,13 @@ export const t = initTRPC.context<Context>().meta<ORPCMeta>().create({
   // },
 });
 
+export const tOpen = initTRPC.create();
+export const openRouter = tOpen.router;
 export const router = t.router;
 export const mergeRouters = t.mergeRouters;
 
 export const publicProcedure = t.procedure;
+export const openProcedure = tOpen.procedure;
 
 export const guestProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
@@ -106,7 +109,7 @@ export const businessProcedure = protectedProcedure.use(async (opts) => {
   throw new TRPCError({
     code: "UNAUTHORIZED",
     message: "please verify",
-    cause : 401
+    cause: 401,
   });
 });
 
