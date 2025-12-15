@@ -88,12 +88,12 @@ export const FormField = <T extends FieldValues>({
                   className={`h-[41px] ${className}`}
                   placeholder={placeholder}
                   onChange={(e) => {
-                    onChange(
-                      type === "number"
-                        ? Number(e.target.value)
-                        : e.target.value,
-                    );
-                    if (onChangeValue) onChangeValue(e.target.value);
+                    const value =
+                      type !== "number"
+                        ? e.target.value
+                        : parseInt(e.target.value, 10);
+                    onChange(value);
+                    if (onChangeValue) onChangeValue(String(value));
                   }}
                   onBlur={onBlur}
                   value={value}

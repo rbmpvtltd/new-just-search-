@@ -1,0 +1,1 @@
+ALTER TABLE "plans" ADD COLUMN "currency" varchar(50) DEFAULT 'INR';

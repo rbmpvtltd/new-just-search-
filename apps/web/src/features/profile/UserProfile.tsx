@@ -1,9 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-
-  userUpdateSchema,
-} from "@repo/db/dist/schema/user.schema";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -177,7 +173,6 @@ export default function UserProfile({ user }: { user: UserProfile }) {
   ];
   return (
     <div className="p-8 bg-muted/20 min-h-screen">
-      
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="shadow-xl mx-auto rounded-xl max-w-4xl bg-white"

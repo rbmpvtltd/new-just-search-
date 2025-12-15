@@ -1,6 +1,5 @@
-import { db } from "@repo/db";
-import { PlanPeriod, UserRole } from "@repo/db/dist/enum/allEnum.enum";
-import { plans, plansInsertSchema } from "@repo/db/dist/schema/plan.schema";
+import { PlanPeriod } from "@repo/db/dist/enum/allEnum.enum";
+import { plansInsertSchema } from "@repo/db/dist/schema/plan.schema";
 import z from "zod";
 import { adminProcedure, router } from "@/utils/trpc";
 

@@ -1,16 +1,29 @@
 import {
   boolean,
   integer,
-  json,
+  jsonb,
   pgTable,
   serial,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { planPeriodEnum, UserRole, userRoleEnum } from "@/enum/allEnum.enum";
+import z from "zod";
+import {
+  PlanPeriod,
+  planPeriodEnum,
+  UserRole,
+  userRoleEnum,
+} from "../enum/allEnum.enum";
 import { users } from "./auth.schema";
 
+export type PlanFeatures = {
+  productLimit: number;
+  offerLimit: number;
+  offerDuration: number;
+  maxOfferPerDay: number;
+  verifyBag: boolean;
+};
 // 1. Plans
 export const plans = pgTable("plans", {
   id: serial("id").primaryKey(),
@@ -20,17 +33,30 @@ export const plans = pgTable("plans", {
   interval: integer("interval").notNull(),
   role: userRoleEnum("role").default(UserRole.guest).notNull(),
   amount: integer("amount"),
+  currency: varchar("currency", { length: 50 }).default("INR"),
   planColor: varchar("plan_color", { length: 50 }).notNull(),
-  productLimit: integer("product_limit"),
-  offerLimit: integer("offer_limit"),
-  offerDuration: integer("offer_duration"),
-  maxOfferPerDay: integer("max_offer_per_day"),
+  features: jsonb("features").$type<PlanFeatures>().notNull(),
   status: boolean("status").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const plansInsertSchema = createInsertSchema(plans);
+export const dbPlansInsertSchema = createInsertSchema(plans).extend({
+  period: z.enum(PlanPeriod),
+  role: z.enum(UserRole),
+});
+export const plansInsertSchema = dbPlansInsertSchema
+  .omit({
+    identifier: true,
+    features: true,
+  })
+  .extend({
+    productLimit: z.number(),
+    offerLimit: z.number(),
+    offerDuration: z.number(),
+    maxOfferPerDay: z.number(),
+    verifyBag: z.boolean(),
+  });
 
 // 2. plane_attribute
 export const planAttributes = pgTable("plan_attributes", {
@@ -38,7 +64,7 @@ export const planAttributes = pgTable("plan_attributes", {
   planId: integer("plan_id")
     .notNull()
     .references(() => plans.id, { onDelete: "cascade" }),
-  name: json("name").$type<string[]>().notNull(),
+  name: varchar("name").notNull(),
   isAvailable: boolean("is_available").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -53,6 +79,7 @@ export const userCurrentPlan = pgTable("user_current_plan", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
+  features: jsonb("features").$type<PlanFeatures>().notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -74,6 +101,7 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   amount: integer("amount").notNull(),
   currency: varchar("currency"),
   expiryDate: integer("expiry_date").notNull(),
+  features: jsonb("features").$type<PlanFeatures>().notNull(),
   status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
