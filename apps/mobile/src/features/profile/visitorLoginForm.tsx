@@ -18,8 +18,6 @@ import {
 } from "@/schemas/loginSchema";
 import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
-import Input from "@/components/inputs/Input";
-import { Pressable } from "react-native-gesture-handler";
 
 GoogleSignin.configure({
   webClientId:

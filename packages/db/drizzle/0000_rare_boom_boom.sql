@@ -550,6 +550,7 @@ CREATE TABLE "profiles" (
 --> statement-breakpoint
 CREATE TABLE "salesmen" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
 	"franchise_id" integer NOT NULL,
 	"refer_code" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now(),
@@ -615,4 +616,5 @@ ALTER TABLE "notification" ADD CONSTRAINT "notification_category_id_categories_i
 ALTER TABLE "notification" ADD CONSTRAINT "notification_sub_category_id_subcategories_id_fk" FOREIGN KEY ("sub_category_id") REFERENCES "public"."subcategories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_franchise_id_franchises_id_fk" FOREIGN KEY ("franchise_id") REFERENCES "public"."franchises"("id") ON DELETE cascade ON UPDATE no action;

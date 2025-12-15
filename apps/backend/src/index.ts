@@ -15,6 +15,7 @@ import { createContext } from "./utils/context";
 const app = express();
 
 app.get("/", (req, res) => {
+  console.log("hi21");
   return res.send("hello");
 });
 app.use(

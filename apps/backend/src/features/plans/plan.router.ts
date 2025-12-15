@@ -11,7 +11,7 @@ z.object({
   currency: z.string().default("INR"),
   description: z.string(),
   interval: z.number(),
-  period: z.enum(PlanPeriod),
+  // period: z.enum(PlanPeriod),
 });
 export const planRouter = router({
   createPlan: adminProcedure
@@ -22,7 +22,7 @@ export const planRouter = router({
         currency: z.string().default("INR"),
         description: z.string(),
         interval: z.number(),
-        period: z.enum(PlanPeriod),
+        // period: z.enum(PlanPeriod),
       }),
     )
     .mutation(async ({ input }) => {

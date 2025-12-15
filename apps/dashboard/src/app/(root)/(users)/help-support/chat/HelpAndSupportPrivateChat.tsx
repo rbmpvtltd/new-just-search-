@@ -1,15 +1,16 @@
 "use client";
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { CldImage } from "next-cloudinary";
 import React, { useEffect, useState } from "react";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 type MessageListType =
-  | OutputTrpcType["helpAndSupportRouter"]["messageList"]
+  | OutputTrpcType["adminHelpAndSupportRouter"]["add"]
   | null;
 
 function HelpAndSupportPrivateChat({
@@ -19,9 +20,13 @@ function HelpAndSupportPrivateChat({
 }) {
   const trpc = useTRPC();
   const scrollRef = React.useRef<HTMLDivElement>(null);
-
-  const { data: messageList } = useQuery(
-    trpc.helpAndSupportRouter.messageList.queryOptions({
+  const { data: getUser } = useSuspenseQuery(
+    trpc.adminHelpAndSupportRouter.getUser.queryOptions({
+      chatTokenSessionId: chatTokenSessionId,
+    }),
+  );
+  const { data: messageList } = useSuspenseQuery(
+    trpc.adminHelpAndSupportRouter.add.queryOptions({
       chatTokenSessionId: chatTokenSessionId,
     }),
   );
@@ -29,12 +34,8 @@ function HelpAndSupportPrivateChat({
     messageList ?? [],
   );
 
-  // const lastMessageId = store?.length
-  //   ? (store?.[store.length - 1]?.id ?? null)
-  //   : null;
-
   const { data } = useSubscription(
-    trpc.helpAndSupportRouter.onMessage.subscriptionOptions({
+    trpc.adminHelpAndSupportRouter.onMessage.subscriptionOptions({
       chatTokenSessionId: chatTokenSessionId,
     }),
   );
@@ -45,12 +46,12 @@ function HelpAndSupportPrivateChat({
   }, [data]);
 
   const { mutate: markRead } = useMutation(
-    trpc.chat.markAsRead.mutationOptions(),
+    trpc.adminHelpAndSupportRouter.markAsRead.mutationOptions(),
   );
 
   useEffect(() => {
     const unread = store
-      ?.filter((msg) => msg.sendByRole !== "User" && !msg.isRead)
+      ?.filter((msg) => msg.sendByRole !== "Admin" && !msg.isRead)
       .map((msg) => msg.id);
 
     if (unread.length > 0) {
@@ -71,23 +72,31 @@ function HelpAndSupportPrivateChat({
     >
       <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg shadow-sm sticky top-0 left-0 right-0 ">
         <div className="border rounded-full overflow-hidden shadow ">
-          <CldImage
-            src={"Banner/cbycmehjeetyxbuxc6ie"}
-            width="40"
-            height="40"
-            alt="image"
-            className="rounded-full"
-          />
+          {getUser?.[0]?.profileImage ? (
+            <CldImage
+              src={getUser?.[0]?.profileImage as string}
+              width="40"
+              height="40"
+              alt="image"
+              className="rounded-full"
+            />
+          ) : (
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-medium text-lg ">
+              {getUser?.[0]?.displayName?.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
 
-        <h2 className="font-semibold text-gray-800 text-lg">Admin</h2>
+        <h2 className="font-semibold text-gray-800 text-lg">
+          {getUser?.[0]?.displayName as string}
+        </h2>
       </div>
       {store.map((msg) => (
         <div key={msg.id} className="flex flex-col gap-1">
           {msg.message && (
             <div
               className={`flex px-2 py-2 rounded-xl text-sm shadow-sm w-fit ${
-                msg.sendByRole === "User"
+                msg.sendByRole === "Admin"
                   ? "bg-blue-100 ml-auto"
                   : "bg-gray-100"
               }`}
@@ -113,7 +122,7 @@ function SendMessage({ chatTokenSessionId }: { chatTokenSessionId: number }) {
   const trpc = useTRPC();
   const [message, setMessage] = React.useState("");
   const { mutate, isPending } = useMutation(
-    trpc.helpAndSupportRouter.sendMessage.mutationOptions(),
+    trpc.adminHelpAndSupportRouter.sendMessage.mutationOptions(),
   );
 
   return (
@@ -152,7 +161,9 @@ export default function HelpAndSupportChat({
 }) {
   return (
     <div className="p-4 max-w-md mx-auto flex flex-col h-[90vh]">
-      <MemorizedPrivateChat chatTokenSessionId={chatTokenSessionId} />
+      <BoundaryWrapper>
+        <MemorizedPrivateChat chatTokenSessionId={chatTokenSessionId} />
+      </BoundaryWrapper>
       <MemorizedSendMessage chatTokenSessionId={chatTokenSessionId} />
     </div>
   );

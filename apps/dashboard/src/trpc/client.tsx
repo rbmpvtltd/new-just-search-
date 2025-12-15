@@ -3,7 +3,7 @@ import type { AppRouter } from "@repo/types"; // file no 1
 // ^-- to make sure we can mount the Provider from a server component
 // import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCClient, httpBatchLink, httpSubscriptionLink, splitLink } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
 import superjson from "superjson";
@@ -24,17 +24,46 @@ export function TRPCReactProvider(
   //       render if it suspends and there is no boundary
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
+    // createTRPCClient<AppRouter>({
+    //   links: [
+    //     httpBatchLink({
+    //       transformer: superjson,
+    //       url: getTrpcUrl(),
+    //       async headers() {
+    //         const token = await getToken();
+    //         return {
+    //           authorization: token ? `Bearer ${token.value}` : "",
+    //         };
+    //       },
+    //     }),
+    //   ],
+    // }),
     createTRPCClient<AppRouter>({
       links: [
-        httpBatchLink({
-          transformer: superjson,
-          url: getTrpcUrl(),
-          async headers() {
-            const token = await getToken();
-            return {
-              authorization: token ? `Bearer ${token.value}` : "",
-            };
-          },
+        splitLink({
+          condition: (op) => op.type === "subscription",
+          true: httpSubscriptionLink({
+            transformer: superjson,
+            url: getTrpcUrl(),
+            async connectionParams() {
+              const token = await getToken();
+              console.log("Client token", token);
+
+              return {
+                authorization: token ? `Bearer ${token.value}` : "",
+              };
+            },
+          }),
+          false: httpBatchLink({
+            transformer: superjson,
+            url: getTrpcUrl(),
+            async headers() {
+              const token = await getToken();
+              return {
+                authorization: token ? `Bearer ${token.value}` : "",
+              };
+            },
+          }),
         }),
       ],
     }),
