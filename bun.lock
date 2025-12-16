@@ -217,6 +217,7 @@
         "react-native-maps": "1.20.1",
         "react-native-pager-view": "6.9.1",
         "react-native-paper": "^5.14.5",
+        "react-native-purchases": "^9.6.10",
         "react-native-razorpay": "^2.3.0",
         "react-native-reanimated": "~4.1.1",
         "react-native-reanimated-carousel": "^4.0.2",
@@ -1864,6 +1865,12 @@
     "@repo/types": ["@repo/types@workspace:packages/types"],
 
     "@repo/typescript-config": ["@repo/typescript-config@workspace:packages/typescript-config"],
+
+    "@revenuecat/purchases-js": ["@revenuecat/purchases-js@1.20.0", "", {}, "sha512-1O10B1GLLKnqjnRVIWjX2Fnphy0lEJwaPqzqzaZGB1mSpbZhxeJmNtTpBDK2chMbsQxRePIiVOKzlSEKp29wJQ=="],
+
+    "@revenuecat/purchases-js-hybrid-mappings": ["@revenuecat/purchases-js-hybrid-mappings@17.23.0", "", { "dependencies": { "@revenuecat/purchases-js": "1.20.0" } }, "sha512-2dYhiRLXEQJ517GfPUzrjS7JOzNWtjZk1mYmJGX+d//7PDLH49lMw4y6sH1rxWUzNaoWJnNpx9PDPeE7U0vt0g=="],
+
+    "@revenuecat/purchases-typescript-internal": ["@revenuecat/purchases-typescript-internal@17.23.0", "", {}, "sha512-BraZIf7iiMqIQYDe47adM8Kji4ylaG68OO9MTNzkOTdYRPmBZUyhtFaWAD72gboIUVR4uVgBCjiC54IHwbhjNQ=="],
 
     "@rtsao/scc": ["@rtsao/scc@1.1.0", "", {}, "sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g=="],
 
@@ -3786,6 +3793,8 @@
     "react-native-paper": ["react-native-paper@5.14.5", "", { "dependencies": { "@callstack/react-theme-provider": "^3.0.9", "color": "^3.1.2", "use-latest-callback": "^0.2.3" }, "peerDependencies": { "react": "*", "react-native": "*", "react-native-safe-area-context": "*" } }, "sha512-eaIH5bUQjJ/mYm4AkI6caaiyc7BcHDwX6CqNDi6RIxfxfWxROsHpll1oBuwn/cFvknvA8uEAkqLk/vzVihI3AQ=="],
 
     "react-native-parsed-text": ["react-native-parsed-text@0.0.22", "", { "dependencies": { "prop-types": "^15.7.x" }, "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-hfD83RDXZf9Fvth3DowR7j65fMnlqM9PpxZBGWkzVcUTFtqe6/yPcIoIAgrJbKn6YmtzkivmhWE2MCE4JKBXrQ=="],
+
+    "react-native-purchases": ["react-native-purchases@9.6.10", "", { "dependencies": { "@revenuecat/purchases-js-hybrid-mappings": "17.23.0", "@revenuecat/purchases-typescript-internal": "17.23.0" }, "peerDependencies": { "react": ">= 16.6.3", "react-native": ">= 0.73.0", "react-native-web": "*" }, "optionalPeers": ["react-native-web"] }, "sha512-clQ/+qLwF1mil1W0rcqmLKHEWuzjvgSeCgJMttLeFTKEH914oka4+NVZbcQAL24RNAR63ohh6oH2PRNkTdLzPg=="],
 
     "react-native-razorpay": ["react-native-razorpay@2.3.1", "", { "peerDependencies": { "react": ">=16.8.0", "react-native": ">=0.66.0" } }, "sha512-aEod2YigiWx9Vik+2YRpTh9kNKK9KZbfhrRpk5tU8z8ZPDdLt57rRsqd7lVuDybqqO6nLY6ughPjMN+FPyX8Ag=="],
 

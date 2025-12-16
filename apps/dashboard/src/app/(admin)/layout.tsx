@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { adminSidebarData } from "./sidebar-data";
 export default async function DashboardLayout({
   children,
 }: {
@@ -22,7 +23,7 @@ export default async function DashboardLayout({
           } as React.CSSProperties
         }
       >
-        <AppSidebar variant="inset" />
+        <AppSidebar data={adminSidebarData} />
         <SidebarInset>
           <SiteHeader />
           <div className="flex flex-1 bg-[#f7f7f7f7] flex-col">{children}</div>

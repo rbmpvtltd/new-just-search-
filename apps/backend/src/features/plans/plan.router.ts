@@ -1,16 +1,12 @@
 import { db } from "@repo/db";
-import { PlanPeriod } from "@repo/db/dist/enum/allEnum.enum";
 import {
   planAttributes,
   plans,
-  plansInsertSchema,
+  planUserActive,
 } from "@repo/db/dist/schema/plan.schema";
 import { eq, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import z from "zod";
-import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
-
-// import { razorpayInstance } from "./plan.service";
+import { protectedProcedure, router } from "@/utils/trpc";
 
 z.object({
   name: z.string(),
@@ -21,8 +17,8 @@ z.object({
   // period: z.enum(PlanPeriod),
 });
 export const planRouter = router({
-  list: protectedProcedure.query(async () => {
-    const data = await db
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const allPlan = await db
       .select({
         id: plans.id,
         title: plans.name,
@@ -52,59 +48,32 @@ export const planRouter = router({
       .leftJoin(planAttributes, eq(plans.id, planAttributes.planId))
       .groupBy(plans.id);
 
-    return data;
+    const freePlan = allPlan.filter((item) => item.role === "all")[0];
+    if (!freePlan) {
+      throw new Error("Free plan not found");
+    }
+
+    const isActivePlanExist = (
+      await db
+        .select()
+        .from(planUserActive)
+        .where(eq(planUserActive.userId, ctx.userId))
+        .limit(1)
+    )[0];
+
+    const activePlan = isActivePlanExist
+      ? allPlan.find((item) => item.id === isActivePlanExist.planId)
+      : freePlan;
+    if (!activePlan) {
+      throw new Error("Active plan not found");
+    }
+
+    return {
+      plans: allPlan,
+      activePlan: {
+        planid: activePlan.id,
+        isactive: activePlan.id !== freePlan.id,
+      },
+    };
   }),
-  createPlan: adminProcedure
-    .input(
-      plansInsertSchema.extend({
-        name: z.string(),
-        amount: z.number(),
-        currency: z.string().default("INR"),
-        description: z.string(),
-        interval: z.number(),
-        // period: z.enum(PlanPeriod),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      // TODO: uncommit this It was commited to avoid temp error
-      // const response = await razorpayInstance.plans.create({
-      //   period: input.period,
-      //   interval: input.interval,
-      //   item: {
-      //     name: input.name,
-      //     amount: input.amount,
-      //     currency: input.currency,
-      //     description: input.description,
-      //   },
-      // });
-      // console.log(response);
-      // const dbData = plansInsertSchema
-      //   .omit({
-      //     identifier: true,
-      //   })
-      //   .extend({
-      //     period: z.enum(PlanPeriod),
-      //     role: z.enum(UserRole),
-      //   })
-      //   .parse(input);
-      //
-      // await db.insert(plans).values({
-      //   ...dbData,
-      //   identifier: response.id,
-      // });
-      // return;
-    }),
-  // createSusbription: adminProcedure
-  //   .input(z.object(planId: z.string(), userId: z.number() ))
-  //   .mutation(async (input ) => {
-  //     const { planId } = input;
-  //     // TODO: uncommit this It was commited to avoid temp error
-  //     // const response = await razorpayInstance.subscriptions.create({
-  //     //   plan_id: planId,
-  //     //   customer_notify: 1,
-  //     //   total_count: 1,
-  //     //   // customer_id: userId,
-  //     // });
-  //     // console.log(response);
-  //   }),
 });

@@ -6,6 +6,7 @@ import {
   serial,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import {
@@ -24,6 +25,8 @@ export const users = pgTable("users", {
   password: text("password"),
   role: userRoleEnum("role").default(UserRole.guest).notNull(),
   googleId: varchar("google_id", { length: 255 }),
+  appleId: varchar("apple_id", { length: 255 }),
+  revanueCatId: uuid("revanue_cat_id").default(sql`gen_random_uuid()`),
   status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),

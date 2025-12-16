@@ -19,6 +19,7 @@ globalThis.TransformStream = globalThis.TransformStream || TransformStream;
 
 export type OutputTrpcType = inferRouterOutputs<AppRouter>;
 export type InputTrpcType = inferRouterInputs<AppRouter>;
+export type UnwrapArray<T> = T extends (infer U)[] ? U : never;
 
 export const queryClient = new QueryClient();
 export const trpcClient = createTRPCClient<AppRouter>({

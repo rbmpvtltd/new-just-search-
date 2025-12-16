@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { setToken } from "@/utils/session";
+import { setRole, setToken } from "@/utils/session";
 
 const formSchema = z.object({
   username: z.string(),
@@ -62,7 +62,7 @@ export function LoginForm({
     mutate(data, {
       onSuccess: (data) => {
         setToken(data?.session || "");
-        // setRole(data?.role || "", false);
+        setRole(data?.role || "", false);
         router.push("/");
       },
     });
