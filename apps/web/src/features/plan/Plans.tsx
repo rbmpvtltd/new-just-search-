@@ -6,24 +6,22 @@ type PlanArray = OutputTrpcType["planRouter"]["list"];
 type Plan = UnwrapArray<PlanArray>;
 
 export default function PricingCard({ plan }: { plan: Plan }) {
-  console.log(plan);
-
   return (
-    <div className="bg-base-200 rounded-3xl shadow-lg m-4 overflow-hidden w-full max-w-sm">
+    <div className=" rounded-3xl shadow-lg m-4 overflow-hidden w-full max-w-sm">
       <div className={`{py-5 rounded-t-3xl text-center relative} `}>
         <h2 className="text-2xl font-bold text-secondary">{plan?.title}</h2>
 
         {plan.status && (
-          <span className="absolute top-2 right-4 bg-accent rounded-full px-3 py-1 text-xs font-bold text-secondary">
+          <span className="absolute top-2 right-4 bg-accent rounded-full px-3 py-1 text-xs font-bold ">
             ACTIVE
           </span>
         )}
       </div>
 
       {/* Price */}
-      <div className="py-5 text-center border-b border-base-300">
+      <div className="py-5 text-center border-b">
         <p className="text-3xl font-bold text-secondary">
-          ₹{plan.amount} {plan?.amount && plan?.amount > 0 && "+ GST / year"}
+          ₹{plan.amount} {plan?.amount > 0 && "+ GST / year"}
         </p>
       </div>
 
@@ -46,11 +44,14 @@ export default function PricingCard({ plan }: { plan: Plan }) {
 
       <div className="px-5 pb-5">
         <PaymentButton
+          disabled={!!plan.status}
           identifier={plan.identifier}
           className={`w-full rounded-full py-3 font-semibold text-lg text-secondary transition
-             ${plan.planColor}`}
+            ${plan.status ? "cursor-not-allowed" : "hover:opacity-90"}`}
           style={{
-            backgroundColor: plan.planColor ?? "#E5E7EB",
+            backgroundColor: plan.status
+              ? "#E5E7EB"
+              : (plan.planColor ?? "#CBD5E1"),
           }}
           title={plan.status ? "Current Plan" : `Get ${plan.title}`}
         />

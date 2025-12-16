@@ -45,7 +45,7 @@ export default function EditOffer({
       discountPercent: myOffer?.offer?.discountPercent,
       finalPrice: myOffer?.offer?.finalPrice,
       offerDescription: myOffer?.offer?.offerDescription,
-      photo: myOffer?.offer.offerPhotos[0]?.photo || "",
+      mainImage: myOffer?.offer.offerPhotos[0]?.photo || "",
       image2: myOffer?.offer.offerPhotos[1]?.photo || "",
       image3: myOffer?.offer.offerPhotos[2]?.photo || "",
       image4: myOffer?.offer.offerPhotos[3]?.photo || "",
@@ -133,9 +133,9 @@ export default function EditOffer({
   const formFields2: FormFieldProps<EditOfferSchema>[] = [
     {
       control,
-      name: "photo",
+      name: "mainImage",
       component: "image",
-      error: errors.photo?.message,
+      error: errors.mainImage?.message,
     },
     {
       control,
@@ -173,13 +173,13 @@ export default function EditOffer({
   ];
   const onSubmit = async (data: any) => {
     const file = await uploadToCloudinary(
-      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "offers",
     );
     mutate(
       {
         ...data,
-        photo: file[0],
+        mainImage: file[0],
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",

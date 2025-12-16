@@ -104,11 +104,11 @@ function AddForm({ setOpen }: AddForm) {
       options: [
         {
           value: 1,
-          label: "FREE",
+          label: "PRO",
         },
         {
           value: 2,
-          label: "PRO",
+          label: "FREE",
         },
         {
           value: 3,

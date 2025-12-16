@@ -43,7 +43,7 @@ export default function AddOffer({
       discountPercent: 0,
       finalPrice: 0,
       offerDescription: "",
-      photo: "",
+      mainImage: "",
       image2: "",
       image3: "",
       image4: "",
@@ -52,7 +52,7 @@ export default function AddOffer({
       subcategoryId: [],
     },
   });
-
+  console.log("Errror", errors);
   const formFields: FormFieldProps<AddOfferSchema>[] = [
     {
       control,
@@ -140,10 +140,10 @@ export default function AddOffer({
   const formFields2: FormFieldProps<AddOfferSchema>[] = [
     {
       control,
-      name: "photo",
+      name: "mainImage",
       component: "image",
       required: false,
-      error: errors.photo?.message,
+      error: errors.mainImage?.message,
     },
     {
       control,
@@ -181,13 +181,13 @@ export default function AddOffer({
   ];
   const onSubmit = async (data: any) => {
     const file = await uploadToCloudinary(
-      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "offers",
     );
     mutate(
       {
         ...data,
-        photo: file[0],
+        mainImage: file[0],
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",
@@ -204,7 +204,7 @@ export default function AddOffer({
           queryClient.invalidateQueries({
             queryKey: trpc.offerrouter.showOffer.queryKey(),
           });
-          // router.push("/");
+          // router2.push("/");
         },
       },
     );

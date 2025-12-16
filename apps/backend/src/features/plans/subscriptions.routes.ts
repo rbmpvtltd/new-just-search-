@@ -26,13 +26,6 @@ export const subscriptionRouter = router({
   create: protectedProcedure
     .input(z.object({ identifier: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const response = await razorpayInstance.subscriptions.create({
-        plan_id: input.identifier,
-        customer_notify: 1,
-        total_count: 1,
-        // customer_id: userId,
-      });
-      console.log(response);
       const data = await db.query.plans.findFirst({
         where: eq(plans.identifier, input.identifier),
       });
@@ -42,6 +35,14 @@ export const subscriptionRouter = router({
           message: "Plan not found",
         });
       }
+      const response = await razorpayInstance.subscriptions.create({
+        plan_id: data.identifier,
+        customer_notify: 1,
+        total_count: 1,
+        // customer_id: userId,
+      });
+      console.log(response);
+
       await db.insert(planUserSubscriptions).values({
         amount: data?.amount || 0,
         subscriptionNumber: response.id,
@@ -52,7 +53,6 @@ export const subscriptionRouter = router({
         currency: data?.currency || "INR",
         features: data?.features,
         expiryDate: response.expire_by || 0,
-
         status: false,
       });
       return { success: true, response: response };
@@ -104,18 +104,26 @@ export const subscriptionRouter = router({
           status: true,
           transactionNumber: razorpay_payment_id,
         })
-        .where(
-          eq(
-            planUserSubscriptions.subscriptionNumber,
-            input.razorpay_subscription_id,
-          ),
-        );
+        .where(eq(planUserSubscriptions.id, subscription.id));
 
-      await db.insert(planUserActive).values({
-        userId: ctx.userId,
-        planId: subscription.plansId,
-        features: subscription.features,
+      const activePlan = await db.query.planUserActive.findFirst({
+        where: eq(planUserActive.userId, ctx.userId),
       });
+      if (!activePlan) {
+        await db.insert(planUserActive).values({
+          userId: ctx.userId,
+          planId: subscription.plansId,
+          features: subscription.features,
+        });
+      } else {
+        await db
+          .update(planUserActive)
+          .set({
+            planId: subscription.plansId,
+            features: subscription.features,
+          })
+          .where(eq(planUserActive.userId, ctx.userId));
+      }
 
       return { success: true, message: "Subscription verified successfully" };
     }),

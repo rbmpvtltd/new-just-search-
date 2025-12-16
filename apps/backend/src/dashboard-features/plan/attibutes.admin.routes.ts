@@ -124,16 +124,14 @@ export const adminAttributesRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      const allSeletedPhoto = await db
-        .select({
-          photo: banners.photo,
-        })
-        .from(banners)
-        .where(inArray(banners.id, input.ids));
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => item.photo),
-      );
-      await db.delete(banners).where(inArray(banners.id, input.ids));
+      // const allSeletedPhoto = await db
+      //   .select()
+      //   .from(planAttributes)
+      //   .where(inArray(planAttributes.id, input.ids));
+
+      await db
+        .delete(planAttributes)
+        .where(inArray(planAttributes.id, input.ids));
       return { success: true };
     }),
   multiactive: adminProcedure

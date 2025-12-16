@@ -22,7 +22,7 @@ export function MuiltDeleteButton() {
   const emptySelect = useTableStore((state) => state.emptySelect);
 
   const { mutate: deleteMany, isPending } = useMutation(
-    trpc.adminCategoryRouter.multidelete.mutationOptions(),
+    trpc.adminAttributesRouter.multidelete.mutationOptions(),
   );
 
   const isActiveExist = select.length >= 1;
@@ -58,7 +58,7 @@ export function MuiltDeleteButton() {
                     if (data.success) {
                       const queryClient = getQueryClient();
                       queryClient.invalidateQueries({
-                        queryKey: trpc.adminCategoryRouter.list.queryKey(),
+                        queryKey: trpc.adminAttributesRouter.list.queryKey(),
                       });
                       setTimeout(() => {
                         emptySelect();

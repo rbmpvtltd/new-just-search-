@@ -8,7 +8,7 @@ import { sql } from "./mysqldb.seed";
 dotenv.config();
 
 export const planSeed = async () => {
-  // await clearAllTablesBusiness();
+  await clearAllTablesBusiness();
   await addplans();
   // await addtransactions();
   // await addUserSubscriptions();
@@ -24,26 +24,50 @@ export const clearAllTablesBusiness = async () => {
 
 // 1. Plans
 const addplans = async () => {
-  await db.insert(plans).values({
-    name: "PRO",
-    identifier: "plan_Rrrr2lJOWGFSLn",
-    period: "yearly",
-    interval: 1,
-    role: "business",
-    amount: 999,
-    currency: "INR",
-    planColor: "#000000",
-    features: {
-      verifyBag: true,
-      offerLimit: 50,
-      productLimit: 20,
-      offerDuration: 10,
-      maxOfferPerDay: 7,
+  const plansData = [
+    {
+      name: "PRO",
+      identifier: "plan_Rrrr2lJOWGFSLn",
+      period: "yearly" as const,
+      interval: 1,
+      role: "business" as const,
+      amount: 999,
+      currency: "INR",
+      planColor: "#ffbd59",
+      features: {
+        verifyBag: true,
+        offerLimit: 50,
+        productLimit: 20,
+        offerDuration: 10,
+        maxOfferPerDay: 7,
+      },
+      status: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
-    status: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
+    {
+      name: "FREE",
+      identifier: "",
+      period: "yearly" as const,
+      interval: 1,
+      role: "visiter" as const,
+      amount: 0,
+      currency: "INR",
+      planColor: "#ff3131",
+      features: {
+        verifyBag: true,
+        offerLimit: 0,
+        productLimit: 0,
+        offerDuration: 0,
+        maxOfferPerDay: 0,
+      },
+      status: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
+
+  await db.insert(plans).values(plansData);
 };
 
 // 3. transactions

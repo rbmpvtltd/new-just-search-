@@ -46,6 +46,7 @@ export const planRouter = router({
         identifier: plans.identifier,
         createdAt: plans.createdAt,
         updatedAt: plans.updatedAt,
+        
       })
       .from(plans)
       .leftJoin(planAttributes, eq(plans.id, planAttributes.planId))

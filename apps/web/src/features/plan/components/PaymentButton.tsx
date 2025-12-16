@@ -12,11 +12,13 @@ interface RazorpayPaymentResponse {
 }
 
 const PaymentButton = ({
+  disabled,
   className,
   style,
   title,
   identifier,
 }: {
+  disabled: boolean;
   className: string;
   style: object;
   title: string;
@@ -97,6 +99,7 @@ const PaymentButton = ({
 
   return (
     <button
+      disabled={disabled}
       type="button"
       onClick={createSubscription}
       className={className}

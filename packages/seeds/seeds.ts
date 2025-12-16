@@ -26,7 +26,7 @@ export const dummyImageUrl = "dummyImageUrl";
     // await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();
-    // await planSeed();
+    await planSeed();
     // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
