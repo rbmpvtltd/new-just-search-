@@ -60,7 +60,7 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
 
   return (
     <>
-      <div className="h-50 relative w-50 border rounded overflow-hidden">
+      <div className="h-50 relative w-50 overflow-hidden">
         <input
           className="absolute opacity-0 inset-0 cursor-pointer z-10"
           type="file"
@@ -80,7 +80,7 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
           <CldImage
             width="100"
             height="100"
-            className="border rounded p-4 w-full h-full"
+            className="p-4 w-full h-full"
             src={value}
             alt="Cloudinary image not loaded"
             onError={(error) =>

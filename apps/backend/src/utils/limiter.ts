@@ -1,10 +1,10 @@
 import { rateLimit } from "express-rate-limit";
 import { type RedisReply, RedisStore } from "rate-limit-redis";
-import { maxGlobalLimit } from "@/constant";
+import { maxGlobalLimit, minitesGlobalLimit } from "@/constant";
 import { redis } from "@/lib/redis";
 
 export const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: minitesGlobalLimit * 60 * 1000,
   max: maxGlobalLimit,
   standardHeaders: true,
   legacyHeaders: false,

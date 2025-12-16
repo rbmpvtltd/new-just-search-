@@ -1,27 +1,22 @@
+import { db } from "@repo/db";
+import { plans } from "@repo/db/dist/schema/plan.schema";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
-import { db } from "@repo/db";
 import { users } from "../db/src/schema/auth.schema";
-import {
-  planAttributes,
-  plans1,
-  transactions,
-  userSubscriptions,
-} from "../db/src/schema/plan.schema";
 import { sql } from "./mysqldb.seed";
 
 dotenv.config();
 
 export const planSeed = async () => {
-  await clearAllTablesBusiness();
+  // await clearAllTablesBusiness();
   await addplans();
-  await addtransactions();
-  await addUserSubscriptions();
+  // await addtransactions();
+  // await addUserSubscriptions();
 };
 
 export const clearAllTablesBusiness = async () => {
-  await db.execute(`TRUNCATE  TABLE transactions RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE plan_attributes RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE  TABLE transactions RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE plan_attributes RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE plans RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
@@ -29,37 +24,26 @@ export const clearAllTablesBusiness = async () => {
 
 // 1. Plans
 const addplans = async () => {
-  const [plans]: any[] = await sql.execute("SELECT * FROM plans");
-  for (const row of plans) {
-    await db.insert(plans1).values({
-      id: row.id,
-      title: row.title,
-      subtitle: row.subtitle,
-      planType: row.plan_type,
-      price: row.price,
-      prevPrice: row.prev_price,
-      priceColor: row.price_color,
-      postLimit: row.post_limit,
-      productLimit: row.product_limit,
-      offerLimit: row.offer_limit,
-      postDuration: row.post_duration,
-      offerDuration: row.offer_duration,
-      maxOfferPerDay: row.max_offer_per_day,
-      status: Boolean(row.status),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-
-    // 2. PlanAttribute
-    await db.insert(planAttributes).values({
-      planId: row.id,
-      name: [row.attribute],
-      isAvailable: Boolean(row.isAvailable),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-  }
-  console.log("successfully seed of plans and planAttributes ");
+  await db.insert(plans).values({
+    name: "PRO",
+    identifier: "plan_Rrrr2lJOWGFSLn",
+    period: "yearly",
+    interval: 1,
+    role: "business",
+    amount: 999,
+    currency: "INR",
+    planColor: "#000000",
+    features: {
+      verifyBag: true,
+      offerLimit: 50,
+      productLimit: 20,
+      offerDuration: 10,
+      maxOfferPerDay: 7,
+    },
+    status: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
 };
 
 // 3. transactions

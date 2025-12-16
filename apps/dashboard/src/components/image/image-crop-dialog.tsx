@@ -107,6 +107,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
       0,
       aspect.value === 1,
     );
+    console.log("croppedImageUrl", croppedImageUrl);
     if (croppedImageUrl) {
       setCroppedImageFor(croppedImageUrl);
     }
