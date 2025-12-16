@@ -13,15 +13,13 @@ import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
 } from "@/lib/cloudinary";
-import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
 import { razorpayInstance } from "@/lib/razorpay";
-import { planUserActive } from "@repo/db/dist/schema/plan.schema";
+import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
 
 export const subscriptionRouter = router({
   create: protectedProcedure
     .input(z.object({ identifier: z.string() }))
-    .mutation(async ({ input,ctx }) => {
-      // TODO: uncommit this It was commited to avoid temp error
+    .mutation(async ({ input, ctx }) => {
       const response = await razorpayInstance.subscriptions.create({
         plan_id: input.identifier,
         customer_notify: 1,

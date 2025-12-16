@@ -1,4 +1,3 @@
-import { adminBannerRouter } from "./dashboard-features/(banners-plan)/banners/banners.admin.routes";
 import { adminBusinessRouter } from "./dashboard-features/(business-hire)/business.admin.routes";
 import { adminHireRouter } from "./dashboard-features/(business-hire)/hire.admin.routes";
 import { adminCategoryRouter } from "./dashboard-features/(category)/category.admin.routes";
@@ -12,6 +11,7 @@ import { adminFeedbackRouter } from "./dashboard-features/(users)/feedback.admin
 import { adminHelpAndSupportRouter } from "./dashboard-features/(users)/help-and-support.admin.routes";
 import { adminNotificationRouter } from "./dashboard-features/(users)/notification.admin.routes";
 import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
+import { adminBannerRouter } from "./dashboard-features/banners/banners.admin.routes";
 import { adminAttributesRouter } from "./dashboard-features/plan/attibutes.admin.routes";
 import { adminPlanRouter } from "./dashboard-features/plan/plan.admin.routes";
 import { razorpayRouter } from "./dashboard-features/plan/razorpay.routes";
@@ -33,7 +33,7 @@ import { utilsRouter } from "./features/routeUtils/utils.route";
 import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
-import { mergeRouters, openProcedure, openRouter, router } from "./utils/trpc";
+import { mergeRouters, openRouter, router } from "./utils/trpc";
 
 const usersRouter = router({
   auth: authRouter,
