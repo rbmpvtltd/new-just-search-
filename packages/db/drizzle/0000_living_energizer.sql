@@ -388,23 +388,7 @@ CREATE TABLE "plan_attributes" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "plans" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"identifier" varchar(255) NOT NULL,
-	"period" "plan_period" NOT NULL,
-	"interval" integer NOT NULL,
-	"role" "user_role" DEFAULT 'guest' NOT NULL,
-	"amount" integer,
-	"currency" varchar(50) DEFAULT 'INR',
-	"plan_color" varchar(50) NOT NULL,
-	"features" jsonb NOT NULL,
-	"status" boolean DEFAULT true,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
-);
---> statement-breakpoint
-CREATE TABLE "user_current_plan" (
+CREATE TABLE "plan_user_active" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"plan_id" integer NOT NULL,
 	"user_id" integer NOT NULL,
@@ -413,7 +397,7 @@ CREATE TABLE "user_current_plan" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "user_subscriptions" (
+CREATE TABLE "plan_user_subscriptions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"plans_id" integer NOT NULL,
@@ -427,7 +411,23 @@ CREATE TABLE "user_subscriptions" (
 	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
-	CONSTRAINT "user_subscriptions_subscription_number_unique" UNIQUE("subscription_number")
+	CONSTRAINT "plan_user_subscriptions_subscription_number_unique" UNIQUE("subscription_number")
+);
+--> statement-breakpoint
+CREATE TABLE "plans" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"identifier" varchar(255) NOT NULL,
+	"period" "plan_period" NOT NULL,
+	"interval" integer NOT NULL,
+	"role" "user_role" DEFAULT 'guest' NOT NULL,
+	"amount" integer NOT NULL,
+	"currency" varchar(50) DEFAULT 'INR',
+	"plan_color" varchar(50) NOT NULL,
+	"features" jsonb NOT NULL,
+	"status" boolean DEFAULT true,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "product_photos" (
@@ -594,10 +594,10 @@ ALTER TABLE "offers" ADD CONSTRAINT "offers_category_id_categories_id_fk" FOREIG
 ALTER TABLE "recent_views_offers" ADD CONSTRAINT "recent_views_offers_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recent_views_offers" ADD CONSTRAINT "recent_views_offers_offer_id_offers_id_fk" FOREIGN KEY ("offer_id") REFERENCES "public"."offers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "plan_attributes" ADD CONSTRAINT "plan_attributes_plan_id_plans_id_fk" FOREIGN KEY ("plan_id") REFERENCES "public"."plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_current_plan" ADD CONSTRAINT "user_current_plan_plan_id_plans_id_fk" FOREIGN KEY ("plan_id") REFERENCES "public"."plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_current_plan" ADD CONSTRAINT "user_current_plan_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_subscriptions" ADD CONSTRAINT "user_subscriptions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_subscriptions" ADD CONSTRAINT "user_subscriptions_plans_id_plans_id_fk" FOREIGN KEY ("plans_id") REFERENCES "public"."plans"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "plan_user_active" ADD CONSTRAINT "plan_user_active_plan_id_plans_id_fk" FOREIGN KEY ("plan_id") REFERENCES "public"."plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "plan_user_active" ADD CONSTRAINT "plan_user_active_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "plan_user_subscriptions" ADD CONSTRAINT "plan_user_subscriptions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "plan_user_subscriptions" ADD CONSTRAINT "plan_user_subscriptions_plans_id_plans_id_fk" FOREIGN KEY ("plans_id") REFERENCES "public"."plans"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_photos" ADD CONSTRAINT "product_photos_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_reviews" ADD CONSTRAINT "product_reviews_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_reviews" ADD CONSTRAINT "product_reviews_business_id_business_listings_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."business_listings"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

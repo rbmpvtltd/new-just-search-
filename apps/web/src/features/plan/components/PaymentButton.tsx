@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
-import { useTRPC } from '@/trpc/client';
-import { useMutation } from '@tanstack/react-query';
-import React from 'react';
+import { useMutation } from "@tanstack/react-query";
+import React from "react";
+import Swal from "sweetalert2";
+import { useTRPC } from "@/trpc/client";
 
 interface RazorpayPaymentResponse {
   razorpay_payment_id: string;
@@ -10,11 +11,26 @@ interface RazorpayPaymentResponse {
   razorpay_signature: string;
 }
 
-const PaymentButton = ({className , style, title,identifier }:{className:string, style:object, title: string, identifier:string}) => {
-  const trpc = useTRPC()
- const {mutate} = useMutation(trpc.subscriptionRouter.create.mutationOptions())
+const PaymentButton = ({
+  className,
+  style,
+  title,
+  identifier,
+}: {
+  className: string;
+  style: object;
+  title: string;
+  identifier: string;
+}) => {
+  const trpc = useTRPC();
+  const { mutate } = useMutation(
+    trpc.subscriptionRouter.create.mutationOptions(),
+  );
+  const { mutate: verify } = useMutation(
+    trpc.subscriptionRouter.verifySubscription.mutationOptions(),
+  );
 
-  const handlePayment = (subscription_id:string) => {
+  const handlePayment = (subscription_id: string) => {
     const options = {
       key: process.env.NEXT_PUBLIC_RAZOR_PAY_KEY_ID, // Replace with your Razorpay key ID
       subscription_id, // Replace with your subscription ID
@@ -22,11 +38,29 @@ const PaymentButton = ({className , style, title,identifier }:{className:string,
       description: "Monthly Test Plan",
       image: "/your_logo.jpg", // URL of your logo
       // callback_url: "https://eneqd3r9zrjok.x.pipedream.net/",
-     	handler: (response: RazorpayPaymentResponse) => {
-					alert(response.razorpay_payment_id);
-					alert(response.razorpay_subscription_id);
-					alert(response.razorpay_signature);
-			},
+      handler: (response: RazorpayPaymentResponse) => {
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_subscription_id);
+        // alert(response.razorpay_signature);
+        verify(
+          {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            razorpay_subscription_id: response.razorpay_subscription_id,
+          },
+          {
+            onSuccess: (data) => {
+              if (data.success) {
+                Swal.fire({
+                  title: data.message,
+                  icon: "success",
+                  draggable: true,
+                });
+              }
+            },
+          },
+        );
+      },
       // prefill: {
       //   name: "<name>",
       //   email: "<email>",
@@ -37,34 +71,37 @@ const PaymentButton = ({className , style, title,identifier }:{className:string,
       //   note_key_2: "Make it so."
       // },
       theme: {
-        color: "#fdd317ff"
-      }
+        color: "#fdd317ff",
+      },
     };
 
     const rzp1 = new window.Razorpay(options);
     rzp1.open();
   };
 
-
   const createSubscription = () => {
-    mutate({
-      identifier
-    },
-    {
-      onSuccess:(data) => {
-        handlePayment(data.response.id)
-
+    mutate(
+      {
+        identifier,
       },
-      onError: (error) => {
-        console.log("Error", error)
-      }
-    },
-  
-  )
-  } 
+      {
+        onSuccess: (data) => {
+          handlePayment(data.response.id);
+        },
+        onError: (error) => {
+          console.log("Error", error);
+        },
+      },
+    );
+  };
 
   return (
-    <button type='button'  onClick={createSubscription} className={className} style={style}>
+    <button
+      type="button"
+      onClick={createSubscription}
+      className={className}
+      style={style}
+    >
       {title}
     </button>
   );

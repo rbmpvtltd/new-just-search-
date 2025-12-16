@@ -1,15 +1,13 @@
 import { CheckCircle, XCircle } from "lucide-react";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
 import PaymentButton from "./components/PaymentButton";
-import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
 
 type PlanArray = OutputTrpcType["planRouter"]["list"];
 type Plan = UnwrapArray<PlanArray>;
 
 export default function PricingCard({ plan }: { plan: Plan }) {
- console.log(plan);
- 
+  console.log(plan);
+
   return (
     <div className="bg-base-200 rounded-3xl shadow-lg m-4 overflow-hidden w-full max-w-sm">
       <div className={`{py-5 rounded-t-3xl text-center relative} `}>
@@ -48,15 +46,14 @@ export default function PricingCard({ plan }: { plan: Plan }) {
 
       <div className="px-5 pb-5">
         <PaymentButton
-        identifier={plan.identifier}
+          identifier={plan.identifier}
           className={`w-full rounded-full py-3 font-semibold text-lg text-secondary transition
              ${plan.planColor}`}
           style={{
             backgroundColor: plan.planColor ?? "#E5E7EB",
           }}
-          title= {plan.status ? "Current Plan" : `Get ${plan.title}`}
+          title={plan.status ? "Current Plan" : `Get ${plan.title}`}
         />
-        
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 {
-  "id": "55fcec1d-b373-43f9-8fc6-a3f0fb88f131",
+  "id": "6b4c08e1-1982-407c-a7bc-3be8fd39ce62",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -2676,104 +2676,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.plans": {
-      "name": "plans",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "identifier": {
-          "name": "identifier",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "period": {
-          "name": "period",
-          "type": "plan_period",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "interval": {
-          "name": "interval",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "user_role",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'guest'"
-        },
-        "amount": {
-          "name": "amount",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "currency": {
-          "name": "currency",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'INR'"
-        },
-        "plan_color": {
-          "name": "plan_color",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "features": {
-          "name": "features",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.user_current_plan": {
-      "name": "user_current_plan",
+    "public.plan_user_active": {
+      "name": "plan_user_active",
       "schema": "",
       "columns": {
         "id": {
@@ -2817,9 +2721,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "user_current_plan_plan_id_plans_id_fk": {
-          "name": "user_current_plan_plan_id_plans_id_fk",
-          "tableFrom": "user_current_plan",
+        "plan_user_active_plan_id_plans_id_fk": {
+          "name": "plan_user_active_plan_id_plans_id_fk",
+          "tableFrom": "plan_user_active",
           "tableTo": "plans",
           "columnsFrom": [
             "plan_id"
@@ -2830,9 +2734,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "user_current_plan_user_id_users_id_fk": {
-          "name": "user_current_plan_user_id_users_id_fk",
-          "tableFrom": "user_current_plan",
+        "plan_user_active_user_id_users_id_fk": {
+          "name": "plan_user_active_user_id_users_id_fk",
+          "tableFrom": "plan_user_active",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -2850,8 +2754,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user_subscriptions": {
-      "name": "user_subscriptions",
+    "public.plan_user_subscriptions": {
+      "name": "plan_user_subscriptions",
       "schema": "",
       "columns": {
         "id": {
@@ -2938,9 +2842,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "user_subscriptions_user_id_users_id_fk": {
-          "name": "user_subscriptions_user_id_users_id_fk",
-          "tableFrom": "user_subscriptions",
+        "plan_user_subscriptions_user_id_users_id_fk": {
+          "name": "plan_user_subscriptions_user_id_users_id_fk",
+          "tableFrom": "plan_user_subscriptions",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -2951,9 +2855,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "user_subscriptions_plans_id_plans_id_fk": {
-          "name": "user_subscriptions_plans_id_plans_id_fk",
-          "tableFrom": "user_subscriptions",
+        "plan_user_subscriptions_plans_id_plans_id_fk": {
+          "name": "plan_user_subscriptions_plans_id_plans_id_fk",
+          "tableFrom": "plan_user_subscriptions",
           "tableTo": "plans",
           "columnsFrom": [
             "plans_id"
@@ -2967,14 +2871,110 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "user_subscriptions_subscription_number_unique": {
-          "name": "user_subscriptions_subscription_number_unique",
+        "plan_user_subscriptions_subscription_number_unique": {
+          "name": "plan_user_subscriptions_subscription_number_unique",
           "nullsNotDistinct": false,
           "columns": [
             "subscription_number"
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.plans": {
+      "name": "plans",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "period": {
+          "name": "period",
+          "type": "plan_period",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "interval": {
+          "name": "interval",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "user_role",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'guest'"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'INR'"
+        },
+        "plan_color": {
+          "name": "plan_color",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "features": {
+          "name": "features",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

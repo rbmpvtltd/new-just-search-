@@ -1,10 +1,16 @@
 // features/banners/banners.admin.routes.ts
 
+import crypto from "node:crypto";
 import { db } from "@repo/db";
 import {
   banners,
   bannerUpdateSchema,
 } from "@repo/db/dist/schema/not-related.schema";
+import {
+  plans,
+  planUserActive,
+  planUserSubscriptions,
+} from "@repo/db/dist/schema/plan.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
@@ -27,11 +33,91 @@ export const subscriptionRouter = router({
         // customer_id: userId,
       });
       console.log(response);
-      // await db.insert(planUserActive).values({
-      //   userId: ctx.userId,
-      //   planId: response.plan_id,
-      // })
+      const data = await db.query.plans.findFirst({
+        where: eq(plans.identifier, input.identifier),
+      });
+      if (!data) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Plan not found",
+        });
+      }
+      await db.insert(planUserSubscriptions).values({
+        amount: data?.amount || 0,
+        subscriptionNumber: response.id,
+        transactionNumber: "",
+        planIdentifier: input.identifier,
+        plansId: data.id,
+        userId: ctx.userId,
+        currency: data?.currency || "INR",
+        features: data?.features,
+        expiryDate: response.expire_by || 0,
+
+        status: false,
+      });
       return { success: true, response: response };
+    }),
+
+  verifySubscription: protectedProcedure
+    .input(
+      z.object({
+        razorpay_payment_id: z.string(),
+        razorpay_signature: z.string(),
+        razorpay_subscription_id: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const {
+        razorpay_payment_id,
+        razorpay_signature,
+        razorpay_subscription_id,
+      } = input;
+      const subscription = await db.query.planUserSubscriptions.findFirst({
+        where: eq(
+          planUserSubscriptions.subscriptionNumber,
+          input.razorpay_subscription_id,
+        ),
+      });
+      if (!subscription) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Subscription not found",
+        });
+      }
+      const sign = `${razorpay_payment_id}|${razorpay_subscription_id}`;
+      const generated_signature = crypto
+        .createHmac("sha256", String(process.env.RAZOR_PAY_KEY_SECRET))
+        .update(sign)
+        .digest("hex");
+
+      const isValid = generated_signature === razorpay_signature;
+
+      if (!isValid) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid signature",
+        });
+      }
+      await db
+        .update(planUserSubscriptions)
+        .set({
+          status: true,
+          transactionNumber: razorpay_payment_id,
+        })
+        .where(
+          eq(
+            planUserSubscriptions.subscriptionNumber,
+            input.razorpay_subscription_id,
+          ),
+        );
+
+      await db.insert(planUserActive).values({
+        userId: ctx.userId,
+        planId: subscription.plansId,
+        features: subscription.features,
+      });
+
+      return { success: true, message: "Subscription verified successfully" };
     }),
   edit: adminProcedure
     .input(
