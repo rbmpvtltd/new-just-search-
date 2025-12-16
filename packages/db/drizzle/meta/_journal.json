@@ -8,6 +8,20 @@
       "when": 1765776271640,
       "tag": "0000_heavy_omega_flight",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765796749107,
+      "tag": "0001_shallow_nitro",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765802147169,
+      "tag": "0002_overrated_bastion",
+      "breakpoints": true
     }
   ]
 }

@@ -32,7 +32,7 @@ export const plans = pgTable("plans", {
   period: planPeriodEnum("period").notNull(),
   interval: integer("interval").notNull(),
   role: userRoleEnum("role").default(UserRole.guest).notNull(),
-  amount: integer("amount"),
+  amount: integer("amount").notNull(),
   currency: varchar("currency", { length: 50 }).default("INR"),
   planColor: varchar("plan_color", { length: 50 }).notNull(),
   features: jsonb("features").$type<PlanFeatures>().notNull(),
@@ -73,7 +73,7 @@ export const planAttributes = pgTable("plan_attributes", {
 export const planAttributesInsertSchema = createInsertSchema(planAttributes);
 
 // 3. transactions
-export const userCurrentPlan = pgTable("user_current_plan", {
+export const planUserActive = pgTable("plan_user_active", {
   id: serial("id").primaryKey(),
   planId: integer("plan_id")
     .notNull()
@@ -85,9 +85,9 @@ export const userCurrentPlan = pgTable("user_current_plan", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
+export const planUserActiveInsertSchema = createInsertSchema(planUserActive);
 // // 4. user_subscriptions
-export const userSubscriptions = pgTable("user_subscriptions", {
+export const planUserSubscriptions = pgTable("plan_user_subscriptions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
@@ -108,3 +108,7 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const planUserSubscriptionsInsertSchema = createInsertSchema(
+  planUserSubscriptions,
+);

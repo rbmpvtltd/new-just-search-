@@ -5,11 +5,6 @@ import {
   banners,
   bannerUpdateSchema,
 } from "@repo/db/dist/schema/not-related.schema";
-import {
-  dbPlansInsertSchema,
-  plans,
-  plansInsertSchema,
-} from "@repo/db/dist/schema/plan.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
@@ -18,100 +13,27 @@ import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
 } from "@/lib/cloudinary";
-import {
-  buildOrderByClause,
-  buildWhereClause,
-  tableInputSchema,
-} from "@/lib/tableUtils";
-import { adminProcedure, router } from "@/utils/trpc";
-import {
-  planAllowedSortColumns,
-  planColumns,
-  planGlobalFilterColumns,
-} from "./plan.admin.service";
+import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
 import { razorpayInstance } from "@/lib/razorpay";
+import { planUserActive } from "@repo/db/dist/schema/plan.schema";
 
-export const adminPlanRouter = router({
-  list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
-    const where = buildWhereClause(
-      input.filters,
-      input.globalFilter,
-      planColumns,
-      planGlobalFilterColumns,
-    );
-
-    const orderBy = buildOrderByClause(
-      input.sorting,
-      planAllowedSortColumns,
-      sql`id DESC`,
-    );
-
-    const offset = input.pagination.pageIndex * input.pagination.pageSize;
-
-    const data = await db
-      .select()
-      .from(plans)
-      .where(where)
-      .orderBy(orderBy)
-      .limit(input.pagination.pageSize)
-      .offset(offset);
-
-    // PostgreSQL returns `bigint` for count → cast to number
-    const totalResult = await db
-      .select({
-        count: sql<number>`count(distinct ${plans.id})::int`,
-      })
-      .from(plans)
-      .where(where);
-
-    const total = totalResult[0]?.count ?? 0;
-    const totalPages = Math.ceil(total / input.pagination.pageSize);
-
-    return {
-      data,
-      totalCount: total,
-      totalPages,
-      pageCount: totalPages,
-    };
-  }),
-
-  add: adminProcedure.query(async () => {
-    return;
-  }),
-
-  create: adminProcedure
-    .input(plansInsertSchema)
-    .mutation(async ({ input }) => {
-      const response = await razorpayInstance.plans.create({
-        period: input.period,
-        interval: input.interval,
-        item: {
-          name: input.name,
-          amount: input.amount,
-          currency: input.currency ?? "INR",
-        },
+export const subscriptionRouter = router({
+  create: protectedProcedure
+    .input(z.object({ identifier: z.string() }))
+    .mutation(async ({ input,ctx }) => {
+      // TODO: uncommit this It was commited to avoid temp error
+      const response = await razorpayInstance.subscriptions.create({
+        plan_id: input.identifier,
+        customer_notify: 1,
+        total_count: 1,
+        // customer_id: userId,
       });
       console.log(response);
-
-      const dbData = dbPlansInsertSchema
-        .omit({
-          features: true,
-          identifier: true,
-        })
-        .parse(input);
-
-      await db.insert(plans).values({
-        ...dbData,
-        identifier: response.id,
-        features: {
-          productLimit: input.productLimit,
-          offerLimit: input.offerLimit,
-          offerDuration: input.offerDuration,
-          maxOfferPerDay: input.maxOfferPerDay,
-          verifyBag: input.verifyBag,
-        },
-      });
-      return { success: true };
+      // await db.insert(planUserActive).values({
+      //   userId: ctx.userId,
+      //   planId: response.plan_id,
+      // })
+      return { success: true, response: response };
     }),
   edit: adminProcedure
     .input(

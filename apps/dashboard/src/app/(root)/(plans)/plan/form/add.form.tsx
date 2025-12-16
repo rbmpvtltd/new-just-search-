@@ -58,6 +58,7 @@ function AddForm({ setOpen }: AddForm) {
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<PlansSelectSchema>({
     resolver: zodResolver(plansInsertSchema),
@@ -80,11 +81,13 @@ function AddForm({ setOpen }: AddForm) {
   console.log("errors", errors);
 
   const onSubmit = async (data: PlansSelectSchema) => {
+    console.log("data", data);
+    
     create(data, {
       onSuccess: () => {
         const queryClient = getQueryClient();
         queryClient.invalidateQueries({
-          queryKey: trpc.adminSubcategoryRouter.list.queryKey(),
+          queryKey: trpc.adminPlanRouter.list.queryKey(),
         });
         setOpen(false);
       },

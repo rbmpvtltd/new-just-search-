@@ -43,6 +43,7 @@ export const planRouter = router({
         planColor: plans.planColor,
         status: plans.status,
         features: plans.features,
+        identifier: plans.identifier,
         createdAt: plans.createdAt,
         updatedAt: plans.updatedAt,
       })

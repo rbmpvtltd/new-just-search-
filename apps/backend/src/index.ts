@@ -11,8 +11,11 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { appRouter, openAppRouter } from "./route";
 import { createContext } from "./utils/context";
+import { limiter } from "./utils/limiter";
 
 const app = express();
+
+app.use(limiter);
 
 app.get("/", (_, res) => {
   return res.send("hello");

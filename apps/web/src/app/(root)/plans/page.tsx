@@ -39,7 +39,7 @@ export const plans = [
 
 export default async function page() {
   const { data } = await asyncHandler(trpcServer.planRouter.list.query());
-  console.log("Plan page", data);
+
 
   return (
     <div className="flex flex-wrap justify-center">
