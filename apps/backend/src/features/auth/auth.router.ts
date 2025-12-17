@@ -14,7 +14,11 @@ import {
 } from "@/utils/trpc";
 import { verifyOTP } from "@/utils/varifyOTP";
 import { checkPasswordGetUser } from "./auth.service";
-import { createSession, deleteSession } from "./lib/session";
+import {
+  createSession,
+  deleteSession,
+  validateSessionToken,
+} from "./lib/session";
 
 export const authRouter = router({
   googleLogin: publicProcedure.query(async ({ ctx }) => {
@@ -71,7 +75,29 @@ export const authRouter = router({
         message: `OTP send on ${input.identifier}`,
       };
     }),
-  verifyauth: protectedProcedure.query(async ({ ctx }) => {
+  verifyauth: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.token) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "cannot find token",
+      });
+    }
+
+    const session = await validateSessionToken(ctx.token);
+    if (!session) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "token is not valid",
+      });
+    }
+
+    // return opts.next({
+    //   ctx: {
+    //     userId: session.userId,
+    //     role: session.role,
+    //     sessionId: session.id,
+    //   },
+    // });
     return { success: true, role: ctx.role };
   }),
   logout: protectedProcedure.mutation(async ({ ctx }) => {

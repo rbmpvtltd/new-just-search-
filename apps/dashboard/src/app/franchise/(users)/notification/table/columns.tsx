@@ -1,0 +1,183 @@
+"use client";
+
+import type { ColumnDef } from "@tanstack/react-table";
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
+import { EditEntiry } from "../form/edit.form";
+import { useTableStore } from "../store";
+
+function SelectCell({ id }: { id: number }) {
+  const select = useTableStore((state) => state.select);
+  const toggleSelect = useTableStore((state) => state.toggleSelect);
+
+  return (
+    <Checkbox
+      checked={select.includes(id)}
+      onCheckedChange={() => toggleSelect(id)}
+      aria-label="Select row"
+      className="translate-y-0.5"
+    />
+  );
+}
+
+function ActionCell({ id }: { id: number }) {
+  return <EditEntiry notificationId={id} />;
+}
+
+function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
+  const allActive = useTableStore((state) => state.active);
+  const toggleActive = useTableStore((state) => state.toggleActive);
+  const isSelected = allActive.filter((item) => item.id === id)[0];
+  const active = isSelected ? isSelected.isActive : isActive;
+  const handleToggle = () => {
+    toggleActive(id, !active);
+  };
+
+  return (
+    <Checkbox
+      checked={active}
+      onCheckedChange={handleToggle}
+      aria-label="Select all"
+      className="translate-y-0.5"
+    />
+  );
+}
+
+function SelectHeader({ ids }: { ids: number[] }) {
+  const select = useTableStore((state) => state.select);
+  const addSelect = useTableStore((state) => state.addSelect);
+  const deleteManySelect = useTableStore((state) => state.deleteManySelect);
+
+  // Derived state
+  const allSelected = ids.every((id) => select.includes(id));
+  const someSelected = ids.some((id) => select.includes(id));
+
+  const handleToggleAll = () => {
+    if (allSelected) {
+      // Deselect all
+      deleteManySelect(ids);
+    } else {
+      // Select all (only those not already selected)
+      ids.forEach((id) => {
+        if (!select.includes(id)) {
+          addSelect(id);
+        }
+      });
+    }
+  };
+
+  return (
+    <Checkbox
+      checked={allSelected || (someSelected && "indeterminate")}
+      onCheckedChange={handleToggleAll}
+      aria-label="Select all"
+      className="translate-y-0.5"
+    />
+  );
+}
+
+type FeedbackArray = OutputTrpcType["adminNotificationRouter"]["list"]["data"];
+type Feedback = UnwrapArray<FeedbackArray>;
+
+export const columns: ColumnDef<Feedback>[] = [
+  {
+    id: "select",
+    header: ({ table }) => {
+      const currentPageIds = table
+        .getRowModel()
+        .rows.map((row) => row.original.notificationId);
+      return <SelectHeader ids={currentPageIds} />;
+    },
+    cell: ({ row }) => <SelectCell id={row.original.notificationId} />,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "notificationId",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="ID" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-20">{row.original.notificationId}</div>
+    ),
+    enableHiding: false,
+  },
+  {
+    accessorKey: "title",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Title" />
+    ),
+    cell: ({ row }) => row.original.title ?? "NO Type",
+  },
+  {
+    accessorKey: "description",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Description" />
+    ),
+    cell: ({ row }) => row.original.description,
+  },
+  {
+    accessorKey: "role",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Role" />
+    ),
+    cell: ({ row }) => row.original.role,
+  },
+  {
+    accessorKey: "category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="category" />
+    ),
+    cell: ({ row }) => row.original.category ?? "any",
+  },
+  {
+    accessorKey: "subcategories",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="subcategories" />
+    ),
+    cell: ({ row }) => row.original.subcategories ?? "any",
+  },
+  {
+    accessorKey: "states",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="states" />
+    ),
+    cell: ({ row }) => row.original.states ?? "any",
+  },
+  {
+    accessorKey: "cities",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="cities" />
+    ),
+    cell: ({ row }) => row.original.cities ?? "any",
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => (
+      <ActiveCell
+        id={row.original.notificationId}
+        isActive={row.original.status ?? false}
+      />
+    ),
+  },
+  {
+    accessorKey: "created_at",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created" />
+    ),
+    cell: ({ row }) =>
+      row?.original?.created_at?.toLocaleDateString() ?? "null",
+  },
+
+  {
+    id: "action",
+    header: () => <div className="text-center">Action</div>,
+    cell: ({ row }) => <ActionCell id={row.original.notificationId} />,
+    enableSorting: false,
+    enableHiding: false,
+  },
+];

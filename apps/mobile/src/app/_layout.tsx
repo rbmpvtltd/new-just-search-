@@ -17,10 +17,8 @@ import "../../global.css";
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import ErrorHandler from "@/components/layout/NativeErrorBoundry";
-import { androidPaymentApiKey, iosPaymentApiKey } from "@/constants/Variable";
 import useGoogleUpdate from "@/hooks/useUpdateApplication";
 import { queryClient } from "@/lib/trpc";
 
@@ -69,16 +67,6 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const heading = useHeadingStore((state) => state.heading);
-
-  useEffect(() => {
-    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-
-    if (Platform.OS === "ios") {
-      Purchases.configure({ apiKey: iosPaymentApiKey });
-    } else if (Platform.OS === "android") {
-      Purchases.configure({ apiKey: androidPaymentApiKey });
-    }
-  }, []);
 
   // crashlytics().log("hello from root layout crashlytics");
   return (

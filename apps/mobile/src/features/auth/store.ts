@@ -2,12 +2,6 @@ import type { UserRole } from "@repo/db";
 import { create } from "zustand";
 import { queryClient } from "@/lib/trpc";
 
-// export enum role {
-//   business = "business",
-//   hire = "hire",
-//   visitor = "visitor",
-//   lister = "lister",
-// }
 type AuthState = {
   token: string | null;
   authenticated: boolean;

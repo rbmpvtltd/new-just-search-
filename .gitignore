@@ -50,3 +50,4 @@ packages/redis/data
 package-lock.json
 yarn.lock
 apps/mobile/build
+apps/mobile/builds
