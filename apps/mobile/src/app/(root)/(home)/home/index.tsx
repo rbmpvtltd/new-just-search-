@@ -1,7 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { useEffect } from "react";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import {
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import CustomCarousel from "@/components/Carousel/CustomCaraousel";
 import Banner1 from "@/features/home/show/Banner1";
 import Banner2 from "@/features/home/show/Banner2";
@@ -11,12 +18,21 @@ import { CategoryList } from "@/features/home/show/CategorySameList";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { Loading } from "@/components/ui/Loading";
 import { trpc } from "@/lib/trpc";
+import { searchClient } from "@/lib/algoliaClient";
+import {
+  InstantSearch,
+  Index,
+  useHits,
+  Configure,
+} from "react-instantsearch-core";
+import { SearchBox } from "@/components/home/SearchBox";
+import { InfiniteHits } from "@/components/home/InfiniteHits";
+import { router } from "expo-router";
 // import Banner1 from "@/components/home/Banner1";
 // import Banner2 from "@/components/home/Banner2";
 // import Banner3 from "@/components/home/Banner3";
 // import Banner4 from "@/components/home/Banner4";
 // import { CategoryList } from "@/components/home/CategorySameList";
-// import SearchForm from "@/components/home/searchForm";
 // import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 
 // async function Banners() {
@@ -40,7 +56,20 @@ export default function TabOneScreen() {
         <Banner1 />
     //     <Banner1 /> */}
 
-        {/* <SearchForm /> */}
+        <InstantSearch searchClient={searchClient} indexName="all_listing">
+          <SearchBox />
+          <Configure hitsPerPage={5} />
+          <InfiniteHits hitComponent={Hit} />
+          {/* <Index indexName="business_listing">
+            <InfiniteHits hitComponent={BusinessListing} />
+
+          </Index>
+
+          <Index indexName="hire_listing">
+            <InfiniteHits hitComponent={HireListing} />
+
+          </Index> */}
+        </InstantSearch>
         <BoundaryWrapper>
           <CategoryList />
         </BoundaryWrapper>
@@ -68,6 +97,36 @@ export default function TabOneScreen() {
         {/* <Banner4 /> */}
       </View>
     </ScrollView>
-
   );
+}
+
+function Hit({ hit }: { hit: any }) {
+  return (
+    <View className="px-4">
+      <Pressable
+        onPress={() => {
+          if (hit.listingType === "business") {
+            router.push(
+              `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
+            );
+          } else if (hit.listingType === "hire") {
+            router.push(`/(root)/(hire)/hireDetail/${hit.objectID}`);
+          }
+          console.log("clicked on", hit.objectID);
+        }}
+      >
+        <Text className="text-lg text-secondary-content">{hit.name}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+function BusinessListing() {
+  const { hits } = useHits();
+  return hits.map((hit) => <Text key={hit.objectID}>{hit.name}</Text>);
+}
+
+function HireListing() {
+  const { hits } = useHits();
+  return hits.map((hit) => <Text key={hit.objectID}>{hit.name}</Text>);
 }

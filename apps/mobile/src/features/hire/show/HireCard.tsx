@@ -19,7 +19,6 @@
 
 // type HireCardType = OutputTrpcType["hirerouter"]["MobileAllHireLising"]["data"][0] | null
 
-
 // const screenWidth = Dimensions.get("window").width;
 // export default function HireCard({ item, title }: {item : HireCardType ,title? :any}) {
 //   const colorScheme = useColorScheme();
@@ -79,7 +78,7 @@
 //         </View> */}
 //       </View>
 //       <View className="flex-row gap-2 m-4 flex-wrap">
-     
+
 //           <TouchableOpacity
 //             className="bg-success-content rounded-lg py-2 px-3 mb-1"
 //           >
@@ -187,8 +186,9 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
+  Pressable,
 } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+
 import Colors from "@/constants/Colors";
 import { useStartChat } from "@/query/startChat";
 import { useAuthStore } from "@/store/authStore";
@@ -197,18 +197,23 @@ import { dialPhone } from "@/utils/getContact";
 import { OutputTrpcType } from "@/lib/trpc";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { HireListingHitType } from "@/app/(root)/(hire)/(allHire)";
+import { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 
-type HireCardType = OutputTrpcType["hirerouter"]["MobileAllHireLising"]["data"][0] | null
-
-
-export default function HireCard({ item, title }: {item : HireCardType ,title? :any}) {
+export default function HireCard({
+  item,
+  title,
+}: {
+  item: HireListingHitType | SubcategoryHitType;
+  title?: any;
+}) {
   const colorScheme = useColorScheme();
 
-
-  
   return (
-
-   <Pressable className="" onPress={() => router.navigate(`/hireDetail/${item?.id}`)}>
+    <Pressable
+      className=""
+      onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+    >
       <View className="h-auto rounded-xl m-auto w-[90%] bg-base-200 py-8 mb-4 shadow-2xl ">
         <View className="flex-row items-center justify-center w-full">
           <View className="relative top-1">
@@ -218,7 +223,7 @@ export default function HireCard({ item, title }: {item : HireCardType ,title? :
               iconClass="p-6 rounded-full border-2 border-secondary flex items-center justify-center"
               imageStyle={{ resizeMode: "contain" }}
             />
-          {/*{Number(item?.user?.verify) === 1 && (
+            {/*{Number(item?.user?.verify) === 1 && (
               <View className="absolute -bottom-3 left-1/2 -translate-x-1/2">
                 <View
                   className="px-4 py-1 rounded-lg flex-row items-center gap-1"
@@ -243,30 +248,28 @@ export default function HireCard({ item, title }: {item : HireCardType ,title? :
         </View>
 
         <View className="flex-row flex-wrap gap-2 ml-4">
-            <TouchableOpacity
-              className="bg-success-content rounded-lg py-2 px-2 mb-1"
-              onPress={() => router.navigate(`/hireDetail/${item?.id}`)}
-            >
-              <Text className="text-success font-semibold text-xs">
-                {item?.category ?? "fake category"}
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            className="bg-success-content rounded-lg py-2 px-2 mb-1"
+            onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+          >
+            <Text className="text-success font-semibold text-xs">
+              {item?.category ?? "fake category"}
+            </Text>
+          </TouchableOpacity>
 
-           {item?.subcategories?.slice(0,2).map((sub: string, i: number) => (
+          {item?.subcategories?.slice(0, 2).map((sub: string, i: number) => (
             <TouchableOpacity
               key={i.toString()}
               className="bg-error-content rounded-lg py-2 px-2 mb-1"
-              onPress={() => router.navigate(`/hireDetail/${item?.id}`)}
+              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
             >
-              <Text className="text-pink-700 font-semibold text-xs">
-                {sub}
-              </Text>
+              <Text className="text-pink-700 font-semibold text-xs">{sub}</Text>
             </TouchableOpacity>
           ))}
           {Number(item?.subcategories?.length) > 2 && (
             <TouchableOpacity
               className="dark:bg-base-100 bg-base-200 rounded-lg py-2 px-4 mb-1"
-              onPress={() => router.navigate(`/hireDetail/${item?.id}`)}
+              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
             >
               <Text className="text-secondary font-semibold text-xs">
                 + More
@@ -275,22 +278,23 @@ export default function HireCard({ item, title }: {item : HireCardType ,title? :
           )}
         </View>
 
-        <View className="mx-4 my-1">
+        {/* <View className="mx-4 my-1">
           <View className="flex-row items-start">
             <Text className="text-secondary font-black mr-2">Job Role :</Text>
             <Text className="text-secondary-content flex-1">
               {item?.jobRole}
             </Text>
           </View>
-        </View>
+        </View> */}
 
         <View className="mx-4 my-2">
           <View className="flex-row items-start">
             <Text className="text-secondary font-black mr-2">Job Type : </Text>
-            <Text className="text-secondary-content flex-1">
-             fake job{item?.jobType.join(", ")}
-            </Text>
-           
+            {item?.jobType && (
+              <Text className="text-secondary-content flex-1">
+                fake job{item?.jobType.join(", ")}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -302,7 +306,8 @@ export default function HireCard({ item, title }: {item : HireCardType ,title? :
               color={colorScheme === "dark" ? "#F87171" : "#DC2626"}
             />
             <Text className="text-base text-secondary-content">
-              {item?.area}, {item?.streetName} {item?.buildingName} 
+              {item?.area}, {item?.buildingName}{" "}
+              {/** TODO: add street name when seed update */}
             </Text>
           </View>
         </View>
@@ -310,7 +315,7 @@ export default function HireCard({ item, title }: {item : HireCardType ,title? :
         <View className="flex-row w-[60%] mx-auto items-center justify-center gap-2">
           <View className="flex-1 bg-primary rounded-lg px-2 py-2">
             <Pressable
-              onPress={() => router.navigate(`/hireDetail/${item?.id}`)}
+              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
             >
               <View className="flex-row items-center justify-center gap-1">
                 <Ionicons name="chatbox-ellipses" size={20} color={"white"} />
@@ -326,7 +331,7 @@ export default function HireCard({ item, title }: {item : HireCardType ,title? :
 
           <View className="flex-1 bg-primary rounded-lg px-2 py-2">
             <Pressable
-              onPress={() => router.navigate(`/hireDetail/${item?.id}`)}
+              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
             >
               <View className="flex-row items-center justify-center gap-1">
                 <Ionicons name="call" size={20} color={"white"} />

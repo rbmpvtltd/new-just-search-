@@ -20,8 +20,8 @@ import {
   Switch,
   useColorScheme,
   View,
+  Pressable
 } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
 import { Checkbox, Text } from "react-native-paper";
 import Colors from "@/constants/Colors";
 import { cld } from "@/lib/cloudinary";

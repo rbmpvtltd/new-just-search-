@@ -1,8 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { FlatList, Image, Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { FlatList, Image, Text, useColorScheme, View,Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DataNotFound from "@/components/ui/DataNotFound";
 import { NOTIFICATION_URL } from "@/constants/apis";

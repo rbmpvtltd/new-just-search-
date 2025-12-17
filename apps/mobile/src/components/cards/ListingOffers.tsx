@@ -1,11 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import React from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import {
-  GestureHandlerRootView,
-  Pressable,
-} from "react-native-gesture-handler";
+import {Pressable, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+
 import { LISTING_OFFER_LIST_URL } from "@/constants/apis";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import { useListingOffersList } from "@/query/listingOfferList";
@@ -27,7 +24,6 @@ export default function ListingsOffersList({
       data={data.offer}
       renderItem={(item: any) => {
         return (
-          <GestureHandlerRootView>
             <Pressable
               onPress={() => {
                 router.push({
@@ -71,7 +67,6 @@ export default function ListingsOffersList({
                 </View>
               </View>
             </Pressable>
-          </GestureHandlerRootView>
         );
       }}
     />

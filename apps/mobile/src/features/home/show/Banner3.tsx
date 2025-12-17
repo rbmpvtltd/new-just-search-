@@ -3,7 +3,6 @@ import CarouselCompo from "../../../components/Carousel/Carousel";
 import { useSuspenceData } from "@/query/getAllSuspense";
 import { BANNER_URL } from "@/constants/apis";
 import MainCard from "../../../components/cards/MainCard";
-import { Text } from "react-native-gesture-handler";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
 

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Pressable } from "react-native";
 import Colors from "@/constants/Colors";
 import { useDetectLocation } from "@/query/useDetectLocation";
 
@@ -20,12 +20,15 @@ type LocationResult = {
 type Props = {
   onResult: (data: LocationResult) => void;
   iconOnly?: boolean;
+  className?: string;
 };
 
-export default function LocationAutoDetect({ onResult, iconOnly }: Props) {
+export default function LocationAutoDetect({ onResult, iconOnly,className }: Props) {
+
   const { data, isLoading, isError, error, refetch } = useDetectLocation(false);
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
+
 
   const handleDetect = async () => {
     try {
@@ -56,13 +59,14 @@ export default function LocationAutoDetect({ onResult, iconOnly }: Props) {
 
   const renderButtonContent = () => {
     if (iconOnly) {
+ 
       return (
-        <Ionicons name="location-outline" size={24} color={theme.secondary} />
+        <Ionicons className={className} name="location-outline" size={24} color={theme.secondary} />
       );
     }
 
     return (
-      <View className="bg-error p-3 rounded-lg items-center justify-center flex-row space-x-2">
+      <View className="bg-error  rounded-lg items-center justify-center flex-row">
         {isLoading ? (
           <>
             <ActivityIndicator size="small" color="#fff" />
@@ -76,14 +80,14 @@ export default function LocationAutoDetect({ onResult, iconOnly }: Props) {
   };
 
   return (
-    <View className="mx-auto mt-4 items-center w-[60%]">
+    <View className=" w-fit">
       {isLoading ? (
         <View className="items-center justify-center space-y-3">
           <Pressable
             onPress={handleDetect}
             disabled
             style={{ marginHorizontal: "auto" }}
-            className={`w-full rounded-lg bg-info px-4 py-3 opacity-50 flex-row items-center justify-center`}
+            className={`rounded-lg  bg-info p-4 opacity-50 flex-row items-center justify-center`}
           >
             {renderButtonContent()}
           </Pressable>
@@ -95,8 +99,8 @@ export default function LocationAutoDetect({ onResult, iconOnly }: Props) {
           onPress={handleDetect}
           disabled={isLoading}
           style={{ marginHorizontal: "auto" }}
-          className={`w-full rounded-lg ${
-            iconOnly ? "" : "bg-info px-4 py-3"
+          className={`w-fit rounded-lg  ${
+            iconOnly ? "" : "bg-info  py-3"
           } flex-row items-center justify-center`}
         >
           {renderButtonContent()}

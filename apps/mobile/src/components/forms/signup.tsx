@@ -22,7 +22,6 @@ import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../inputs/Input";
 
-// import { Pressable } from 'react-native-gesture-handler';
 
 const SignupComponent: React.FC = () => {
   const { setToken: setAuthStoreToken } = useAuthStore(); // Get setToken from Zustand

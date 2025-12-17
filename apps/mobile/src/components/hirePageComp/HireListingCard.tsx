@@ -1,8 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Image, Text, useColorScheme, View,Pressable } from "react-native";
 import Colors from "@/constants/Colors";
 import { apiUrl } from "@/constants/Variable";
 

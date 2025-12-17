@@ -8,8 +8,8 @@ import {
   Text,
   TextInput,
   View,
+  Pressable
 } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
 import {
   SafeAreaView,
   useSafeAreaInsets,

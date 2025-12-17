@@ -13,6 +13,7 @@ import { useAuthStore } from "@/store/authStore";
 import "@azure/core-asynciterator-polyfill";
 import { RNEventSource } from "rn-eventsource-reborn";
 import { ReadableStream, TransformStream } from "web-streams-polyfill";
+import { backendUrl } from "@/constants/Variable";
 
 globalThis.ReadableStream = globalThis.ReadableStream || ReadableStream;
 globalThis.TransformStream = globalThis.TransformStream || TransformStream;
@@ -71,9 +72,8 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 
 function getTrpcUrl() {
   const base = (() => {
-    console.log("backend expo is ", process.env.EXPO_PUBLIC_BACKEND_URL);
-    if (process.env.EXPO_PUBLIC_BACKEND_URL)
-      return process.env.EXPO_PUBLIC_BACKEND_URL;
+    if (backendUrl)
+      return backendUrl;
     return "http://192.168.1.44:4000";
   })();
   return `${base}/trpc`;

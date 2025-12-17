@@ -1,7 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import {  Text, TouchableOpacity, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import StarRating from "react-native-star-rating-widget";
 import { useShopIdStore } from "@/store/shopIdStore";
 import { Image } from "react-native";

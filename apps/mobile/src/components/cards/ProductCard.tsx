@@ -1,10 +1,9 @@
-import { Alert, Image, Text, useColorScheme, View } from "react-native";
+import { Alert, Image, Text, useColorScheme, View,Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React from "react";
 import { RelativePathString, useRouter } from "expo-router";
 import { apiUrl } from "@/constants/Variable";
 import { useDeleteProduct } from "@/query/deleteProduct";
-import { Pressable } from "react-native-gesture-handler";
 import Colors from "@/constants/Colors";
 
 type ProductListingCardProps = {

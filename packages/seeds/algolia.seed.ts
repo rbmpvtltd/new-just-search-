@@ -1,4 +1,5 @@
 import { db, schemas } from "@repo/db";
+import { hireCategories } from "@repo/db/dist/schema/hire.schema";
 import {
   categories,
   subcategories,
@@ -22,10 +23,11 @@ const algoliaClient = algoliasearch(
 
 export async function algoliaSeed() {
   // await algoliaHireSeed()
-  // await algoliaBusinessSeed()
+  // await algoliaBusinessSeed();
   // await algoliaProductOfferSeed();
-  await algoliaCategorySeed();
+  // await algoliaCategorySeed();
   // await algoliaSubCategorySeed();
+  await algoliaAllListingSeed();
 }
 
 async function algoliaCategorySeed() {
@@ -469,3 +471,226 @@ async function algoliaProductOfferSeed() {
 //     console.error("Seed failed:", error);
 //     process.exit(1);
 //   });
+
+async function algoliaAllListingSeed() {
+  try {
+    // =========== BUSINESS DATA ============
+    const businessData = await db
+      .select({
+        id: businessListings.id,
+        name: businessListings.name,
+        photo: businessListings.photo,
+        area: businessListings.area,
+        streetName: businessListings.streetName,
+        buildingName: businessListings.buildingName,
+        longitude: businessListings.longitude,
+        latitude: businessListings.latitude,
+        phoneNumber: businessListings.phoneNumber,
+        categoryId: businessCategories.categoryId,
+        rating: sql<
+          string[]
+        >`COALESCE(AVG(${schemas.business.businessReviews.rate}),0)`,
+        subcategories: sql<string[]>`
+          COALESCE(
+            ARRAY_AGG(DISTINCT subcategories.name) 
+            FILTER (WHERE subcategories.id IS NOT NULL),
+            '{}'
+          )
+        `,
+        category: sql<
+          string | null
+        >`MAX(${schemas.not_related.categories.title})`,
+      })
+      .from(businessListings)
+      .innerJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(
+        schemas.business.businessSubcategories,
+        eq(
+          businessListings.id,
+          schemas.business.businessSubcategories.businessId,
+        ),
+      )
+      .leftJoin(
+        schemas.not_related.subcategories,
+        eq(
+          schemas.business.businessSubcategories.subcategoryId,
+          schemas.not_related.subcategories.id,
+        ),
+      )
+      .leftJoin(
+        schemas.not_related.categories,
+        eq(
+          schemas.not_related.subcategories.categoryId,
+          schemas.not_related.categories.id,
+        ),
+      )
+      .leftJoin(
+        schemas.business.businessReviews,
+        eq(businessListings.id, schemas.business.businessReviews.businessId),
+      )
+      .groupBy(businessListings.id, businessCategories.id);
+
+    // =========== HIRE DATA ============
+    const hireData = await db
+      .select({
+        id: hireListing.id,
+        name: hireListing.name,
+        photo: hireListing.photo,
+        area: hireListing.area,
+        gender: hireListing.gender,
+        languages: hireListing.languages,
+        workExp: hireListing.workExperienceYear,
+        buildingName: hireListing.buildingName,
+        streetName: hireListing.streetName,
+        expectedSalary: hireListing.expectedSalaryFrom,
+        longitude: hireListing.longitude,
+        latitude: hireListing.latitude,
+        workShift: hireListing.workShift,
+        phoneNumber: hireListing.mobileNumber,
+        jobType: hireListing.jobType,
+        categoryId: hireCategories.categoryId,
+        city: cities.city,
+        state: states.name,
+        subcategories: sql<string[]>`
+            COALESCE(
+              ARRAY_AGG(DISTINCT subcategories.name) 
+              FILTER (WHERE subcategories.id IS NOT NULL),
+              '{}'
+            )
+          `,
+        category: sql<string | null>`
+          MAX(${schemas.not_related.categories.title})
+        `,
+      })
+      .from(hireListing)
+      .innerJoin(
+        schemas.hire.hireCategories,
+        eq(hireListing.id, schemas.hire.hireCategories.hireId),
+      )
+      .leftJoin(cities, eq(hireListing.city, cities.id))
+      .leftJoin(states, eq(hireListing.state, states.id))
+      .leftJoin(
+        schemas.hire.hireSubcategories,
+        eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
+      )
+      .leftJoin(
+        schemas.not_related.subcategories,
+        eq(
+          schemas.hire.hireSubcategories.subcategoryId,
+          schemas.not_related.subcategories.id,
+        ),
+      )
+      .leftJoin(
+        schemas.not_related.categories,
+        eq(
+          schemas.not_related.subcategories.categoryId,
+          schemas.not_related.categories.id,
+        ),
+      )
+      .groupBy(hireListing.id, cities.city, states.name, hireCategories.id);
+
+    const bdata = businessData.map((item) => {
+      let longitude = item.longitude?.replaceAll(",", "");
+      let latitude = item.latitude?.replaceAll(",", "");
+      console.log("longi and lati", longitude, latitude);
+      if (isNaN(Number(longitude))) {
+        longitude = "73.0363583";
+      }
+      if (isNaN(Number(latitude))) {
+        latitude = "26.292058";
+      }
+
+      return {
+        objectID: item.id,
+        name: item.name,
+        listingType: "business",
+        photo: item.photo,
+        area: item.area,
+        gender: null,
+        languages: null,
+        workExp: null,
+        expectedSalary: null,
+        longitude,
+        latitude,
+        buildingName: item.buildingName,
+        jobType: null,
+        city: null,
+        state: null,
+        phoneNumber: item.phoneNumber,
+        workShift: null,
+        subcategories: item.subcategories,
+        streetName: item.streetName,
+        category: item.category,
+        categoryId: item.categoryId,
+        rating: Math.ceil(Number(item.rating)),
+        _geoloc: {
+          lat: Number(latitude),
+          lng: Number(longitude),
+        },
+      };
+    });
+
+    const hdata = hireData.map((item) => {
+      let longitude = item.longitude?.replaceAll(",", "");
+      let latitude = item.latitude?.replaceAll(",", "");
+      console.log("longi and lati", longitude, latitude);
+      if (isNaN(Number(longitude))) {
+        longitude = "73.0363583";
+      }
+      if (isNaN(Number(latitude))) {
+        latitude = "26.292058";
+      }
+
+      return {
+        objectID: item.id,
+        name: item.name,
+        listingType: "hire",
+        photo: item.photo,
+        area: item.area,
+        gender: item.gender,
+        languages: item.languages,
+        workExp: item.workExp,
+        expectedSalary: Number(item.expectedSalary),
+        longitude,
+        latitude,
+        buildingName: item.buildingName,
+        jobType: item.jobType,
+        city: item.city,
+        state: item.state,
+        phoneNumber: item.phoneNumber,
+        workShift: item.workShift,
+        subcategories: item.subcategories,
+        categoryId: item.categoryId,
+        rating: null,
+        streetName: item.streetName,
+        category: item.category,
+        _geoloc: {
+          lat: Number(latitude),
+          lng: Number(longitude),
+        },
+      };
+    });
+
+    const finalData = [...bdata, ...hdata];
+    console.log(
+      `Preparing to upload ${finalData.length} records to Algolia...`,
+    );
+
+    await algoliaClient.saveObjects({
+      indexName: "all_listing",
+      objects: finalData,
+    });
+
+    console.log(
+      `✅ Successfully uploaded ${finalData.length} records to Algolia index: business_listing`,
+    );
+
+    return { success: true, count: finalData.length };
+  } catch (error) {
+    console.error("❌ Error uploading to Algolia:", error);
+    throw error;
+  }
+}

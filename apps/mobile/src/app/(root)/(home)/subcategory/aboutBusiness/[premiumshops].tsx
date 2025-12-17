@@ -1,6 +1,5 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Dimensions, Image, ScrollView, Text, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Carousel from "react-native-reanimated-carousel";
 import ShposCard from "@/features/business/show/PremiumShopsCard";
 import { useQuery } from "@tanstack/react-query";
@@ -102,7 +101,6 @@ export default function TabOneScreen() {
       /> 
       <View className="flex-1 items-center">
         <View className="flex-1 justify-center">
-          <GestureHandlerRootView>
             <Carousel
               key={data?.id}
               loop
@@ -126,7 +124,6 @@ export default function TabOneScreen() {
                 );
               }}
             />
-          </GestureHandlerRootView>
         </View>
         <ShposCard item={data} />
       </View>

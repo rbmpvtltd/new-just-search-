@@ -1,5 +1,5 @@
 import { seedRequestAccounts } from "./account_delete_request.seed";
-// import { algoliaSeed } from "./algolia.seed";
+import { algoliaSeed } from "./algolia.seed";
 import { businessSeed } from "./business.seed";
 import { fakeSeed } from "./fake.seed";
 import { feedbackseed } from "./feedback.seed";
@@ -17,9 +17,9 @@ export const dummyImageUrl = "dummyImageUrl";
 (async () => {
   try {
     // Postgres seeding
-    await notRelated();
-    await userSeed();
-    await fakeSeed();
+    // await notRelated();
+    // await userSeed();
+    // await fakeSeed();
     // await businessSeed();
     // await hireSeed();
     // await productSeed();
