@@ -4,6 +4,7 @@ import {
   plans,
   planUserActive,
 } from "@repo/db/dist/schema/plan.schema";
+import { logger } from "@repo/logger";
 import { eq, sql } from "drizzle-orm";
 import z from "zod";
 import { protectedProcedure, router } from "@/utils/trpc";
@@ -42,17 +43,16 @@ export const planRouter = router({
         identifier: plans.identifier,
         createdAt: plans.createdAt,
         updatedAt: plans.updatedAt,
-        
       })
       .from(plans)
       .leftJoin(planAttributes, eq(plans.id, planAttributes.planId))
       .groupBy(plans.id);
 
-    const freePlan = allPlan.filter((item) => item.role === "all")[0];
+    const freePlan = allPlan.filter((item) => item.role === "business")[0];
+    logger.info("freePlan", { freePlan: freePlan });
     if (!freePlan) {
       throw new Error("Free plan not found");
     }
-
     const isActivePlanExist = (
       await db
         .select()
@@ -68,6 +68,7 @@ export const planRouter = router({
       throw new Error("Active plan not found");
     }
 
+    logger.info("allPlan", allPlan);
     return {
       plans: allPlan,
       activePlan: {

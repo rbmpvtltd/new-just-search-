@@ -1,34 +1,59 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from ".";
-import { categories } from "./schema/not-related.schema";
-import { notification } from "./schema/user.schema";
+import { planAttributes, plans, planUserActive } from "./schema/plan.schema";
 
-const data = await db
+const allPlan = await db
   .select({
-    // id: sql`min(${notification.id})`.as("id"),
-    notificationId: notification.notificationId,
-    title: notification.title,
-    description: notification.description,
-    status: notification.status,
-    created_at: notification.createdAt,
-    role: sql<string>`string_agg(DISTINCT ${notification.role}::text, ', ' ORDER BY ${notification.role}::text)`.as(
-      "role",
-    ),
-    category: sql<
-      string | null
-    >`string_agg(DISTINCT ${categories.title}, ', ' ORDER BY ${categories.title})`.as(
-      "category",
-    ),
+    id: plans.id,
+    title: plans.name,
+    attribute: sql<{ name: string; isAvailable: boolean }[]>`
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'name', ${planAttributes.name},
+            'isAvailable', ${planAttributes.isAvailable}
+          )
+        ) FILTER (WHERE ${planAttributes.id} IS NOT NULL),
+        '[]'
+      )
+    `,
+    role: plans.role,
+    amount: plans.amount,
+    currency: plans.currency,
+    planColor: plans.planColor,
+    status: plans.status,
+    features: plans.features,
+    identifier: plans.identifier,
+    createdAt: plans.createdAt,
+    updatedAt: plans.updatedAt,
   })
-  .from(notification)
-  .leftJoin(categories, eq(notification.categoryId, categories.id))
-  .groupBy(
-    notification.notificationId,
-    notification.title,
-    notification.description,
-    notification.status,
-    notification.createdAt,
-  )
-  .limit(10)
-  .offset(0);
-console.log(data);
+  .from(plans)
+  .leftJoin(planAttributes, eq(plans.id, planAttributes.planId))
+  .groupBy(plans.id);
+
+const freePlan = allPlan.filter((item) => item.role === "business")[0];
+if (!freePlan) {
+  throw new Error("Free plan not found");
+}
+const isActivePlanExist = (
+  await db
+    .select()
+    .from(planUserActive)
+    .where(eq(planUserActive.userId, 7))
+    .limit(1)
+)[0];
+
+const activePlan = isActivePlanExist
+  ? allPlan.find((item) => item.id === isActivePlanExist.planId)
+  : freePlan;
+if (!activePlan) {
+  throw new Error("Active plan not found");
+}
+
+console.log("allPlan", {
+  plans: allPlan,
+  activePlan: {
+    planid: activePlan.id,
+    isactive: activePlan.id !== freePlan.id,
+  },
+});
