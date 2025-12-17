@@ -77,28 +77,15 @@ export const authRouter = router({
     }),
   verifyauth: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.token) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "cannot find token",
-      });
+      return { success: false };
     }
 
     const session = await validateSessionToken(ctx.token);
     if (!session) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "token is not valid",
-      });
+      return { success: false };
     }
 
-    // return opts.next({
-    //   ctx: {
-    //     userId: session.userId,
-    //     role: session.role,
-    //     sessionId: session.id,
-    //   },
-    // });
-    return { success: true, role: ctx.role };
+    return { success: true };
   }),
   logout: protectedProcedure.mutation(async ({ ctx }) => {
     await deleteSession(ctx.sessionId);

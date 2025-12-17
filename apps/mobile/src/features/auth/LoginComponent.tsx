@@ -12,26 +12,26 @@ export default function LoginComponent() {
     <>
       {!renderForm && (
         <View className="mt-36 flex-1 justify-center items-center w-full gap-8">
-          {/* <Pressable */}
-          {/*   onPress={() => { */}
-          {/*     setRenderForm("business-hire"); */}
-          {/*   }} */}
-          {/*   className="bg-primary py-4 px-8 rounded-lg w-[80%]" */}
-          {/* > */}
-          {/*   <Text className="mx-auto text-[#fff] text-xl"> */}
-          {/*     Login As Business/Hire */}
-          {/*   </Text> */}
-          {/* </Pressable> */}
-          {/* <Pressable */}
-          {/*   onPress={() => { */}
-          {/*     setRenderForm("visitor"); */}
-          {/*   }} */}
-          {/*   className="bg-primary py-4 px-8 rounded-lg w-[80%]" */}
-          {/* > */}
-          {/*   <Text className="mx-auto text-[#fff] text-xl"> */}
-          {/*     Login As A Visitor */}
-          {/*   </Text> */}
-          {/* </Pressable> */}
+          <Pressable
+            onPress={() => {
+              setRenderForm("business-hire");
+            }}
+            className="bg-primary py-4 px-8 rounded-lg w-[80%]"
+          >
+            <Text className="mx-auto text-[#fff] text-xl">
+              Login As Business/Hire
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              setRenderForm("visitor");
+            }}
+            className="bg-primary py-4 px-8 rounded-lg w-[80%]"
+          >
+            <Text className="mx-auto text-[#fff] text-xl">
+              Login As A Visitor
+            </Text>
+          </Pressable>
         </View>
       )}
       {!!renderForm && (
