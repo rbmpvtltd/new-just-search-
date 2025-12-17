@@ -1,10 +1,9 @@
-import { api, methods } from "@/lib/api";
-import { LoginBusinessFormData } from "@/schemas/loginSchema";
-import { ChangePasswordData } from "@/schemas/changePasswordSchema";
+import type { UserRole } from "@repo/db";
 import { getAuthHeader } from "@/constants/authHeader";
 import { apiUrl } from "@/constants/Variable";
-import { UserRole } from "@repo/db";
-
+import type { LoginBusinessFormData } from "@/features/auth/schema/loginSchema";
+import { api, methods } from "@/lib/api";
+import type { ChangePasswordData } from "@/schemas/changePasswordSchema";
 
 export type UserData = {
   success: boolean;

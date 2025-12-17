@@ -12,7 +12,7 @@ export const MyProfile = () => {
     trpc.userRouter.getUserProfile.queryOptions(),
   );
   return (
-    <View className=" bg-base-100 py-8 w-[90%] rounded-lg">
+    <View className=" bg-base-300 py-8 mt-4 w-[90%] rounded-lg">
       <View className="flex-row items-center relative justify-around w-[100%] gap-4 px-8">
         <View className="relative">
           <View className="w-28 h-28 rounded-lg">

@@ -20,10 +20,9 @@ import { type VerifyOtpData, verifyOtp } from "@/query/verifyOtp";
 import { type SignupFormData, signupSchema } from "@/schemas/signupSchema";
 import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
-import Input from "../inputs/Input";
+import Input from "../../../components/inputs/Input";
 
-
-const SignupComponent: React.FC = () => {
+const SignUpComponent: React.FC = () => {
   const { setToken: setAuthStoreToken } = useAuthStore(); // Get setToken from Zustand
   const [agree, setAgree] = useState(false);
   const colorScheme = useColorScheme();
@@ -50,7 +49,7 @@ const SignupComponent: React.FC = () => {
     const response = await verifyBusinessOtp(data);
     if (response.success) {
       setAuthStoreToken(response.token, response.role);
-      await setTokenRole(response.token,response.role);
+      await setTokenRole(response.token, response.role);
       return router.back();
     }
     Alert.alert(response.message);
@@ -232,4 +231,4 @@ const SignupComponent: React.FC = () => {
   );
 };
 
-export default SignupComponent;
+export default SignUpComponent;

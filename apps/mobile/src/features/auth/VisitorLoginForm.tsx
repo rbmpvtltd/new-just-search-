@@ -9,11 +9,11 @@ import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import Input from "@/components/inputs/Input";
-import { fetchVisitorData, sendVisitorOtp } from "@/query/sendVisitorOtp";
 import {
   type LoginVisitorFormData,
   loginVisitorSchema,
-} from "@/schemas/loginSchema";
+} from "@/features/auth/schema/loginSchema";
+import { fetchVisitorData, sendVisitorOtp } from "@/query/sendVisitorOtp";
 import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
 

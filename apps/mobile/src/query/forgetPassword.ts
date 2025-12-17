@@ -1,6 +1,6 @@
 import { apiUrl } from "@/constants/Variable";
+import type { ForgetPasswordFormData } from "@/features/auth/schema/loginSchema";
 import { api, methods } from "@/lib/api";
-import type { ForgetPasswordFormData } from "@/schemas/loginSchema";
 
 export const sendForgetPasswordOtp = async (data: {
   mobile_no: string;

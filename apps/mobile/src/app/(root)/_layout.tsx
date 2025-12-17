@@ -170,7 +170,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: isAuthenticated.isSuccess ? "Profile" : "Login",
+          title: isAuthenticated ? "Profile" : "Login",
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-outline" size={24} color={color} />
           ),
