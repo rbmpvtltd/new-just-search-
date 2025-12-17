@@ -2,7 +2,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
 import PaymentButton from "./components/PaymentButton";
 
-type PlanArray = OutputTrpcType["planRouter"]["list"];
+type PlanArray = OutputTrpcType["planRouter"]["list"]["plans"];
 type Plan = UnwrapArray<PlanArray>;
 
 export default function PricingCard({ plan }: { plan: Plan }) {
