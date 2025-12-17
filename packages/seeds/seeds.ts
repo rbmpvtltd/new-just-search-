@@ -1,5 +1,5 @@
 import { seedRequestAccounts } from "./account_delete_request.seed";
-// import { algoliaSeed } from "./algolia.seed";
+import { algoliaSeed } from "./algolia.seed";
 import { businessSeed } from "./business.seed";
 import { fakeSeed } from "./fake.seed";
 import { feedbackseed } from "./feedback.seed";
@@ -22,12 +22,12 @@ export const dummyImageUrl = "dummyImageUrl";
     // await fakeSeed();
     // await businessSeed();
     // await hireSeed();
-    await productSeed();
-    await offerSeed();
-    await feedbackseed();
-    await seedRequestAccounts();
-    await planSeed();
-    // await algoliaSeed();
+    // await productSeed();
+    // await offerSeed();
+    // await feedbackseed();
+    // await seedRequestAccounts();
+    // await planSeed();
+    await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
 

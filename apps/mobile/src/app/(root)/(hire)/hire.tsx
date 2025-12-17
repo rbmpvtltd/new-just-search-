@@ -74,16 +74,14 @@
 //     </SafeAreaView>
 //   );
 // }
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import HireSearchForm from "@/features/hire/show/hireSearchForm";
 import HireCard from "@/features/hire/show/HireCard";
 import { searchClient } from "@/lib/algoliaClient";
 import { Configure, InstantSearch } from "react-instantsearch-core";
 import { InfiniteHits } from "@/components/home/InfiniteHits";
 import type { Hit as AlgoliaHit } from "instantsearch.js";
 import { SearchBox } from "@/components/home/SearchBox";
-import { router } from "expo-router";
 import { HireFilters } from "@/features/hire/show/HireFilter";
 import { useState } from "react";
 
@@ -147,19 +145,19 @@ function HireHitCard({ hit }: { hit: HireListingHitType }) {
   return <HireCard item={hit} />;
 }
 
-function Hit({ hit }: { hit: any }) {
-  return (
-    <View className="px-4">
-      <Pressable
-        onPress={() => {
-          console.log("clicked on", hit.objectID);
-          router.push(
-            `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
-          );
-        }}
-      >
-        <Text className="text-lg text-secondary-content">{hit.name}</Text>
-      </Pressable>
-    </View>
-  );
-}
+// function Hit({ hit }: { hit: any }) {
+//   return (
+//     <View className="px-4">
+//       <Pressable
+//         onPress={() => {
+//           console.log("clicked on", hit.objectID);
+//           router.push(
+//             `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
+//           );
+//         }}
+//       >
+//         <Text className="text-lg text-secondary-content">{hit.name}</Text>
+//       </Pressable>
+//     </View>
+//   );
+// }

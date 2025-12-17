@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -10,16 +10,12 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
-  Pressable
+  Pressable,
 } from "react-native";
-import { HIRE_DETAIL_URL } from "@/constants/apis";
-import Colors from "@/constants/Colors";
-import { useSuspenceData } from "@/query/getAllSuspense";
 import { useStartChat } from "@/query/startChat";
 import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
-import Review from "../../../components/forms/review";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
 import { Loading } from "../../../components/ui/Loading";
@@ -28,7 +24,7 @@ const screenWidth = Dimensions.get("window").width;
 export default function HireDetailsCard(item: any) {
   const [aspectRatio, setAspectRatio] = useState(3 / 4);
 
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
   const { mutate: startChat } = useStartChat();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   const clearToken = useAuthStore((state) => state.clearToken);
@@ -38,9 +34,7 @@ export default function HireDetailsCard(item: any) {
     trpc.hirerouter.singleHire.queryOptions({ hireId: Number(hiredetails) }),
   );
   if (isLoading) {
-    return (
-      <Loading position="center" size={"large"}/>
-    );
+    return <Loading position="center" size={"large"} />;
   }
   console.log("data is ===========>", JSON.stringify(data, null, 2));
   // return <Text className="text-secondary text-3xl">for test purpose {hiredetails}</Text>
@@ -102,7 +96,7 @@ export default function HireDetailsCard(item: any) {
           <Image
             className=""
             source={{
-              uri: "https://www.justsearch.net.in/assets/images/9706277681737097544.jpg"
+              uri: "https://www.justsearch.net.in/assets/images/9706277681737097544.jpg",
             }}
             style={{
               width: "100%",
@@ -117,17 +111,17 @@ export default function HireDetailsCard(item: any) {
             {data.data?.name}
           </Text>
           <Text className="text-secondary">
-            {data?.data?.gender} AGE
+            {data?.data?.gender}, AGE=
             {calculateAge(data?.data?.dob)}
           </Text>
         </View>
         <View className="flex-row gap-2 mb-2 flex-wrap">
-            <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">
-              <Text className="text-success font-semibold text-xs">
-                {data?.data?.category ?? "Fake Category"}
-              </Text>
-            </TouchableOpacity>
-          {data?.data?.subcategories?.map((item,i) => (
+          <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">
+            <Text className="text-success font-semibold text-xs">
+              {data?.data?.category ?? "Fake Category"}
+            </Text>
+          </TouchableOpacity>
+          {data?.data?.subcategories?.map((item, i) => (
             <TouchableOpacity
               key={i.toString()}
               className="bg-error-content rounded-lg py-2 px-3 mb-1"
@@ -198,20 +192,19 @@ export default function HireDetailsCard(item: any) {
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Languages: </Text>
               <Text>{data?.data?.languages?.join(",")}</Text>
-              {data?.data?.languages?.length && (<Text>Hindi</Text>)}
+              {data?.data?.languages?.length && <Text>Hindi</Text>}
             </Text>
           </View>
 
-          
-            <View className="flex-row items-center gap-4 mb-3">
-              <Ionicons name="construct-outline" size={16} color="#888" />
-              <Text className="text-lg text-secondary">
-                <Text className="font-semibold">Skillsets:</Text>
-                <Text className="text-secondary font-light">
-                  {data?.data?.skillSet}
-                </Text>
+          <View className="flex-row items-center gap-4 mb-3">
+            <Ionicons name="construct-outline" size={16} color="#888" />
+            <Text className="text-lg text-secondary">
+              <Text className="font-semibold">Skillsets:</Text>
+              <Text className="text-secondary font-light">
+                {data?.data?.skillSet}
               </Text>
-            </View>
+            </Text>
+          </View>
           <View className="flex-row items-center gap-4 mb-3">
             <Ionicons name="globe-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
@@ -223,8 +216,8 @@ export default function HireDetailsCard(item: any) {
             <Ionicons name="location-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary w-[100%]">
               <Text className="font-semibold w-[90%]">Location:</Text>
-              {data?.data?.area}, {data?.data?.city},
-              {data?.data?.state}, {data?.data?.pincode}
+              {data?.data?.area}, {data?.data?.city},{data?.data?.state},{" "}
+              {data?.data?.pincode}
             </Text>
           </View>
         </View>
@@ -267,7 +260,9 @@ export default function HireDetailsCard(item: any) {
               </Pressable>
             </View>
             <View className="w-[45%] bg-primary rounded-lg py-2 px-4">
-              <Pressable onPress={() => dialPhone(String(data?.data?.mobileNo))}>
+              <Pressable
+                onPress={() => dialPhone(String(data?.data?.mobileNo))}
+              >
                 <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
                   <Ionicons size={20} name="call" color={"white"} />
                   <Text className="text-[#ffffff] font-semibold">

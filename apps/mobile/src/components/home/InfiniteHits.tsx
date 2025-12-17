@@ -122,7 +122,7 @@ export function InfiniteHits<THit extends AlgoliaHit = AlgoliaHit>({
       }}
       ListEmptyComponent={() => (
         <View className="flex-1">
-          <Loading position="center" />
+          <Text className="text-secondary-content">Data Not Found</Text>
         </View>
       )}
       ListFooterComponent={() =>

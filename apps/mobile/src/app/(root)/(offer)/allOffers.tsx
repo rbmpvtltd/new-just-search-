@@ -28,7 +28,7 @@ function AllOffers() {
   const [isModalOpen, setModalOpen] = useState(false);
   return (
     <SafeAreaView className="flex-1">
-      <View className="">
+      <View className="-mb-14 flex-1">
         <InstantSearch
           searchClient={searchClient}
           indexName="product_offer_listing"

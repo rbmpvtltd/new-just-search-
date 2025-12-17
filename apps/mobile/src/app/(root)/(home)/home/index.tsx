@@ -56,7 +56,7 @@ export default function TabOneScreen() {
         <Banner1 />
     //     <Banner1 /> */}
 
-        <InstantSearch searchClient={searchClient} indexName="business_listing">
+        <InstantSearch searchClient={searchClient} indexName="all_listing">
           <SearchBox />
           <Configure hitsPerPage={5} />
           <InfiniteHits hitComponent={Hit} />
@@ -105,10 +105,14 @@ function Hit({ hit }: { hit: any }) {
     <View className="px-4">
       <Pressable
         onPress={() => {
+          if (hit.listingType === "business") {
+            router.push(
+              `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
+            );
+          } else if (hit.listingType === "hire") {
+            router.push(`/(root)/(hire)/hireDetail/${hit.objectID}`);
+          }
           console.log("clicked on", hit.objectID);
-          router.push(
-            `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
-          );
         }}
       >
         <Text className="text-lg text-secondary-content">{hit.name}</Text>

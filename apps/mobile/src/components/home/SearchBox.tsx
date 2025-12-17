@@ -3,7 +3,9 @@ import { StyleSheet, View, TextInput, useColorScheme } from "react-native";
 import { useSearchBox, type UseSearchBoxProps } from "react-instantsearch-core";
 import Colors from "@/constants/Colors";
 
-interface SearchBoxProps extends UseSearchBoxProps {}
+interface SearchBoxProps extends UseSearchBoxProps {
+  placeholder?: string;
+}
 
 export function SearchBox(props: SearchBoxProps) {
   const { query, refine } = useSearchBox(props);
@@ -27,7 +29,7 @@ export function SearchBox(props: SearchBoxProps) {
   return (
     <View className="bg-base-300 w-full ">
       <TextInput
-        placeholder="Search Anything"
+        placeholder={props.placeholder ?? "Search Anything"}
         placeholderTextColor={
           Colors[colorSheme ?? "light"]["secondary-content"]
         }

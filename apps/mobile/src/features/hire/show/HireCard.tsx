@@ -19,7 +19,6 @@
 
 // type HireCardType = OutputTrpcType["hirerouter"]["MobileAllHireLising"]["data"][0] | null
 
-
 // const screenWidth = Dimensions.get("window").width;
 // export default function HireCard({ item, title }: {item : HireCardType ,title? :any}) {
 //   const colorScheme = useColorScheme();
@@ -79,7 +78,7 @@
 //         </View> */}
 //       </View>
 //       <View className="flex-row gap-2 m-4 flex-wrap">
-     
+
 //           <TouchableOpacity
 //             className="bg-success-content rounded-lg py-2 px-3 mb-1"
 //           >
@@ -187,7 +186,7 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
-  Pressable
+  Pressable,
 } from "react-native";
 
 import Colors from "@/constants/Colors";
@@ -199,17 +198,22 @@ import { OutputTrpcType } from "@/lib/trpc";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HireListingHitType } from "@/app/(root)/(hire)/(allHire)";
+import { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 
-
-
-export default function HireCard({ item, title }: {item : HireListingHitType ,title? :any}) {
+export default function HireCard({
+  item,
+  title,
+}: {
+  item: HireListingHitType | SubcategoryHitType;
+  title?: any;
+}) {
   const colorScheme = useColorScheme();
 
-
-  
   return (
-
-   <Pressable className="" onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}>
+    <Pressable
+      className=""
+      onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+    >
       <View className="h-auto rounded-xl m-auto w-[90%] bg-base-200 py-8 mb-4 shadow-2xl ">
         <View className="flex-row items-center justify-center w-full">
           <View className="relative top-1">
@@ -219,7 +223,7 @@ export default function HireCard({ item, title }: {item : HireListingHitType ,ti
               iconClass="p-6 rounded-full border-2 border-secondary flex items-center justify-center"
               imageStyle={{ resizeMode: "contain" }}
             />
-          {/*{Number(item?.user?.verify) === 1 && (
+            {/*{Number(item?.user?.verify) === 1 && (
               <View className="absolute -bottom-3 left-1/2 -translate-x-1/2">
                 <View
                   className="px-4 py-1 rounded-lg flex-row items-center gap-1"
@@ -244,24 +248,22 @@ export default function HireCard({ item, title }: {item : HireListingHitType ,ti
         </View>
 
         <View className="flex-row flex-wrap gap-2 ml-4">
-            <TouchableOpacity
-              className="bg-success-content rounded-lg py-2 px-2 mb-1"
-              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
-            >
-              <Text className="text-success font-semibold text-xs">
-                {item?.category ?? "fake category"}
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            className="bg-success-content rounded-lg py-2 px-2 mb-1"
+            onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+          >
+            <Text className="text-success font-semibold text-xs">
+              {item?.category ?? "fake category"}
+            </Text>
+          </TouchableOpacity>
 
-           {item?.subcategories?.slice(0,2).map((sub: string, i: number) => (
+          {item?.subcategories?.slice(0, 2).map((sub: string, i: number) => (
             <TouchableOpacity
               key={i.toString()}
               className="bg-error-content rounded-lg py-2 px-2 mb-1"
               onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
             >
-              <Text className="text-pink-700 font-semibold text-xs">
-                {sub}
-              </Text>
+              <Text className="text-pink-700 font-semibold text-xs">{sub}</Text>
             </TouchableOpacity>
           ))}
           {Number(item?.subcategories?.length) > 2 && (
@@ -288,10 +290,11 @@ export default function HireCard({ item, title }: {item : HireListingHitType ,ti
         <View className="mx-4 my-2">
           <View className="flex-row items-start">
             <Text className="text-secondary font-black mr-2">Job Type : </Text>
-            <Text className="text-secondary-content flex-1">
-             fake job{item?.jobType.join(", ")}
-            </Text>
-           
+            {item?.jobType && (
+              <Text className="text-secondary-content flex-1">
+                fake job{item?.jobType.join(", ")}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -303,7 +306,8 @@ export default function HireCard({ item, title }: {item : HireListingHitType ,ti
               color={colorScheme === "dark" ? "#F87171" : "#DC2626"}
             />
             <Text className="text-base text-secondary-content">
-              {item?.area},  {item?.buildingName } {/** TODO: add street name when seed update */}
+              {item?.area}, {item?.buildingName}{" "}
+              {/** TODO: add street name when seed update */}
             </Text>
           </View>
         </View>

@@ -23,34 +23,25 @@ import Favourite from "../shared/FaouritBtn";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
 import { showLoginAlert } from "@/utils/alert";
-
-type DetailCardType =
-  OutputTrpcType["subcategoryRouter"]["businessesByCategoryInfinate"]["data"][number];
+import { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 
 const screenWidth = Dimensions.get("window").width;
 
 function DetailCard({
   item,
   type,
-  category,
-  subcategories,
 }: {
-  item: DetailCardType;
+  item: SubcategoryHitType;
   type: number;
-  category: string;
-  subcategories: any;
 }) {
   const [aspectRatio, setAspectRatio] = useState(3 / 4);
   const { setShopId } = useShopIdStore();
-  const colorScheme = useColorScheme()
+  const colorScheme = useColorScheme();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   const { mutate: toggleWishlist } = useToggleWishlist();
   const clearToken = useAuthStore((state) => state.clearToken);
   const { data: wishlist = [] } = useWishlist();
   const { mutate: startChat } = useStartChat();
-
-  const latitude = Number(item?.latitude?.split(",").shift());
-  const longitude = Number(item?.longitude?.split(",").pop());
 
   const wishlistArray = Array.isArray(wishlist?.data) ? wishlist.data : [];
 
@@ -69,12 +60,12 @@ function DetailCard({
   }
 
   return (
-     <Pressable
+    <Pressable
       onPress={() => {
-        setShopId(String(item.id));
+        setShopId(String(item.objectID));
         router.navigate({
           pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-          params: { premiumshops: item.id.toString() },
+          params: { premiumshops: item.objectID },
         });
       }}
     >
@@ -87,7 +78,9 @@ function DetailCard({
         <View className="flex-row p-3 ">
           <View>
             <AvatarWithFallback
-              uri={"https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png"} // TODO : change image when upload on cloudinary
+              uri={
+                "https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png"
+              } // TODO : change image when upload on cloudinary
               imageClass="w-[150px] h-[180px] rounded-lg"
               iconClass="items-center justify-center"
               imageStyle={{ resizeMode: "stretch" }}
@@ -106,48 +99,24 @@ function DetailCard({
                 <Pressable
                   className=""
                   onPress={() => {
-                    if (!isAuthenticated) {
-                      showLoginAlert({
-                        message: "Need to login to add to your wishlist",
-                        onConfirm: () => {
-                          clearToken();
-                          router.push("/(root)/profile");
-                        },
-                      });
-                      return;
-                    }
-                    toggleWishlist(
-                      { listing_id: item?.id?.toString() },
-                      {
-                        onSuccess: () => {
-                          console.log("Wishlist added successfully");
-                        },
-                        onError: (error) => {
-                          console.log("error", error);
-                          Alert.alert(
-                            "Error toggling wishlist",
-                            error?.message,
-                          );
-                        },
-                      },
-                    );
+                    router.push({
+                      pathname:
+                        "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                      params: { premiumshops: item.objectID },
+                    });
                   }}
                 >
                   <Ionicons
                     size={26}
-                    color={
-                      isFavourite
-                        ? "red"
-                        : Colors[colorScheme ?? "light"].secondary
-                    }
-                    name={isFavourite ? "heart" : "heart-outline"}
+                    color={Colors[colorScheme ?? "light"].secondary}
+                    name="heart-outline"
                   />
                 </Pressable>
               )}
             </View>
             <View className="my-2">
               <StarRating
-                rating={rating}
+                rating={item.rating}
                 onChange={() => {}}
                 starSize={18}
                 enableSwiping={false}
@@ -168,44 +137,45 @@ function DetailCard({
               <TouchableOpacity
                 className="bg-success-content rounded-lg py-2 px-1"
                 onPress={() => {
-                  setShopId(String(item.id));
+                  setShopId(String(item.objectID));
                   router.navigate({
-                    pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                    params: { premiumshops: item.id.toString() },
+                    pathname:
+                      "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                    params: { premiumshops: item.objectID },
                   });
                 }}
               >
                 <Text className="text-success font-semibold text-xs">
-                  {category}
+                  {item.category}
                 </Text>
               </TouchableOpacity>
-              {subcategories
-                ?.slice(0, 2)
-                .map((sub: any, index: number) => (
-                  <TouchableOpacity
-                    key={index.toString()}
-                    className="bg-error-content rounded-lg py-2 px-2 mb-1"
-                    onPress={() => {
-                      setShopId(String(item.id));
-                      router.navigate({
-                        pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                        params: { premiumshops: item.id.toString() },
-                      });
-                    }}
-                  >
-                    <Text className="text-pink-700 font-semibold text-xs">
-                      {sub}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+              {item.subcategories.slice(0, 2).map((sub: any, index: number) => (
+                <TouchableOpacity
+                  key={index.toString()}
+                  className="bg-error-content rounded-lg py-2 px-2 mb-1"
+                  onPress={() => {
+                    setShopId(String(item.objectID));
+                    router.navigate({
+                      pathname:
+                        "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                      params: { premiumshops: item.objectID },
+                    });
+                  }}
+                >
+                  <Text className="text-pink-700 font-semibold text-xs">
+                    {sub}
+                  </Text>
+                </TouchableOpacity>
+              ))}
               {item.subcategories?.length > 2 && (
                 <TouchableOpacity
                   className="bg-base-100 rounded-lg py-2 px-4 mb-1"
                   onPress={() => {
-                    setShopId(String(item.id));
+                    setShopId(String(item.objectID));
                     router.navigate({
-                      pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                      params: { premiumshops: item.id.toString() },
+                      pathname:
+                        "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                      params: { premiumshops: item.objectID },
                     });
                   }}
                 >
@@ -240,10 +210,11 @@ function DetailCard({
           <View className="rounded-lg bg-primary p-1">
             <Pressable
               onPress={() => {
-                setShopId(String(item.id));
+                setShopId(String(item.objectID));
                 router.navigate({
-                  pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                  params: { premiumshops: item.id.toString() },
+                  pathname:
+                    "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                  params: { premiumshops: item.objectID },
                 });
               }}
             >
@@ -256,10 +227,11 @@ function DetailCard({
           <View className="rounded-lg bg-primary p-1">
             <Pressable
               onPress={() => {
-                setShopId(String(item.id));
+                setShopId(String(item.objectID));
                 router.navigate({
-                  pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                  params: { premiumshops: item.id.toString() },
+                  pathname:
+                    "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                  params: { premiumshops: item.objectID },
                 });
               }}
             >
@@ -272,10 +244,11 @@ function DetailCard({
             <View className="rounded-lg bg-primary p-1">
               <Pressable
                 onPress={() => {
-                  setShopId(String(item.id));
+                  setShopId(String(item.objectID));
                   router.navigate({
-                    pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                    params: { premiumshops: item.id.toString() },
+                    pathname:
+                      "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                    params: { premiumshops: item.objectID },
                   });
                 }}
               >
