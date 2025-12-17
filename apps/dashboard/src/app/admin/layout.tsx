@@ -23,7 +23,7 @@ export default async function DashboardLayout({
           } as React.CSSProperties
         }
       >
-        <AppSidebar data={adminSidebarData} />
+        <AppSidebar data={adminSidebarData} currentPath="/admin" />
         <SidebarInset>
           <SiteHeader />
           <div className="flex flex-1 bg-[#f7f7f7f7] flex-col">{children}</div>
