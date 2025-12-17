@@ -20,6 +20,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import ErrorHandler from "@/components/layout/NativeErrorBoundry";
+import { androidPaymentApiKey, iosPaymentApiKey } from "@/constants/Variable";
 import useGoogleUpdate from "@/hooks/useUpdateApplication";
 import { queryClient } from "@/lib/trpc";
 
@@ -72,13 +73,10 @@ function RootLayoutNav() {
   useEffect(() => {
     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
 
-    const iosApiKey = "appl_RiTjBDuyekUKpwXeFXIFzKujefz";
-    const androidApiKey = "test_OlGUPjHqBFswfIxwlLKklPFNVjt";
-
     if (Platform.OS === "ios") {
-      Purchases.configure({ apiKey: iosApiKey });
+      Purchases.configure({ apiKey: iosPaymentApiKey });
     } else if (Platform.OS === "android") {
-      Purchases.configure({ apiKey: androidApiKey });
+      Purchases.configure({ apiKey: androidPaymentApiKey });
     }
   }, []);
 

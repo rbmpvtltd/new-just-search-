@@ -1,15 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { router, Tabs, usePathname } from "expo-router";
-import { Alert, SafeAreaView, Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Tabs, usePathname } from "expo-router";
+import { useColorScheme } from "react-native";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import Colors from "@/constants/Colors";
 import { useNotificationCount } from "@/query/notification/notication";
 import { useAuthStore } from "@/store/authStore";
-import { showLoginAlert } from "@/utils/alert";
-import { useQuery } from "@tanstack/react-query";
-import { trpc } from "@/lib/trpc";
 
 export default function TabLayout() {
   const {
@@ -21,8 +17,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   const isAboutBusiness = pathname.startsWith("/subcategory/aboutBusiness");
-  const isAuthenticated = useQuery(trpc.auth.verifyauth.queryOptions());
-  const clearToken = useAuthStore((state) => state.clearToken);
+  const isAuthenticated = useAuthStore((state) => state.authenticated);
 
   if (isLoading) {
     return <Loading position="center" />;

@@ -74,7 +74,7 @@ export const adminOfferRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: adminProcedure.query(async ({ ctx }) => {
+  add: adminProcedure.query(async () => {
     const getBusinessCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 1),
     });
@@ -101,8 +101,8 @@ export const adminOfferRouter = router({
     }),
 
   create: adminProcedure
-    .input(offersInsertSchema)
-    .mutation(async ({ ctx, input }) => {
+    .input(offersInsertSchema.extend({ businessId: z.number() }))
+    .mutation(async ({ input }) => {
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.id, input.businessId),
@@ -180,7 +180,7 @@ export const adminOfferRouter = router({
 
   edit: adminProcedure
     .input(z.object({ offerId: z.number() }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input }) => {
       const getBusinessCategories = await db.query.categories.findMany({
         where: (categories, { eq }) => eq(categories.type, 1),
       });
@@ -247,7 +247,7 @@ export const adminOfferRouter = router({
     }),
 
   update: adminProcedure
-    .input(offersUpdateSchema)
+    .input(offersUpdateSchema.extend({ businessId: z.number() }))
     .mutation(async ({ input }) => {
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>

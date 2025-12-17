@@ -7,10 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 import Input from "@/components/inputs/Input";
-import { loginWithGoogle } from "@/query/google-login";
 import { fetchVisitorData, sendVisitorOtp } from "@/query/sendVisitorOtp";
 import {
   type LoginVisitorFormData,
@@ -18,7 +16,6 @@ import {
 } from "@/schemas/loginSchema";
 import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
-import Input from "@/components/inputs/Input";
 
 // GoogleSignin.configure({
 //   webClientId:

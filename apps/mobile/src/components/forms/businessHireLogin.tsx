@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
+import Purchases from "react-native-purchases";
 import { trpc } from "@/lib/trpc";
 import {
   type LoginBusinessFormData,
@@ -33,6 +34,7 @@ export default function BusinessHireLogin() {
         if (data) {
           console.log("data is =dfsfsfsdfsdfsdfsdf=====>", data);
           setAuthStoreToken(data?.session ?? "", data.role ?? "visiter"); // TODO : set role as the response comes in future
+          await Purchases.logIn(data?.revanueCatToken ?? "");
           await setTokenRole(data?.session ?? "", data.role ?? "visiter");
           Alert.alert("Login Successfully");
           // router.push("/(root)/(home)/home");

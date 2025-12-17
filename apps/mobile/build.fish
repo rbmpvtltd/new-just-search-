@@ -57,10 +57,12 @@ switch $platform
         # Validate profile
         switch $profile
             case development preview production
+                notify-send "Build started"
                 cleanup
                 cd $mydir
                 TMPDIR=~/eas-build-tmp eas build --platform $platform --clear-cache --local --profile=$profile
                 java-24
+                notify-send "Build complete"
             case '*'
                 usage
         end

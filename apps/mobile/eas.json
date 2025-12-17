@@ -10,7 +10,9 @@
       "distribution": "internal",
       "channel": "development",
       "env": {
-        "EAS_BUILD_PROFILE": "development"
+        "EAS_BUILD_PROFILE": "development",
+        "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt"
       },
       "android": {
         "buildType": "apk"
@@ -27,7 +29,9 @@
       },
       "env": {
         "EAS_BUILD_PROFILE": "preview",
-          "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/"
+        "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/",
+        "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt"
       }
     },
     "production": {
@@ -39,7 +43,9 @@
       },
       "env": {
         "EAS_BUILD_PROFILE": "production",
-        "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/"
+        "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/",
+        "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt"
       }
     }
   },
