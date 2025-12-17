@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1765865615628,
-      "tag": "0000_living_energizer",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1765884889046,
-      "tag": "0001_nasty_paibok",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1765609125422,
-      "tag": "0002_free_blue_shield",
+      "when": 1765971865361,
+      "tag": "0000_medical_zombie",
       "breakpoints": true
     }
   ]

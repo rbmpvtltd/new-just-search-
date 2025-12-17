@@ -15,9 +15,9 @@ import {
 } from "@repo/db/dist/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -205,10 +205,7 @@ export const adminHireRouter = router({
         message: "City not found",
       });
     }
-    const slugifyName = slugify(input.name, {
-      lower: true,
-      strict: true,
-    });
+    const slugifyName = slugify(input.name);
 
     const [createHire] = await db
       .insert(hireListing)

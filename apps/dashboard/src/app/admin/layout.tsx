@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { redirectRole } from "@/utils/redirect";
 import { adminSidebarData } from "./sidebar-data";
 export default async function DashboardLayout({
   children,
@@ -14,6 +15,9 @@ export default async function DashboardLayout({
     trpcServer.auth.dashboardverify.query(),
   );
   if (verityDashboardUser.data?.success) {
+    if (verityDashboardUser.data.role !== "admin") {
+      return redirect(redirectRole(verityDashboardUser.data.role ?? ""));
+    }
     return (
       <SidebarProvider
         style={

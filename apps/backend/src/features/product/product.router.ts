@@ -7,9 +7,9 @@ import {
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   businessProcedure,
   protectedProcedure,
@@ -91,10 +91,7 @@ export const productrouter = router({
           message: "Business not found",
         });
       }
-      const slugifyName = slugify(input.productName, {
-        lower: true,
-        strict: true,
-      });
+      const slugifyName = slugify(input.productName);
 
       const [product] = await db
         .insert(schemas.product.products)

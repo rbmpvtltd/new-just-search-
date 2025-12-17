@@ -5,9 +5,20 @@ export const safeArray = (val: any) => {
     return parsed.map((v) =>
       typeof v === "string"
         ? v.trim().charAt(0).toUpperCase() + v.trim().slice(1).toLowerCase()
-        : v
+        : v,
     );
   } catch {
     return [];
   }
 };
+
+import slugifylib from "slugify";
+
+export const slugify = (name: string) =>
+  slugifylib(name, {
+    replacement: "-",
+    remove: /[*+~.()'"!:@]/g,
+    lower: true,
+    strict: true,
+    trim: true,
+  });

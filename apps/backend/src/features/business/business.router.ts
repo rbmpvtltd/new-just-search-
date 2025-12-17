@@ -27,12 +27,12 @@ import {
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
 } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   businessProcedure,
   protectedProcedure,
@@ -142,10 +142,7 @@ export const businessrouter = router({
         });
       }
 
-      const slugifyName = slugify(input.name, {
-        lower: true,
-        strict: true,
-      });
+      const slugifyName = slugify(input.name);
       const [createBusiness] = await db
         .insert(schemas.business.businessListings)
         .values({

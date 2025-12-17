@@ -7,9 +7,9 @@ import {
 } from "@repo/db/dist/schema/offer.schema";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   businessProcedure,
   protectedProcedure,
@@ -81,10 +81,7 @@ export const offerrouter = router({
           message: "Business not found",
         });
       }
-      const slugifyName = slugify(input.offerName, {
-        lower: true,
-        strict: true,
-      });
+      const slugifyName = slugify(input.offerName);
 
       const startDate = new Date();
       const endDate = new Date(startDate);
@@ -333,12 +330,10 @@ export const offerrouter = router({
       return { success: true };
     }),
   createOfferReview: protectedProcedure
-    .input(
-      insertOfferReviewSchema
-    )
-    .mutation(async ({ input,ctx }) => {
+    .input(insertOfferReviewSchema)
+    .mutation(async ({ input, ctx }) => {
       const { email, message, name, offerId, rate, status, view } = input;
-      const {userId} = ctx
+      const { userId } = ctx;
       const reviewExist = await offerReviewExist(userId, offerId, email ?? "");
       if (reviewExist) {
         throw new TRPCError({
@@ -358,10 +353,12 @@ export const offerrouter = router({
       );
       return { success: true, data: data };
     }),
-    offerReviewSubmitted : protectedProcedure.input(z.object({offerId:z.number()})).query(async ({input,ctx})=>{
-      const {offerId} = input;
-      const {userId} = ctx
-      const submitted = await offerReviewExist(userId,offerId)
-      return {submitted:submitted}
-    })
+  offerReviewSubmitted: protectedProcedure
+    .input(z.object({ offerId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { offerId } = input;
+      const { userId } = ctx;
+      const submitted = await offerReviewExist(userId, offerId);
+      return { submitted: submitted };
+    }),
 });

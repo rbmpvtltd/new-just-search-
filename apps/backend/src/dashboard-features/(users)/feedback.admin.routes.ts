@@ -10,7 +10,7 @@ import {
 import { feedbacks } from "@repo/db/dist/schema/user.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
-import slugify from "slugify";
+import { slugify } from "@/lib/slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,

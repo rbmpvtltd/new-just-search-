@@ -16,12 +16,12 @@ import {
 } from "@repo/db/dist/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
 } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -215,10 +215,7 @@ export const adminBusinessRouter = router({
         });
       }
 
-      const slugifyName = slugify(input.name, {
-        lower: true,
-        strict: true,
-      });
+      const slugifyName = slugify(input.name);
       const [createBusiness] = await db
         .insert(businessListings)
         .values({
