@@ -15,6 +15,13 @@
       "when": 1765884889046,
       "tag": "0001_nasty_paibok",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765609125422,
+      "tag": "0002_free_blue_shield",
+      "breakpoints": true
     }
   ]
 }
