@@ -18,8 +18,8 @@ import {
 } from "@/components/forms/formComponent";
 import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
+import { useAuthStore } from "@/features/auth/authStore";
 import { trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 
 type AddOfferSchema = z.infer<typeof offersInsertSchema>;
 export default function AddOffer() {

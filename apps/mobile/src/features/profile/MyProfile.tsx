@@ -2,9 +2,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 
 export const MyProfile = () => {
   const role = useAuthStore((state) => state.role);

@@ -19,8 +19,8 @@ import {
 } from "@/components/forms/formComponent";
 import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
+import { useAuthStore } from "@/features/auth/authStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 
 type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
 type EditOfferType = OutputTrpcType["offerrouter"]["edit"] | null;

@@ -4,10 +4,10 @@ import { Alert, FlatList, Image, Pressable, Text, View } from "react-native";
 import DataNotFound from "@/components/ui/DataNotFound";
 import { Loading } from "@/components/ui/Loading";
 import { apiUrl } from "@/constants/Variable";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useOfferSearchLists } from "@/query/offerSearchListing";
 import { useStartOfferChat } from "@/query/startOfferChat";
 import { useStartProductChat } from "@/query/startProductChat";
-import { useAuthStore } from "@/store/authStore";
 import { useShopIdStore } from "@/store/shopIdStore";
 import { showLoginAlert } from "@/utils/alert";
 import { openInGoogleMaps } from "@/utils/getDirection";
@@ -81,7 +81,8 @@ export default function AllOfferListing() {
                     <Pressable
                       onPress={() => {
                         router.push({
-                          pathname: "/(root)/(home)/subcategory/aboutBusiness/offers/singleOffers/[singleOffer]",
+                          pathname:
+                            "/(root)/(home)/subcategory/aboutBusiness/offers/singleOffers/[singleOffer]",
                           params: { singleOffer: item?.product_id },
                         });
                       }}
@@ -120,7 +121,9 @@ export default function AllOfferListing() {
                 <View className="w-full items-center gap-4 my-4">
                   <View className="w-[90%] bg-primary rounded-lg py-2 px-4">
                     <Pressable
-                      onPress={() => openInGoogleMaps(String(latitude), String(longitude))}
+                      onPress={() =>
+                        openInGoogleMaps(String(latitude), String(longitude))
+                      }
                     >
                       <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
                         <Ionicons size={20} name="location" color={"white"} />
@@ -186,7 +189,8 @@ export default function AllOfferListing() {
                 <Pressable
                   onPress={() => {
                     router.push({
-                      pathname: "/(root)/(home)/subcategory/aboutBusiness/products/singleProduct/[singleProduct]",
+                      pathname:
+                        "/(root)/(home)/subcategory/aboutBusiness/products/singleProduct/[singleProduct]",
                       params: { singleProduct: item?.product_id },
                     });
                   }}

@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
 import {
   type ForgetPasswordFormData,
   forgetPasswordSchema,
@@ -11,7 +12,6 @@ import {
   verifyForgetPasswordOtp,
 } from "@/query/forgetPassword";
 import { fetchVisitorData } from "@/query/sendVisitorOtp";
-import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../inputs/Input";
 

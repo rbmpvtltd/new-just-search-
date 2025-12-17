@@ -16,7 +16,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   authenticated: false,
   setToken: (token, role) => {
     queryClient.invalidateQueries();
-    return set({ token, authenticated: true, role });
+    const authenticated = token !== null && token !== "";
+    return set({ token, authenticated, role });
   },
   clearToken: () => {
     set({ token: null, authenticated: false });

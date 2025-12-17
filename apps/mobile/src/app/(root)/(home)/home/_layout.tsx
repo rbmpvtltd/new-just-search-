@@ -14,8 +14,8 @@
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { useEffect } from "react";
 import DrawerLayout from "@/components/layout/Drawer";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useLoadToken } from "@/hooks/useLoadToken";
-import { useAuthStore } from "@/store/authStore";
 
 export default function HomeLayout() {
   const { data, isLoading } = useLoadToken();

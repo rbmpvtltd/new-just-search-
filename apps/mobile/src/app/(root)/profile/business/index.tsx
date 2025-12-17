@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { ActivityIndicator, Text, View } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
 import CreateBusinessListing from "@/features/business/create/add-business";
 import MyBusinessCard from "@/features/business/show/MyBusiness";
 import { trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 
 export default function MyBusinessListing() {
   const getAuthStoreToken = useAuthStore((state) => state.token);

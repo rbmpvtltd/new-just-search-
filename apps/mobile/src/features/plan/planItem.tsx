@@ -11,9 +11,9 @@ import {
 import Purchases, { type PurchasesPackage } from "react-native-purchases";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { type OutputTrpcType, queryClient, type UnwrapArray } from "@/lib/trpc";
 // import { useVerityApplePay } from "@/query/razorPay";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/features/auth/authStore";
+import { type OutputTrpcType, queryClient, type UnwrapArray } from "@/lib/trpc";
 
 type PlanArray = OutputTrpcType["planRouter"]["list"]["plans"];
 type ActivePlan = OutputTrpcType["planRouter"]["list"]["activePlan"];

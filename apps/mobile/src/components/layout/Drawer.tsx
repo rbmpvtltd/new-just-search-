@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/store/authStore";
+import { Ionicons } from "@expo/vector-icons";
 import {
   type DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -6,18 +6,24 @@ import {
   DrawerToggleButton,
 } from "@react-navigation/drawer";
 import type { HeaderBackButtonProps } from "@react-navigation/elements";
+import { useQuery } from "@tanstack/react-query";
 import { type Href, router, useSegments } from "expo-router";
 import { Drawer } from "expo-router/drawer";
-import { Alert, Image, Pressable, Text, useColorScheme, View } from "react-native";
-import { showLoginAlert } from "@/utils/alert";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Alert,
+  Image,
+  Pressable,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
+import { trpc } from "@/lib/trpc";
 import { useNotificationCount } from "@/query/notification/notication";
+import { showLoginAlert } from "@/utils/alert";
 import { Loading } from "../ui/Loading";
 import { SomethingWrong } from "../ui/SomethingWrong";
-import { trpc } from "@/lib/trpc";
-import { useQuery } from "@tanstack/react-query";
-
 
 const drawerFields: DrawerField[] = [
   {
@@ -83,19 +89,19 @@ interface DrawerField {
   key?: string;
   title?: string;
   headerLeft?:
-  | ((
-    props: HeaderBackButtonProps & {
-      canGoBack?: boolean;
-    },
-  ) => React.ReactNode)
-  | undefined;
+    | ((
+        props: HeaderBackButtonProps & {
+          canGoBack?: boolean;
+        },
+      ) => React.ReactNode)
+    | undefined;
   headerRight?:
-  | ((
-    props: HeaderBackButtonProps & {
-      canGoBack?: boolean;
-    },
-  ) => React.ReactNode)
-  | undefined;
+    | ((
+        props: HeaderBackButtonProps & {
+          canGoBack?: boolean;
+        },
+      ) => React.ReactNode)
+    | undefined;
 
   route: Href;
 }
@@ -144,7 +150,6 @@ export default function DrawerLayout() {
   return (
     <Drawer
       screenOptions={{
-
         headerStyle: {
           backgroundColor: Colors[colorScheme ?? "light"]["base-100"],
           // dark slate color
@@ -239,20 +244,24 @@ export default function DrawerLayout() {
             </Pressable>
           </View>
         ),
-        headerLeft: () => (<>
-          <DrawerToggleButton tintColor={Colors[colorScheme ?? "light"].secondary} />
-          {colorScheme === "dark" ? (
-            <Image
-              source={require("@/assets/images/Just_Search_Logo_Full_Dark.png")}
-              className="w-32 h-20"
+        headerLeft: () => (
+          <>
+            <DrawerToggleButton
+              tintColor={Colors[colorScheme ?? "light"].secondary}
             />
-          ) : (
-            <Image
-              source={require("@/assets/images/Just_Search_Logo_Full_Light.png")}
-              className="w-[100px] h-[50px]"
-            />
-          )}
-        </>),
+            {colorScheme === "dark" ? (
+              <Image
+                source={require("@/assets/images/Just_Search_Logo_Full_Dark.png")}
+                className="w-32 h-20"
+              />
+            ) : (
+              <Image
+                source={require("@/assets/images/Just_Search_Logo_Full_Light.png")}
+                className="w-[100px] h-[50px]"
+              />
+            )}
+          </>
+        ),
         headerTitle: "",
         headerTitleStyle: {
           fontWeight: "bold",

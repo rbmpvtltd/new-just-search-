@@ -1,23 +1,19 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigation, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/features/auth/authStore";
 import { deleteTokenRole } from "@/utils/secureStore";
 
 export default function Logout() {
-  // const router = useRouter();
+  const router = useRouter();
   const clearToken = useAuthStore((state) => state.clearToken);
   const queryClient = useQueryClient();
-  const navigation = useNavigation();
 
   const logout = async () => {
     await deleteTokenRole();
     clearToken();
     queryClient.clear();
-    navigation.reset({
-      index: 0,
-      routes: [],
-    });
+    router.dismissAll();
     // await Purchases.logOut();
     // router.replace("/");
   };

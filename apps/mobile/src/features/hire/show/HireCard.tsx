@@ -182,23 +182,22 @@ import { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
+  Pressable,
   Text,
   TouchableOpacity,
   useColorScheme,
   View,
-  Pressable,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { HireListingHitType } from "@/app/(root)/(hire)/(allHire)";
+import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
+import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
+import { OutputTrpcType } from "@/lib/trpc";
 import { useStartChat } from "@/query/startChat";
-import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
-import { OutputTrpcType } from "@/lib/trpc";
-import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { HireListingHitType } from "@/app/(root)/(hire)/(allHire)";
-import { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 
 export default function HireCard({
   item,

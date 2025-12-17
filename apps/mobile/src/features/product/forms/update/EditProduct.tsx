@@ -17,8 +17,8 @@ import {
   type FormFieldProps,
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
+import { useAuthStore } from "@/features/auth/authStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 
 type EditProductSchema = z.infer<typeof productInsertSchema>;
 type EditProductType = OutputTrpcType["productrouter"]["edit"] | null;

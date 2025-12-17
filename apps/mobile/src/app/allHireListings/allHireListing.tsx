@@ -13,11 +13,11 @@ import {
 import DataNotFound from "@/components/ui/DataNotFound";
 import { Loading } from "@/components/ui/Loading";
 import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useHireSearchLists } from "@/query/hireSearchListings";
 import { useOfferSearchLists } from "@/query/offerSearchListing";
 import { useStartChat } from "@/query/startChat";
 import { useStartOfferChat } from "@/query/startOfferChat";
-import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 
@@ -72,7 +72,6 @@ export default function AllHireListing() {
       <Stack.Screen
         options={{
           title: "All Searched Hires",
-          
         }}
       />
       <FlatList

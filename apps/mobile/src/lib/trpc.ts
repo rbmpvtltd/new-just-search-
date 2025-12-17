@@ -9,7 +9,7 @@ import {
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import superjson from "superjson";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/features/auth/authStore";
 import "@azure/core-asynciterator-polyfill";
 import { RNEventSource } from "rn-eventsource-reborn";
 import { ReadableStream, TransformStream } from "web-streams-polyfill";
@@ -72,8 +72,7 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 
 function getTrpcUrl() {
   const base = (() => {
-    if (backendUrl)
-      return backendUrl;
+    if (backendUrl) return backendUrl;
     return "http://192.168.1.44:4000";
   })();
   return `${base}/trpc`;

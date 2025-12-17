@@ -5,25 +5,25 @@ import {
   Alert,
   Dimensions,
   Image,
+  Pressable,
   Text,
   TouchableOpacity,
   useColorScheme,
   View,
-  Pressable,
 } from "react-native";
 import StarRating from "react-native-star-rating-widget";
-import { useToggleWishlist, useWishlist } from "@/query/favorite";
-import { useStartChat } from "@/query/startChat";
-import { useAuthStore } from "@/store/authStore";
-import { useShopIdStore } from "@/store/shopIdStore";
-import { dialPhone } from "@/utils/getContact";
-import { openInGoogleMaps } from "@/utils/getDirection";
-import { OutputTrpcType, trpc } from "@/lib/trpc";
-import Favourite from "../shared/FaouritBtn";
+import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
+import { OutputTrpcType, trpc } from "@/lib/trpc";
+import { useToggleWishlist, useWishlist } from "@/query/favorite";
+import { useStartChat } from "@/query/startChat";
+import { useShopIdStore } from "@/store/shopIdStore";
 import { showLoginAlert } from "@/utils/alert";
-import { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
+import { dialPhone } from "@/utils/getContact";
+import { openInGoogleMaps } from "@/utils/getDirection";
+import Favourite from "../shared/FaouritBtn";
 
 const screenWidth = Dimensions.get("window").width;
 
