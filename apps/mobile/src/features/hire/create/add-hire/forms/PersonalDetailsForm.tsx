@@ -16,7 +16,6 @@ import PrimaryButton from "@/components/inputs/SubmitBtn";
 import LocationAutoDetect from "@/components/ui/LocationAutoDetect";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { genderEnum, maritalStatusEnum } from "@repo/db/dist/enum/allEnum.enum";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
@@ -69,6 +68,12 @@ export default function PersonalDetailsForm({
   );
 
   const selectedStateId = useWatch({ control, name: "state" });
+  const states = data?.getStates.map((item) => {
+    return {
+      label: item.name,
+      value: item.id,
+    };
+  });
   const {
     data: cities,
     isLoading,
@@ -193,7 +198,7 @@ export default function PersonalDetailsForm({
       name: "gender",
       label: "Gender",
       component: "dropdown",
-      data: Object.values(genderEnum).map((item) => ({
+      data: Object.values(Gender).map((item) => ({
         label: item,
         value: item,
       })),
@@ -206,7 +211,7 @@ export default function PersonalDetailsForm({
       name: "maritalStatus",
       label: "Marital Status",
       component: "dropdown",
-      data: Object.values(maritalStatusEnum).map((item) => {
+      data: Object.values(MaritalStatus).map((item) => {
         return {
           label: item,
           value: item,
@@ -237,17 +242,12 @@ export default function PersonalDetailsForm({
       name: "languages",
       label: "Languages",
       component: "multiselectdropdown",
-      data: [
-        { label: "Hindi", value: "Hindi" },
-        { label: "English", value: "English" },
-        { label: "Punjabi", value: "Punjabi" },
-        { label: "Gujarati", value: "Gujarati" },
-        { label: "Bengali", value: "Bengali" },
-        { label: "Malayalam", value: "Malayalam" },
-        { label: "Kannada", value: "Kannada" },
-        { label: "Tamil", value: "Tamil" },
-        { label: "Other", value: "Other" },
-      ],
+      data: data?.getLanguages.map((item) => {
+        return {
+          label: item.name,
+          value: item.id,
+        };
+      }),
       dropdownPosition: "top",
       placeholder: "Select Languages",
       error: errors.languages?.message,
@@ -314,12 +314,11 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your State",
       component: "dropdown",
       className: "w-[90%] bg-base-200 rounded-lg",
-      data: data?.getStates.map((item) => {
-        return {
-          label: item.name,
-          value: item.id,
-        };
-      }),
+      data:
+        states?.map((state) => ({
+          label: state.label,
+          value: state.value,
+        })) ?? [],
       dropdownPosition: "top",
       error: errors.state?.message,
     },
@@ -356,6 +355,8 @@ export default function PersonalDetailsForm({
               {field.name === "alternativeMobileNumber" && (
                 <LocationAutoDetect
                   onResult={(locationData) => {
+                    console.log("data", locationData);
+
                     const formatted = locationData.formattedAddress ?? "";
                     const parts = formatted.split(",").map((p) => p.trim());
 
@@ -392,8 +393,9 @@ export default function PersonalDetailsForm({
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[35%] self-center mt-6 mb-24">
+        <View className="mx-auto w-[90%] mt-6 mb-24">
           <PrimaryButton
+            className="w-[40%] mx-auto"
             title="Next"
             onPress={handleSubmit(onSubmit, onError)}
             isLoading={isSubmitting}

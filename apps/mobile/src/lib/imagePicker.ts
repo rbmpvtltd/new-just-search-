@@ -33,25 +33,23 @@ export const pickImage = async (fromCamera = false, MAX_SIZE_MB = 1) => {
         // base64: true,
       }));
 
-
   if (!result.canceled) {
     const imageUri = result.assets[0].uri;
     const fileName = result.assets[0].fileName;
     const size = result.assets[0].fileSize;
 
     const source = { imageUri, fileName, size };
-    const fileInfo = await FileSystem.getInfoAsync(imageUri);
+    // const fileInfo = await FileSystem.getInfoAsync(imageUri);
 
+    // if (fileInfo.exists && fileInfo.size > MAX_SIZE_BYTES * MAX_SIZE_MB) {
+    //   Alert.alert(
+    //     "Image size is too large",
+    //     "Please select an image with a size less than 2MB",
+    //     [{ text: "OK" }],
+    //     { cancelable: false },
+    //   );
+    // }
 
-    if (fileInfo.exists && fileInfo.size > MAX_SIZE_BYTES * MAX_SIZE_MB) {
-      Alert.alert(
-        "Image size is too large",
-        "Please select an image with a size less than 2MB",
-        [{ text: "OK" }],
-        { cancelable: false },
-      );
-    }
-
-    return source
+    return source;
   }
 };

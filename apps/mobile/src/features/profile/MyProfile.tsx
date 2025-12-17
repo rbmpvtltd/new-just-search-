@@ -11,6 +11,7 @@ export const MyProfile = () => {
   const { data: userData } = useSuspenseQuery(
     trpc.userRouter.getUserProfile.queryOptions(),
   );
+
   return (
     <View className=" bg-base-300 py-8 mt-4 w-[90%] rounded-lg">
       <View className="flex-row items-center relative justify-around w-[100%] gap-4 px-8">
@@ -21,6 +22,11 @@ export const MyProfile = () => {
               className="w-[100%] h-[100%] rounded-full border-2 border-secondary"
             />
           </View>
+           {/* <AdvancedImage
+              cldImg={cld.image(userData?.profileImage || "")}
+              className="w-[100%] h-[100%] rounded-full border-2 border-secondary"
+            />
+          </View> */}
         </View>
         <View className="w-[80%] ">
           <View className=" w-[90%] flex-row items-center">
@@ -43,7 +49,7 @@ export const MyProfile = () => {
           </View>
           <View className="w-[80%]">
             <Text className="w-full mx-2 text-secondary-content text-[16px]  mt-2">
-              {role}
+              {userData.role}
             </Text>
 
             {/* <Text className="w-full mx-2 text-secondary-content text-[16px] ">
@@ -58,7 +64,7 @@ export const MyProfile = () => {
           <Text className="font-semibold text-lg text-secondary">
             Profile Type :
           </Text>
-          <Text className="text-secondary">{role}</Text>
+          <Text className="text-secondary">{userData.role}</Text>
         </View>
         <View className="flex-row gap-4 mb-6 w-[100%] items-start">
           <Text className="font-semibold text-lg text-secondary">

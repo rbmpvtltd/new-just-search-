@@ -236,7 +236,7 @@ export default function BusinessDetail({
           ))}
         </View>
         <View className="flex-row items-center">
-          <LableText title="Shop images" className="ml-11" />
+          <LableText title="Shop images" className="ml-10" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>
@@ -247,7 +247,7 @@ export default function BusinessDetail({
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
               title="Next"

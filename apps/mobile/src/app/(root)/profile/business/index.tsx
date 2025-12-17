@@ -26,7 +26,12 @@ function MyBusiness() {
     }
   }
 
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading)
+    return (
+      <View className="flex-1 items-center justify-center py-10">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
   if (!data) return <CreateBusinessListing />;
   return <MyBusinessCard data={data} />;
 }

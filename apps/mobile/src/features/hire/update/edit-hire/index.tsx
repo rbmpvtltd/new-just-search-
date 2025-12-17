@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
   ActivityIndicator,
   Keyboard,
@@ -15,68 +15,24 @@ import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
 
-export type UserHireListingType = OutputTrpcType["hirerouter"]["show"] | null;
-export type FormReferenceDataType = OutputTrpcType["hirerouter"]["add"] | null;
+export type UserHireListingType = OutputTrpcType["hirerouter"]["edit"] | null;
 export default function UpdateHireListing() {
   const { page } = useHireFormStore();
-  const {
-    data: formReferenceData,
-    error: addError,
-    isLoading: addLoading,
-    isError: addIsError,
-  } = useQuery(trpc.hirerouter.add.queryOptions());
+  const { data: hireListing } = useSuspenseQuery(
+    trpc.hirerouter.edit.queryOptions({
+      id: 1,
+    }),
+  );
 
-  const {
-    data: hireListing,
-    isLoading: hireLoading,
-    isError: hireIsError,
-    error: hireError,
-  } = useQuery(trpc.hirerouter.show.queryOptions());
-
-  if (addLoading || hireLoading) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text className="text-gray-600 mt-3">Loading your data...</Text>
-      </View>
-    );
-  }
-
-  if (addIsError || hireIsError) {
-    const message =
-      addError?.message ||
-      hireError?.message ||
-      "Unable to fetch data. Please try again later.";
-
-    return (
-      <View className="flex-1 items-center justify-center py-10 px-6">
-        <Text className="text-red-600 text-center font-semibold mb-2">
-          Something went wrong
-        </Text>
-        <Text className="text-gray-500 text-sm text-center">{message}</Text>
-      </View>
-    );
-  }
-
-  if (!formReferenceData) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <Text className="text-gray-600 text-center">
-          Couldn't load the hire form. Please refresh and try again.
-        </Text>
-      </View>
-    );
-  }
-
-  if (!hireListing) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <Text className="text-gray-600 text-center">
-          No hire listing found. You can create a new one below.
-        </Text>
-      </View>
-    );
-  }
+  // if (!hireListing) {
+  //   return (
+  //     <View className="flex-1 items-center justify-center py-10">
+  //       <Text className="text-gray-600 text-center">
+  //         No hire listing found. You can create a new one below.
+  //       </Text>
+  //     </View>
+  //   );
+  // }
 
   const steps = [
     "Personal Details",
@@ -88,12 +44,7 @@ export default function UpdateHireListing() {
   const renderForm = () => {
     switch (page) {
       case 0:
-        return (
-          <PersonalDetailsForm
-            hireListing={hireListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <PersonalDetailsForm hireListing={hireListing} />;
       case 1:
         return <EducationForm hireListing={hireListing} />;
       case 2:
@@ -101,12 +52,7 @@ export default function UpdateHireListing() {
       case 3:
         return <DocumentsForm hireListing={hireListing} />;
       default:
-        return (
-          <PersonalDetailsForm
-            hireListing={hireListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <PersonalDetailsForm hireListing={hireListing} />;
     }
   };
 

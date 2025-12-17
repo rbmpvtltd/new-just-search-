@@ -16,11 +16,11 @@ import {
   Alert,
   Image,
   Platform,
+  Pressable,
   ScrollView,
   Switch,
   useColorScheme,
   View,
-  Pressable
 } from "react-native";
 import { Checkbox, Text } from "react-native-paper";
 import Colors from "@/constants/Colors";
@@ -155,6 +155,8 @@ export const FormField = <T extends FieldValues>({
             case "image": {
               let cloudinaryImage: any;
               if (value && !value.startsWith("file:")) {
+                console.log("Value", value);
+
                 cloudinaryImage = cld
                   .image(value)
                   .resize(
@@ -262,7 +264,9 @@ export const FormField = <T extends FieldValues>({
                 <View className="space-y-2">
                   {(data || []).map((item) => {
                     if (!item.value) return null;
-                    const isChecked = (value || []).includes(item?.value as never);
+                    const isChecked = (value || []).includes(
+                      item?.value as never,
+                    );
                     return (
                       <Checkbox.Item
                         labelStyle={{
@@ -290,7 +294,7 @@ export const FormField = <T extends FieldValues>({
                 <MultiSelectDropdown
                   value={value || []}
                   onChange={onChange}
-                  data={data as any ?? []}
+                  data={(data as any) ?? []}
                   placeholder={placeholder}
                   multiselect={multiselect}
                   dropdownPosition={dropdownPosition}

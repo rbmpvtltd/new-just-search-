@@ -26,7 +26,7 @@ export default function CreateBusinessListing() {
   const [open, setOpen] = useState(false);
 
   return (
-    <View className="bg-white">
+    <View className="bg-white h-full">
       {!open ? (
         <View className="px-4 mt-4">
           <Pressable

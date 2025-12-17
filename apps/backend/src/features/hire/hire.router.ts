@@ -246,8 +246,10 @@ export const hirerouter = router({
         },
       });
       const getStates = await db.query.states.findMany();
+      const getLanguages = await db.query.languages.findMany();
+      const getDocuments = await db.query.documents.findMany();
       const hire = await db.query.hireListing.findFirst({
-        where: (hire, { eq }) => eq(hire.id, input.id),
+        where: (hire, { eq }) => eq(hire.id, Number(input.id)),
       });
 
       const category = await db.query.hireCategories.findFirst({
@@ -266,9 +268,11 @@ export const hirerouter = router({
       return {
         hire,
         category,
-        subcategory,
-        getHireCategories,
         getStates,
+        subcategory,
+        getLanguages,
+        getDocuments,
+        getHireCategories,
       };
     }),
 

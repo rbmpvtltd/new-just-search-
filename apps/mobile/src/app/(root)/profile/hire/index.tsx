@@ -15,7 +15,12 @@ function MyHire() {
   const { data, error, isLoading, isError } = useQuery(
     trpc.hirerouter.show.queryOptions(),
   );
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading)
+    return (
+      <View className="flex-1 items-center justify-center py-10">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
   if (!data) return <CreateHireListing />;
   return <MyHireCard data={data} />;
 }

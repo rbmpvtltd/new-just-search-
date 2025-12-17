@@ -67,6 +67,10 @@ const drawerFields: DrawerField[] = [
     route: "/(root)/profile/product",
   },
   {
+    name: "Pricing Plans",
+    route: "/(root)/profile/plan",
+  },
+  {
     name: "Request to Delete Account",
     route: "/(root)/profile/account-delete-request",
   },

@@ -1,13 +1,17 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
-import { Image, Text, useColorScheme, View,Pressable } from "react-native";
+import { Pressable, Text, useColorScheme, View } from "react-native";
 import Colors from "@/constants/Colors";
+import { cld } from "@/lib/cloudinary";
 import type { OutputTrpcType } from "@/lib/trpc";
 
 type MyHireType = OutputTrpcType["hirerouter"]["show"];
 export default function MyHireCard({ data }: { data: MyHireType }) {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  console.log("data", data);
+
   return (
     <View className="w-full h-full bg-base-100">
       <View className="bg-base-200 rounded-xl shadow-md mx-4 my-6 p-4">
@@ -16,14 +20,19 @@ export default function MyHireCard({ data }: { data: MyHireType }) {
         </Text>
         <View className="border-b border-secondary mb-4" />
 
-        <Image
+        {/* <Image
           source={{
             uri: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
           }}
           className="w-full h-44 rounded-lg mb-3"
           resizeMode="cover"
-        />
-
+        /> */}
+        <View className="w-[100%] h-44">
+          <AdvancedImage
+            cldImg={cld.image(data?.photo || "")}
+            className="w-[100%] h-[100%]"
+          />
+        </View>
         <View className="w-full flex-row items-center justify-between">
           <Text className="text-secondary text-lg font-semibold mb-1 w-[80%]">
             {data.name}
@@ -36,7 +45,7 @@ export default function MyHireCard({ data }: { data: MyHireType }) {
         <View className="flex-row justify-between">
           <Pressable
             onPress={() => {
-              router.push("/(root)/profile/hire/edit");
+              router.push(`/(root)/profile/hire/edit/${data.id}`);
             }}
             style={{
               backgroundColor: Colors[colorScheme ?? "light"].success,
