@@ -1,7 +1,7 @@
 import { db } from "@repo/db";
 import { plans } from "@repo/db/dist/schema/plan.schema";
 import dotenv from "dotenv";
-import { eq } from "drizzle-orm";
+import { eq, type InferInsertModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import { sql } from "./mysqldb.seed";
 
@@ -24,13 +24,14 @@ export const clearAllTablesBusiness = async () => {
 
 // 1. Plans
 const addplans = async () => {
-  const plansData = [
+  type PlanData = InferInsertModel<typeof plans>;
+  const plansData: PlanData[] = [
     {
       name: "PRO",
       identifier: "plan_Rrrr2lJOWGFSLn",
-      period: "yearly" as const,
+      period: "yearly",
       interval: 1,
-      role: "business" as const,
+      role: "business",
       amount: 999,
       currency: "INR",
       planColor: "#ffbd59",
@@ -50,7 +51,7 @@ const addplans = async () => {
       identifier: "",
       period: "yearly" as const,
       interval: 1,
-      role: "visiter" as const,
+      role: "all",
       amount: 0,
       currency: "INR",
       planColor: "#ff3131",

@@ -36,6 +36,7 @@ export const seedUsers = async () => {
       continue;
     }
 
+    // TODO: add revanuecat id
     const user = {
       id: row.id,
       displayName: row.display_name ?? "null",
