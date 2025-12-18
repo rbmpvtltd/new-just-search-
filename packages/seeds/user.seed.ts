@@ -1,7 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db, schemas } from "@repo/db";
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
-import { occupation } from "@repo/db/dist/schema/not-related.schema";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
@@ -13,7 +12,14 @@ interface NameParts {
   lastName: string | null;
 }
 
-function parseName(name: string): NameParts {
+function parseName(name: string | null): NameParts {
+  if (!name) {
+    return {
+      salutation: "",
+      firstName: "",
+      lastName: "",
+    };
+  }
   const salutationRegex = /^(Mr\.|Mrs\.|Ms\.|Dr\.)\s+/; // regex to match common salutations
   const match = name.match(salutationRegex);
 

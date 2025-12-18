@@ -61,6 +61,24 @@ export const authRouter = router({
       const session = await createSession(user.id);
       return { session: session?.token, role: session?.role };
     }),
+  loginMobile: publicProcedure
+    .input(z.object({ username: z.string(), password: z.string().min(6) }))
+    .mutation(async ({ input }) => {
+      const user = await checkPasswordGetUser(input.username, input.password);
+
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "your credential is not correct",
+        });
+      }
+      const session = await createSession(user.id);
+      return {
+        session: session?.token,
+        role: session?.role,
+        ravanueCatId: user.revanueCatId,
+      };
+    }),
   testadmin: visitorProcedure.query(() => {
     return "yes";
   }),

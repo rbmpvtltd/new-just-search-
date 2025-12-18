@@ -1,13 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Button,
-  Linking,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { useEffect, useState } from "react";
+import { Button, Linking, ScrollView, Text, View } from "react-native";
 import Purchases, { type PurchasesOfferings } from "react-native-purchases";
 import { trpc } from "@/lib/trpc";
 import PricingCard from "./planItem";
@@ -20,14 +13,16 @@ export default function PricingPlansComponent() {
   useEffect(() => {
     const fetchOfferings = async () => {
       try {
-        const offering = await Purchases.getOfferings();
-        if (
-          offering.current !== null &&
-          offering.current.availablePackages.length !== 0
-        ) {
-          // loading.current = false;
-          setOfferings(offering);
-        }
+        const data = await Purchases.getAppUserID();
+        console.log(data);
+        // const offering = await Purchases.getOfferings();
+        // if (
+        //   offering.current !== null &&
+        //   offering.current.availablePackages.length !== 0
+        // ) {
+        //   // loading.current = false;
+        //   setOfferings(offering);
+        // }
       } catch (error) {
         // TODO:  handle error
         console.error("Error fetching offerings:", error);
