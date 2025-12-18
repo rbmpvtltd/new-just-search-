@@ -7,6 +7,37 @@ import { eq } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
+interface NameParts {
+  salutation: string | null;
+  firstName: string;
+  lastName: string | null;
+}
+
+function parseName(name: string): NameParts {
+  const salutationRegex = /^(Mr\.|Mrs\.|Ms\.|Dr\.)\s+/; // regex to match common salutations
+  const match = name.match(salutationRegex);
+
+  // Extract salutation, if present
+  const salutation = match ? match[0].trim() : null;
+
+  // Remove the salutation from the name if it exists
+  const nameWithoutSalutation = salutation
+    ? name.replace(salutationRegex, "")
+    : name;
+
+  // Split the remaining name into parts
+  const nameParts = nameWithoutSalutation.trim().split(" ");
+
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : null;
+
+  return {
+    salutation: salutation,
+    firstName: firstName,
+    lastName: lastName,
+  };
+}
+
 dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
@@ -39,11 +70,11 @@ export const seedUsers = async () => {
     // TODO: add revanuecat id
     const user = {
       id: row.id,
-      displayName: row.display_name ?? "null",
+      displayName: "null",
       username: row.username ?? "null",
       phoneNumber: row.phone ?? "null",
       email: row.email ?? `example${row.id}@mail.com`,
-      password: row.password ?? "null",
+      password: row.password ?? null,
       role: UserRole.visiter,
       googleId: row.google_id,
       refreshToken: null,
@@ -121,27 +152,35 @@ export const seedUsers = async () => {
       occupationId = occupationData?.id;
       console.log("occupationId is", occupationId);
     }
-    // 5 Insert profile
-    const profileData = {
-      userId: insertedUser!.id,
-      firstName: row.first_name ?? "null",
-      lastName: row.last_name ?? "null",
+
+    const { salutation, firstName, lastName } = parseName(row.name);
+
+    await db.insert(profiles).values({
+      userId: Number(insertedUser.id),
+      salutation: salutation,
+      firstName: firstName,
+      lastName: lastName,
       city: cityId,
-      photo: profilePhotoUrl,
+      profileImage: profilePhotoUrl,
       address: row.address ?? "null",
       dob: row.dob ?? null,
       maritalStatus: row.marital_status ?? null,
       occupation: occupationId,
       state: row.state ?? 19,
-      website: row.website ?? null,
-      area: row.area ?? null,
-      zipcode: row.zip ?? "000000",
+      pincode: row.zip ?? "000000",
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-    };
-
-    await db.insert(profiles).values(profileData);
+    });
   }
+
+  /*
+   * name | salutation | first_name | last_name
+   * "Mr. abc xyz" | "Mr." | "abc" | "xyz"
+   * "abc xyz" | "null" | "abc" | "xyz"
+   * "abc" | "null" | "abc" | "null"
+   * "abc xyz efg" | "null" | "abc" | "xyz efg"
+   *
+   * */
 
   console.log("users and Profiles seeding complete");
 };
@@ -171,7 +210,7 @@ const seedfranchises = async () => {
       id: row.id,
       userId: user!.id,
       referPrifixed: refer_prifixed,
-      status: Boolean(row.status),
+      // status: Boolean(row.status),
       employeeLimit: row.employee_limit,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -217,7 +256,7 @@ export const seedOfSalesman = async () => {
       userId: user!.id,
       franchiseId: Franchises.id,
       referCode: refer_code,
-      status: Boolean(row.status),
+      // status: Boolean(row.status),
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });

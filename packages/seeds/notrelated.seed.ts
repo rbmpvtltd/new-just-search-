@@ -28,11 +28,11 @@ export const notRelated = async () => {
   await bannerSeed();
   await seedCategories();
   await seedSubcategories();
-  // await seedOccupation();
-  // await seedDocuments();
-  // await seedHighestQualification();
-  // await seedSalutation();
-  // await seedLanguages();
+  await seedOccupation();
+  await seedDocuments();
+  await seedHighestQualification();
+  await seedSalutation();
+  await seedLanguages();
 };
 
 export const clearAllTablesNotRelated = async () => {
@@ -181,22 +181,6 @@ export const seedSubcategories = async () => {
       console.log(`Category parent_id not found for sub_category id ${row.id}`);
       continue;
     }
-
-    // NOTE: it can be remove if no error come in future
-    // const [category] = await db
-    //   .select()
-    //   .from(categories)
-    //   .where(eq(categories.id, row.parent_id));
-    //
-    // if (!category) {
-    //   console.log(`Category not found for sub_category id ${row.id}`);
-    //   continue;
-    // }
-    //
-    // const skipSlug = [""];
-    // if (skipSlug.includes(row.slug)) {
-    //   row.slug = row.slug + row.id;
-    // }
 
     dbSubCategoryValue.push({
       id: row.id,

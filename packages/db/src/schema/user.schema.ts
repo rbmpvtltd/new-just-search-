@@ -34,7 +34,6 @@ export const profiles = pgTable("profiles", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  mysqlUserId: integer("mysql_user_id"),
   profileImage: varchar("profileImage", { length: 255 }),
   salutation: varchar("salutation", { length: 100 }),
   firstName: varchar("first_name", { length: 100 }),
