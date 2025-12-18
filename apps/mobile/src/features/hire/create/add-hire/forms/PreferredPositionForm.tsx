@@ -161,9 +161,10 @@ export default function PreferredPositionForm() {
             <FormField key={field.name} {...field} />
           ))}
           <View className="w-[90%] mt-4">
-            <Text className="text-secondary ml-4 font-medium">
-              Working Hour From
-            </Text>
+            <View className="flex-row justify-around">
+              <Text className="text-secondary ml-4 font-medium">From</Text>
+              <Text className="text-secondary ml-4 font-medium">To</Text>
+            </View>
             <View className="flex-row mt-4 w-[50%]">
               {/* <View className="flex"> */}
               <FormField

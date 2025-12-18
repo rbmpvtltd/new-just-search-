@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import StoreChat from "@/features/chat/PrivateChat";

@@ -9,8 +9,8 @@ import { cities, states } from "@repo/db/dist/schema/not-related.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { count, eq, gt, sql } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
+import { slugify } from "@/lib/slugify";
 import {
   hireProcedure,
   publicProcedure,
@@ -117,10 +117,7 @@ export const hirerouter = router({
           message: "City not found",
         });
       }
-      const slugifyName = slugify(input.name, {
-        lower: true,
-        strict: true,
-      });
+      const slugifyName = slugify(input.name);
 
       const [createHire] = await db
         .insert(schemas.hire.hireListing)
@@ -246,8 +243,12 @@ export const hirerouter = router({
         },
       });
       const getStates = await db.query.states.findMany();
+      const getLanguages = await db.query.languages.findMany();
+      const getDocuments = await db.query.documents.findMany();
+      const getHighestQualification =
+        await db.query.highestQualification.findMany();
       const hire = await db.query.hireListing.findFirst({
-        where: (hire, { eq }) => eq(hire.id, input.id),
+        where: (hire, { eq }) => eq(hire.id, Number(input.id)),
       });
 
       const category = await db.query.hireCategories.findFirst({
@@ -266,9 +267,12 @@ export const hirerouter = router({
       return {
         hire,
         category,
-        subcategory,
-        getHireCategories,
         getStates,
+        subcategory,
+        getLanguages,
+        getDocuments,
+        getHireCategories,
+        getHighestQualification,
       };
     }),
 

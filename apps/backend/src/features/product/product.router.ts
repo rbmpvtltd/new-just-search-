@@ -7,9 +7,9 @@ import {
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   businessProcedure,
   protectedProcedure,
@@ -91,10 +91,7 @@ export const productrouter = router({
           message: "Business not found",
         });
       }
-      const slugifyName = slugify(input.productName, {
-        lower: true,
-        strict: true,
-      });
+      const slugifyName = slugify(input.productName);
 
       const [product] = await db
         .insert(schemas.product.products)
@@ -151,39 +148,61 @@ export const productrouter = router({
       };
     }),
 
-  showProduct: businessProcedure.query(async ({ ctx }) => {
-    if (!ctx.userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User not looged in",
+  showProduct: businessProcedure
+    .input(
+      z.object({
+        cursor: z.number(),
+        limit: z.number().default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit;
+      const cursor = input.cursor ?? 0;
+      if (!ctx.userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not logged in",
+        });
+      }
+      const business = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
       });
-    }
+      if (!business) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business not found",
+        });
+      }
 
-    const business = await db.query.businessListings.findFirst({
-      where: (businessListings, { eq }) =>
-        eq(businessListings.userId, ctx.userId),
-    });
-
-    if (!business) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Business not found",
+      const products = await db.query.products.findMany({
+        where: (products, { and, gt, eq }) =>
+          and(
+            eq(products.businessId, business.id),
+            cursor ? gt(products.id, cursor) : undefined,
+          ),
+        orderBy: (products, { asc }) => [asc(products.id)],
+        limit,
+        with: {
+          productPhotos: true,
+        },
       });
-    }
 
-    const products = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.businessId, business.id),
-      with: {
-        productPhotos: true,
-      },
-    });
+      // if (!offers) {
+      //   return { message: "Offers not found" };
+      // }
 
-    return { products };
-  }),
+      const nextCursor =
+        products.length > 0 ? products[products.length - 1]?.id : null;
+
+      return { products, nextCursor };
+    }),
 
   edit: businessProcedure
-    .input(z.object({ productSlug: z.string() }))
+    .input(z.object({ id: z.number() }))
     .query(async ({ input, ctx }) => {
+      console.log("id", input.id);
+
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.userId, ctx.userId),
@@ -198,10 +217,7 @@ export const productrouter = router({
 
       const product = await db.query.products.findFirst({
         where: (products, { and, eq }) =>
-          and(
-            eq(products.productSlug, input.productSlug),
-            eq(products.businessId, business.id),
-          ),
+          and(eq(products.id, input.id), eq(products.businessId, business.id)),
         with: {
           productPhotos: true,
           productSubCategories: true,
@@ -230,8 +246,7 @@ export const productrouter = router({
       }
 
       const isProductExists = await db.query.products.findFirst({
-        where: (products, { eq }) =>
-          eq(products.productSlug, String(input.productSlug)),
+        where: (products, { eq }) => eq(products.id, Number(input.id)),
       });
 
       if (!isProductExists) {

@@ -4,7 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useId } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -36,7 +35,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter();
   const id = useId();
   const trpc = useTRPC();
   const { mutate, isError, error } = useMutation(
@@ -63,7 +61,7 @@ export function LoginForm({
       onSuccess: (data) => {
         setToken(data?.session || "");
         setRole(data?.role || "", false);
-        router.push("/");
+        return;
       },
     });
   }

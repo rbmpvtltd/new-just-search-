@@ -16,7 +16,13 @@ import {
 } from "@/components/ui/sidebar";
 import type { SidebarData } from "@/types/sidebar";
 
-export function AppSidebar({ data }: { data: SidebarData }) {
+export function AppSidebar({
+  data,
+  currentPath,
+}: {
+  data: SidebarData;
+  currentPath: string;
+}) {
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader>
@@ -26,7 +32,7 @@ export function AppSidebar({ data }: { data: SidebarData }) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <Link href="/">
+              <Link href={currentPath}>
                 <IconInnerShadowTop className="size-5!" />
                 <span className="text-base font-semibold">Just Search</span>
               </Link>
@@ -35,8 +41,12 @@ export function AppSidebar({ data }: { data: SidebarData }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        {data.navMain.length > 0 && (
+          <NavMain items={data.navMain} currentPath={currentPath} />
+        )}
+        {data.documents.length > 0 && (
+          <NavDocuments items={data.documents} currentPath={currentPath} />
+        )}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>

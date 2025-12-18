@@ -1,44 +1,32 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { Alert, Text, View } from "react-native";
-import { queryClient } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
+import { Pressable, Text, View } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
+import { deleteTokenRole } from "@/utils/secureStore";
 
 export default function Logout() {
   const router = useRouter();
   const clearToken = useAuthStore((state) => state.clearToken);
+  const queryClient = useQueryClient();
 
-  (() => {
-    Alert.alert(
-      "Logout Confirmation",
-      "Are you sure you want to logout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-          onPress: () => {
-            router.back();
-          },
-        },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: () => {
-            clearToken();
-            queryClient.clear();
-            console.log("User logged out");
-            router.replace("/(root)/(home)/home");
-          },
-        },
-      ],
-      { cancelable: false },
-    );
-  })();
-
+  const logout = async () => {
+    await deleteTokenRole();
+    clearToken();
+    queryClient.clear();
+    router.dismissAll();
+    // await Purchases.logOut();
+    // router.replace("/");
+  };
   return (
-    <View className="flex-1 justify-center items-center">
-      <Text className="bg-error-content  text-error rounded-xl text-xl px-8 py-2">
-        Logging out...
+    <View className="flex-1 justify-center gap-4 items-center">
+      <Text className="text-secondary text-xl">
+        Are you sure you wanna logout
       </Text>
+      <Pressable onPress={logout}>
+        <Text className="bg-error-content  text-error rounded-xl text-xl px-8 py-2">
+          Logout
+        </Text>
+      </Pressable>
     </View>
   );
 }

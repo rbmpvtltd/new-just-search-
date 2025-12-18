@@ -172,6 +172,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
       placeholder: "Enter your State",
       component: "dropdown",
       className: "w-[90%] bg-base-200",
+      dropdownPosition: "top",
       data:
         states?.map((state) => ({ label: state.label, value: state.value })) ??
         [],
@@ -184,6 +185,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
       placeholder: "Enter your City",
       component: "dropdown",
       className: "w-[90%] bg-base-200",
+      dropdownPosition: "top",
       data: cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
       error: errors.city?.message,
     },
@@ -236,13 +238,9 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
           <View className="w-[45%]">
-            <PrimaryButton
-              title="Previous"
-              variant="outline"
-              onPress={prevPage}
-            />
+            <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
           </View>
           <View className="w-[45%]">
             <PrimaryButton

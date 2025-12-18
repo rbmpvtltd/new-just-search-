@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useBusinessFormStore } from "../../shared/store/useCreateBusinessStore";
 import AddressDetail from "./forms/AddressDetail";
@@ -15,71 +14,15 @@ import BusinessDetail from "./forms/BusinessDetail";
 import BusinessTiming from "./forms/BusinessTiming";
 import ContactDetail from "./forms/ContactDetail";
 
-export type FormReferenceDataType =
-  | OutputTrpcType["businessrouter"]["add"]
-  | null;
-
 export type UserBusinessListingType =
-  | OutputTrpcType["businessrouter"]["show"]
+  | OutputTrpcType["businessrouter"]["edit"]
   | null;
-export default function UpdateBusinessListing() {
+export default function UpdateBusinessListing({
+  data,
+}: {
+  data: UserBusinessListingType;
+}) {
   const { page } = useBusinessFormStore();
-  const {
-    data: formReferenceData,
-    error: addError,
-    isLoading: addLoading,
-    isError: addIsError,
-  } = useQuery(trpc.businessrouter.add.queryOptions());
-
-  const {
-    data: businessListing,
-    isLoading: businessLoading,
-    isError: businessIsError,
-    error: businessError,
-  } = useQuery(trpc.businessrouter.show.queryOptions());
-
-  if (addLoading || businessLoading) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text className="text-gray-600 mt-3">Preparing form...</Text>
-      </View>
-    );
-  }
-
-  if (addIsError || businessIsError) {
-    const message =
-      addError?.message ||
-      businessError?.message ||
-      "Unable to fetch data. Please try again later.";
-    return (
-      <View className="flex-1 items-center justify-center py-10 px-6">
-        <Text className="text-red-600 text-center font-semibold mb-2">
-          Something went wrong
-        </Text>
-        <Text className="text-gray-500 text-sm text-center">{message}</Text>
-      </View>
-    );
-  }
-  if (!formReferenceData) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <Text className="text-gray-600 text-center">
-          Couldn't load the hire form. Please refresh and try again.
-        </Text>
-      </View>
-    );
-  }
-
-  if (!businessListing) {
-    return (
-      <View className="flex-1 items-center justify-center py-10">
-        <Text className="text-gray-600 text-center">
-          No hire listing found. You can create a new one below.
-        </Text>
-      </View>
-    );
-  }
 
   const steps = [
     "Business Detail",
@@ -91,30 +34,15 @@ export default function UpdateBusinessListing() {
   const renderForm = () => {
     switch (page) {
       case 0:
-        return (
-          <BusinessDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <BusinessDetail data={data} />;
       case 1:
-        return (
-          <AddressDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <AddressDetail data={data} />;
       case 2:
-        return <BusinessTiming businessListing={businessListing} />;
+        return <BusinessTiming data={data} />;
       case 3:
-        return <ContactDetail businessListing={businessListing} />;
+        return <ContactDetail data={data} />;
       default:
-        return (
-          <BusinessDetail
-            businessListing={businessListing}
-            formReferenceData={formReferenceData}
-          />
-        );
+        return <BusinessDetail data={data} />;
     }
   };
 

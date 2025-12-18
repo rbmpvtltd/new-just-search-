@@ -6,7 +6,7 @@ import {
   occupation,
   salutation,
 } from "@repo/db/dist/schema/not-related.schema";
-import { sql as dbsql, eq } from "drizzle-orm";
+import { sql as dbsql, eq, type InferInsertModel } from "drizzle-orm";
 import {
   banners,
   categories,
@@ -19,6 +19,7 @@ import {
 import { sql } from "./mysqldb.seed";
 // import { uploadOnCloudinary } from "@repo/cloudinary";
 import { clouadinaryFake } from "./seeds";
+import { slugify } from "./utils";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
@@ -53,25 +54,23 @@ export const clearAllTablesNotRelated = async () => {
 
 const state = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM states");
-  // console.log("rows", rows);
+  type DbState = InferInsertModel<typeof states>;
+  const dbStateValue: DbState[] = [];
 
   for (const row of rows) {
-    // console.log("row.id", row.id, "row.name", row.name);
-
-    await db.insert(states).values({
+    dbStateValue.push({
       id: row.id,
       name: row.name,
     });
   }
+
+  await db.insert(states).values(dbStateValue);
   console.log("state migrated successfully!");
 };
 
-type DbCity = {
-  city: string;
-  stateId: number;
-};
 const citie = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM cities");
+  type DbCity = InferInsertModel<typeof cities>;
   const dbcityvalue: DbCity[] = [];
   for (const row of rows) {
     const [state] = await db
@@ -97,17 +96,9 @@ const citie = async () => {
 
 // banner
 
-type DbBanner = {
-  mysqlId: number;
-  route: string;
-  photo: string;
-  isActive: boolean;
-  type: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
 export const bannerSeed = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM `banners`");
+  type DbBanner = InferInsertModel<typeof banners>;
   const dbBannerValue: DbBanner[] = [];
   for (const row of rows) {
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
@@ -122,7 +113,7 @@ export const bannerSeed = async () => {
     }
 
     dbBannerValue.push({
-      mysqlId: row.id,
+      // id: row.id,
       route: row.route ?? null,
       photo: bannerPhotoPublicId ?? "",
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
@@ -137,21 +128,12 @@ export const bannerSeed = async () => {
 
 // categories
 
-type DbCategory = {
-  id: number;
-  title: string;
-  slug: string;
-  photo: string;
-  status: boolean;
-  isPopular: boolean;
-  type: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
 export const seedCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM categories");
+  type DbCategory = InferInsertModel<typeof categories>;
   const dbCategoryValue: DbCategory[] = [];
   for (const row of rows) {
+    // const row = rows.filter((item) => item.id === 207)[0];
     const liveProfileImageUrl = `https://justsearch.net.in/assets/images/categories/${row.photo}`;
     let categoryPhotoPublicId: string | null = null;
 
@@ -162,15 +144,16 @@ export const seedCategories = async () => {
         clouadinaryFake,
       );
 
-      console.log("category photo public id", result);
       categoryPhotoPublicId = result ?? null;
 
+      const slug =
+        row.slug !== "" || row.slug !== null ? slugify(row.title) : row.slug;
       dbCategoryValue.push({
         id: Number(row?.id) ?? 12,
         title: row.title ?? "",
-        slug: row.slug ?? "",
+        slug,
         photo: categoryPhotoPublicId ?? "",
-        isPopular: Boolean(row.id < 13),
+        isPopular: Boolean(row.is_popular),
         status: Boolean(row.status),
         type: Number(row.type),
         createdAt: row.created_at,
@@ -179,42 +162,31 @@ export const seedCategories = async () => {
     }
   }
   await db.insert(categories).values(dbCategoryValue);
+  await db.execute(
+    dbsql`SELECT setval(
+        'categories_id_seq',
+        COALESCE((SELECT MAX(id) + 1 FROM categories), 1),
+        false
+      );`,
+  );
 };
 
 // sub_categories
-type DbSubCategory = {
-  id: number;
-  name: string;
-  slug: string;
-  categoryId: number;
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-};
 export const seedSubcategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM sub_categories");
+  type DbSubCategory = InferInsertModel<typeof subcategories>;
   const dbSubCategoryValue: DbSubCategory[] = [];
   for (const row of rows) {
-    const [category] = await db
-      .select()
-      .from(categories)
-      .where(eq(categories.id, row.parent_id));
-
-    if (!category) {
-      console.log(`Category not found for sub_category id ${row.id}`);
+    if (!row.parent_id) {
+      console.log(`Category parent_id not found for sub_category id ${row.id}`);
       continue;
-    }
-
-    const skipSlug = [""];
-    if (skipSlug.includes(row.slug)) {
-      row.slug = row.slug + row.id;
     }
 
     dbSubCategoryValue.push({
       id: row.id,
       name: row.name,
       slug: row.slug,
-      categoryId: category.id,
+      categoryId: row.parent_id,
       status: Boolean(row.status),
       createdAt: row.created_at,
       updatedAt: row.updated_at,

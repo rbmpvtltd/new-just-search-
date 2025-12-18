@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
-import { Text, useColorScheme, View,Pressable } from "react-native";
+import { Pressable, Text, useColorScheme, View } from "react-native";
 import Colors from "@/constants/Colors";
 import { cld } from "@/lib/cloudinary";
 import type { OutputTrpcType } from "@/lib/trpc";
@@ -17,25 +17,27 @@ export default function MyBusinessCard({ data }: { data: MyBusinessType }) {
           My Listings
         </Text>
         <View className="border-b border-secondary mb-4" />
-        <AdvancedImage
-          cldImg={cld.image(data?.photo || "")}
-          style={{
-            width: 200,
-            height: 200,
-            alignSelf: "center",
-          }}
-        />
+        <View className="w-[100%] h-44">
+          <AdvancedImage
+            cldImg={cld.image(data?.business.photo || "")}
+            className="w-[100%] h-[100%]"
+          />
+        </View>
         <View className="w-full flex-row items-center justify-between">
           <Text className="text-secondary text-lg font-semibold mb-1 w-[80%]">
-            {data.name}
+            {data?.business?.name}
           </Text>
           <Ionicons name="checkmark-circle" size={24} color="green" />
         </View>
-        <Text className="text-secondary text-sm mb-4">{data.area}</Text>
+        <Text className="text-secondary text-sm mb-4">
+          {data?.business?.area}
+        </Text>
         <View className="flex-row justify-between">
           <Pressable
             onPress={() => {
-              router.push("/(root)/profile/business/edit");
+              router.push(
+                `/(root)/profile/business/edit/${data?.business?.id}`,
+              );
             }}
             style={{
               backgroundColor: Colors[colorScheme ?? "light"].success,

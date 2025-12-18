@@ -21,11 +21,7 @@ export const uploadToCloudinary = async (
   const uploadPromises: Promise<string | null>[] = [];
 
   for (let i = 0; i < files.length; i++) {
-    console.log("File----------------------", files);
-
     const fileUrl = files[i];
-    console.log("FILE URL ------------", fileUrl);
-
     if (!fileUrl) {
       uploadPromises.push(Promise.resolve(null));
       continue;

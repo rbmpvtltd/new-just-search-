@@ -2,20 +2,15 @@
 import { db } from "@repo/db";
 import {
   categories,
-  categoryInsertSchema,
-  categoryUpdateSchema,
   subcategories,
   subcategoryInsertSchema,
   subcategoryupdateschema,
 } from "@repo/db/dist/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
-import {
-  cloudinaryDeleteImageByPublicId,
-  cloudinaryDeleteImagesByPublicIds,
-} from "@/lib/cloudinary";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -95,7 +90,7 @@ export const adminSubcategoryRouter = router({
     .mutation(async ({ input }) => {
       console.log("Input", input);
 
-      const slug = slugify(input.name, { lower: true });
+      const slug = slugify(input.name);
       console.log("Slug", { slug });
       try {
         const data = await db.insert(subcategories).values({

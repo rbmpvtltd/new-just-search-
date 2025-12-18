@@ -12,7 +12,7 @@ import {
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
-import slugify from "slugify";
+import { slugify } from "@/lib/slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,

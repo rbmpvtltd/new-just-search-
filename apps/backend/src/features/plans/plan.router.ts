@@ -48,7 +48,7 @@ export const planRouter = router({
       .leftJoin(planAttributes, eq(plans.id, planAttributes.planId))
       .groupBy(plans.id);
 
-    const freePlan = allPlan.filter((item) => item.role === "business")[0];
+    const freePlan = allPlan.filter((item) => item.role === "all")[0];
     logger.info("freePlan", { freePlan: freePlan });
     if (!freePlan) {
       throw new Error("Free plan not found");

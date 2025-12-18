@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { getTokenRole } from "@/utils/secureStore";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "../features/auth/authStore";
 
 export function useLoadToken() {
   const setTokenRole = useAuthStore((state) => state.setToken);
@@ -20,7 +20,7 @@ export function useLoadToken() {
       console.error(error);
     }
   }, [isLoading, isError, data, error, setTokenRole]);
-  return {data, isLoading };
+  return { data, isLoading };
 }
 
 // import { useEffect, useState } from "react";

@@ -1,17 +1,24 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { FlatList, Image, Text, useColorScheme, View,Pressable } from "react-native";
+import {
+  FlatList,
+  Image,
+  Pressable,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DataNotFound from "@/components/ui/DataNotFound";
+import { Loading } from "@/components/ui/Loading";
 import { NOTIFICATION_URL } from "@/constants/apis";
 import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useClearNotification } from "@/query/clearNotifications";
 import { useSuspenceData } from "@/query/getAllSuspense";
-import { useStartChat } from "@/query/startChat";
-import { useAuthStore } from "@/store/authStore";
-import { Loading } from "@/components/ui/Loading";
 import { useMaskAsRead } from "@/query/notification/notication";
+import { useStartChat } from "@/query/startChat";
 import { isoStringToTime } from "@/utils/dateAndTime";
 
 export default function Notification() {

@@ -20,6 +20,7 @@ import {
 
 export function NavMain({
   items,
+  currentPath,
 }: {
   items: {
     title: string;
@@ -31,6 +32,7 @@ export function NavMain({
       url: string;
     }[];
   }[];
+  currentPath: string;
 }) {
   return (
     <SidebarGroup>
@@ -56,7 +58,7 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <Link href={subItem.url}>
+                        <Link href={currentPath + subItem.url}>
                           <span>{subItem.title}</span>
                         </Link>
                       </SidebarMenuSubButton>

@@ -95,11 +95,11 @@ function AddHirePage() {
       case 0:
         return <PersonalDetailsForm data={data} />;
       case 1:
-        return <EducationForm />;
+        return <EducationForm data={data} />;
       case 2:
         return <PreferredPositionForm />;
       case 3:
-        return <DocumentsForm />;
+        return <DocumentsForm data={data} />;
       default:
         return <PersonalDetailsForm data={data} />;
     }

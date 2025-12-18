@@ -1,23 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
   Dimensions,
   Image,
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   useColorScheme,
   View,
-  Pressable,
 } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
+import { trpc } from "@/lib/trpc";
 import { useStartChat } from "@/query/startChat";
-import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
-import { useQuery } from "@tanstack/react-query";
-import { trpc } from "@/lib/trpc";
 import { Loading } from "../../../components/ui/Loading";
 
 const screenWidth = Dimensions.get("window").width;

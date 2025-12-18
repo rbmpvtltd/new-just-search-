@@ -27,6 +27,7 @@ const Input = forwardRef<TextInput, InputProps>(
       >
         <TextInput
           ref={ref}
+          
           editable={editable}
           style={[
             {

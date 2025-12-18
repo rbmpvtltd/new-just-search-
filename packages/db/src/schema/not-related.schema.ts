@@ -94,7 +94,6 @@ const highestQualification = pgTable("highest_qualification", {
 
 const banners = pgTable("banners", {
   id: serial("id").primaryKey(),
-  mysqlId: integer("mysql_id"),
   route: text("route"),
   photo: text("photo").notNull(),
   isActive: boolean("is_active").default(true).notNull(),

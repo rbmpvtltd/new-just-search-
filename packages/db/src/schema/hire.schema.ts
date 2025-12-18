@@ -158,7 +158,7 @@ export const hireUpdateSchema = createUpdateSchema(hireListing).extend({
   subcategoryId: z.array(z.number()),
   gender: z.enum(Gender),
   maritalStatus: z.enum(MaritalStatus),
-  languages: z.array(z.string()),
+  languages: z.array(z.number()),
   jobType: z.array(z.enum(JobType)),
   jobDuration: z.array(z.enum(JobDuration)),
   workShift: z.array(z.enum(WorkShift)),

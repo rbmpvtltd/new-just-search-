@@ -4,20 +4,20 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
-  Pressable
 } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { Loading } from "@/components/ui/Loading";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useChatMessages } from "@/query/chatMessages";
 import { useSendMessage } from "@/query/sendMessage";
-import { useAuthStore } from "@/store/authStore";
 
 const ChatScreen = () => {
   const { chat } = useLocalSearchParams();

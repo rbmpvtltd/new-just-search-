@@ -1,5 +1,5 @@
 // src/utils/authHeader.ts
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/features/auth/authStore";
 
 export const getAuthHeader = () => {
   const token = useAuthStore.getState().token;

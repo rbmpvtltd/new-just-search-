@@ -1,15 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
   Alert,
   Keyboard,
-  ScrollView,
   Text,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
 import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
@@ -18,11 +21,14 @@ import {
 } from "@/components/forms/formComponent";
 import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
-import { trpc } from "@/lib/trpc";
+import { queryClient, trpc } from "@/lib/trpc";
 
 type AddProductSchema = z.infer<typeof productInsertSchema>;
 export default function AddProduct() {
-  const { data } = useSuspenseQuery(trpc.productrouter.add.queryOptions());
+  const router = useRouter();
+  const { data, isLoading } = useSuspenseQuery(
+    trpc.productrouter.add.queryOptions(),
+  );
   const { mutate } = useMutation(
     trpc.productrouter.addProduct.mutationOptions(),
   );
@@ -41,7 +47,7 @@ export default function AddProduct() {
       categoryId: categories?.id ?? 0,
       subcategoryId: [],
       productDescription: "",
-      photo: "",
+      mainImage: "",
       image2: "",
       image3: "",
       image4: "",
@@ -49,25 +55,23 @@ export default function AddProduct() {
     },
   });
 
-  if (!data) {
+  if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center py-10">
-        <Text className="text-gray-600">
-          Unable to load the form. Try again later.
-        </Text>
+        <ActivityIndicator size="large" color="#2563eb" />
       </View>
     );
   }
 
   const onSubmit = async (data: AddProductSchema) => {
     const file = await uploadToCloudinary(
-      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "products",
     );
     mutate(
       {
         ...data,
-        photo: file[0] ?? "",
+        mainImage: file[0] ?? "",
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",
@@ -76,10 +80,18 @@ export default function AddProduct() {
       {
         onSuccess: (data) => {
           if (data.success) {
-            //TODO Add query client
             Alert.alert(data.message);
+            queryClient.invalidateQueries({
+              queryKey: trpc.productrouter.showProduct.queryKey(),
+            });
+            router.replace("/(root)/profile");
           }
-          // router.push("/");
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            Alert.alert(error.message);
+          }
+          console.error("Error", error.message);
         },
       },
     );
@@ -148,11 +160,11 @@ export default function AddProduct() {
   const formFields2: FormFieldProps<AddProductSchema>[] = [
     {
       control,
-      name: "photo",
+      name: "mainImage",
       placeholder: "Select Image 1",
       component: "image",
       required: false,
-      error: errors.photo?.message,
+      error: errors.mainImage?.message,
     },
     {
       control,
@@ -188,34 +200,44 @@ export default function AddProduct() {
     },
   ];
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView className="w-[100%] h-full">
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAwareScrollView
+        enableOnAndroid
+        extraScrollHeight={60}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 12,
+          paddingVertical: 0,
+        }}
+      >
         <View className=" mx-auto w-[90%]">
           {formFields.map((field) => (
             <FormField key={field.name} {...field} />
           ))}
         </View>
-        <View className="flex-row items-center">
-          <LableText title="Product images" className="ml-11" />
+        <View className="flex-row items-center ml-8 w-[90%]">
+          <LableText title="Product Images" className="" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>
         </View>
-        <View className="mt-2 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
+        <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
           {formFields2.map((field) => (
-            <FormField labelHidden key={field.name} {...field} />
+            <FormField key={field.name} {...field} />
           ))}
         </View>
-        <View className="flex-row justify-between w-[90%] self-center  mt-6 mb-10">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-2">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
-              title="Submit"
+              title="Next"
               isLoading={isSubmitting}
               onPress={handleSubmit(onSubmit)}
             />
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );
 }

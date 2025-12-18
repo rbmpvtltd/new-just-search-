@@ -9,8 +9,8 @@ import {
 } from "@repo/db/dist/schema/offer.schema";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
-import slugify from "slugify";
 import z from "zod";
+import { slugify } from "@/lib/slugify";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -113,10 +113,7 @@ export const adminOfferRouter = router({
           message: "Business not found",
         });
       }
-      const slugifyName = slugify(input.offerName, {
-        lower: true,
-        strict: true,
-      });
+      const slugifyName = slugify(input.offerName);
 
       const startDate = new Date();
       const endDate = new Date(startDate);

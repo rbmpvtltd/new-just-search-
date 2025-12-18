@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { ActivityIndicator, Text, View } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
 import CreateBusinessListing from "@/features/business/create/add-business";
 import MyBusinessCard from "@/features/business/show/MyBusiness";
 import { trpc } from "@/lib/trpc";
-import { useAuthStore } from "@/store/authStore";
 
 export default function MyBusinessListing() {
   const getAuthStoreToken = useAuthStore((state) => state.token);
-
   return (
     <View>
       {getAuthStoreToken ? <MyBusiness /> : <CreateBusinessListing />}
@@ -26,7 +25,12 @@ function MyBusiness() {
     }
   }
 
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading)
+    return (
+      <View className="flex-1 items-center justify-center py-10">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
   if (!data) return <CreateBusinessListing />;
   return <MyBusinessCard data={data} />;
 }

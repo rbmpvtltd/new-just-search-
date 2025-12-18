@@ -19,8 +19,10 @@ import {
 import Carousel from "react-native-reanimated-carousel";
 import RenderHtml from "react-native-render-html";
 import Review from "@/components/forms/review";
+import { Loading } from "@/components/ui/Loading";
+import { useAuthStore } from "@/features/auth/authStore";
+import { trpc } from "@/lib/trpc";
 import { useStartChat } from "@/query/startChat";
-import { useAuthStore } from "@/store/authStore";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";

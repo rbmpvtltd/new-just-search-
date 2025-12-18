@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { redirectRole } from "@/utils/redirect";
 import { adminSidebarData } from "./sidebar-data";
 export default async function DashboardLayout({
   children,
@@ -13,7 +14,11 @@ export default async function DashboardLayout({
   const verityDashboardUser = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );
+  console.log("verityDashboardUser", verityDashboardUser);
   if (verityDashboardUser.data?.success) {
+    if (verityDashboardUser.data.role !== "franchises") {
+      return redirect(redirectRole(verityDashboardUser.data.role ?? ""));
+    }
     return (
       <SidebarProvider
         style={
@@ -23,7 +28,7 @@ export default async function DashboardLayout({
           } as React.CSSProperties
         }
       >
-        <AppSidebar data={adminSidebarData} />
+        <AppSidebar data={adminSidebarData} currentPath="/franchise" />
         <SidebarInset>
           <SiteHeader />
           <div className="flex flex-1 bg-[#f7f7f7f7] flex-col">{children}</div>

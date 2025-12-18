@@ -1,17 +1,18 @@
 import { redirect } from "next/navigation";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { redirectRole } from "@/utils/redirect";
 import { LoginForm } from "./login-form";
 
 export default async function Login() {
+  console.log("login page");
   const dashboardverify = await asyncHandler(
     trpcServer.auth.dashboardverify.query(),
   );
 
   if (dashboardverify?.data?.success) {
-    redirect("/");
+    return redirect(redirectRole(dashboardverify.data.role ?? ""));
   }
-
   return <LoadLoginForm />;
 }
 

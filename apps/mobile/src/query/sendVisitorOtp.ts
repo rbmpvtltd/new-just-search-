@@ -1,6 +1,6 @@
 import { apiUrl } from "@/constants/Variable";
+import type { LoginVisitorFormData } from "@/features/auth/schema/loginSchema";
 import { api, methods } from "@/lib/api";
-import type { LoginVisitorFormData } from "@/schemas/loginSchema";
 
 export const sendVisitorOtp = async (data: {
   mobile_no: string;
