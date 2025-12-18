@@ -1,11 +1,11 @@
 import type { salesmenInsertSchema } from "@repo/db/dist/schema/user.schema";
 import type z from "zod";
 import { create } from "zustand";
-import type { adminAddProfileInsertSchema } from "../../create/add-salesman/forms/ProfileForm";
-import type { adminAddUserInsertSchema } from "../../create/add-salesman/forms/UserForm";
+import type { franchiseAddProfileInsertSchema } from "../../create/add-salesman/forms/ProfileForm";
+import type { franchiseAddUserInsertSchema } from "../../create/add-salesman/forms/UserForm";
 
-type UserInsertSchema = z.infer<typeof adminAddUserInsertSchema>;
-type ProfileSchema = z.infer<typeof adminAddProfileInsertSchema>;
+type UserInsertSchema = z.infer<typeof franchiseAddUserInsertSchema>;
+type ProfileSchema = z.infer<typeof franchiseAddProfileInsertSchema>;
 type SalesmanSchema = z.infer<typeof salesmenInsertSchema>;
 export type CombinedForm = ProfileSchema & UserInsertSchema & SalesmanSchema;
 
@@ -36,7 +36,6 @@ const initialFormValue: CombinedForm = {
   profileImage: "",
   maritalStatus: "Married",
   dob: null,
-  area: "",
   pincode: "",
   state: 0,
   city: 0,
@@ -45,7 +44,6 @@ const initialFormValue: CombinedForm = {
   lastName: "",
   occupation: null,
   salutation: "",
-
   //salesman
   franchiseId: NaN,
   referCode: "",

@@ -19,10 +19,10 @@ import type { OutputTrpcType } from "@/trpc/type";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 
 export type AddAdminSalesmanType = OutputTrpcType["adminSalemanRouter"]["add"];
-export const adminAddProfileInsertSchema = profileInsertSchema.omit({
+export const franchiseAddProfileInsertSchema = profileInsertSchema.omit({
   userId: true,
 });
-type ProfileSchema = z.infer<typeof adminAddProfileInsertSchema>;
+type ProfileSchema = z.infer<typeof franchiseAddProfileInsertSchema>;
 export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
   const trpc = useTRPC();
   const prevPage = useSalesmanFormStore((state) => state.prevPage);
@@ -33,7 +33,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ProfileSchema>({
-    resolver: zodResolver(adminAddProfileInsertSchema),
+    resolver: zodResolver(franchiseAddProfileInsertSchema),
     defaultValues: {
       address: formValue.address ?? "",
       profileImage: formValue.profileImage ?? "",
@@ -43,7 +43,6 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       salutation: formValue.salutation ?? "",
       occupation: formValue.occupation ?? null,
       maritalStatus: formValue.maritalStatus ?? "Married",
-      area: formValue.area ?? "",
       pincode: formValue.pincode ?? "",
       city: formValue.city ?? NaN,
       state: formValue.state ?? NaN,
@@ -143,15 +142,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
         };
       }),
     },
-    {
-      control,
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
-      required: false,
-      component: "input",
-      error: "",
-    },
+
     {
       control,
       label: "Pincode",

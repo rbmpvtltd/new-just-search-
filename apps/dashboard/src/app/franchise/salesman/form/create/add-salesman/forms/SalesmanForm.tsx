@@ -13,6 +13,8 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
@@ -20,10 +22,11 @@ import type { SetOpen } from "../../../add.form";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 import type { AddAdminSalesmanType } from "./ProfileForm";
 
-const adminSalesmenInsertSchema = salesmenInsertSchema.omit({
+const franchiseSalesmenInsertSchema = salesmenInsertSchema.omit({
   userId: true,
+  franchiseId: true,
 });
-type SalesmanInsertSchema = z.infer<typeof adminSalesmenInsertSchema>;
+type SalesmanInsertSchema = z.infer<typeof franchiseSalesmenInsertSchema>;
 
 export default function SalesmanForm({
   data,
@@ -34,64 +37,22 @@ export default function SalesmanForm({
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
-    trpc.adminSalemanRouter.create.mutationOptions(),
+    trpc.franchiseSalemanRouter.create.mutationOptions(),
   );
   const formValue = useSalesmanFormStore((s) => s.formValue);
   const prevPage = useSalesmanFormStore((s) => s.prevPage);
   const clearPage = useSalesmanFormStore((s) => s.clearPage);
-  const [code, setCode] = useState<null | string>("");
+
   const {
     control,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<SalesmanInsertSchema>({
-    resolver: zodResolver(adminSalesmenInsertSchema),
+    resolver: zodResolver(franchiseSalesmenInsertSchema),
     defaultValues: {
-      franchiseId: formValue.franchiseId,
       referCode: formValue.referCode,
     },
   });
-  const franchiseId = useWatch({ control, name: "franchiseId" });
-  const { data: dataReferCode, isLoading } = useQuery(
-    trpc.adminSalemanRouter.getReferCode.queryOptions({
-      franchiseId: Number(franchiseId),
-    }),
-  );
-
-  useEffect(() => {
-    if (dataReferCode?.newReferCode) {
-      reset((prev) => {
-        if (prev.referCode === dataReferCode.newReferCode) return prev;
-        return { ...prev, referCode: dataReferCode.newReferCode };
-      });
-    }
-  }, [dataReferCode, reset]);
-
-  const formFields: FormFieldProps<SalesmanInsertSchema>[] = [
-    {
-      control,
-      label: "Franchise Name",
-      name: "franchiseId",
-      placeholder: "Enter Franchise Name",
-      component: "select",
-      options:
-        data?.franchise?.map((franchise) => ({
-          label: franchise?.displayName ?? "",
-          value: franchise?.id,
-        })) ?? [],
-      error: errors.franchiseId?.message,
-    },
-    {
-      control,
-      label: "Refer Code",
-      name: "referCode",
-      placeholder: "Enter Refer Code",
-      component: "input",
-      loading: isLoading,
-      error: errors.referCode?.message,
-    },
-  ];
 
   const onSubmit = async (data: SalesmanInsertSchema) => {
     useSalesmanFormStore.setState((state) => ({
@@ -104,33 +65,30 @@ export default function SalesmanForm({
       ...formValue,
       ...data,
     };
-    mutate(
-      { ...finalData, nextNumber: Number(dataReferCode?.nextNumber) },
-      {
-        onSuccess: async (data) => {
-          if (data?.success) {
-            clearPage();
-            toast("success", {
-              description: data.message,
-            });
-            const queryClient = getQueryClient();
-            queryClient.invalidateQueries({
-              queryKey: trpc.adminSalemanRouter.list.queryKey(),
-            });
-            setOpen(false);
-          }
-          console.log("success", data);
-        },
-        onError: async (error) => {
-          if (isTRPCClientError(error)) {
-            toast.error("Error", {
-              description: error.message,
-            });
-            console.error("error,", error.message);
-          }
-        },
+    mutate(finalData, {
+      onSuccess: async (data) => {
+        if (data?.success) {
+          clearPage();
+          toast("success", {
+            description: data.message,
+          });
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.franchiseSalemanRouter.list.queryKey(),
+          });
+          setOpen(false);
+        }
+        console.log("success", data);
       },
-    );
+      onError: async (error) => {
+        if (isTRPCClientError(error)) {
+          toast.error("Error", {
+            description: error.message,
+          });
+          console.error("error,", error.message);
+        }
+      },
+    });
   };
 
   return (
@@ -139,10 +97,25 @@ export default function SalesmanForm({
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-6xl mx-auto bg-gray-100 rounded-lg shadow-xl"
       >
-        <div className="p-8 space-y-8">
-          {formFields.map((field) => (
-            <FormField key={field.name} {...field} />
-          ))}
+        <div className="flex flex-wrap gap-4 p-8 space-y-8 w-full">
+          <div className="w-[20%]">
+            <Label htmlFor="referCode">Prefix Code</Label>
+            <Input
+              type="text"
+              className="mt-2 h-10 border-gray-600 border-2"
+              value={data.franchise[0]?.displayName ?? ""}
+              disabled
+            />
+          </div>
+          <div className="w-[60%]">
+            <FormField
+              control={control}
+              component="input"
+              name="referCode"
+              label="Suffix Code"
+              placeholder="Enter Suffix Code"
+            />
+          </div>
         </div>
 
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">

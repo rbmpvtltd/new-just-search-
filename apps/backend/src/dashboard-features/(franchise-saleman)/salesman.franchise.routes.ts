@@ -1,3 +1,4 @@
+import { features } from "node:process";
 import { db } from "@repo/db";
 import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
@@ -12,6 +13,7 @@ import {
   salesmen,
   salesmenInsertSchema,
 } from "@repo/db/dist/schema/user.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { desc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -89,16 +91,33 @@ export const franchiseSalemanRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: franchisesProcedure.query(async () => {
+  add: franchisesProcedure.query(async ({ ctx }) => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();
-    const franchise = await db.query.users.findMany({
-      columns: {
-        displayName: true,
-        id: true,
-      },
-      where: (user, { eq }) => eq(user.role, "franchises"),
-    });
+    // const prifix = await db.query.franchises.findFirst({
+    //   where: (franchise, { eq }) => eq(franchise.userId, ctx.userId),
+    // });
+    // const franchise = await db.query.users.findFirst({
+    //   columns: {
+    //     displayName: true,
+    //     id: true,
+    //   },
+    //   where: (user, { eq }) => eq(user.id, ctx.userId),
+    // });
+
+    console.log("Hii");
+
+    const franchise = await db
+      .select({
+        displayName: users.displayName,
+        referPrifixed: franchises.referPrifixed,
+        id: franchises.id,
+      })
+      .from(franchises)
+      .where(eq(franchises.userId, ctx.userId))
+      .leftJoin(users, eq(franchises.userId, users.id));
+
+    console.log("Franchice", franchise);
 
     return { states, occupation, franchise };
   }),
@@ -128,23 +147,21 @@ export const franchiseSalemanRouter = router({
         .omit({ role: true })
         .extend(profileInsertSchema.omit({ userId: true }).shape)
         .extend(
-          salesmenInsertSchema
-            .omit({ userId: true })
-            .extend({ nextNumber: z.number() }).shape,
+          salesmenInsertSchema.omit({ userId: true, franchiseId: true }).shape,
         ),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const userData = usersInsertSchema.omit({ role: true }).parse(input);
       const profileData = profileInsertSchema
         .omit({ userId: true })
         .parse(input);
       const salesmenData = salesmenInsertSchema
-        .extend({ nextNumber: z.number() })
-        .omit({ userId: true })
+        // .extend({ nextNumber: z.number() })
+        .omit({ userId: true, franchiseId: true })
         .parse(input);
 
       const franchise = await db.query.franchises.findFirst({
-        where: (franchise, { eq }) => eq(franchise.userId, input.franchiseId),
+        where: (franchise, { eq }) => eq(franchise.userId, ctx.userId),
       });
       const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
         where: (user, { eq, or }) =>
@@ -159,6 +176,8 @@ export const franchiseSalemanRouter = router({
           message: "Email already exists",
         });
       }
+      const referCode = franchise?.referPrifixed + salesmenData.referCode;
+      console.log("refer code", franchise);
 
       const newUserData = (
         await db
@@ -173,19 +192,25 @@ export const franchiseSalemanRouter = router({
         });
       }
 
-      await db.insert(profiles).values({
-        ...profileData,
-        userId: newUserData?.id,
-      });
-
+      try {
+        await db.insert(profiles).values({
+          ...profileData,
+          userId: newUserData?.id,
+        });
+      } catch (error) {
+        console.log("Error", error);
+        logger.info("Error", error);
+      }
+      console.log("refer code", profiles);
       await db.insert(salesmen).values({
         ...salesmenData,
+        referCode: referCode,
         userId: newUserData?.id,
         franchiseId: Number(franchise?.id),
       });
 
       await db.update(franchises).set({
-        lastAssignCode: Number(salesmenData.nextNumber),
+        lastAssignCode: Number(salesmenData.referCode),
       });
       return { success: true, message: "Salesmen created successfully" };
     }),

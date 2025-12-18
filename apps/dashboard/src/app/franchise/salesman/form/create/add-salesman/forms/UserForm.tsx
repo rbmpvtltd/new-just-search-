@@ -11,10 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 
-export const adminAddUserInsertSchema = usersInsertSchema.omit({
+export const franchiseAddUserInsertSchema = usersInsertSchema.omit({
   role: true,
 });
-type UserInsertSchema = z.infer<typeof adminAddUserInsertSchema>;
+type UserInsertSchema = z.infer<typeof franchiseAddUserInsertSchema>;
 
 export default function UserForm() {
   const nextPage = useSalesmanFormStore((s) => s.nextPage);
@@ -24,7 +24,7 @@ export default function UserForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<UserInsertSchema>({
-    resolver: zodResolver(adminAddUserInsertSchema),
+    resolver: zodResolver(franchiseAddUserInsertSchema),
     defaultValues: {
       displayName: formValue.displayName,
       email: formValue.email,

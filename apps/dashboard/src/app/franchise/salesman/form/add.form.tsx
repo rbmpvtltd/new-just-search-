@@ -18,7 +18,7 @@ export function AddNewEntiry() {
         <Button>Add Entry</Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-[425px] lg:max-w-[80%] w-full p-4">
-        <SheetTitle>Add Hire Listing</SheetTitle>
+        <SheetTitle>Add Salesman</SheetTitle>
         {open && (
           <Suspense fallback={<div> loading ...</div>}>
             <div className="overflow-y-scroll">
