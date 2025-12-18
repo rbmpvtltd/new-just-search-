@@ -22,17 +22,18 @@ import {
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
-import { slugify } from "@/lib/slugify";
 import z from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
 } from "@/lib/cloudinary";
+import { slugify } from "@/lib/slugify";
 import {
   buildOrderByClause,
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
+import { hashPassword } from "@/utils/hashpass";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
   usersAllowedSortColumns,
@@ -119,14 +120,25 @@ export const adminFranchiseRouter = router({
       if (isEmailOrPhoneNumberExist) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Email already exists",
+          message: "Phone or Email already exists",
+        });
+      }
+
+      if (!userData.password) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Password is required",
         });
       }
 
       const newUserData = (
         await db
           .insert(users)
-          .values({ ...userData, role: "franchises" })
+          .values({
+            ...userData,
+            password: await hashPassword(userData.password),
+            role: "franchises",
+          })
           .returning()
       )[0];
       if (!newUserData?.id) {

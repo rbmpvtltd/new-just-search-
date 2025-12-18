@@ -4,6 +4,7 @@ import { adminCategoryRouter } from "./dashboard-features/(category)/category.ad
 import { adminSubcategoryRouter } from "./dashboard-features/(category)/subcategory.admin.routes";
 import { adminFranchiseRouter } from "./dashboard-features/(franchise-saleman)/franchise.admin.routes";
 import { adminSalemanRouter } from "./dashboard-features/(franchise-saleman)/salesman.admin.routes";
+import { franchiseSalemanRouter } from "./dashboard-features/(franchise-saleman)/salesman.franchise.routes";
 import { adminOfferRouter } from "./dashboard-features/(offer-product)/offer.admin.routes";
 import { adminProductRouter } from "./dashboard-features/(offer-product)/product.admin.routes";
 import { adminDeleteRequestRouter } from "./dashboard-features/(users)/deleteRequest.admin.routes";
@@ -72,6 +73,7 @@ const adminRouter = router({
   adminUtilsRouter,
   adminHelpAndSupportRouter,
   adminAttributesRouter,
+  franchiseSalemanRouter,
 });
 
 export const openAppRouter = openRouter({
