@@ -16,13 +16,17 @@ import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
 
 export type UserHireListingType = OutputTrpcType["hirerouter"]["edit"] | null;
-export default function UpdateHireListing() {
+export default function UpdateHireListing({
+  data,
+}: {
+  data: UserHireListingType;
+}) {
   const { page } = useHireFormStore();
-  const { data: hireListing } = useSuspenseQuery(
-    trpc.hirerouter.edit.queryOptions({
-      id: 1,
-    }),
-  );
+  // const { data: hireListing } = useSuspenseQuery(
+  //   trpc.hirerouter.edit.queryOptions({
+  //     id: 1,
+  //   }),
+  // );
 
   // if (!hireListing) {
   //   return (
@@ -44,15 +48,15 @@ export default function UpdateHireListing() {
   const renderForm = () => {
     switch (page) {
       case 0:
-        return <PersonalDetailsForm hireListing={hireListing} />;
+        return <PersonalDetailsForm data={data} />;
       case 1:
-        return <EducationForm hireListing={hireListing} />;
+        return <EducationForm data={data} />;
       case 2:
-        return <PreferredPositionForm hireListing={hireListing} />;
+        return <PreferredPositionForm data={data} />;
       case 3:
-        return <DocumentsForm hireListing={hireListing} />;
+        return <DocumentsForm data={data} />;
       default:
-        return <PersonalDetailsForm hireListing={hireListing} />;
+        return <PersonalDetailsForm data={data} />;
     }
   };
 

@@ -3,32 +3,30 @@ import { useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, Text, View } from "react-native";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
-import UpdateHireListing from "@/features/hire/update/edit-hire";
+import EditProduct from "@/features/product/forms/update/EditProduct";
 import { trpc } from "@/lib/trpc";
 
-export default function EditMyHireListing() {
+export default function CreateProduct() {
   const { id } = useLocalSearchParams();
-
-  const { data, isLoading, isError, error } = useQuery(
-    trpc.hirerouter.edit.queryOptions({ id: Number(id) ?? "" }),
+  const { data, isError, error, isLoading } = useQuery(
+    trpc.productrouter.edit.queryOptions({ id: Number(id) ?? "" }),
   );
-  if (isLoading) {
+  if (isLoading)
     return (
       <View className="flex-1 items-center justify-center py-10">
         <ActivityIndicator size="large" color="#2563eb" />
       </View>
     );
-  }
   if (isError) {
+    console.log(error);
     return <SomethingWrong />;
   }
   if (!data) {
-    return <Text className="text-secondary">No listing found</Text>;
+    return <Text className="text-secondary">No product found</Text>;
   }
-
   return (
     <BoundaryWrapper>
-      <UpdateHireListing data={data} />
+      <EditProduct myProduct={data} />
     </BoundaryWrapper>
   );
 }

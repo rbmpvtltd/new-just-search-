@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { AdvancedImage } from "cloudinary-react-native";
+import { use } from "passport";
 import React, { useEffect, useState } from "react";
 import {
   BackHandler,
@@ -13,7 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { cld } from "@/lib/cloudinary";
-import { type OutputTrpcType, trpc } from "@/lib/trpc";
+import { type OutputTrpcType, queryClient, trpc } from "@/lib/trpc";
 
 type MessageListType = OutputTrpcType["chat"]["getMessageList"] | null;
 type OtherUerDisplayNameAndImageType =
@@ -33,20 +34,13 @@ function PrivateChat({
   const { data: messageList } = useSuspenseQuery(
     trpc.chat.getMessageList.queryOptions({ conversationId }),
   );
-
-  const [store, setStore] = useState(messageList);
-
-  //Store ko server update ke saath sync
-  useEffect(() => {
-    setStore(messageList);
-  }, [messageList]);
+  const [store, setStore] = useState<Exclude<MessageListType, null>>(
+    messageList ?? [],
+  );
 
   const lastMessageId = store?.length
     ? (store?.[store.length - 1]?.id ?? null)
     : null;
-  const { mutate: markRead } = useMutation(
-    trpc.chat.markAsRead.mutationOptions(),
-  );
 
   const { data: newMessage, error } = useSubscription(
     trpc.chat.onMessage.subscriptionOptions({
@@ -60,17 +54,30 @@ function PrivateChat({
     setStore((prev) => [...prev, newMessage]);
   }, [newMessage]);
 
+  // useEffect(() => {
+  //   setStore(messageList);
+  // }, [messageList]);
+
+  const { mutate: markRead } = useMutation(
+    trpc.chat.markAsRead.mutationOptions(),
+  );
+
   useEffect(() => {
     const unread = store
       .filter((m) => m.senderId !== userData?.id && !m.isRead)
       .map((m) => m.id);
 
     if (unread.length > 0) {
-      markRead({ messageId: unread });
+      markRead({ messageId: unread }, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: trpc.chat.conversationList.queryKey()
+          })
+        }
+      });
     }
   }, [markRead, userData, store]);
 
-  console.log("Store", store);
 
   return (
     <View className="flex-1">
@@ -102,7 +109,7 @@ function PrivateChat({
               {msg.message && (
                 <View
                   className={`max-w-[80%] px-2 py-2 rounded-2xl shadow-sm ${
-                    msg.senderId === userData?.id
+                    msg.senderId === userData?.userId
                       ? "bg-blue-100 self-end"
                       : "bg-gray-200 self-start"
                   }`}
@@ -190,7 +197,7 @@ export default function StoreChat({
 }) {
   return (
     <BoundaryWrapper>
-      <View className="h-[89vh]">
+      <View className="h-full">
         <MemorizedPrivateChat
           conversationId={conversationId}
           displayName={displayName}

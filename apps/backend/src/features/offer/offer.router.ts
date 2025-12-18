@@ -10,13 +10,7 @@ import { eq } from "drizzle-orm";
 import slugify from "slugify";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
-import {
-  businessProcedure,
-  protectedProcedure,
-  publicProcedure,
-  router,
-  visitorProcedure,
-} from "@/utils/trpc";
+import { businessProcedure, protectedProcedure, router } from "@/utils/trpc";
 import { createOfferReview, offerReviewExist } from "./offer.service";
 
 export const offerrouter = router({
@@ -197,7 +191,7 @@ export const offerrouter = router({
     }),
 
   edit: businessProcedure
-    .input(z.object({ offerSlug: z.string() }))
+    .input(z.object({ id: z.number() }))
     .query(async ({ input, ctx }) => {
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
@@ -212,10 +206,7 @@ export const offerrouter = router({
 
       const offer = await db.query.offers.findFirst({
         where: (offers, { and, eq }) =>
-          and(
-            eq(offers.offerSlug, input.offerSlug),
-            eq(offers.businessId, business.id),
-          ),
+          and(eq(offers.id, input.id), eq(offers.businessId, business.id)),
         with: {
           offerPhotos: true,
           offerSubcategory: true,
@@ -235,6 +226,7 @@ export const offerrouter = router({
   update: businessProcedure
     .input(offersUpdateSchema)
     .mutation(async ({ ctx, input }) => {
+      console.log("I am inside update offer start");
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.userId, ctx.userId),
@@ -246,9 +238,10 @@ export const offerrouter = router({
         });
       }
 
+      console.log("I am inside update offer 2");
+      console.log("Consoling input", input);
       const isOfferExists = await db.query.offers.findFirst({
-        where: (offers, { eq }) =>
-          eq(offers.offerSlug, String(input.offerSlug)),
+        where: (offers, { eq }) => eq(offers.id, Number(input.id)),
       });
       if (!isOfferExists) {
         throw new TRPCError({
@@ -256,6 +249,7 @@ export const offerrouter = router({
           message: "Offer not found or does not belong to this business",
         });
       }
+      console.log("I am inside update offer 3");
       const updateOffer = await db
         .update(schemas.offer.offers)
         .set({
@@ -301,6 +295,7 @@ export const offerrouter = router({
         );
       }
 
+      console.log("I am inside update offer end");
       return {
         success: true,
         message: "Offer updated successfully",
@@ -333,12 +328,10 @@ export const offerrouter = router({
       return { success: true };
     }),
   createOfferReview: protectedProcedure
-    .input(
-      insertOfferReviewSchema
-    )
-    .mutation(async ({ input,ctx }) => {
+    .input(insertOfferReviewSchema)
+    .mutation(async ({ input, ctx }) => {
       const { email, message, name, offerId, rate, status, view } = input;
-      const {userId} = ctx
+      const { userId } = ctx;
       const reviewExist = await offerReviewExist(userId, offerId, email ?? "");
       if (reviewExist) {
         throw new TRPCError({
@@ -358,10 +351,12 @@ export const offerrouter = router({
       );
       return { success: true, data: data };
     }),
-    offerReviewSubmitted : protectedProcedure.input(z.object({offerId:z.number()})).query(async ({input,ctx})=>{
-      const {offerId} = input;
-      const {userId} = ctx
-      const submitted = await offerReviewExist(userId,offerId)
-      return {submitted:submitted}
-    })
+  offerReviewSubmitted: protectedProcedure
+    .input(z.object({ offerId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { offerId } = input;
+      const { userId } = ctx;
+      const submitted = await offerReviewExist(userId, offerId);
+      return { submitted: submitted };
+    }),
 });

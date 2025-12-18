@@ -14,15 +14,13 @@ import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import type { FormReferenceDataType, UserBusinessListingType } from "..";
+import type { UserBusinessListingType } from "..";
 
 type BusinessDetailSchema = z.infer<typeof businessDetailSchema>;
 export default function BusinessDetail({
-  businessListing,
-  formReferenceData,
+  data,
 }: {
-  businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
+  data: UserBusinessListingType;
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const nextPage = useBusinessFormStore((s) => s.nextPage);
@@ -34,29 +32,27 @@ export default function BusinessDetail({
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
     defaultValues: {
-      name: businessListing?.name ?? "",
-      photo: businessListing?.photo ?? "",
-      categoryId: businessListing?.category.id ?? 0,
-      subcategoryId: businessListing?.subcategory.map((s) => s.id) ?? [],
-      specialities: businessListing?.specialities ?? "",
-      homeDelivery: businessListing?.homeDelivery ?? "",
-      description: businessListing?.description ?? "",
-      image1: businessListing?.businessPhotos[0]?.photo ?? "",
-      image2: businessListing?.businessPhotos[1]?.photo ?? "",
-      image3: businessListing?.businessPhotos[2]?.photo ?? "",
-      image4: businessListing?.businessPhotos[3]?.photo ?? "",
-      image5: businessListing?.businessPhotos[4]?.photo ?? "",
+      name: data?.business?.name ?? "",
+      photo: data?.business?.photo ?? "",
+      categoryId: data?.category?.categoryId ?? 0,
+      subcategoryId: data?.subcategories?.map((s) => s.subcategoryId) ?? [],
+      specialities: data?.business?.specialities ?? "",
+      homeDelivery: data?.business?.homeDelivery ?? "",
+      description: data?.business?.description ?? "",
+      image1: data?.businessPhotos[0]?.photo ?? "",
+      image2: data?.businessPhotos[1]?.photo ?? "",
+      image3: data?.businessPhotos[2]?.photo ?? "",
+      image4: data?.businessPhotos[3]?.photo ?? "",
+      image5: data?.businessPhotos[4]?.photo ?? "",
     },
   });
 
-  const categories = formReferenceData?.getBusinessCategories.map(
-    (item: any) => {
-      return {
-        label: item.title,
-        value: item.id,
-      };
-    },
-  );
+  const categories = data?.getBusinessCategories.map((item) => {
+    return {
+      label: item.title,
+      value: item.id,
+    };
+  });
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
@@ -230,15 +226,7 @@ export default function BusinessDetail({
   ];
 
   return (
-    // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
     <>
-      {/* <KeyboardAwareScrollView
-        enableOnAndroid
-        extraScrollHeight={80}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, paddingVertical: 16 }}
-      > */}
       <View className="mx-auto w-[90%]">
         {formFields.map((field) => (
           <FormField key={field.name} {...field} />
@@ -252,21 +240,18 @@ export default function BusinessDetail({
       </View>
       <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2     ">
         {formFields2.map((field) => (
-          <FormField labelHidden key={field.name} {...field} />
+          <FormField key={field.name} {...field} />
         ))}
       </View>
 
-      <View className="flex-row justify-between w-[90%] self-center mt-6">
-        <View className="w-[45%] mx-auto">
-          <PrimaryButton
-            title="Next"
-            isLoading={isSubmitting}
-            onPress={handleSubmit(onSubmit)}
-          />
-        </View>
+      <View className="mx-auto w-[90%] mt-6 mb-2">
+        <PrimaryButton
+          className="w-[40%] mx-auto"
+          title="Next"
+          onPress={handleSubmit(onSubmit)}
+          isLoading={isSubmitting}
+        />
       </View>
-      {/* </KeyboardAwareScrollView> */}
     </>
-    // </SafeAreaView>
   );
 }

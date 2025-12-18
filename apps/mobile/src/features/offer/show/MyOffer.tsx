@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Image,
   Pressable,
   Text,
   View,
@@ -17,7 +16,7 @@ import { cld } from "@/lib/cloudinary";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 export default function MyOffersList() {
   const {
-    data: myOffers,
+    data,
     isLoading,
     isError,
     hasNextPage,
@@ -39,7 +38,7 @@ export default function MyOffersList() {
 
   if (isError) return <SomethingWrong />;
 
-  if (!myOffers?.pages[0].offers || myOffers.pages[0].offers.length === 0)
+  if (!data?.pages[0].offers || data.pages[0].offers.length === 0)
     return (
       <View className="px-4 mt-4">
         <Pressable
@@ -53,7 +52,7 @@ export default function MyOffersList() {
         </Pressable>
       </View>
     );
-  const offersData = myOffers?.pages.flatMap((page) => page.offers || []) ?? [];
+  const offersData = data?.pages.flatMap((page) => page.offers || []) ?? [];
 
   return (
     <View className="flex-1 bg-base-100">
@@ -125,7 +124,7 @@ function OfferCard({ item }: { item: OfferType }) {
       <View className="flex-row bg-base-200 p-4 rounded-2xl shadow-sm">
         <View className="w-28 h-28 rounded-lg">
           <AdvancedImage
-            cldImg={cld.image(item?.offerPhotos[0].photo || "")}
+            cldImg={cld.image(item?.mainImage || "")}
             className="w-[100%] h-[100%] rounded-lg"
           />
         </View>
@@ -155,9 +154,7 @@ function OfferCard({ item }: { item: OfferType }) {
             <Pressable
               className="bg-info flex-row items-center px-3 py-1.5 rounded-lg mr-2"
               onPress={() =>
-                router.navigate(
-                  `/(root)/profile/offer/edit-offer/${item?.offerSlug}`,
-                )
+                router.push(`/(root)/profile/offer/edit-offer/${item?.id}`)
               }
             >
               <Ionicons name="create-outline" size={14} color="#fff" />

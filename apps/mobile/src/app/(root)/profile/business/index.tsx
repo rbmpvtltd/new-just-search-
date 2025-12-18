@@ -7,7 +7,6 @@ import { trpc } from "@/lib/trpc";
 
 export default function MyBusinessListing() {
   const getAuthStoreToken = useAuthStore((state) => state.token);
-
   return (
     <View>
       {getAuthStoreToken ? <MyBusiness /> : <CreateBusinessListing />}

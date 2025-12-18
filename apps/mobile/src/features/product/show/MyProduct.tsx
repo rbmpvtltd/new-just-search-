@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
 import {
@@ -10,21 +10,34 @@ import {
   Text,
   View,
 } from "react-native";
+import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { cld } from "@/lib/cloudinary";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 export default function MyProductsList() {
   const {
-    data: myProducts,
+    data,
     isLoading,
     isError,
-  } = useQuery(trpc.productrouter.showProduct.queryOptions());
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    trpc.productrouter.showProduct.infiniteQueryOptions(
+      {
+        cursor: 0,
+        limit: 10,
+      },
+      {
+        getNextPageParam: (data) => data.nextCursor,
+      },
+    ),
+  );
   const router = useRouter();
   if (isLoading) return <ActivityIndicator />;
 
   if (isError) return <SomethingWrong />;
-  // -->
-  if (!myProducts?.products || myProducts.products.length === 0)
+  if (!data?.pages[0].products || data.pages[0].products.length === 0)
     return (
       <View className="px-4 mt-4">
         <Pressable
@@ -38,17 +51,18 @@ export default function MyProductsList() {
         </Pressable>
       </View>
     );
-  const productsData = myProducts?.products ?? [];
+  const productsData = data?.pages.flatMap((page) => page.products || []) ?? [];
 
   return (
     <View className="flex-1 bg-base-100">
       <FlatList
         data={productsData}
         renderItem={({ item }) => <ProductCard item={item} />}
-        // onEndReached={() => {
-        //   if (hasNextPage) fetchNextPage();
-        // }}
+        onEndReached={() => {
+          if (hasNextPage) fetchNextPage();
+        }}
         onEndReachedThreshold={0.5}
+        ListFooterComponent={() => (isFetchingNextPage ? <Loading /> : null)}
       />
     </View>
   );
@@ -96,7 +110,7 @@ function ProductCard({ item }: { item: ProductType }) {
       <View className="flex-row bg-base-200 p-4 rounded-2xl shadow-sm">
         <View className="w-28 h-28 rounded-lg">
           <AdvancedImage
-            cldImg={cld.image(item?.productPhotos[0].photo || "")}
+            cldImg={cld.image(item?.mainImage || "")}
             className="w-[100%] h-[100%] rounded-lg"
           />
         </View>
@@ -118,9 +132,7 @@ function ProductCard({ item }: { item: ProductType }) {
             <Pressable
               className="bg-info flex-row items-center px-3 py-1.5 rounded-lg mr-2"
               onPress={() =>
-                router.push(
-                  `/(root)/profile/product/[${item.productSlug}]`,
-                )
+                router.push(`/(root)/profile/product/edit/${item.id}`)
               }
             >
               <Ionicons name="create-outline" size={14} color="#fff" />

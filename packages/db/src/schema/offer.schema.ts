@@ -8,7 +8,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 import { businessListings } from "../schema/business.schema";
 import { categories, subcategories } from "../schema/not-related.schema";
@@ -39,7 +39,7 @@ export const offers = pgTable("offers", {
 });
 
 export const offersInsertSchema = createInsertSchema(offers, {
-  mainImage: z.string().min(1, "Image 1 is required"),
+  mainImage: () => z.string().min(1, "Image 1 is required"),
   categoryId: () => z.number().min(1, "Category is required"),
   offerName: () =>
     z.string().min(3, "Offer name should be minimum 3 characters long"),
@@ -62,9 +62,26 @@ export const offersInsertSchema = createInsertSchema(offers, {
     image4: z.string().optional(),
     image5: z.string().optional(),
   });
-export const offersUpdateSchema = offersInsertSchema.extend({
-  offerSlug: z.string().optional(),
+
+export const offersUpdateSchema = createUpdateSchema(offers, {
+  mainImage: () => z.string().min(1, "Image 1 is required"),
+  categoryId: () => z.number().min(1, "Category is required"),
+  offerName: () =>
+    z.string().min(3, "Offer name should be minimum 3 characters long"),
+  rate: () => z.number().min(1, "Rate is required"),
+  finalPrice: () => z.number().min(1, "Final price is required"),
+  offerDescription: () =>
+    z.string().min(3, "Offer description should be minimum 3 characters long"),
+}).extend({
+  subcategoryId: z.array(z.number()).min(1, "Select at least one subcategory"),
+  image2: z.string().optional(),
+  image3: z.string().optional(),
+  image4: z.string().optional(),
+  image5: z.string().optional(),
 });
+// export const offersUpdateSchema = offersInsertSchema.extend({
+//   offerSlug: z.string().optional(),
+// });
 
 // 2 OfferPhoto
 export const offerPhotos = pgTable("offer_photos", {

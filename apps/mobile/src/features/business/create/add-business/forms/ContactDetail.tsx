@@ -13,7 +13,7 @@ import {
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
-import { trpc } from "@/lib/trpc";
+import { queryClient, trpc } from "@/lib/trpc";
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail() {
@@ -21,6 +21,7 @@ export default function ContactDetail() {
   const clearPage = useBusinessFormStore((s) => s.clearPage);
   const formValue = useBusinessFormStore((s) => s.formValue);
   const prevPage = useBusinessFormStore((s) => s.prevPage);
+  const setPage = useBusinessFormStore((s) => s.setPage);
 
   const { mutate, isError, error } = useMutation(
     trpc.businessrouter.create.mutationOptions(),
@@ -51,15 +52,14 @@ export default function ContactDetail() {
       {
         onSuccess: async (data) => {
           if (data.success) {
+            setPage(0);
             clearPage();
             Alert.alert(data.message);
-            // const queryClient = getQueryClient();
-            // queryClient.invalidateQueries({
-            //   queryKey: trpc.businessrouter.show.queryKey(),
-            // });
+            queryClient.invalidateQueries({
+              queryKey: trpc.businessrouter.show.queryKey(),
+            });
             router.replace("/(root)/profile");
           }
-          console.log("Success", data);
         },
         onError: (error) => {
           Alert.alert("On Error", error.message);
@@ -143,13 +143,9 @@ export default function ContactDetail() {
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-96">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
           <View className="w-[45%]">
-            <PrimaryButton
-              title="Previous"
-              variant="outline"
-              onPress={prevPage}
-            />
+            <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
           </View>
           <View className="w-[45%]">
             <PrimaryButton

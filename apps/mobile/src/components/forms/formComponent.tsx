@@ -119,7 +119,7 @@ export const FormField = <T extends FieldValues>({
                     if (props.onBlurEvent) props.onBlurEvent(value);
                   }}
                   onChangeText={(text) => {
-                    onChange(text);
+                    onChange(keyboardType === "numeric" ? Number(text) : text);
                     if (onValueChange) onValueChange(text);
                   }}
                   value={value?.toString() ?? ""}

@@ -11,9 +11,9 @@ import type { UserBusinessListingType } from "..";
 
 type BusinessTimingSchema = z.infer<typeof businessTimingSchema>;
 export default function BusinessTiming({
-  businessListing,
+  data,
 }: {
-  businessListing: UserBusinessListingType;
+  data: UserBusinessListingType;
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
   const nextPage = useBusinessFormStore((s) => s.nextPage);
@@ -25,9 +25,9 @@ export default function BusinessTiming({
   } = useForm<BusinessTimingSchema>({
     resolver: zodResolver(businessTimingSchema),
     defaultValues: {
-      days: businessListing?.days ?? [],
-      fromHour: businessListing?.fromHour ?? "",
-      toHour: businessListing?.toHour ?? "",
+      days: data?.business?.days ?? [],
+      fromHour: data?.business?.fromHour ?? "",
+      toHour: data?.business?.toHour ?? "",
     },
   });
 
@@ -96,13 +96,9 @@ export default function BusinessTiming({
         </View>
       </View>
 
-      <View className="flex-row justify-between w-[90%] self-center mt-6 mb-64">
+      <View className="flex-row justify-between w-[90%] self-center mt-6 mb-2">
         <View className="w-[45%]">
-          <PrimaryButton
-            title="Previous"
-            variant="outline"
-            onPress={prevPage}
-          />
+          <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
         </View>
         <View className="w-[45%]">
           <PrimaryButton

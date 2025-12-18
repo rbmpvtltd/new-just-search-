@@ -1,16 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersUpdateSchema } from "@repo/db/dist/schema/offer.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm, useWatch } from "react-hook-form";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "expo-router";
+import { useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
   Keyboard,
-  ScrollView,
   Text,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import type z from "zod";
 import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
@@ -19,17 +21,20 @@ import {
 } from "@/components/forms/formComponent";
 import LableText from "@/components/inputs/LableText";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
-import { useAuthStore } from "@/features/auth/authStore";
-import { type OutputTrpcType, trpc } from "@/lib/trpc";
+import { type OutputTrpcType, queryClient, trpc } from "@/lib/trpc";
 
 type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
 type EditOfferType = OutputTrpcType["offerrouter"]["edit"] | null;
 export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
-  const token = useAuthStore((state) => state.token);
-  const { data } = useQuery(trpc.offerrouter.add.queryOptions());
+  const router = useRouter();
+  const { data, isLoading, isError } = useQuery(
+    trpc.offerrouter.add.queryOptions(),
+  );
   const { mutate } = useMutation(trpc.offerrouter.update.mutationOptions());
   const categories = data?.categoryRecord;
   const subCategories = data?.subcategoryRecord;
+
+  console.log("offer id is ", myOffer);
 
   const {
     control,
@@ -40,16 +45,17 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
   } = useForm<EditOfferSchema>({
     resolver: zodResolver(offersUpdateSchema),
     defaultValues: {
+      id: myOffer?.offer.id,
       offerName: myOffer?.offer.offerName,
       rate: myOffer?.offer?.rate,
       discountPercent: myOffer?.offer?.discountPercent,
       finalPrice: myOffer?.offer?.finalPrice,
       offerDescription: myOffer?.offer?.offerDescription,
-      photo: myOffer?.offer.offerPhotos[0]?.photo || "",
-      image2: myOffer?.offer.offerPhotos[1]?.photo || "",
-      image3: myOffer?.offer.offerPhotos[2]?.photo || "",
-      image4: myOffer?.offer.offerPhotos[3]?.photo || "",
-      image5: myOffer?.offer.offerPhotos[4]?.photo || "",
+      mainImage: myOffer?.offer?.mainImage ?? "",
+      image2: myOffer?.offer.offerPhotos[1]?.photo ?? "",
+      image3: myOffer?.offer.offerPhotos[2]?.photo ?? "",
+      image4: myOffer?.offer.offerPhotos[3]?.photo ?? "",
+      image5: myOffer?.offer.offerPhotos[4]?.photo ?? "",
       categoryId: myOffer?.offer.categoryId,
       subcategoryId: myOffer?.offer.offerSubcategory.map(
         (item) => item.subcategoryId,
@@ -57,37 +63,45 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
     },
   });
 
-  if (!data) {
+  if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center py-10">
-        <Text className="text-gray-600">
-          Unable to load the form. Try again later.
-        </Text>
+        <ActivityIndicator size="large" color="#2563eb" />
       </View>
     );
   }
 
   const onSubmit = async (data: EditOfferSchema) => {
     const file = await uploadToCloudinary(
-      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "offers",
     );
+
     mutate(
       {
         ...data,
-        photo: file[0] ?? "",
-        image2: file[1] ?? "",
-        image3: file[2] ?? "",
-        image4: file[3] ?? "",
-        image5: file[4] ?? "",
+        id: myOffer?.offer.id,
+        mainImage: file[0] ?? data.mainImage,
+        image2: file[1] ?? data.image2,
+        image3: file[2] ?? data.image3,
+        image4: file[3] ?? data.image4,
+        image5: file[4] ?? data.image5,
       },
       {
         onSuccess: (data) => {
           if (data.success) {
-            //TODO Add query client
             Alert.alert(data.message);
+            queryClient.invalidateQueries({
+              queryKey: trpc.offerrouter.showOffer.queryKey(),
+            });
+            router.replace("/(root)/profile");
           }
-          // router.push("/");
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            Alert.alert(error.message);
+          }
+          console.error("Error", error.message);
         },
       },
     );
@@ -189,11 +203,11 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
   const formFields2: FormFieldProps<EditOfferSchema>[] = [
     {
       control,
-      name: "photo",
+      name: "mainImage",
       placeholder: "Select Image 1",
       component: "image",
       required: false,
-      error: errors.photo?.message,
+      error: errors.mainImage?.message,
     },
     {
       control,
@@ -229,26 +243,36 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
     },
   ];
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView className="w-[100%] h-full">
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAwareScrollView
+        enableOnAndroid
+        extraScrollHeight={60}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 12,
+          paddingVertical: 0,
+        }}
+      >
         <View className=" mx-auto w-[90%]">
           {formFields.map((field) => (
             <FormField key={field.name} {...field} />
           ))}
         </View>
-        <View className="flex-row items-center">
-          <LableText title="Shop images" className="ml-11" />
+        <View className="flex-row items-center ml-8 w-[90%]">
+          <LableText title="Offer Images" className="" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>
         </View>
-        <View className="mt-2 flex-1 flex-row flex-wrap items-center justify-center m-auto w-[80%] gap-4">
+        <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
           {formFields2.map((field) => (
-            <FormField labelHidden key={field.name} {...field} />
+            <FormField key={field.name} {...field} />
           ))}
         </View>
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
-          <View className="w-[45%]">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-2">
+          <View className="w-[45%] mx-auto">
             <PrimaryButton
               title="Next"
               isLoading={isSubmitting}
@@ -256,7 +280,7 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
             />
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );
 }

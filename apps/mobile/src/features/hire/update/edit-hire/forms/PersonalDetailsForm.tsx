@@ -20,9 +20,9 @@ import type { UserHireListingType } from "..";
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 
 export default function PersonalDetailsForm({
-  hireListing,
+  data,
 }: {
-  hireListing: UserHireListingType;
+  data: UserHireListingType;
 }) {
   const setFormValue = useHireFormStore((s) => s.setFormValue);
   const nextPage = useHireFormStore((s) => s.nextPage);
@@ -37,25 +37,24 @@ export default function PersonalDetailsForm({
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
-      photo: hireListing?.hire?.photo ?? "",
-      name: hireListing?.hire?.name ?? "",
-      categoryId: hireListing?.category?.categoryId ?? 0,
-      subcategoryId:
-        hireListing?.subcategory?.map((item) => item.subcategoryId) ?? [],
-      email: hireListing?.hire?.email ?? "",
-      gender: hireListing?.hire?.gender ?? "Male",
-      maritalStatus: hireListing?.hire?.maritalStatus ?? "Married",
-      fatherName: hireListing?.hire?.fatherName ?? "",
-      dob: hireListing?.hire?.dob ?? "",
-      languages: hireListing?.hire?.languages ?? [],
-      mobileNumber: hireListing?.hire?.mobileNumber ?? "",
-      alternativeMobileNumber: hireListing?.hire?.alternativeMobileNumber ?? "",
-      latitude: hireListing?.hire?.latitude ?? "",
-      longitude: hireListing?.hire?.longitude ?? "",
-      area: hireListing?.hire?.area ?? "",
-      pincode: hireListing?.hire?.pincode ?? "",
-      state: hireListing?.hire?.state ?? 0,
-      city: hireListing?.hire?.city ?? 0,
+      photo: data?.hire?.photo ?? "",
+      name: data?.hire?.name ?? "",
+      categoryId: data?.category?.categoryId ?? 0,
+      subcategoryId: data?.subcategory?.map((item) => item.subcategoryId) ?? [],
+      email: data?.hire?.email ?? "",
+      gender: data?.hire?.gender ?? "Male",
+      maritalStatus: data?.hire?.maritalStatus ?? "Married",
+      fatherName: data?.hire?.fatherName ?? "",
+      dob: data?.hire?.dob ?? "",
+      languages: data?.hire?.languages ?? [],
+      mobileNumber: data?.hire?.mobileNumber ?? "",
+      alternativeMobileNumber: data?.hire?.alternativeMobileNumber ?? "",
+      latitude: data?.hire?.latitude ?? "",
+      longitude: data?.hire?.longitude ?? "",
+      area: data?.hire?.area ?? "",
+      pincode: data?.hire?.pincode ?? "",
+      state: data?.hire?.state ?? 0,
+      city: data?.hire?.city ?? 0,
     },
   });
 
@@ -66,7 +65,7 @@ export default function PersonalDetailsForm({
     }),
   );
 
-  const states = hireListing?.getStates.map((item: any) => {
+  const states = data?.getStates.map((item: any) => {
     return {
       label: item.name,
       value: item.id,
@@ -156,12 +155,13 @@ export default function PersonalDetailsForm({
       control,
       name: "categoryId",
       label: "Applied For",
-      data: hireListing?.getHireCategories.map((item) => {
+      data: data?.getHireCategories.map((item) => {
         return {
           label: item.title,
           value: item.id,
         };
       }),
+      disable: true,
       component: "dropdown",
       placeholder: "Select Category",
       error: errors.categoryId?.message,
@@ -240,7 +240,7 @@ export default function PersonalDetailsForm({
       name: "languages",
       label: "Languages",
       component: "multiselectdropdown",
-      data: hireListing?.getLanguages.map((item) => ({
+      data: data?.getLanguages.map((item) => ({
         label: item.name,
         value: item.id,
       })),
@@ -385,8 +385,9 @@ export default function PersonalDetailsForm({
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[35%] self-center mt-6 mb-24">
+        <View className="mx-auto w-[90%] mt-6 mb-24">
           <PrimaryButton
+            className="w-[40%] mx-auto"
             title="Next"
             onPress={handleSubmit(onSubmit, onError)}
             isLoading={isSubmitting}

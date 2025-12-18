@@ -3,32 +3,30 @@ import { useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, Text, View } from "react-native";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
-import UpdateHireListing from "@/features/hire/update/edit-hire";
+import EditOffer from "@/features/offer/forms/update/EditOffer";
 import { trpc } from "@/lib/trpc";
 
-export default function EditMyHireListing() {
+export default function CreateOffer() {
   const { id } = useLocalSearchParams();
 
-  const { data, isLoading, isError, error } = useQuery(
-    trpc.hirerouter.edit.queryOptions({ id: Number(id) ?? "" }),
+  const { data, isError, isLoading } = useQuery(
+    trpc.offerrouter.edit.queryOptions({ id: Number(id) ?? "" }),
   );
-  if (isLoading) {
+  if (isLoading)
     return (
       <View className="flex-1 items-center justify-center py-10">
         <ActivityIndicator size="large" color="#2563eb" />
       </View>
     );
-  }
   if (isError) {
-    return <SomethingWrong />;
+    return <SomethingWrong  />;
   }
   if (!data) {
-    return <Text className="text-secondary">No listing found</Text>;
+    return <Text className="text-secondary">No offer found</Text>;
   }
-
   return (
     <BoundaryWrapper>
-      <UpdateHireListing data={data} />
+      <EditOffer myOffer={data} />
     </BoundaryWrapper>
   );
 }
