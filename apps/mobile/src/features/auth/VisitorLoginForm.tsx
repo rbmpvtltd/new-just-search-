@@ -9,12 +9,12 @@ import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import Input from "@/components/inputs/Input";
-import { fetchVisitorData, sendVisitorOtp } from "@/query/sendVisitorOtp";
+import { useAuthStore } from "@/features/auth/authStore";
 import {
   type LoginVisitorFormData,
   loginVisitorSchema,
-} from "@/schemas/loginSchema";
-import { useAuthStore } from "@/store/authStore";
+} from "@/features/auth/schema/loginSchema";
+import { fetchVisitorData, sendVisitorOtp } from "@/query/sendVisitorOtp";
 import { setTokenRole } from "@/utils/secureStore";
 
 // GoogleSignin.configure({

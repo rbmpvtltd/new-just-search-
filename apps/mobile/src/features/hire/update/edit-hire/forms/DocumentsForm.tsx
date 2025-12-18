@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "@repo/db/dist/schema/hire.schema";
 import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -17,15 +19,14 @@ import type { UserHireListingType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
 
-export default function DocumentsForm({
-  hireListing,
-}: {
-  hireListing: UserHireListingType;
-}) {
+export default function DocumentsForm({ data }: { data: UserHireListingType }) {
   const setFormValue = useHireFormStore((s) => s.setFormValue);
   const prevPage = useHireFormStore((s) => s.prevPage);
   const formValue = useHireFormStore((s) => s.formValue);
+  const clearPage = useHireFormStore((s) => s.clearPage);
+  const setPage = useHireFormStore((s) => s.setPage);
   const { mutate } = useMutation(trpc.hirerouter.update.mutationOptions());
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -33,19 +34,14 @@ export default function DocumentsForm({
   } = useForm<DocumentSchema>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
-      idProof: hireListing?.idProof ?? "",
-      idProofPhoto: hireListing?.idProofPhoto ?? "",
-      coverLetter: hireListing?.coverLetter ?? "",
-      resumePhoto: hireListing?.resumePhoto ?? "",
-      aboutYourself: hireListing?.aboutYourself ?? "",
+      idProof: data?.hire?.idProof ?? NaN,
+      idProofPhoto: data?.hire?.idProofPhoto ?? "",
+      coverLetter: data?.hire?.coverLetter ?? "",
+      resumePhoto: data?.hire?.resumePhoto ?? "",
+      aboutYourself: data?.hire?.aboutYourself ?? "",
     },
   });
   const onSubmit = async (data: DocumentSchema) => {
-    // setFormValue("idProof", data.idProof);
-    // setFormValue("idProofPhoto", data.idProofPhoto ?? "");
-    // setFormValue("coverLetter", data.coverLetter ?? "");
-    // setFormValue("resumePhoto", data.resumePhoto ?? "");
-    // setFormValue("aboutYourself", data.aboutYourself ?? "");
     const mergedData = { ...formValue, ...data };
     const files = await uploadToCloudinary(
       [data.idProofPhoto, data.resumePhoto],
@@ -62,17 +58,17 @@ export default function DocumentsForm({
     mutate(finalData, {
       onSuccess: async (data) => {
         if (data?.success) {
-          // const verifyAuth = await fetchVerifyAuth(getAuthStoreToken);
-          // setAuthStoreToken(verifyAuth?.token, verifyAuth?.role);
-          // await setToken(verifyAuth?.token);
-          Alert.alert("listing added successfully");
+          setPage(0);
+          clearPage();
+          Alert.alert(data.message);
+          router.replace("/(root)/(home)/home");
         }
       },
-      // onError: (error) => {
-      //   if (isTRPCClientError(error)) {
-      //     console.log("Error", error);
-      //   }
-      // },
+      onError: (error) => {
+        if (isTRPCClientError(error)) {
+          console.log("Error", error.message);
+        }
+      },
     });
   };
 
@@ -82,13 +78,11 @@ export default function DocumentsForm({
       name: "idProof",
       label: "ID Proof",
       component: "dropdown",
-      data: [
-        { label: "Aadhar Card", value: "Aadhar Card" },
-        { label: "Pan Card", value: "Pan Card" },
-        { label: "Voter Id Card", value: "Voter Id Card" },
-        { label: "Driving License", value: "Driving License" },
-        { label: "Others", value: "Others" },
-      ],
+      data:
+        data?.getDocuments?.map((doc) => ({
+          label: doc.name,
+          value: doc.id,
+        })) ?? [],
       placeholder: "Select ID Proof",
       error: errors.idProof?.message,
     },
@@ -98,7 +92,7 @@ export default function DocumentsForm({
       label: "ID Proof Photo",
       component: "image",
       className: "w-[100%]",
-
+      placeholder: "Select ID Proof Photo",
       error: errors.idProofPhoto?.message,
     },
     {
@@ -106,7 +100,8 @@ export default function DocumentsForm({
       name: "coverLetter",
       label: "Cover Letter",
       component: "textarea",
-      className: " mx-aw-[90%] bg-base-200",
+      className: " mx-auto w-[90%] bg-base-200",
+      placeholder: "Write Cover Letter",
       error: errors.coverLetter?.message,
     },
     {
@@ -115,6 +110,7 @@ export default function DocumentsForm({
       label: "Resume Photo",
       component: "image",
       className: "w-[100%]",
+      placeholder: "Select Resume Photo",
       error: errors.resumePhoto?.message?.toString(),
     },
     {
@@ -123,6 +119,7 @@ export default function DocumentsForm({
       label: "Describe About Yourself",
       component: "textarea",
       className: "mx-auto w-[90%] bg-base-200",
+      placeholder: "Write About Yourself",
       error: errors.aboutYourself?.message,
     },
   ];

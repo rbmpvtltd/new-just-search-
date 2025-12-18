@@ -4,8 +4,8 @@ import { useColorScheme } from "react-native";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useNotificationCount } from "@/query/notification/notication";
-import { useAuthStore } from "@/store/authStore";
 
 export default function TabLayout() {
   const {
@@ -170,7 +170,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: isAuthenticated.isSuccess ? "Profile" : "Login",
+          title: isAuthenticated ? "Profile" : "Login",
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-outline" size={24} color={color} />
           ),

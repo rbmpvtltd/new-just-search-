@@ -12,14 +12,14 @@ import {
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
-import { trpc } from "@/lib/trpc";
+import { queryClient, trpc } from "@/lib/trpc";
 import type { UserBusinessListingType } from "..";
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail({
-  businessListing,
+  data,
 }: {
-  businessListing: UserBusinessListingType;
+  data: UserBusinessListingType;
 }) {
   const router = useRouter();
   const formValue = useBusinessFormStore((s) => s.formValue);
@@ -35,11 +35,11 @@ export default function ContactDetail({
   } = useForm<ContactDetailSchema>({
     resolver: zodResolver(contactDetailSchema),
     defaultValues: {
-      contactPerson: businessListing?.contactPerson ?? "",
-      phoneNumber: businessListing?.phoneNumber ?? "",
-      ownerNumber: businessListing?.ownerNumber ?? "",
-      whatsappNo: businessListing?.whatsappNo ?? "",
-      email: businessListing?.email ?? "",
+      contactPerson: data?.business?.contactPerson ?? "",
+      phoneNumber: data?.business?.phoneNumber ?? "",
+      ownerNumber: data?.business?.ownerNumber ?? "",
+      whatsappNo: data?.business?.whatsappNo ?? "",
+      email: data?.business?.email ?? "",
     },
   });
 
@@ -57,6 +57,9 @@ export default function ContactDetail({
             setPage(0);
             clearPage();
             Alert.alert(data.message);
+            queryClient.invalidateQueries({
+              queryKey: trpc.businessrouter.show.queryKey(),
+            });
             router.replace("/(root)/profile");
           }
           console.log("Success", data);

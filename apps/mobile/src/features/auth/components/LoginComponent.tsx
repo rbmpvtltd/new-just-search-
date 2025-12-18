@@ -1,15 +1,15 @@
 import type React from "react";
 import { useState } from "react";
 import { Pressable, Text } from "react-native";
-import BusinessHireLogin from "@/components/forms/businessHireLogin";
-import SignupComponent from "@/components/forms/signup";
+import LoginFrom from "@/features/auth/forms/LoginFrom";
+import SignupComponent from "@/features/auth/forms/SignUpForm";
 
-const BusinessHireLoginComponent: React.FC = () => {
+const LoginComponent: React.FC = () => {
   const [alreadHaveAc, setAlreadyHaveAc] = useState<boolean>(true);
 
   return (
     <>
-      {alreadHaveAc && <BusinessHireLogin />}
+      {alreadHaveAc && <LoginFrom />}
       {!alreadHaveAc && <SignupComponent />}
       <Pressable
         className="mx-auto"
@@ -25,4 +25,4 @@ const BusinessHireLoginComponent: React.FC = () => {
   );
 };
 
-export default BusinessHireLoginComponent;
+export default LoginComponent;

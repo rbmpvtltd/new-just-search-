@@ -1,6 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, useColorScheme, View } from "react-native";
-import { Pressable } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 import Colors from "@/constants/Colors";
 import { useDetectLocation } from "@/query/useDetectLocation";
 
@@ -23,12 +28,14 @@ type Props = {
   className?: string;
 };
 
-export default function LocationAutoDetect({ onResult, iconOnly,className }: Props) {
-
+export default function LocationAutoDetect({
+  onResult,
+  iconOnly,
+  className,
+}: Props) {
   const { data, isLoading, isError, error, refetch } = useDetectLocation(false);
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
-
 
   const handleDetect = async () => {
     try {
@@ -59,14 +66,18 @@ export default function LocationAutoDetect({ onResult, iconOnly,className }: Pro
 
   const renderButtonContent = () => {
     if (iconOnly) {
- 
       return (
-        <Ionicons className={className} name="location-outline" size={24} color={theme.secondary} />
+        <Ionicons
+          className={className}
+          name="location-outline"
+          size={24}
+          color={theme.secondary}
+        />
       );
     }
 
     return (
-      <View className="bg-error  rounded-lg items-center justify-center flex-row">
+      <View className="mx-4 rounded-lg items-center justify-center flex-row">
         {isLoading ? (
           <>
             <ActivityIndicator size="small" color="#fff" />
@@ -80,7 +91,7 @@ export default function LocationAutoDetect({ onResult, iconOnly,className }: Pro
   };
 
   return (
-    <View className=" w-fit">
+    <View className="w-fit mt-2">
       {isLoading ? (
         <View className="items-center justify-center space-y-3">
           <Pressable

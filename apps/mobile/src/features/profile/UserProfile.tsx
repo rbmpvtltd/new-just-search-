@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
 import {
   Alert,
@@ -18,11 +19,12 @@ import {
   type FormFieldProps,
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
-import { trpc } from "@/lib/trpc";
+import { queryClient, trpc } from "@/lib/trpc";
 
 type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
 export default function UserProfile() {
   const { data } = useSuspenseQuery(trpc.userRouter.edit.queryOptions());
+  console.log("count");
 
   const {
     control,
@@ -55,7 +57,10 @@ export default function UserProfile() {
     mutate(finalData, {
       onSuccess: (data) => {
         Alert.alert(data.message);
-        console.log("success", data);
+        queryClient.invalidateQueries({
+          queryKey: trpc.userRouter.getUserProfile.queryKey(),
+        });
+        router.replace("/(root)/profile");
       },
       onError: (error) => {
         console.log("error", error);
@@ -84,6 +89,7 @@ export default function UserProfile() {
       name: "profileImage",
       label: "Photo",
       component: "image",
+      placeholder: "Select Image",
       required: false,
       className: "mx-auto w-[90%]",
     },
@@ -139,7 +145,7 @@ export default function UserProfile() {
       data: data.getOccupations.map((item: any) => {
         return {
           label: item.name,
-          value: item.name,
+          value: item.id,
         };
       }),
       required: false,
@@ -162,11 +168,11 @@ export default function UserProfile() {
     },
     {
       control,
-      label: "Adaddress",
+      label: "Address",
       name: "address",
-      placeholder: "Adaddress",
+      placeholder: "Address",
       component: "input",
-      className: "mx-auto w-[90%]",
+      className: "w-[90%] bg-base-200",
       required: false,
       error: errors.address?.message,
     },
@@ -175,7 +181,7 @@ export default function UserProfile() {
       label: "Pincode",
       name: "pincode",
       placeholder: "Pincode",
-      className: "mx-auto w-[90%]",
+      className: "w-[90%] bg-base-200",
       component: "input",
       required: false,
       error: errors.pincode?.message,

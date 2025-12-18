@@ -43,7 +43,7 @@ const initialFormValue: CombinedForm = {
   relocate: "",
 
   // EducationSchema
-  highestQualification: "",
+  highestQualification: NaN,
   employmentStatus: "",
   workExperienceYear: NaN,
   workExperienceMonth: NaN,
@@ -53,7 +53,7 @@ const initialFormValue: CombinedForm = {
   certificates: "",
 
   // DocumentSchema
-  idProof: "",
+  idProof: NaN,
   idProofPhoto: "",
   coverLetter: "",
   resumePhoto: "",

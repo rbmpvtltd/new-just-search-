@@ -4,23 +4,20 @@ import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
 import Purchases from "react-native-purchases";
-import { trpc } from "@/lib/trpc";
-import {
-  type LoginBusinessFormData,
-  loginBusinesSchema,
-} from "@/schemas/loginSchema";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/features/auth/authStore";
+import { queryClient, trpc } from "@/lib/trpc";
 import { setTokenRole } from "@/utils/secureStore";
-import Input from "../inputs/Input";
+import Input from "../../../components/inputs/Input";
+import { type LoginFormData, loginSchema } from "../schema/loginSchema";
 
-export default function BusinessHireLogin() {
+export default function LoginFrom() {
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
   const {
     control: businessControl,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginBusinessFormData>({
-    resolver: zodResolver(loginBusinesSchema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -34,8 +31,11 @@ export default function BusinessHireLogin() {
         if (data) {
           console.log("data is =dfsfsfsdfsdfsdfsdf=====>", data);
           setAuthStoreToken(data?.session ?? "", data.role ?? "visiter"); // TODO : set role as the response comes in future
-          await Purchases.logIn(data?.revanueCatToken ?? "");
+          // await Purchases.logIn(data?.revanueCatToken ?? "");
           await setTokenRole(data?.session ?? "", data.role ?? "visiter");
+          queryClient.invalidateQueries({
+            queryKey: trpc.auth.verifyauth.queryKey(),
+          });
           Alert.alert("Login Successfully");
           // router.push("/(root)/(home)/home");
           return router.back();
@@ -54,13 +54,11 @@ export default function BusinessHireLogin() {
 
   return (
     <View className="flex-1 justify-center items-center p-4 w-full">
-      <Text className="text-2xl font-bold mb-8 text-secondary">
-        Login As Business/Hire
-      </Text>
+      <Text className="text-2xl font-bold mb-8 text-secondary">Login Now</Text>
 
       <View className="w-full max-w-md">
         <Text className="text-lg font-medium text-secondary mb-2">
-          Mobile Number :
+          Email / Mobile Number :
         </Text>
         <Controller
           control={businessControl}
@@ -68,7 +66,7 @@ export default function BusinessHireLogin() {
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
               className="text-secondary bg-base-200"
-              placeholder="Enter your mobile number"
+              placeholder="Enter your email or mobile number"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}

@@ -1,9 +1,9 @@
-import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 import { useColorScheme } from "react-native";
+import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();

@@ -75,8 +75,6 @@ export default function BusinessDetail({
       ],
       "business",
     );
-    console.log("file", file);
-
     setFormValue("name", data.name ?? "");
     setFormValue("photo", file[0] ?? "");
     setFormValue("categoryId", data.categoryId ?? "");
@@ -108,7 +106,6 @@ export default function BusinessDetail({
       label: "Business Image",
       component: "image",
       placeholder: "Business Image",
-      // className: "mx-auto w-[90%]",
       error: errors.photo?.message,
     },
 
@@ -235,19 +232,19 @@ export default function BusinessDetail({
             <FormField key={field.name} {...field} />
           ))}
         </View>
-        <View className="flex-row items-center">
-          <LableText title="Shop images" className="ml-11" />
+        <View className="flex-row items-center ml-8 w-[90%]">
+          <LableText title="Shop Images" className="" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>
         </View>
-        <View className="mt-8 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2     ">
+        <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
           {formFields2.map((field) => (
-            <FormField labelHidden key={field.name} {...field} />
+            <FormField key={field.name} {...field} />
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-60">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
               title="Next"

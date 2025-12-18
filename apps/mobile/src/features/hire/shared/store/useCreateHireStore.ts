@@ -19,6 +19,7 @@ export type CombinedForm = PreferredPositionSchema &
 type HireFormProps = {
   page: number;
   prevPage: () => void;
+  setPage: (page: number) => void;
   nextPage: () => void;
   clearPage: () => void;
   formValue: CombinedForm;
@@ -38,7 +39,6 @@ const initialFormValue: CombinedForm = {
   // fromPeriod: "",
   // toHour: "",
   // toPeriod: "",
-  preferredWorkingHours: "",
   availability: "",
   locationPreferred: "",
   expectedSalaryFrom: "",
@@ -46,7 +46,7 @@ const initialFormValue: CombinedForm = {
   relocate: "",
 
   // EducationSchema
-  highestQualification: "",
+  highestQualification: NaN,
   employmentStatus: "",
   workExperienceYear: 0,
   workExperienceMonth: 0,
@@ -56,7 +56,7 @@ const initialFormValue: CombinedForm = {
   certificates: "",
 
   // DocumentSchema
-  idProof: "",
+  idProof: NaN,
   idProofPhoto: "",
   coverLetter: "",
   resumePhoto: "",
@@ -88,6 +88,7 @@ export const useHireFormStore = create<HireFormProps>((set) => ({
   page: 0,
   formValue: initialFormValue,
 
+  setPage: (page) => set({ page }),
   prevPage: () =>
     set((state) => ({
       page: Math.max(state.page - 1, 0),

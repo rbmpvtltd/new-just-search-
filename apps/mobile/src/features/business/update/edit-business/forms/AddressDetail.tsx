@@ -14,15 +14,13 @@ import PrimaryButton from "@/components/inputs/SubmitBtn";
 import LocationAutoDetect from "@/components/ui/LocationAutoDetect";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { trpc } from "@/lib/trpc";
-import type { FormReferenceDataType, UserBusinessListingType } from "..";
+import type { UserBusinessListingType } from "..";
 
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({
-  businessListing,
-  formReferenceData,
+  data,
 }: {
-  businessListing: UserBusinessListingType;
-  formReferenceData: FormReferenceDataType;
+  data: UserBusinessListingType;
 }) {
   const [detectedCityName, setDetectedCityName] = useState<null | string>(null);
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
@@ -36,18 +34,18 @@ export default function AddressDetail({
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
     defaultValues: {
-      buildingName: businessListing?.buildingName ?? "",
-      streetName: businessListing?.streetName ?? "",
-      area: businessListing?.area ?? "",
-      landmark: businessListing?.landmark ?? "",
-      latitude: businessListing?.latitude ?? "",
-      longitude: businessListing?.longitude ?? "",
-      pincode: businessListing?.pincode ?? "",
-      state: businessListing?.state.id ?? 0,
-      city: businessListing?.city.id ?? 0,
+      buildingName: data?.business?.buildingName ?? "",
+      streetName: data?.business?.streetName ?? "",
+      area: data?.business?.area ?? "",
+      landmark: data?.business?.landmark ?? "",
+      latitude: data?.business?.latitude ?? "",
+      longitude: data?.business?.longitude ?? "",
+      pincode: data?.business?.pincode ?? "",
+      state: data?.business?.state ?? 0,
+      city: data?.business?.city ?? 0,
     },
   });
-  const states = formReferenceData?.getStates.map((item) => {
+  const states = data?.getStates.map((item) => {
     return {
       label: item.name,
       value: item.id,
@@ -201,9 +199,9 @@ export default function AddressDetail({
       >
         <View className="mx-auto w-[90%]">
           <LocationAutoDetect
-            onResult={(data:any) => {
+            onResult={(data) => {
               const formatted = data.formattedAddress ?? "";
-              const parts = formatted.split(",").map((p:string) => p.trim());
+              const parts = formatted.split(",").map((p: string) => p.trim());
 
               const lat = data.latitude;
               const lng = data.longitude;
@@ -239,13 +237,9 @@ export default function AddressDetail({
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
+        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-2">
           <View className="w-[45%]">
-            <PrimaryButton
-              title="Previous"
-              variant="outline"
-              onPress={prevPage}
-            />
+            <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
           </View>
           <View className="w-[45%]">
             <PrimaryButton

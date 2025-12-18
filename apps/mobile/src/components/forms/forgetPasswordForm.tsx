@@ -2,16 +2,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
+import {
+  type ForgetPasswordFormData,
+  forgetPasswordSchema,
+} from "@/features/auth/schema/loginSchema";
 import {
   sendForgetPasswordOtp,
   verifyForgetPasswordOtp,
 } from "@/query/forgetPassword";
 import { fetchVisitorData } from "@/query/sendVisitorOtp";
-import {
-  type ForgetPasswordFormData,
-  forgetPasswordSchema,
-} from "@/schemas/loginSchema";
-import { useAuthStore } from "@/store/authStore";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../inputs/Input";
 
@@ -40,7 +40,7 @@ export default function ForgetPasswordForm() {
 
     if (response.success) {
       setAuthStoreToken(response.token, response.role);
-      await setTokenRole(response.token,response.role);
+      await setTokenRole(response.token, response.role);
       return router.navigate("/(root)/profile");
     }
     Alert.alert(response.message);

@@ -14,7 +14,7 @@ import PricingCard from "./planItem";
 
 export default function PricingPlansComponent() {
   const [offerings, setOfferings] = useState<PurchasesOfferings | null>();
-  const loading = useRef(true);
+  // const loading = useRef(true);
   const { data } = useSuspenseQuery(trpc.planRouter.list.queryOptions());
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function PricingPlansComponent() {
           offering.current !== null &&
           offering.current.availablePackages.length !== 0
         ) {
-          loading.current = false;
+          // loading.current = false;
           setOfferings(offering);
         }
       } catch (error) {
@@ -45,16 +45,16 @@ export default function PricingPlansComponent() {
     return offerings?.all[lowerTitle].availablePackages[0];
   };
 
-  if (loading.current) {
-    return <ActivityIndicator size="large" />;
-  }
+  // if (loading.current) {
+  //   return <ActivityIndicator size="large" />;
+  // }
 
-  const TeamOfUse = () => {
-    // TODO: change this based on Platform
-    Linking.openURL(
-      "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
-    );
-  };
+  // const TeamOfUse = () => {
+  //   // TODO: change this based on Platform
+  //   Linking.openURL(
+  //     "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+  //   );
+  // };
   const privacy = () => {
     Linking.openURL("https://justsearch.net.in/privacy");
   };
@@ -69,7 +69,7 @@ export default function PricingPlansComponent() {
         />
       ))}
       <View className="flex flex-row justify-center items-center">
-        <Button title="Team of Use" onPress={TeamOfUse} />
+        {/* <Button title="Team of Use" onPress={TeamOfUse} /> */}
         <Text className="text-secondary">-</Text>
         <Button title="privacy policy" onPress={privacy} />
       </View>

@@ -1,14 +1,27 @@
 import { z } from "zod";
 
-export const loginBusinesSchema = z.object({
+export const loginSchema = z.object({
   username: z
     .string()
-    .min(2, "username Should Be Atleast 2 Character")
-    .max(50, "username Should Be Atmost 50 Character"),
-  password: z.string().min(1, "Password Should Not Be Empty"),
+    .min(2, "Email/Mobile should be at least 2 characters")
+    .max(50, "Email/Mobile should be at most 50 characters")
+    .refine(
+      (value) => {
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+        const isMobile = /^[6-9]\d{9}$/.test(value); // Indian mobile number
+
+        return isEmail || isMobile;
+      },
+      {
+        message: "Enter a valid Email or Mobile number",
+      },
+    ),
+
+  password: z.string().min(1, "Password should not be empty"),
 });
 
-export type LoginBusinessFormData = z.infer<typeof loginBusinesSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;
 
 export const loginVisitorSchema = z.object({
   mobile_no: z

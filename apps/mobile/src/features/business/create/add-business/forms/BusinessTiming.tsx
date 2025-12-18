@@ -30,7 +30,7 @@ export default function BusinessTiming() {
   const onSubmit = (data: BusinessTimingSchema) => {
     const formatFromHour = toISOStringTime(data?.fromHour ?? "");
     const formatToHour = toISOStringTime(data?.toHour ?? "");
-    
+
     setFormValue("days", data.days ?? []);
     setFormValue("fromHour", formatFromHour ?? "");
     setFormValue("toHour", formatToHour ?? "");
@@ -92,14 +92,9 @@ export default function BusinessTiming() {
           />
         </View>
       </View>
-
-      <View className="flex-row justify-between w-[90%] self-center mt-6 mb-96">
+      <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
         <View className="w-[45%]">
-          <PrimaryButton
-            title="Previous"
-            variant="outline"
-            onPress={prevPage}
-          />
+          <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
         </View>
         <View className="w-[45%]">
           <PrimaryButton

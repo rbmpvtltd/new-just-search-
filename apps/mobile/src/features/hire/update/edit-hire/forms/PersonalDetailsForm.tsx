@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { uploadOnCloudinary } from "@repo/cloudinary";
 import { Gender, MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { personalDetailsHireSchema } from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
@@ -14,20 +13,16 @@ import {
   type FormFieldProps,
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
-import LocationAutoDetect from "@/components/ui/LocationAutoDetect";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { trpc } from "@/lib/trpc";
-import type { FormReferenceDataType, UserHireListingType } from "..";
-import { genderEnum, maritalStatusEnum } from "@repo/db/dist/enum/allEnum.enum";
+import type { UserHireListingType } from "..";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 
 export default function PersonalDetailsForm({
-  hireListing,
-  formReferenceData,
+  data,
 }: {
-  hireListing: UserHireListingType;
-  formReferenceData: FormReferenceDataType;
+  data: UserHireListingType;
 }) {
   const setFormValue = useHireFormStore((s) => s.setFormValue);
   const nextPage = useHireFormStore((s) => s.nextPage);
@@ -42,43 +37,35 @@ export default function PersonalDetailsForm({
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
-      photo: hireListing?.photo ?? "",
-      name: hireListing?.name ?? "",
-      categoryId: hireListing?.categoryId.id ?? 0,
-      subcategoryId: hireListing?.subcategoryId.map((item) => item.id) ?? [],
-      email: hireListing?.email ?? "",
-      gender: hireListing?.gender ?? "Male",
-      maritalStatus: hireListing?.maritalStatus ?? "Married",
-      fatherName: hireListing?.fatherName ?? "",
-      dob: hireListing?.dob ?? "",
-      languages: hireListing?.languages ?? [],
-      mobileNumber: hireListing?.mobileNumber ?? "",
-      alternativeMobileNumber: hireListing?.alternativeMobileNumber ?? "",
-      latitude: hireListing?.latitude ?? "",
-      longitude: hireListing?.longitude ?? "",
-      area: hireListing?.area ?? "",
-      pincode: hireListing?.pincode ?? "",
-      state: hireListing?.state.id ?? 0,
-      city: hireListing?.city.id ?? 0,
+      photo: data?.hire?.photo ?? "",
+      name: data?.hire?.name ?? "",
+      categoryId: data?.category?.categoryId ?? 0,
+      subcategoryId: data?.subcategory?.map((item) => item.subcategoryId) ?? [],
+      email: data?.hire?.email ?? "",
+      gender: data?.hire?.gender ?? "Male",
+      maritalStatus: data?.hire?.maritalStatus ?? "Married",
+      fatherName: data?.hire?.fatherName ?? "",
+      dob: data?.hire?.dob ?? "",
+      languages: data?.hire?.languages ?? [],
+      mobileNumber: data?.hire?.mobileNumber ?? "",
+      alternativeMobileNumber: data?.hire?.alternativeMobileNumber ?? "",
+      latitude: data?.hire?.latitude ?? "",
+      longitude: data?.hire?.longitude ?? "",
+      area: data?.hire?.area ?? "",
+      pincode: data?.hire?.pincode ?? "",
+      state: data?.hire?.state ?? 0,
+      city: data?.hire?.city ?? 0,
     },
   });
 
-  const categories = formReferenceData?.getHireCategories.map((item) => {
-    return {
-      label: item.title,
-      value: item.id,
-    };
-  });
-
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
-
   const { data: subCategories } = useQuery(
     trpc.hirerouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
   );
 
-  const states = formReferenceData?.getStates.map((item: any) => {
+  const states = data?.getStates.map((item: any) => {
     return {
       label: item.name,
       value: item.id,
@@ -168,12 +155,13 @@ export default function PersonalDetailsForm({
       control,
       name: "categoryId",
       label: "Applied For",
-      data: formReferenceData?.getHireCategories.map((item) => {
+      data: data?.getHireCategories.map((item) => {
         return {
           label: item.title,
           value: item.id,
         };
       }),
+      disable: true,
       component: "dropdown",
       placeholder: "Select Category",
       error: errors.categoryId?.message,
@@ -208,7 +196,7 @@ export default function PersonalDetailsForm({
       name: "gender",
       label: "Gender",
       component: "dropdown",
-      data: Object.values(genderEnum).map((item) => ({
+      data: Object.values(Gender).map((item) => ({
         label: item,
         value: item,
       })),
@@ -221,7 +209,7 @@ export default function PersonalDetailsForm({
       name: "maritalStatus",
       label: "Marital Status",
       component: "dropdown",
-      data: Object.values(maritalStatusEnum).map((item) => {
+      data: Object.values(MaritalStatus).map((item) => {
         return {
           label: item,
           value: item,
@@ -252,17 +240,10 @@ export default function PersonalDetailsForm({
       name: "languages",
       label: "Languages",
       component: "multiselectdropdown",
-      data: [
-        { label: "Hindi", value: "Hindi" },
-        { label: "English", value: "English" },
-        { label: "Punjabi", value: "Punjabi" },
-        { label: "Gujarati", value: "Gujarati" },
-        { label: "Bengali", value: "Bengali" },
-        { label: "Malayalam", value: "Malayalam" },
-        { label: "Kannada", value: "Kannada" },
-        { label: "Tamil", value: "Tamil" },
-        { label: "Other", value: "Other" },
-      ],
+      data: data?.getLanguages.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       dropdownPosition: "top",
       placeholder: "Select Languages",
       error: errors.languages?.message,
@@ -328,12 +309,11 @@ export default function PersonalDetailsForm({
       placeholder: "Enter your State",
       component: "dropdown",
       className: "w-[90%] bg-base-200 rounded-lg",
-      data: formReferenceData?.getStates.map((item) => {
-        return {
-          label: item.name,
-          value: item.id,
-        };
-      }),
+      data:
+        states?.map((state) => ({
+          label: state.label,
+          value: state.value,
+        })) ?? [],
       dropdownPosition: "top",
       error: errors.state?.message,
     },
@@ -405,8 +385,9 @@ export default function PersonalDetailsForm({
           ))}
         </View>
 
-        <View className="flex-row justify-between w-[35%] self-center mt-6 mb-24">
+        <View className="mx-auto w-[90%] mt-6 mb-24">
           <PrimaryButton
+            className="w-[40%] mx-auto"
             title="Next"
             onPress={handleSubmit(onSubmit, onError)}
             isLoading={isSubmitting}

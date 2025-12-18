@@ -1,7 +1,7 @@
-import { api, methods } from "@/lib/api";
 import { getAuthHeader, getFormAuthHeader } from "@/constants/authHeader";
 import { apiUrl } from "@/constants/Variable";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/features/auth/authStore";
+import { api, methods } from "@/lib/api";
 
 export const addProductApi = async (data: any): Promise<any> => {
   const response = await api(

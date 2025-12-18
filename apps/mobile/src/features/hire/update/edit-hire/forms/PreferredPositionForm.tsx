@@ -1,7 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  preferredPositionSchema,
-} from "@repo/db/dist/schema/hire.schema";
+  JobDuration,
+  JobType,
+  jobDurationEnum,
+  jobTypeEnum,
+  WorkShift,
+  workShiftEnum,
+} from "@repo/db/dist/enum/allEnum.enum";
+import { preferredPositionSchema } from "@repo/db/dist/schema/hire.schema";
 import { useForm } from "react-hook-form";
 import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -12,16 +18,14 @@ import {
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
-import type { OutputTrpcType } from "@/lib/trpc";
 import type { UserHireListingType } from "..";
-import { jobDurationEnum, jobTypeEnum, workShiftEnum } from "@repo/db/dist/enum/allEnum.enum";
 
 type PreferredPositionSchema = z.infer<typeof preferredPositionSchema>;
 
 export default function PreferredPositionForm({
-  hireListing,
+  data,
 }: {
-  hireListing: UserHireListingType;
+  data: UserHireListingType;
 }) {
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const formValue = useHireFormStore((s) => s.formValue);
@@ -34,15 +38,16 @@ export default function PreferredPositionForm({
   } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
-      jobType: hireListing?.jobType ?? [],
-      locationPreferred: hireListing?.locationPreferred ?? "",
-      workShift: hireListing?.workShift ?? [],
-      expectedSalaryFrom: hireListing?.expectedSalaryFrom ?? "",
-      expectedSalaryTo: hireListing?.expectedSalaryTo ?? "",
-      preferredWorkingHours: hireListing?.preferredWorkingHours ?? "",
-      jobDuration: hireListing?.jobDuration ?? [],
-      availability: hireListing?.availability ?? "",
-      relocate: hireListing?.relocate ?? "",
+      jobType: data?.hire?.jobType ?? [],
+      locationPreferred: data?.hire?.locationPreferred ?? "",
+      workShift: data?.hire?.workShift ?? [],
+      expectedSalaryFrom: data?.hire?.expectedSalaryFrom ?? "",
+      expectedSalaryTo: data?.hire?.expectedSalaryTo ?? "",
+      fromHour: data?.hire?.fromHour ?? "",
+      toHour: data?.hire?.toHour ?? "",
+      jobDuration: data?.hire?.jobDuration ?? [],
+      availability: data?.hire?.availability ?? "",
+      relocate: data?.hire?.relocate ?? "",
     },
   });
 
@@ -52,10 +57,8 @@ export default function PreferredPositionForm({
     setFormValue("workShift", data.workShift);
     setFormValue("expectedSalaryFrom", data.expectedSalaryFrom ?? "");
     setFormValue("expectedSalaryTo", data.expectedSalaryTo ?? "");
-    // setFormValue("from_hour", data.from_hour);
-    // setFormValue("from_period", data.from_period);
-    // setFormValue("to_hour", data.to_hour);
-    // setFormValue("to_period", data.to_period);
+    setFormValue("fromHour", data.fromHour ?? "");
+    setFormValue("toHour", data.toHour ?? "");
     setFormValue("jobDuration", data.jobDuration);
     setFormValue("relocate", data.relocate ?? "");
     setFormValue("availability", data.availability ?? "");
@@ -68,7 +71,7 @@ export default function PreferredPositionForm({
       label: "Job Type",
       component: "checkbox",
       className: "w-[90%] text-secondary",
-      data: Object.values(jobTypeEnum).map((jobType) => ({
+      data: Object.values(JobType).map((jobType) => ({
         label: jobType,
         value: jobType,
       })),
@@ -89,7 +92,7 @@ export default function PreferredPositionForm({
       name: "workShift",
       label: "Work Shift",
       component: "checkbox",
-      data: Object.values(workShiftEnum).map((shift) => ({
+      data: Object.values(WorkShift).map((shift) => ({
         label: shift,
         value: shift,
       })),
@@ -120,7 +123,7 @@ export default function PreferredPositionForm({
       name: "jobDuration",
       label: "Job Duration",
       component: "checkbox",
-      data: Object.values(jobDurationEnum).map((duration) => ({
+      data: Object.values(JobDuration).map((duration) => ({
         label: duration,
         value: duration,
       })),
@@ -166,84 +169,43 @@ export default function PreferredPositionForm({
           {formFields.map((field, idx) => (
             <FormField key={field.name} {...field} />
           ))}
-          {/* --- Working Hour From --- */}
-          <View className="w-[90%] mx-auto mt-4">
-            <Text className="text-secondary font-medium mb-2">
-              Working Hour From
-            </Text>
-            {/* <View className="flex-row gap-x-2 ">
-              <View className="flex-1 ">
-                <FormField
-                  control={control}
-                  name="from_hour"
-                  component="dropdown"
-                  data={hours}
-                  className="bg-base-200 rounded-md"
-                  error={errors.from_hour?.message}
-                  label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Hour"
-                />
-              </View>
-              <View className="flex-1">
-                <FormField
-                  control={control}
-                  name="from_period"
-                  component="dropdown"
-                  data={[
-                    { label: "AM", value: "AM" },
-                    { label: "PM", value: "PM" },
-                  ]}
-                  className="bg-base-200 rounded-md"
-                  error={errors.from_period?.message}
-                  label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Period"
-                />
-              </View>
-            </View> */}
-          </View>
 
           {/* --- Working Hour To --- */}
           <View className="w-[90%] mx-auto mt-4">
-            <Text className="text-secondary font-medium mb-2">
-              Working Hour To
-            </Text>
-            {/* <View className="flex-row gap-x-2 w-[100%]">
-              <View className="flex-1">
-                <FormField
-                  control={control}
-                  name="to_hour"
-                  component="dropdown"
-                  data={hours}
-                  className="bg-base-200 rounded-md"
-                  error={errors.to_hour?.message}
-                  label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Hour"
-                />
+            <Text className="text-secondary font-bold mb-2">Working Hour</Text>
+            <View className="w-[90%] mt-4">
+              <View className="flex-row justify-around">
+                <Text className="text-secondary ml-4 font-medium">From</Text>
+                <Text className="text-secondary ml-4 font-medium">To</Text>
               </View>
-              <View className="flex-1">
+              <View className="flex-row mt-4 w-[50%]">
+                {/* <View className="flex"> */}
                 <FormField
-                  control={control}
-                  name="to_period"
-                  component="dropdown"
-                  data={[
-                    { label: "AM", value: "AM" },
-                    { label: "PM", value: "PM" },
-                  ]}
-                  className="bg-base-200 w-[35%] rounded-md"
-                  error={errors.to_period?.message}
                   label=""
-                  labelHidden
-                  dropdownPosition="top"
-                  placeholder="Select Period"
+                  control={control}
+                  name="fromHour"
+                  component="datepicker"
+                  mode="time"
+                  // className="w-[20%] mt-0"
+                  required={false}
+                  placeholder="Opening Time"
                 />
+                {/* </View> */}
+                {/* <View className="flex"> */}
+
+                <FormField
+                  label=""
+                  control={control}
+                  name="toHour"
+                  component="datepicker"
+                  mode="time"
+                  className="w-[20%] mt-0"
+                  required={false}
+                  placeholder="AM/PM"
+                />
+                {/* </View> */}
               </View>
-            </View> */}
+            </View>
           </View>
         </View>
         <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">

@@ -2,6 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "@repo/db/dist/schema/hire.schema";
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
+import { router } from "expo-router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -13,11 +15,12 @@ import {
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
-import { trpc } from "@/lib/trpc";
+import { queryClient, trpc } from "@/lib/trpc";
+import type { AddHirePageType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
 
-export default function DocumentsForm() {
+export default function DocumentsForm({ data }: { data: AddHirePageType }) {
   const prevPage = useHireFormStore((s) => s.prevPage);
   const formValue = useHireFormStore((s) => s.formValue);
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
@@ -35,12 +38,8 @@ export default function DocumentsForm() {
       aboutYourself: formValue?.aboutYourself ?? "",
     },
   });
+
   const onSubmit = async (data: DocumentSchema) => {
-    // setFormValue("idProof", data.idProof);
-    // setFormValue("idProofPhoto", data.idProofPhoto ?? "");
-    // setFormValue("coverLetter", data.coverLetter ?? "");
-    // setFormValue("resumePhoto", data.resumePhoto ?? "");
-    // setFormValue("aboutYourself", data.aboutYourself ?? "");
     const mergedData = { ...formValue, ...data };
     const files = await uploadToCloudinary(
       [data.idProofPhoto, data.resumePhoto],
@@ -57,23 +56,15 @@ export default function DocumentsForm() {
     mutate(finalData, {
       onSuccess: async (data) => {
         if (data?.success) {
-          // const verifyAuth = await fetchVerifyAuth(getAuthStoreToken);
-          // setAuthStoreToken(verifyAuth?.token, verifyAuth?.role);
-          // await setToken(verifyAuth?.token);
           Alert.alert("listing added successfully");
+          queryClient.invalidateQueries({
+            queryKey: trpc.hirerouter.show.queryKey(),
+          });
+          router.push("/(root)/(home)/home");
         }
       },
       onError: (error) => {
         console.log("On Error", error.message);
-
-        // const message = Array.isArray(error)
-        //   ? error[0]?.message
-        //   : error.message;
-
-        // console.log("Message", error);
-
-        // Alert.alert("On Error", message[0].message || "Something went wrong");
-
         if (isTRPCClientError(error)) {
           Alert.alert("Something went wrong", "Some fields are missing");
           console.log("Error", error);
@@ -88,13 +79,10 @@ export default function DocumentsForm() {
       name: "idProof",
       label: "ID Proof",
       component: "dropdown",
-      data: [
-        { label: "Aadhar Card", value: "Aadhar Card" },
-        { label: "Pan Card", value: "Pan Card" },
-        { label: "Voter Id Card", value: "Voter Id Card" },
-        { label: "Driving License", value: "Driving License" },
-        { label: "Others", value: "Others" },
-      ],
+      data: data?.getDocuments.map((docs) => ({
+        label: docs?.name,
+        value: docs?.id,
+      })),
       placeholder: "Select ID Proof",
       error: errors.idProof?.message,
     },

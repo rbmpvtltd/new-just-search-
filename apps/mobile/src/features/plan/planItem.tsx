@@ -11,9 +11,9 @@ import {
 import Purchases, { type PurchasesPackage } from "react-native-purchases";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { type OutputTrpcType, queryClient, type UnwrapArray } from "@/lib/trpc";
 // import { useVerityApplePay } from "@/query/razorPay";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/features/auth/authStore";
+import { type OutputTrpcType, queryClient, type UnwrapArray } from "@/lib/trpc";
 
 type PlanArray = OutputTrpcType["planRouter"]["list"]["plans"];
 type ActivePlan = OutputTrpcType["planRouter"]["list"]["activePlan"];
@@ -33,7 +33,7 @@ export default function PricingCard({
   // const { data, refetch } = useSuspenceData(PROFILE_URL.url, PROFILE_URL.key);
   const currentRole = useAuthStore((state) => state.role);
 
-  const { mutate } = useVerityApplePay();
+  // const { mutate } = useVerityApplePay();
 
   const showBtn = currentRole === plan.role || currentRole === "visiter";
   const buttonDisable =
@@ -48,51 +48,51 @@ export default function PricingCard({
       setLoading(false);
       return;
     }
-    try {
-      const { customerInfo, productIdentifier, transaction } =
-        await Purchases.purchasePackage(pkg);
-      if (
-        typeof customerInfo.entitlements.active[productIdentifier] !==
-        "undefined"
-      ) {
-        mutate(
-          {
-            revanue_id: customerInfo.originalAppUserId,
-            transaction: transaction.transactionIdentifier,
-            plan_id: plan_id,
-            product_identifier: productIdentifier,
-          },
-          {
-            onSuccess: (res) => {
-              if (res.success) {
-                queryClient.invalidateQueries({
-                  queryKey: ["plans"],
-                });
-                Alert.alert("payment verify successfully ");
-              } else {
-                console.log(res);
-                Alert.alert(
-                  "payment completed but verification failed",
-                  "please raise help token to get money back",
-                );
-              }
+    // try {
+    //   const { customerInfo, productIdentifier, transaction } =
+    //     await Purchases.purchasePackage(pkg);
+    //   if (
+    //     typeof customerInfo.entitlements.active[productIdentifier] !==
+    //     "undefined"
+    //   ) {
+    //     mutate(
+    //       {
+    //         revanue_id: customerInfo.originalAppUserId,
+    //         transaction: transaction.transactionIdentifier,
+    //         plan_id: plan_id,
+    //         product_identifier: productIdentifier,
+    //       },
+    //       {
+    //         onSuccess: (res) => {
+    //           if (res.success) {
+    //             queryClient.invalidateQueries({
+    //               queryKey: ["plans"],
+    //             });
+    //             Alert.alert("payment verify successfully ");
+    //           } else {
+    //             console.log(res);
+    //             Alert.alert(
+    //               "payment completed but verification failed",
+    //               "please raise help token to get money back",
+    //             );
+    //           }
 
-              setLoading(false);
-            },
-            onError: () => {
-              Alert.alert(
-                "payment completed but verification failed",
-                "please raise help token to get money back",
-              );
-              setLoading(false);
-            },
-          },
-        );
-      }
-    } catch (e) {
-      console.log(e);
-      setLoading(false);
-    }
+    //           setLoading(false);
+    //         },
+    //         onError: () => {
+    //           Alert.alert(
+    //             "payment completed but verification failed",
+    //             "please raise help token to get money back",
+    //           );
+    //           setLoading(false);
+    //         },
+    //       },
+    //     );
+    //   }
+    // } catch (e) {
+    //   console.log(e);
+    //   setLoading(false);
+    // }
   };
 
   if (loading) {
