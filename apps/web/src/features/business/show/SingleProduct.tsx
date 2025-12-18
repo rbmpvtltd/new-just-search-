@@ -6,7 +6,13 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -28,7 +34,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 import {
-  Form, FormControl,
+  Form,
+  FormControl,
   FormDescription,
   FormField,
   FormItem,
@@ -49,7 +56,7 @@ import Swal from "sweetalert2";
 type SingleProductType =
   | OutputTrpcType["businessrouter"]["singleProduct"]
   | null;
-type ReviewFormValues = z.infer<typeof insertProductReviewSchema>
+type ReviewFormValues = z.infer<typeof insertProductReviewSchema>;
 
 function SingleProductComp({
   productPhotos,
@@ -65,8 +72,12 @@ function SingleProductComp({
   const { mutateAsync: createConversation } = useMutation(
     trpc.chat.createConversation.mutationOptions(),
   );
-  const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions())
-  const { data: submitted } = useQuery(trpc.productrouter.productReviewSubmitted.queryOptions({ productId: product?.id ?? 0 }))
+  const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions());
+  const { data: submitted } = useQuery(
+    trpc.productrouter.productReviewSubmitted.queryOptions({
+      productId: product?.id ?? 0,
+    }),
+  );
 
   async function handleChat() {
     const conv = await createConversation({
@@ -84,7 +95,6 @@ function SingleProductComp({
   const { mutate, isPending } = useMutation(
     trpc.chat.sendMessage.mutationOptions(),
   );
-
 
   return (
     <div>
@@ -192,9 +202,12 @@ function SingleProductComp({
                         <CheckCircle2 className="h-6 w-6 text-green-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-green-900">Review Already Submitted</CardTitle>
+                        <CardTitle className="text-green-900">
+                          Review Already Submitted
+                        </CardTitle>
                         <CardDescription className="text-green-700 mt-1">
-                          Thank you for sharing your feedback! You've already submitted a review for this product.
+                          Thank you for sharing your feedback! You've already
+                          submitted a review for this product.
                         </CardDescription>
                       </div>
                     </div>
@@ -202,19 +215,18 @@ function SingleProductComp({
                 </Card>
               )}
               {!submitted?.submitted && (
-                <ReviewForm productId={product?.id ?? 0} businessId={product?.businessId ?? 0} />
+                <ReviewForm
+                  productId={product?.id ?? 0}
+                  businessId={product?.businessId ?? 0}
+                />
               )}
             </div>
           )}
-          {!authenticated?.success && (
-            <LoginRedirect />
-          )}
+          {!authenticated?.success && <LoginRedirect />}
         </div>
         {product?.rating.length === 0 && (
           <div className="mx-auto bg-primary-accent px-6 py-4 rounded-lg">
-            <h1 className="text-secondary">
-              No Review Founds On This Product
-            </h1>
+            <h1 className="text-secondary">No Review Founds On This Product</h1>
           </div>
         )}
         {product?.rating?.map((item, index) => {
@@ -246,11 +258,18 @@ function SingleProductComp({
   );
 }
 
-
-function ReviewForm({ productId, businessId }: { productId: number, businessId: number }) {
-  const trpc = useTRPC()
-  const [submittedData, setSubmittedData] = useState<any>(null)
-  const { mutate, isPending } = useMutation(trpc.productrouter.createProductReview.mutationOptions())
+function ReviewForm({
+  productId,
+  businessId,
+}: {
+  productId: number;
+  businessId: number;
+}) {
+  const trpc = useTRPC();
+  const [submittedData, setSubmittedData] = useState<any>(null);
+  const { mutate, isPending } = useMutation(
+    trpc.productrouter.createProductReview.mutationOptions(),
+  );
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(insertProductReviewSchema),
@@ -264,38 +283,42 @@ function ReviewForm({ productId, businessId }: { productId: number, businessId: 
       view: false,
       status: true,
     },
-  })
+  });
 
   function onSubmit(data: ReviewFormValues) {
     mutate(data, {
       onSuccess: (responseData) => {
-        console.log("Review submitted successfully:", responseData)
-        setSubmittedData(responseData)
+        console.log("Review submitted successfully:", responseData);
+        setSubmittedData(responseData);
         Swal.fire({
           icon: "success",
           title: "Successful",
           text: `Review Submitted Successfully`,
         });
-        form.reset()
+        form.reset();
       },
       onError: (err) => {
-        console.error("Error submitting review:", err)
+        console.error("Error submitting review:", err);
       },
-    })
+    });
   }
 
-  const watchRating = form.watch("rate")
+  const watchRating = form.watch("rate");
 
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Write a Review</h1>
-        <p className="text-muted-foreground">Share your experience with this offer</p>
+        <p className="text-muted-foreground">
+          Share your experience with this offer
+        </p>
       </div>
 
       {submittedData && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-green-800 font-medium">✓ Review submitted successfully!</p>
+          <p className="text-green-800 font-medium">
+            ✓ Review submitted successfully!
+          </p>
         </div>
       )}
 
@@ -314,16 +337,23 @@ function ReviewForm({ productId, businessId }: { productId: number, businessId: 
                     className="flex gap-2"
                   >
                     {[1, 2, 3, 4, 5].map((rating) => (
-                      <FormItem key={rating} className="flex items-center space-x-2 space-y-0">
+                      <FormItem
+                        key={rating}
+                        className="flex items-center space-x-2 space-y-0"
+                      >
                         <FormControl>
-                          <RadioGroupItem value={rating.toString()} className="sr-only" />
+                          <RadioGroupItem
+                            value={rating.toString()}
+                            className="sr-only"
+                          />
                         </FormControl>
                         <FormLabel className="cursor-pointer">
                           <Star
-                            className={`w-8 h-8 transition-colors ${rating <= (watchRating ?? 0)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300"
-                              }`}
+                            className={`w-8 h-8 transition-colors ${
+                              rating <= (watchRating ?? 0)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                            }`}
                           />
                         </FormLabel>
                       </FormItem>
@@ -404,15 +434,17 @@ function ReviewForm({ productId, businessId }: { productId: number, businessId: 
             )}
           />
 
-
-          <Button type="submit" disabled={isPending || submittedData} className="w-full">
+          <Button
+            type="submit"
+            disabled={isPending || submittedData}
+            className="w-full"
+          >
             {isPending ? "Submitting..." : "Submit Review"}
-
           </Button>
         </form>
       </Form>
     </div>
-  )
+  );
 }
 
 export default SingleProductComp;

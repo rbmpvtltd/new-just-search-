@@ -15,9 +15,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 import { useForm } from "react-hook-form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Textarea } from "@/components/ui/textarea"
-import { CheckCircle2, Star } from "lucide-react"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { CheckCircle2, Star } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useState } from "react";
@@ -29,8 +29,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+} from "@/components/ui/form";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import LoginRedirect from "@/components/LoginRedirect";
 import { insertBusinessReviewSchema } from "@repo/db/dist/schema/business.schema";
 import Swal from "sweetalert2";
@@ -41,9 +46,12 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
   const trpc = useTRPC();
   const latitude = Number(singleShop?.latitude?.split(",").shift());
   const longitude = Number(singleShop?.longitude?.split(",").pop());
-  const { data } = useQuery(trpc.auth.verifyauth.queryOptions())
-  const { data: submmited } = useQuery(trpc.businessrouter.ReviewSubmitted.queryOptions({ businessId: singleShop?.id ?? 0 }))
-
+  const { data } = useQuery(trpc.auth.verifyauth.queryOptions());
+  const { data: submmited } = useQuery(
+    trpc.businessrouter.ReviewSubmitted.queryOptions({
+      businessId: singleShop?.id ?? 0,
+    }),
+  );
 
   const handleClick = () => {
     const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -214,9 +222,12 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                           <CheckCircle2 className="h-6 w-6 text-green-600" />
                         </div>
                         <div>
-                          <CardTitle className="text-green-900">Review Already Submitted</CardTitle>
+                          <CardTitle className="text-green-900">
+                            Review Already Submitted
+                          </CardTitle>
                           <CardDescription className="text-green-700 mt-1">
-                            Thank you for sharing your feedback! You've already submitted a review for this business.
+                            Thank you for sharing your feedback! You've already
+                            submitted a review for this business.
                           </CardDescription>
                         </div>
                       </div>
@@ -228,9 +239,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                 )}
               </div>
             )}
-            {!data?.success && (
-              <LoginRedirect />
-            )}
+            {!data?.success && <LoginRedirect />}
             <div className="w-full">
               <h1 className="text-2xl font-semibold text-secondary">
                 Recommended Reviews
@@ -378,23 +387,15 @@ function ShopProducts({
   );
 }
 
-
-
-const reviewSchema = z.object({
-  businessId: z.number().positive("Business ID is required"),
-  message: z.string().min(10, "Review must be at least 10 characters").max(500, "Review must not exceed 500 characters"),
-  rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
-})
-
-type ReviewFormValues = z.infer<typeof insertBusinessReviewSchema>
+type ReviewFormValues = z.infer<typeof insertBusinessReviewSchema>;
 
 function ReviewForm({ businessId }: { businessId: number }) {
-  const trpc = useTRPC()
-  const [submittedData, setSubmittedData] = useState<any>(null)
+  const trpc = useTRPC();
+  const [submittedData, setSubmittedData] = useState<any>(null);
 
   const { mutate, isPending } = useMutation(
-    trpc.businessrouter.businessReview.mutationOptions()
-  )
+    trpc.businessrouter.businessReview.mutationOptions(),
+  );
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(insertBusinessReviewSchema),
@@ -403,38 +404,42 @@ function ReviewForm({ businessId }: { businessId: number }) {
       message: "",
       rate: 5,
     },
-  })
+  });
 
   function onSubmit(data: ReviewFormValues) {
     mutate(data, {
       onSuccess: (responseData) => {
-        console.log("Review submitted successfully:", responseData)
-        setSubmittedData(responseData)
+        console.log("Review submitted successfully:", responseData);
+        setSubmittedData(responseData);
         Swal.fire({
           icon: "success",
           title: "Successful",
           text: `Review Submitted Successfully`,
         });
-        form.reset()
+        form.reset();
       },
       onError: (err) => {
-        console.error("Error submitting review:", err)
+        console.error("Error submitting review:", err);
       },
-    })
+    });
   }
 
-  const watchRating = form.watch("rate")
+  const watchRating = form.watch("rate");
 
   return (
     <div className="">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Write a Review</h1>
-        <p className="text-muted-foreground">Share your experience with this business</p>
+        <p className="text-muted-foreground">
+          Share your experience with this business
+        </p>
       </div>
 
       {submittedData && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-green-800 font-medium">✓ Review submitted successfully!</p>
+          <p className="text-green-800 font-medium">
+            ✓ Review submitted successfully!
+          </p>
         </div>
       )}
 
@@ -453,16 +458,23 @@ function ReviewForm({ businessId }: { businessId: number }) {
                     className="flex gap-2"
                   >
                     {[1, 2, 3, 4, 5].map((rating) => (
-                      <FormItem key={rating} className="flex items-center space-x-2 space-y-0">
+                      <FormItem
+                        key={rating}
+                        className="flex items-center space-x-2 space-y-0"
+                      >
                         <FormControl>
-                          <RadioGroupItem value={rating.toString()} className="sr-only" />
+                          <RadioGroupItem
+                            value={rating.toString()}
+                            className="sr-only"
+                          />
                         </FormControl>
                         <FormLabel className="cursor-pointer">
                           <Star
-                            className={`w-8 h-8 transition-colors ${rating <= (watchRating ?? 0)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300"
-                              }`}
+                            className={`w-8 h-8 transition-colors ${
+                              rating <= (watchRating ?? 0)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                            }`}
                           />
                         </FormLabel>
                       </FormItem>
@@ -498,11 +510,15 @@ function ReviewForm({ businessId }: { businessId: number }) {
             )}
           />
 
-          <Button type="submit" disabled={isPending || submittedData} className="w-full">
+          <Button
+            type="submit"
+            disabled={isPending || submittedData}
+            className="w-full"
+          >
             {isPending ? "Submitting..." : "Submit Review"}
           </Button>
         </form>
       </Form>
     </div>
-  )
+  );
 }

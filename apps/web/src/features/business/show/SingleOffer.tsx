@@ -1,5 +1,11 @@
 "use client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -13,7 +19,8 @@ import parse from "html-react-parser";
 import Rating from "@/components/ui/Rating";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import {
-  Form, FormControl,
+  Form,
+  FormControl,
   FormDescription,
   FormField,
   FormItem,
@@ -35,16 +42,22 @@ import Swal from "sweetalert2";
 
 const reviewSchema = z.object({
   offerId: z.number().positive("Business ID is required"),
-  message: z.string().min(10, "Review must be at least 10 characters").max(500, "Review must not exceed 500 characters"),
+  message: z
+    .string()
+    .min(10, "Review must be at least 10 characters")
+    .max(500, "Review must not exceed 500 characters"),
   rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
   email: z.email().min(8, "Email Must Be Contain 8 Characters").max(500),
-  name: z.string().min(3, "Name Must Be Constain 3 Characters").max(255, "Too Long Name"),
+  name: z
+    .string()
+    .min(3, "Name Must Be Constain 3 Characters")
+    .max(255, "Too Long Name"),
   view: z.boolean(),
-  status: z.boolean()
-})
+  status: z.boolean(),
+});
 
 type SingleOfferType = OutputTrpcType["businessrouter"]["singleOffer"] | null;
-type ReviewFormValues = z.infer<typeof insertOfferReviewSchema>
+type ReviewFormValues = z.infer<typeof insertOfferReviewSchema>;
 
 function SingleOfferComp({
   offerPhotos,
@@ -54,9 +67,13 @@ function SingleOfferComp({
   offer: SingleOfferType;
 }) {
   const content = parse(offer?.description ?? "");
-  const trpc = useTRPC()
-  const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions())
-  const { data: submitted } = useQuery(trpc.offerrouter.offerReviewSubmitted.queryOptions({ offerId: offer?.id ?? 0 }))
+  const trpc = useTRPC();
+  const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions());
+  const { data: submitted } = useQuery(
+    trpc.offerrouter.offerReviewSubmitted.queryOptions({
+      offerId: offer?.id ?? 0,
+    }),
+  );
   return (
     <div>
       <div className="flex flex-col sm:flex-row gap-6 items-center">
@@ -127,27 +144,25 @@ function SingleOfferComp({
                       <CheckCircle2 className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-green-900">Review Already Submitted</CardTitle>
+                      <CardTitle className="text-green-900">
+                        Review Already Submitted
+                      </CardTitle>
                       <CardDescription className="text-green-700 mt-1">
-                        Thank you for sharing your feedback! You've already submitted a review for this offer.
+                        Thank you for sharing your feedback! You've already
+                        submitted a review for this offer.
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
               </Card>
             )}
-            {!submitted?.submitted && (
-              <ReviewForm offerId={offer?.id ?? 0} />
-            )}
+            {!submitted?.submitted && <ReviewForm offerId={offer?.id ?? 0} />}
           </div>
         )}
-        {!authenticated?.success && (
-          <LoginRedirect />
-        )}
+        {!authenticated?.success && <LoginRedirect />}
         <h1 className="text-2xl font-semibold text-secondary mb-4">
           Recommended Reviews
         </h1>
-
       </div>
       {/* TODO : uncommen when offer review seeding complete correctly */}
       <div className="w-[80%] mx-auto mt-5">
@@ -180,11 +195,12 @@ function SingleOfferComp({
   );
 }
 
-
 function ReviewForm({ offerId }: { offerId: number }) {
-  const trpc = useTRPC()
-  const [submittedData, setSubmittedData] = useState<any>(null)
-  const { mutate, isPending } = useMutation(trpc.offerrouter.createOfferReview.mutationOptions())
+  const trpc = useTRPC();
+  const [submittedData, setSubmittedData] = useState<any>(null);
+  const { mutate, isPending } = useMutation(
+    trpc.offerrouter.createOfferReview.mutationOptions(),
+  );
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(insertOfferReviewSchema),
@@ -197,38 +213,42 @@ function ReviewForm({ offerId }: { offerId: number }) {
       view: false,
       status: true,
     },
-  })
+  });
 
   function onSubmit(data: ReviewFormValues) {
     mutate(data, {
       onSuccess: (responseData) => {
-        console.log("Review submitted successfully:", responseData)
-        setSubmittedData(responseData)
+        console.log("Review submitted successfully:", responseData);
+        setSubmittedData(responseData);
         Swal.fire({
           icon: "success",
           title: "Successful",
           text: `Review Submitted Successfully`,
         });
-        form.reset()
+        form.reset();
       },
       onError: (err) => {
-        console.error("Error submitting review:", err)
+        console.error("Error submitting review:", err);
       },
-    })
+    });
   }
 
-  const watchRating = form.watch("rate")
+  const watchRating = form.watch("rate");
 
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Write a Review</h1>
-        <p className="text-muted-foreground">Share your experience with this offer</p>
+        <p className="text-muted-foreground">
+          Share your experience with this offer
+        </p>
       </div>
 
       {submittedData && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-green-800 font-medium">✓ Review submitted successfully!</p>
+          <p className="text-green-800 font-medium">
+            ✓ Review submitted successfully!
+          </p>
         </div>
       )}
 
@@ -247,16 +267,23 @@ function ReviewForm({ offerId }: { offerId: number }) {
                     className="flex gap-2"
                   >
                     {[1, 2, 3, 4, 5].map((rating) => (
-                      <FormItem key={rating} className="flex items-center space-x-2 space-y-0">
+                      <FormItem
+                        key={rating}
+                        className="flex items-center space-x-2 space-y-0"
+                      >
                         <FormControl>
-                          <RadioGroupItem value={rating.toString()} className="sr-only" />
+                          <RadioGroupItem
+                            value={rating.toString()}
+                            className="sr-only"
+                          />
                         </FormControl>
                         <FormLabel className="cursor-pointer">
                           <Star
-                            className={`w-8 h-8 transition-colors ${rating <= (watchRating ?? 0)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300"
-                              }`}
+                            className={`w-8 h-8 transition-colors ${
+                              rating <= (watchRating ?? 0)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                            }`}
                           />
                         </FormLabel>
                       </FormItem>
@@ -337,15 +364,17 @@ function ReviewForm({ offerId }: { offerId: number }) {
             )}
           />
 
-
-          <Button type="submit" disabled={isPending || submittedData} className="w-full">
+          <Button
+            type="submit"
+            disabled={isPending || submittedData}
+            className="w-full"
+          >
             {isPending ? "Submitting..." : "Submit Review"}
-
           </Button>
         </form>
       </Form>
     </div>
-  )
+  );
 }
 
 export default SingleOfferComp;

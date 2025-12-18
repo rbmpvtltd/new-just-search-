@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
-  Pressable
+  Pressable,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import Colors from "@/constants/Colors";
@@ -19,22 +19,22 @@ import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import Review from "../../../components/forms/review";
-import { OutputTrpcType } from "@/lib/trpc";
+import { OutputTrpcType, trpc } from "@/lib/trpc";
+import { useQuery } from "@tanstack/react-query";
+import LoginRedirect from "@/components/cards/LoginRedirect";
+import ReviewForm from "../create/add-business/forms/ReviewForm";
 
-type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] 
+type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] | undefined;
 
-
-
-const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
-
+const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
   const router = useRouter();
-  const { mutate: startChat} = useStartChat();
+  const { mutate: startChat } = useStartChat();
   const latitude = Number(shop?.latitude?.split(",").shift());
   const longitude = Number(shop?.longitude?.split(",").pop());
-  const isAuthenticated = useAuthStore((state) => state.authenticated);
+  const { data } = useQuery(trpc.auth.verifyauth.queryOptions());
+
   const clearToken = useAuthStore((state) => state.clearToken);
   const { mutate: toggleWishlist } = useToggleWishlist();
-
 
   return (
     <View className="w-[93%] mx-auto mt-6 p-4 rounded-2xl bg-base-200 shadow-lg gap-4">
@@ -50,7 +50,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
         <View className="w-[10%] ">
           <Pressable
             onPress={() => {
-              if (!isAuthenticated) {
+              if (!data?.success) {
                 showLoginAlert({
                   message: "Need to login to add to your wishlist",
                   onConfirm: () => {
@@ -92,12 +92,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
           <Ionicons name="location-outline" size={16} className="ml-1" />
         </Text>
         <Text className=" text-secondary flex-1 flex-wrap">
-          {[
-            shop?.buildingName,
-            shop?.streetName,
-            shop?.landMark,
-            shop?.area,
-          ]
+          {[shop?.buildingName, shop?.streetName, shop?.landMark, shop?.area]
             .filter(Boolean)
             .join(", ")}
         </Text>
@@ -149,13 +144,12 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
             Categories:
           </Text>
         </View>
-       
-          <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">
-            <Text className="text-success font-semibold text-xs">
-              {shop?.category}
-            </Text>
-          </TouchableOpacity>
-        
+
+        <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">
+          <Text className="text-success font-semibold text-xs">
+            {shop?.category}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <View className="flex-row flex-wrap gap-2 ">
@@ -169,9 +163,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
             className="bg-error-content rounded-lg py-2 px-3 mb-1"
             key={index.toString()}
           >
-            <Text className="text-pink-700 font-semibold text-xs">
-              {sub}
-            </Text>
+            <Text className="text-pink-700 font-semibold text-xs">{sub}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -195,7 +187,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
             </View>
           );
         })}
-      </View>  TODO : ==> Set schedule when dbsync is complete */} 
+      </View>  TODO : ==> Set schedule when dbsync is complete */}
 
       <View className="flex-row w-full justify-center gap-2">
         {/* Chat Now */}
@@ -231,9 +223,7 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
           >
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="chatbox-ellipses" color={"white"} />
-              <Text className="text-white font-semibold text-sm">
-                Chat Now
-              </Text>
+              <Text className="text-white font-semibold text-sm">Chat Now</Text>
             </View>
           </Pressable>
         </View>
@@ -252,7 +242,11 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
 
         {/* Get Direction */}
         <View className="flex-1 bg-primary rounded-lg px-2 py-2">
-          <Pressable onPress={() => openInGoogleMaps(String(latitude), String(longitude))}>
+          <Pressable
+            onPress={() =>
+              openInGoogleMaps(String(latitude), String(longitude))
+            }
+          >
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="location" color={"white"} />
               <Text className="text-white font-semibold text-sm">
@@ -293,9 +287,9 @@ const ShposCard = ({ item: shop }: {item : ShopCardType}) => {
         </Text>
       )}
 
-      <Text className="text-secondary text-3xl">
-        Review Submit Form Pending
-      </Text>
+      {data?.success && <ReviewForm businessId={shop?.id ?? 0} />}
+
+      {!data?.success && <LoginRedirect />}
       <View>
         <Review rating={shop?.rating} />
       </View>

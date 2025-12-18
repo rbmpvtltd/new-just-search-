@@ -17,6 +17,6 @@
     "expo-env.d.ts",
     "nativewind-env.d.ts",
     "components/ui/radio"
-  ],
-  "references": [{ "path": "../backend" }]
+  ]
+  //"references": [{ "path": "../backend" }]
 }

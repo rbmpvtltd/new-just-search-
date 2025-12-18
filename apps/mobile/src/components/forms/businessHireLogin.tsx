@@ -34,7 +34,7 @@ export default function BusinessHireLogin() {
         if (data) {
           console.log("data is =dfsfsfsdfsdfsdfsdf=====>", data);
           setAuthStoreToken(data?.session ?? "", data.role ?? "visiter"); // TODO : set role as the response comes in future
-          await Purchases.logIn(data?.revanueCatToken ?? "");
+          // await Purchases.logIn(data?.revanueCatToken ?? "");
           await setTokenRole(data?.session ?? "", data.role ?? "visiter");
           Alert.alert("Login Successfully");
           // router.push("/(root)/(home)/home");

@@ -1,7 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { da } from "date-fns/locale";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -49,14 +48,15 @@ export function LoginForm({
   });
 
   if (isError) {
-    console.log("oo error ho gyo", error);
+    console.log("oo error ho gyo=====>", error);
   }
 
   function onSubmit(data: { username: string; password: string }) {
     mutate(data, {
-      onSuccess:async (data) => {
+      onSuccess: async (data) => {
         await setToken(data?.session || "");
         setRole(data?.role || "");
+        router.push("/");
       },
     });
   }

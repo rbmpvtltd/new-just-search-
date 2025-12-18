@@ -2,11 +2,20 @@ import { db } from "@repo/db";
 import bcrypt from "bcryptjs";
 
 const getUserByUserName = async (username: string) => {
-  const user = await db.query.users.findFirst({
-    where: (user, { eq, or }) =>
-      or(eq(user.email, username), eq(user.phoneNumber, username)),
-  });
-  return user;
+  console.log("========> getUserByUserName", username);
+
+  try {
+    const user = await db.query.users.findFirst({
+      where: (user, { eq, or }) =>
+        or(eq(user.email, username), eq(user.phoneNumber, username)),
+    });
+
+    console.log("USER FOUND:", user);
+    return user;
+  } catch (err) {
+    console.error("DB ERROR:", err);
+    throw err;
+  }
 };
 
 const getUserById = async (id: number) => {
@@ -18,6 +27,7 @@ const getUserById = async (id: number) => {
 
 const checkPasswordGetUser = async (username: string, password: string) => {
   const user = await getUserByUserName(username);
+  console.log("===========> and execution comes in service file", user);
   if (!user || !user.password) {
     return false;
   }

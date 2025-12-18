@@ -16,6 +16,8 @@ CREATE TABLE "users" (
 	"password" text,
 	"role" "user_role" DEFAULT 'guest' NOT NULL,
 	"google_id" varchar(255),
+	"apple_id" varchar(255),
+	"revanue_cat_id" uuid DEFAULT gen_random_uuid(),
 	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT NOW(),
 	"updated_at" timestamp DEFAULT NOW()

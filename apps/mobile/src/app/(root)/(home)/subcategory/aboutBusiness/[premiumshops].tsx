@@ -15,14 +15,14 @@ export default function TabOneScreen() {
   const { premiumshops } = useLocalSearchParams();
   const setShopId = useShopIdStore((state) => state.setShopId);
 
-  const { data,isLoading } = useQuery(
+  const { data, isLoading } = useQuery(
     trpc.businessrouter.singleShop.queryOptions({
       businessId: Number(premiumshops),
     }),
   );
-  setShopId(Array.isArray(premiumshops) ? premiumshops[0] : premiumshops)
-  if(isLoading){
-    return <Loading position="center" size={"large"}/>
+  setShopId(Array.isArray(premiumshops) ? premiumshops[0] : premiumshops);
+  if (isLoading) {
+    return <Loading position="center" size={"large"} />;
   }
 
   // const premiumShopId = Array.isArray(premiumshops)
@@ -95,39 +95,38 @@ export default function TabOneScreen() {
   return (
     <ScrollView>
       <Stack.Screen
-      options={{
-        title : data?.name
-      }} 
-      /> 
+        options={{
+          title: data?.name,
+        }}
+      />
       <View className="flex-1 items-center">
         <View className="flex-1 justify-center">
-            <Carousel
-              key={data?.id}
-              loop
-              width={width}
-              height={360}
-              autoPlay={true}
-              autoPlayInterval={5000}
-              data={data?.businessPhotos ?? []}
-              scrollAnimationDuration={1000}
-              mode="parallax"
-              renderItem={({ item }) => {
-                const bannerImg = cld.image(item);
-                return (
-                  <View className="w-[100%] self-center">
-                    <AdvancedImage
-                      className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover"
-                      style={{ width: 400, height: 400, alignSelf: "center" }}
-                      cldImg={bannerImg}
-                    />
-                  </View>
-                );
-              }}
-            />
+          <Carousel
+            key={data?.id}
+            loop
+            width={width}
+            height={360}
+            autoPlay={true}
+            autoPlayInterval={5000}
+            data={data?.businessPhotos ?? []}
+            scrollAnimationDuration={1000}
+            mode="parallax"
+            renderItem={({ item }) => {
+              const bannerImg = cld.image(item);
+              return (
+                <View className="w-[100%] self-center">
+                  <AdvancedImage
+                    className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover"
+                    style={{ width: 400, height: 400, alignSelf: "center" }}
+                    cldImg={bannerImg}
+                  />
+                </View>
+              );
+            }}
+          />
         </View>
         <ShposCard item={data} />
       </View>
-      
     </ScrollView>
   );
 }

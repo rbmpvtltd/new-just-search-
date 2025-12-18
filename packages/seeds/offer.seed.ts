@@ -66,6 +66,7 @@ export const addOffer = async () => {
       .insert(offers)
       .values({
         businessId: business.id,
+        mainImage: "Banner/cbycmehjeetyxbuxc6ie", // TODO: change this image upload on cloudinary
         categoryId: category.id,
         offerName: row.product_name,
         offerSlug: row.product_slug,
@@ -107,7 +108,7 @@ export const addOffer = async () => {
 // 2. offer_reviews
 export const addOfferReviews = async () => {
   const [reviews]: any[] = await sql.execute("SELECT * FROM offer_reviews");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed()).user;
+  const fakeUser = (await fakeUserSeed()) || (await fakeSeed())?.user;
 
   for (const row of reviews) {
     let [user] = await db.select().from(users).where(eq(users.id, row.user_id));

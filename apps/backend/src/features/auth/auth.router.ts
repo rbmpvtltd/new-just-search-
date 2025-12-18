@@ -85,7 +85,7 @@ export const authRouter = router({
       return { success: false };
     }
 
-    return { success: true };
+    return { success: true, role: session.role };
   }),
   logout: protectedProcedure.mutation(async ({ ctx }) => {
     await deleteSession(ctx.sessionId);

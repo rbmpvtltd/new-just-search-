@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Carousel,
   CarouselContent,
@@ -16,8 +16,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 
 function PremiumShop() {
-  const trpc = useTRPC()
-  const { data } =  useQuery(trpc.banners.premiumShops.queryOptions());
+  const trpc = useTRPC();
+  const { data } = useQuery(trpc.banners.premiumShops.queryOptions());
   return (
     <div className="py-4 mt-5">
       <h1 className="text-4xl text-primary font-bold text-center">
@@ -26,7 +26,7 @@ function PremiumShop() {
       <Carousel opts={{ loop: true }} className="w-full ">
         <CarouselContent className="ml-10">
           {data?.map((item, index: number) => {
-            console.log(item.isFavourite)
+            console.log(item.isFavourite);
             return (
               <CarouselItem
                 key={index.toString()}
@@ -51,7 +51,10 @@ function PremiumShop() {
                             />
                           </Link>
                           <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">
-                            <Favourite businessId={Number(item.id)} initialFav={item.isFavourite}/>
+                            <Favourite
+                              businessId={Number(item.id)}
+                              initialFav={item.isFavourite}
+                            />
                           </div>
                         </div>
                         <Rating

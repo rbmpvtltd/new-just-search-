@@ -1,5 +1,5 @@
 {
-  "id": "6b4c08e1-1982-407c-a7bc-3be8fd39ce62",
+  "id": "4fc72948-3b65-495c-9ecd-8dab14d8bbb7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -50,6 +50,19 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "apple_id": {
+          "name": "apple_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revanue_cat_id": {
+          "name": "revanue_cat_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
         },
         "status": {
           "name": "status",
