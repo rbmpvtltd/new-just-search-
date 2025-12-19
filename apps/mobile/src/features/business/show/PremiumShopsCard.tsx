@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import {
   Alert,
   Platform,
-  Pressable,
   Text,
   TouchableOpacity,
   useColorScheme,
@@ -14,7 +13,6 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
-import type { OutputTrpcType } from "@/lib/trpc";
 import { useToggleWishlist, useWishlist } from "@/query/favorite";
 import { useStartChat } from "@/query/startChat";
 import { showLoginAlert } from "@/utils/alert";

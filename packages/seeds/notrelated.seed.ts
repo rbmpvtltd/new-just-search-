@@ -115,7 +115,7 @@ export const bannerSeed = async () => {
     dbBannerValue.push({
       // id: row.id,
       route: row.route ?? null,
-      photo: bannerPhotoPublicId ?? "",
+      photo: "Banner/cbycmehjeetyxbuxc6ie", //TODO: change the photo with original when upload on cloudinary
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,
@@ -152,7 +152,7 @@ export const seedCategories = async () => {
         id: Number(row?.id) ?? 12,
         title: row.title ?? "",
         slug,
-        photo: categoryPhotoPublicId ?? "",
+        photo: "Banner/cbycmehjeetyxbuxc6ie", //TODO: change the photo with original when upload on cloudinary
         isPopular: Boolean(row.is_popular),
         status: Boolean(row.status),
         type: Number(row.type),

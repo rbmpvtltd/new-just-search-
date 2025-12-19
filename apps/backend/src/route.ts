@@ -34,6 +34,7 @@ import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
 import { mergeRouters, openRouter, router } from "./utils/trpc";
+import { notificationRouter } from "./features/notification/notification.router";
 
 const usersRouter = router({
   auth: authRouter,
@@ -52,6 +53,7 @@ const usersRouter = router({
   planRouter,
   utilsRouter,
   subscriptionRouter,
+  notificationRouter,
 });
 
 const adminRouter = router({

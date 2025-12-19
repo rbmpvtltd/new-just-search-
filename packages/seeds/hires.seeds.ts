@@ -21,7 +21,7 @@ import { safeArray } from "./utils";
 
 export const hireSeed = async () => {
   await cleardataofhire();
-  await addHire();
+  // await addHire();
   // await seedRecentViewsHire();
   await seedHireCategories();
   await seedHireSubcategories();
@@ -32,8 +32,8 @@ const cleardataofhire = async () => {
   await db.execute(
     `TRUNCATE  TABLE hire_subcategories RESTART IDENTITY CASCADE;`,
   );
-  await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
-  console.log("all tables clear successfully")
+  // await db.execute(`TRUNCATE  TABLE hire_listing RESTART IDENTITY CASCADE;`);
+  console.log("all tables clear successfully");
 };
 
 export const addHire = async () => {
@@ -143,6 +143,8 @@ export const addHire = async () => {
       }
       await db.insert(hireListing).values({
         id: row.id,
+        fromHour: "",
+        toHour: "",
         userId: createUser?.id ?? 588,
         city: city!.id,
         name: row.name,
@@ -201,7 +203,6 @@ export const addHire = async () => {
         workShift: safeArray(row.work_shift),
         expectedSalaryFrom: row.expected_salary_from,
         expectedSalaryTo: row.expected_salary_to,
-        preferredWorkingHours: row.preferred_working_hours,
         jobDuration: safeArray(row.job_duration),
         relocate: row.relocate,
         availability: row.availability,
