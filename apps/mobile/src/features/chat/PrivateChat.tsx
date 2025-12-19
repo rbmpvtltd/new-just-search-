@@ -1,16 +1,9 @@
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { AdvancedImage } from "cloudinary-react-native";
-import { use } from "passport";
 import React, { useEffect, useState } from "react";
-import {
-  BackHandler,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { cld } from "@/lib/cloudinary";
@@ -68,16 +61,18 @@ function PrivateChat({
       .map((m) => m.id);
 
     if (unread.length > 0) {
-      markRead({ messageId: unread }, {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: trpc.chat.conversationList.queryKey()
-          })
-        }
-      });
+      markRead(
+        { messageId: unread },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: trpc.chat.conversationList.queryKey(),
+            });
+          },
+        },
+      );
     }
   }, [markRead, userData, store]);
-
 
   return (
     <View className="flex-1">
@@ -102,8 +97,14 @@ function PrivateChat({
         </View>
       </View>
 
-      <ScrollView>
-        <View className="mt-3 space-y-3 px-2 max-h-full gap-2 overflow-y-scroll mb-2">
+      <View>
+        <Text className="text-secondary"> hi</Text>
+      </View>
+      <ScrollView className="flex-1">
+        <View>
+          <Text className="text-secondary"> hi</Text>
+        </View>
+        <View className="mt-3 space-y-3 px-2 gap-2 mb-2">
           {store.map((msg) => (
             <View key={msg.id} className="px-1">
               {msg.message && (
@@ -197,14 +198,16 @@ export default function StoreChat({
 }) {
   return (
     <BoundaryWrapper>
-      <View className="h-full">
-        <MemorizedPrivateChat
-          conversationId={conversationId}
-          displayName={displayName}
-          userData={userData}
-        />
+      <View className="flex-1 border-red-200 border">
+        <KeyboardAwareScrollView contentContainerClassName="flex-1">
+          <MemorizedPrivateChat
+            conversationId={conversationId}
+            displayName={displayName}
+            userData={userData}
+          />
 
-        <MemorizedSendMessage conversationId={conversationId} />
+          <MemorizedSendMessage conversationId={conversationId} />
+        </KeyboardAwareScrollView>
       </View>
     </BoundaryWrapper>
   );

@@ -38,6 +38,7 @@
       "bun": "1.2.20",
       "autoIncrement": true,
       "channel": "production",
+      "developmentClient": true,
       "android": {
         "buildType": "app-bundle"
       },

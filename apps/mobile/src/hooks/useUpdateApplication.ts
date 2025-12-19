@@ -1,9 +1,9 @@
+import Constants from "expo-constants";
+import { useEffect } from "react";
+import { Alert, Linking, Platform } from "react-native";
+import VersionCheck from "react-native-version-check";
 import { apiUrl } from "@/constants/Variable";
 import { api, methods } from "@/lib/api";
-import { useEffect } from "react";
-import VersionCheck from "react-native-version-check";
-import Constants from "expo-constants";
-import { Alert, Linking, Platform } from "react-native";
 
 interface IAllLastestVersion {
   success: boolean;
@@ -59,7 +59,7 @@ const checkAppUpdate = async () => {
   }
 };
 
-export default function useGoogleUpdate() {
+export default function useAppUpdate() {
   useEffect(() => {
     checkAppUpdate();
   }, []);

@@ -13,16 +13,24 @@ export default function PricingPlansComponent() {
   useEffect(() => {
     const fetchOfferings = async () => {
       try {
-        const data = await Purchases.getAppUserID();
-        console.log(data);
-        // const offering = await Purchases.getOfferings();
-        // if (
-        //   offering.current !== null &&
-        //   offering.current.availablePackages.length !== 0
-        // ) {
-        //   // loading.current = false;
-        //   setOfferings(offering);
-        // }
+        const offering = await Purchases.getOfferings();
+        const user = await Purchases.getAppUserID();
+        const customer = await Purchases.getCustomerInfo();
+        console.log(
+          "offerings",
+          offerings,
+          "useris",
+          user,
+          "customerl",
+          customer,
+        );
+        if (
+          offering.current !== null &&
+          offering.current.availablePackages.length !== 0
+        ) {
+          // loading.current = false;
+          setOfferings(offering);
+        }
       } catch (error) {
         // TODO:  handle error
         console.error("Error fetching offerings:", error);
@@ -30,7 +38,7 @@ export default function PricingPlansComponent() {
     };
 
     fetchOfferings();
-  }, []);
+  }, [offerings]);
 
   const getPkg = (title: string) => {
     const lowerTitle = title.toLowerCase();

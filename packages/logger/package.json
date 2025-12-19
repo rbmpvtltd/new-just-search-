@@ -15,7 +15,7 @@
     "setup": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "5.9.2"
   },
   "dependencies": {
     "winston": "^3.17.0"

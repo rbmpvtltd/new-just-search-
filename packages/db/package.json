@@ -22,7 +22,7 @@
     "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "5.9.2"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

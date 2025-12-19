@@ -18,10 +18,9 @@
     "setup": "tsc -p tsconfig.json",
     "start": "bun run --watch dist/index.js"
   },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
+  "peerDependencies": {},
   "dependencies": {
+    "typescript": "5.9.2",
     "@orpc/openapi": "^1.8.7",
     "@orpc/trpc": "^1.8.7",
     "@orpc/zod": "^1.9.4",
