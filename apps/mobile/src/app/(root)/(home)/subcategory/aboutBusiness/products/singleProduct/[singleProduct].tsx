@@ -21,7 +21,6 @@ import Carousel from "react-native-reanimated-carousel";
 import RenderHtml from "react-native-render-html";
 import LoginRedirect from "@/components/cards/LoginRedirect";
 import Review from "@/components/forms/review";
-import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/features/auth/authStore";
 import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
 import { trpc } from "@/lib/trpc";
@@ -34,7 +33,6 @@ const { width } = Dimensions.get("window");
 
 export default function TabOneScreen() {
   const { singleProduct } = useLocalSearchParams();
-  const isAuthenticated = useAuthStore((state) => state.authenticated);
   const clearToken = useAuthStore((state) => state.clearToken);
   const { mutate: startChat } = useStartChat();
 
@@ -154,7 +152,7 @@ export default function TabOneScreen() {
                 <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
                   <Pressable
                     onPress={() => {
-                      if (!isAuthenticated) {
+                      if (!authenticated?.success) {
                         showLoginAlert({
                           message: "Need to login to chat on your behalf",
                           onConfirm: () => {

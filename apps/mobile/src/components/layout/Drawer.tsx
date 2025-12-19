@@ -229,7 +229,7 @@ export default function DrawerLayout() {
                     ],
                   );
                 } else {
-                  router.push("/notification");
+                  router.push("/(root)/profile/notification");
                 }
               }}
             >

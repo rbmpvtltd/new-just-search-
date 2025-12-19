@@ -1,61 +1,66 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
+// import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+// import { router } from "expo-router";
 import {
-  FlatList,
-  Image,
-  Pressable,
+  // FlatList,
+  // Image,
+  // Pressable,
   Text,
-  useColorScheme,
+  // useColorScheme,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import DataNotFound from "@/components/ui/DataNotFound";
-import { Loading } from "@/components/ui/Loading";
-import { NOTIFICATION_URL } from "@/constants/apis";
-import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/features/auth/authStore";
-import { useClearNotification } from "@/query/clearNotifications";
-import { useSuspenceData } from "@/query/getAllSuspense";
-import { useMaskAsRead } from "@/query/notification/notication";
-import { useStartChat } from "@/query/startChat";
-import { isoStringToTime } from "@/utils/dateAndTime";
+// import { SafeAreaView } from "react-native-safe-area-context";
+// import DataNotFound from "@/components/ui/DataNotFound";
+// import { Loading } from "@/components/ui/Loading";
+// import { NOTIFICATION_URL } from "@/constants/apis";
+// import Colors from "@/constants/Colors";
+// import { useAuthStore } from "@/features/auth/authStore";
+// import { useClearNotification } from "@/query/clearNotifications";
+// import { useSuspenceData } from "@/query/getAllSuspense";
+// import { useMaskAsRead } from "@/query/notification/notication";
+// import { useStartChat } from "@/query/startChat";
+// import { isoStringToTime } from "@/utils/dateAndTime";
+import { trpc } from "@/lib/trpc";
 
 export default function Notification() {
-  const colorScheme = useColorScheme();
-  const queryClient = useQueryClient();
-  const isAuthenticated = useAuthStore((state) => state.authenticated);
-  const { mutate: startChat, isPending: loading } = useStartChat();
-  const { mutate: mutateMaskAsRead } = useMaskAsRead();
-  if (loading) <Loading position="center" />;
+  const { data } = useQuery(
+    trpc.notificationRouter.getNotification.queryOptions(),
+  );
+  console.log(data?.data.role);
+  // const colorScheme = useColorScheme();
+  // const queryClient = useQueryClient();
+  // const isAuthenticated = useAuthStore((state) => state.authenticated);
+  // const { mutate: startChat, isPending: loading } = useStartChat();
+  // const { mutate: mutateMaskAsRead } = useMaskAsRead();
+  // if (loading) <Loading position="center" />;
 
-  const { mutate: clearNotifications, isPending } = useClearNotification();
+  // const { mutate: clearNotifications, isPending } = useClearNotification();
 
-  const handleClear = () => {
-    clearNotifications(undefined, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["notifications"],
-        });
-      },
-      onError: (error) => {
-        console.error("Clear failed:", error);
-      },
-    });
-  };
+  // const handleClear = () => {
+  //   clearNotifications(undefined, {
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries({
+  //         queryKey: ["notifications"],
+  //       });
+  //     },
+  //     onError: (error) => {
+  //       console.error("Clear failed:", error);
+  //     },
+  //   });
+  // };
 
-  if (!isAuthenticated) {
-    router.replace("/(root)/profile");
-  }
+  // if (!isAuthenticated) {
+  //   router.replace("/(root)/profile");
+  // }
 
-  const { data } = useSuspenceData(NOTIFICATION_URL.url, NOTIFICATION_URL.key);
-  if (data?.data?.length === 0) {
-    return <DataNotFound />;
-  }
+  // const { data } = useSuspenceData(NOTIFICATION_URL.url, NOTIFICATION_URL.key);
+  // if (data?.data?.length === 0) {
+  //   return <DataNotFound />;
+  // }
 
   return (
     <>
-      <FlatList
+      {/* <FlatList
         className="bg-base-200 mb-10"
         data={data.data}
         renderItem={({ item, index }) => {
@@ -156,7 +161,10 @@ export default function Notification() {
             />
           </Pressable>
         </View>
-      </SafeAreaView>
+      </SafeAreaView> */}
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-secondary">Notitication page</Text>
+      </View>
     </>
   );
 }
