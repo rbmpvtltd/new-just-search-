@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import {
   Stack,
   useFocusEffect,
   useLocalSearchParams,
   useRouter,
 } from "expo-router";
+import { useCallback } from "react";
 import {
   Alert,
   BackHandler,
@@ -15,17 +17,14 @@ import {
   Text,
   View,
 } from "react-native";
-
 import Carousel from "react-native-reanimated-carousel";
-import Review from "@/components/forms/review";
-import { useStartOfferChat } from "@/query/startOfferChat";
-import { dialPhone } from "@/utils/getContact";
-import { useQuery } from "@tanstack/react-query";
-import { trpc } from "@/lib/trpc";
 import RenderHTML from "react-native-render-html";
 import LoginRedirect from "@/components/cards/LoginRedirect";
+import Review from "@/components/forms/review";
 import { OfferReviewForm } from "@/features/offer/forms/create/OfferReviewForm";
-import { useCallback } from "react";
+import { trpc } from "@/lib/trpc";
+import { useStartOfferChat } from "@/query/startOfferChat";
+import { dialPhone } from "@/utils/getContact";
 
 const { width } = Dimensions.get("window");
 
@@ -62,7 +61,7 @@ export default function TabOneScreen() {
       );
 
       return () => subscription.remove();
-    }, [data?.businessId]),
+    }, [data?.businessId, router]),
   );
   console.log(
     "data of single offer in [singleOffer].tsx file line no 28",
@@ -87,7 +86,7 @@ export default function TabOneScreen() {
             autoPlayInterval={4000}
             data={data?.photos ?? ["1"]}
             scrollAnimationDuration={1000}
-            renderItem={({ item }) => (
+            renderItem={() => (
               <View className="relative bg-base-200">
                 <View className="relative h-[300px] mx-auto mt-2 w-[60%] bg-base-200 ">
                   <Image
@@ -156,7 +155,7 @@ export default function TabOneScreen() {
                           onSuccess: (res) => {
                             if (res?.chat_session_id) {
                               router.push({
-                                pathname: "/chat/[chat]",
+                                pathname: "/(root)/chats", //TODO: add real chats redirect
                                 params: {
                                   chat: res?.chat_session_id.toString(),
                                 },

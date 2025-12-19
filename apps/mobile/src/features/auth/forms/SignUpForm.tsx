@@ -14,10 +14,9 @@ import {
 import { Checkbox } from "react-native-paper";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
-import { fetchLogin, fetchVerifyAuth } from "@/query/auth";
 import { sendOtp } from "@/query/sendOtp";
 import { verifyBusinessOtp } from "@/query/verifyBusiness";
-import { type VerifyOtpData, verifyOtp } from "@/query/verifyOtp";
+import type { VerifyOtpData } from "@/query/verifyOtp";
 import { type SignupFormData, signupSchema } from "@/schemas/signupSchema";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../../../components/inputs/Input";
@@ -43,7 +42,7 @@ const SignUpComponent: React.FC = () => {
     },
   });
 
-  const [mobile_no, otp, password] = watch(["mobile_no", "otp", "password"]);
+  const [mobile_no] = watch(["mobile_no", "otp", "password"]);
 
   const onSubmit = async (data: VerifyOtpData) => {
     const response = await verifyBusinessOtp(data);

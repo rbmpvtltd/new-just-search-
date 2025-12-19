@@ -1,8 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import React from "react";
-import { Image, Text, View, Pressable, Alert } from "react-native";
-import { OfferProductHitType } from "@/app/(root)/(offer)/allOffers";
+import { Alert, Image, Pressable, Text, View } from "react-native";
+import type { OfferProductHitType } from "@/app/(root)/(offer)/allOffers";
 import { useStartChat } from "@/query/startChat";
 
 export default function OffersList({ item }: { item: OfferProductHitType }) {
@@ -89,7 +88,7 @@ export default function OffersList({ item }: { item: OfferProductHitType }) {
                 onSuccess: (res) => {
                   if (res?.chat_session_id) {
                     router.push({
-                      pathname: "/chat/[chat]",
+                      pathname: "/(root)/chats", //TODO: add real chats redirect
                       params: { chat: res?.chat_session_id.toString() },
                     });
                   } else {

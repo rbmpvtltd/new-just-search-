@@ -68,7 +68,7 @@ export default function Notification() {
                       startChat(item.chat_session_id, {
                         onSuccess: (res) => {
                           router.navigate({
-                            pathname: "/chat/[chat]",
+                            pathname: "/(root)/chats", // TODO: add real chats redirect
                             params: {
                               chat: res?.chat_session_id.toString(),
                             },

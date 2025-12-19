@@ -18,7 +18,8 @@ import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 
-export type AddAdminSalesmanType = OutputTrpcType["adminSalemanRouter"]["add"];
+export type AddAdminSalesmanType =
+  OutputTrpcType["franchiseSalemanRouter"]["add"];
 export const franchiseAddProfileInsertSchema = profileInsertSchema.omit({
   userId: true,
 });

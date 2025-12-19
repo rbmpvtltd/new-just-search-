@@ -101,7 +101,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router, usePathname } from "expo-router";
 import { useForm } from "react-hook-form";
-import { Alert, useColorScheme, View, Text } from "react-native";
+import { Alert, Text, useColorScheme, View } from "react-native";
 import Colors from "@/constants/Colors";
 import {
   type SearchFormData,
@@ -138,14 +138,17 @@ export default function HireSearchForm({ bgColor }: { bgColor?: string }) {
     setCity(city);
     setValue("location", city);
   };
-  
+
   const handleCategorySelect = (category: string) => {
     setValue("category", category);
   };
 
   const onSearch = async () => {
     if (!category || !location) {
-      Alert.alert("Missing Information", "Please enter both location and category to search");
+      Alert.alert(
+        "Missing Information",
+        "Please enter both location and category to search",
+      );
       return;
     }
     const query = `?location=${encodeURIComponent(location)}&category=${encodeURIComponent(category)}`;
@@ -156,7 +159,7 @@ export default function HireSearchForm({ bgColor }: { bgColor?: string }) {
       return;
     }
     router.navigate({
-      pathname: "/allHireListings/allHireListing",
+      pathname: "/(root)/chats", // TODO: add real allHireListing
       params: { location, category },
     });
   };
@@ -172,12 +175,10 @@ export default function HireSearchForm({ bgColor }: { bgColor?: string }) {
         elevation: 8,
       }}
     >
-
       {/* Form Content */}
       <View className="px-3 py-2 gap-2">
         {/* Location Input */}
         <View>
-         
           <View
             className="rounded-xl overflow-hidden"
             style={{
@@ -188,7 +189,10 @@ export default function HireSearchForm({ bgColor }: { bgColor?: string }) {
               elevation: 2,
             }}
           >
-            <CitySearch onSelect={handleCitySelect} placeholder="Enter your location" />
+            <CitySearch
+              onSelect={handleCitySelect}
+              placeholder="Enter your location"
+            />
           </View>
           {errors.location && (
             <View className="mt-1 ml-1">
@@ -199,7 +203,6 @@ export default function HireSearchForm({ bgColor }: { bgColor?: string }) {
 
         {/* Category Input with Search Button */}
         <View>
-          
           <View className="flex-row items-start gap-2">
             <View
               className="flex-1 rounded-xl overflow-hidden"
@@ -216,7 +219,7 @@ export default function HireSearchForm({ bgColor }: { bgColor?: string }) {
                 className="flex-1 mx-0"
               />
             </View>
-            
+
             <View
               className="rounded-xl overflow-hidden"
               style={{

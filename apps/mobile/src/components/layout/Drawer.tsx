@@ -200,7 +200,7 @@ export default function DrawerLayout() {
                     ],
                   );
                 } else {
-                  router.push("/favorite");
+                  router.push("/home"); // TODO: add real favorites redirect
                 }
               }}
             >

@@ -1,37 +1,34 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import {
   router,
   Stack,
   useFocusEffect,
   useLocalSearchParams,
 } from "expo-router";
+import { useCallback } from "react";
 import {
-  Pressable,
   Alert,
+  BackHandler,
   Dimensions,
   Image,
+  Pressable,
   ScrollView,
   Text,
   View,
-  BackHandler,
 } from "react-native";
-
 import Carousel from "react-native-reanimated-carousel";
 import RenderHtml from "react-native-render-html";
+import LoginRedirect from "@/components/cards/LoginRedirect";
 import Review from "@/components/forms/review";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/features/auth/authStore";
+import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
 import { trpc } from "@/lib/trpc";
 import { useStartChat } from "@/query/startChat";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
-import { useQuery } from "@tanstack/react-query";
-import { trpc } from "@/lib/trpc";
-import { Loading } from "@/components/ui/Loading";
-import LoginRedirect from "@/components/cards/LoginRedirect";
-import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
-import { useCallback } from "react";
 
 const { width } = Dimensions.get("window");
 
@@ -190,7 +187,7 @@ export default function TabOneScreen() {
                               );
                             } else {
                               router.push({
-                                pathname: "/chat/[chat]",
+                                pathname: "/(root)/chats", // TODO: add real chats redirect
                                 params: {
                                   chat: res?.chat_session_id.toString(),
                                 },

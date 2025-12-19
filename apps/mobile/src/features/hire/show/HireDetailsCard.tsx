@@ -167,7 +167,7 @@ export default function HireDetailsCard(item: any) {
             <Ionicons name="school-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Qualification:</Text>
-              {data?.data?.qualification === "2"
+              {data?.data?.qualification === 2
                 ? "Graduation"
                 : data?.data?.qualification}
             </Text>
@@ -240,7 +240,7 @@ export default function HireDetailsCard(item: any) {
                         console.log("Chat started:", res.chat_session_id);
 
                         router.push({
-                          pathname: "/chat/[chat]",
+                          pathname: "/(root)/chats", // TODO: add real chats redirect
                           params: { chat: res?.chat_session_id.toString() },
                         });
                       },

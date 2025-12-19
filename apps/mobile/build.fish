@@ -25,9 +25,9 @@ function cleanup
 
     if test -d .gradle/caches
         rm -rf .gradle/caches
-        echo (set_color green)"[OK] Removed .gradle."(set_color normal)
+        echo (set_color green)"[OK] Removed .gradle/caches"(set_color normal)
     else
-        echo (set_color cyan)"[SKIP] .gradle not found."(set_color normal)
+        echo (set_color cyan)"[SKIP] .gradle/caches not found."(set_color normal)
     end
 end
 

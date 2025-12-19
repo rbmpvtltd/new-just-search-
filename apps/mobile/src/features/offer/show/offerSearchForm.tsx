@@ -55,13 +55,13 @@ export default function OfferSearchForm({ bgColor }: { bgColor?: string }) {
       return;
     }
     router.navigate({
-      pathname: "/allOfferListings/allOfferListing",
+      pathname: "/home", // TODO: add real allOfferListing
       params: { location, category },
     });
   };
 
   return (
-   <View
+    <View
       className={`w-full bg-base-200 rounded-2xl shadow-lg overflow-hidden ${bgColor}`}
       style={{
         shadowColor: "#000",
@@ -71,12 +71,10 @@ export default function OfferSearchForm({ bgColor }: { bgColor?: string }) {
         elevation: 8,
       }}
     >
-
       {/* Form Content */}
       <View className="px-3 py-2 gap-2">
         {/* Location Input */}
         <View>
-         
           <View
             className="rounded-xl overflow-hidden"
             style={{
@@ -87,7 +85,10 @@ export default function OfferSearchForm({ bgColor }: { bgColor?: string }) {
               elevation: 2,
             }}
           >
-            <CitySearch onSelect={handleCitySelect} placeholder="Enter your location" />
+            <CitySearch
+              onSelect={handleCitySelect}
+              placeholder="Enter your location"
+            />
           </View>
           {errors.location && (
             <View className="mt-1 ml-1">
@@ -98,7 +99,6 @@ export default function OfferSearchForm({ bgColor }: { bgColor?: string }) {
 
         {/* Category Input with Search Button */}
         <View>
-          
           <View className="flex-row items-start gap-2">
             <View
               className="flex-1 rounded-xl overflow-hidden"
@@ -115,7 +115,7 @@ export default function OfferSearchForm({ bgColor }: { bgColor?: string }) {
                 className="flex-1 mx-0"
               />
             </View>
-            
+
             <View
               className="rounded-xl overflow-hidden"
               style={{

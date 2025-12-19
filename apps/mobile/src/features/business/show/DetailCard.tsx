@@ -1,10 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import React, { memo, useMemo, useState } from "react";
+import { memo } from "react";
 import {
-  Alert,
-  Dimensions,
-  Image,
   Pressable,
   Text,
   TouchableOpacity,
@@ -15,17 +12,7 @@ import StarRating from "react-native-star-rating-widget";
 import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/features/auth/authStore";
-import { OutputTrpcType, trpc } from "@/lib/trpc";
-import { useToggleWishlist, useWishlist } from "@/query/favorite";
-import { useStartChat } from "@/query/startChat";
 import { useShopIdStore } from "@/store/shopIdStore";
-import { showLoginAlert } from "@/utils/alert";
-import { dialPhone } from "@/utils/getContact";
-import { openInGoogleMaps } from "@/utils/getDirection";
-import Favourite from "../shared/FaouritBtn";
-
-const screenWidth = Dimensions.get("window").width;
 
 function DetailCard({
   item,
@@ -34,30 +21,8 @@ function DetailCard({
   item: SubcategoryHitType;
   type: number;
 }) {
-  const [aspectRatio, setAspectRatio] = useState(3 / 4);
   const { setShopId } = useShopIdStore();
   const colorScheme = useColorScheme();
-  const isAuthenticated = useAuthStore((state) => state.authenticated);
-  const { mutate: toggleWishlist } = useToggleWishlist();
-  const clearToken = useAuthStore((state) => state.clearToken);
-  const { data: wishlist = [] } = useWishlist();
-  const { mutate: startChat } = useStartChat();
-
-  const wishlistArray = Array.isArray(wishlist?.data) ? wishlist.data : [];
-
-  const isFavourite = useMemo(
-    () => wishlistArray.some((fav: any) => fav.listing_id === item.id),
-    [wishlistArray, item.id],
-  );
-  let rating: number;
-
-  const rawRate = Number(item.rating);
-
-  if (!isNaN(rawRate)) {
-    rating = Number(rawRate.toFixed(0));
-  } else {
-    rating = 0;
-  }
 
   return (
     <Pressable
@@ -116,7 +81,7 @@ function DetailCard({
             </View>
             <View className="my-2">
               <StarRating
-                rating={item.rating}
+                rating={item.rating ?? 0}
                 onChange={() => {}}
                 starSize={18}
                 enableSwiping={false}
@@ -149,7 +114,7 @@ function DetailCard({
                   {item.category}
                 </Text>
               </TouchableOpacity>
-              {item.subcategories.slice(0, 2).map((sub: any, index: number) => (
+              {item.subcategories.slice(0, 2).map((sub, index) => (
                 <TouchableOpacity
                   key={index.toString()}
                   className="bg-error-content rounded-lg py-2 px-2 mb-1"

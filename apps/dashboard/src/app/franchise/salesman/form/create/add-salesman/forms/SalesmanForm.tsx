@@ -1,17 +1,12 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { salesmenInsertSchema } from "@repo/db/dist/schema/user.schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import next from "next";
-import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
-import {
-  FormField,
-  type FormFieldProps,
-} from "@/components/form/form-component";
+import { FormField } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,14 +38,16 @@ export default function SalesmanForm({
   const prevPage = useSalesmanFormStore((s) => s.prevPage);
   const clearPage = useSalesmanFormStore((s) => s.clearPage);
 
+  const nextNumber = (data.franchise?.lastAssignCode ?? 0) + 1;
+  const fullCode = nextNumber.toString().padStart(4, "0");
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<SalesmanInsertSchema>({
     resolver: zodResolver(franchiseSalesmenInsertSchema),
     defaultValues: {
-      referCode: formValue.referCode,
+      referCode: fullCode,
     },
   });
 
@@ -103,7 +100,7 @@ export default function SalesmanForm({
             <Input
               type="text"
               className="mt-2 h-10 border-gray-600 border-2"
-              value={data.franchise[0]?.displayName ?? ""}
+              value={data.franchise?.referPrifixed ?? ""}
               disabled
             />
           </div>
@@ -113,6 +110,7 @@ export default function SalesmanForm({
               component="input"
               name="referCode"
               label="Suffix Code"
+              defaultValue={String(data.franchise?.lastAssignCode) ?? "0"}
               placeholder="Enter Suffix Code"
             />
           </div>

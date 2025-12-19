@@ -1,29 +1,24 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
 import {
   Alert,
   Platform,
   Pressable,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
-  Pressable,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import Colors from "@/constants/Colors";
+import LoginRedirect from "@/components/cards/LoginRedirect";
 import { useAuthStore } from "@/features/auth/authStore";
-import type { OutputTrpcType } from "@/lib/trpc";
-import { useToggleWishlist, useWishlist } from "@/query/favorite";
+import { type OutputTrpcType, trpc } from "@/lib/trpc";
+import { useToggleWishlist } from "@/query/favorite";
 import { useStartChat } from "@/query/startChat";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import Review from "../../../components/forms/review";
-import { OutputTrpcType, trpc } from "@/lib/trpc";
-import { useQuery } from "@tanstack/react-query";
-import LoginRedirect from "@/components/cards/LoginRedirect";
 import ReviewForm from "../create/add-business/forms/ReviewForm";
 
 type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] | undefined;
@@ -200,7 +195,7 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
                 onSuccess: (res) => {
                   if (res?.chat_session_id) {
                     router.push({
-                      pathname: "/chat/[chat]",
+                      pathname: "/(root)/chats", // TODO: add real chats redirect
                       params: { chat: res?.chat_session_id.toString() },
                     });
                   } else {

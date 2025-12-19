@@ -1,4 +1,3 @@
-import { features } from "node:process";
 import { db } from "@repo/db";
 import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
@@ -94,30 +93,13 @@ export const franchiseSalemanRouter = router({
   add: franchisesProcedure.query(async ({ ctx }) => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();
-    // const prifix = await db.query.franchises.findFirst({
-    //   where: (franchise, { eq }) => eq(franchise.userId, ctx.userId),
-    // });
-    // const franchise = await db.query.users.findFirst({
-    //   columns: {
-    //     displayName: true,
-    //     id: true,
-    //   },
-    //   where: (user, { eq }) => eq(user.id, ctx.userId),
-    // });
-
-    console.log("Hii");
-
-    const franchise = await db
-      .select({
-        displayName: users.displayName,
-        referPrifixed: franchises.referPrifixed,
-        id: franchises.id,
-      })
-      .from(franchises)
-      .where(eq(franchises.userId, ctx.userId))
-      .leftJoin(users, eq(franchises.userId, users.id));
-
-    console.log("Franchice", franchise);
+    const franchise = await db.query.franchises.findFirst({
+      where: (franchise, { eq }) => eq(franchise.userId, ctx.userId),
+      columns: {
+        referPrifixed: true,
+        lastAssignCode: true,
+      },
+    });
 
     return { states, occupation, franchise };
   }),

@@ -81,7 +81,7 @@ function ListingProduct({ shopId }: { shopId: string }) {
                       {
                         onSuccess: (res) => {
                           router.push({
-                            pathname: "/chat/[chat]",
+                            pathname: "/(root)/chats", // TODO: add real chats redirect
                             params: { chat: res?.chat_session_id.toString() },
                           });
                         },
