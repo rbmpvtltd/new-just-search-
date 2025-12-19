@@ -57,12 +57,14 @@ switch $platform
         # Validate profile
         switch $profile
             case development preview production
+                bun run build
                 notify-send "Build started"
                 cleanup
                 cd $mydir
                 TMPDIR=~/eas-build-tmp eas build --platform $platform --clear-cache --local --profile=$profile
                 java-24
-                notify-send "Build complete"
+                notify-send -u critical "Build complete" "Please check your build"
+                kdeconnect-cli --device 8c540802_d102_461f_889c_ef589e293139 --ping-msg "Your Build is Completed"
             case '*'
                 usage
         end

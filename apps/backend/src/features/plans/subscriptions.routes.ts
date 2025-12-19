@@ -130,63 +130,32 @@ export const subscriptionRouter = router({
   revanuePaymentVerification: protectedProcedure
     .input(
       z.object({
-        // revanue_id: customerInfo.originalAppUserId,
-        // transaction: transaction.transactionIdentifier,
-        // plan_id: plan_id,
-        // product_identifier: productIdentifier,
+        revanue_id: z.string(),
+        transaction: z.string(),
+        // plan_id: z.number(),
+        product_identifier: z.string(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      // const {
-      //   razorpay_payment_id,
-      //   razorpay_signature,
-      //   razorpay_subscription_id,
-      // } = input;
-      // const subscription = await db.query.planUserSubscriptions.findFirst({
-      //   where: eq(
-      //     planUserSubscriptions.subscriptionNumber,
-      //     input.razorpay_subscription_id,
-      //   ),
-      // });
-      // if (!subscription) {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: "Subscription not found",
-      //   });
-      // }
-      // const sign = `${razorpay_payment_id}|${razorpay_subscription_id}`;
-      // const generated_signature = crypto
-      //   .createHmac("sha256", String(process.env.RAZOR_PAY_KEY_SECRET))
-      //   .update(sign)
-      //   .digest("hex");
-      //
-      // const isValid = generated_signature === razorpay_signature;
-      //
-      // if (!isValid) {
-      //   throw new TRPCError({
-      //     code: "UNAUTHORIZED",
-      //     message: "Invalid signature",
-      //   });
-      // }
-      // await db
-      //   .update(planUserSubscriptions)
-      //   .set({
-      //     status: true,
-      //     transactionNumber: razorpay_payment_id,
-      //   })
-      //   .where(
-      //     eq(
-      //       planUserSubscriptions.subscriptionNumber,
-      //       input.razorpay_subscription_id,
-      //     ),
-      //   );
-      //
-      // await db.insert(planUserActive).values({
-      //   userId: ctx.userId,
-      //   planId: subscription.plansId,
-      //   features: subscription.features,
-      // });
-      //
+      await db
+        .update(planUserSubscriptions)
+        .set({
+          status: true,
+          transactionNumber: razorpay_payment_id,
+        })
+        .where(
+          eq(
+            planUserSubscriptions.subscriptionNumber,
+            input.razorpay_subscription_id,
+          ),
+        );
+
+      await db.insert(planUserActive).values({
+        userId: ctx.userId,
+        planId: subscription.plansId,
+        features: subscription.features,
+      });
+
       return { success: true, message: "Subscription verified successfully" };
     }),
 

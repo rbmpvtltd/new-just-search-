@@ -40,7 +40,7 @@ export const planRouter = router({
         planColor: plans.planColor,
         status: plans.status,
         features: plans.features,
-        identifier: plans.identifier,
+        identifier: plans.razorPayIdentifier,
         createdAt: plans.createdAt,
         updatedAt: plans.updatedAt,
       })

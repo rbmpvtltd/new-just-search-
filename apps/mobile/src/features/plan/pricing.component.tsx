@@ -6,9 +6,12 @@ import { trpc } from "@/lib/trpc";
 import PricingCard from "./planItem";
 
 export default function PricingPlansComponent() {
+  console.log("hello 2");
   const [offerings, setOfferings] = useState<PurchasesOfferings | null>();
   // const loading = useRef(true);
   const { data } = useSuspenseQuery(trpc.planRouter.list.queryOptions());
+
+  console.log("data is", data);
 
   useEffect(() => {
     const fetchOfferings = async () => {
@@ -18,7 +21,7 @@ export default function PricingPlansComponent() {
         const customer = await Purchases.getCustomerInfo();
         console.log(
           "offerings",
-          offerings,
+          offering,
           "useris",
           user,
           "customerl",
@@ -36,9 +39,8 @@ export default function PricingPlansComponent() {
         console.error("Error fetching offerings:", error);
       }
     };
-
     fetchOfferings();
-  }, [offerings]);
+  }, []);
 
   const getPkg = (title: string) => {
     const lowerTitle = title.toLowerCase();

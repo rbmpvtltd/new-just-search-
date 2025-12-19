@@ -28,7 +28,10 @@ export type PlanFeatures = {
 export const plans = pgTable("plans", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  identifier: varchar("identifier", { length: 255 }).notNull(),
+  razorPayIdentifier: varchar("razor_pay_identifier", {
+    length: 255,
+  }).notNull(),
+  revenueCatIdentifier: varchar("revenue_cat_identifier", { length: 255 }),
   period: planPeriodEnum("period").notNull(),
   interval: integer("interval").notNull(),
   role: userRoleEnum("role").default(UserRole.guest).notNull(),

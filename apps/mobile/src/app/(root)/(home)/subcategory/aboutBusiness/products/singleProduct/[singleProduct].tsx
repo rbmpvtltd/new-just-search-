@@ -21,6 +21,7 @@ import Carousel from "react-native-reanimated-carousel";
 import RenderHtml from "react-native-render-html";
 import LoginRedirect from "@/components/cards/LoginRedirect";
 import Review from "@/components/forms/review";
+import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/features/auth/authStore";
 import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
 import { trpc } from "@/lib/trpc";

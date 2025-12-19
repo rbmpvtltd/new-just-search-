@@ -48,51 +48,52 @@ export default function PricingCard({
       setLoading(false);
       return;
     }
-    // try {
-    //   const { customerInfo, productIdentifier, transaction } =
-    //     await Purchases.purchasePackage(pkg);
-    //   if (
-    //     typeof customerInfo.entitlements.active[productIdentifier] !==
-    //     "undefined"
-    //   ) {
-    //     mutate(
-    //       {
-    //         revanue_id: customerInfo.originalAppUserId,
-    //         transaction: transaction.transactionIdentifier,
-    //         plan_id: plan_id,
-    //         product_identifier: productIdentifier,
-    //       },
-    //       {
-    //         onSuccess: (res) => {
-    //           if (res.success) {
-    //             queryClient.invalidateQueries({
-    //               queryKey: ["plans"],
-    //             });
-    //             Alert.alert("payment verify successfully ");
-    //           } else {
-    //             console.log(res);
-    //             Alert.alert(
-    //               "payment completed but verification failed",
-    //               "please raise help token to get money back",
-    //             );
-    //           }
-
-    //           setLoading(false);
-    //         },
-    //         onError: () => {
-    //           Alert.alert(
-    //             "payment completed but verification failed",
-    //             "please raise help token to get money back",
-    //           );
-    //           setLoading(false);
-    //         },
-    //       },
-    //     );
-    //   }
-    // } catch (e) {
-    //   console.log(e);
-    //   setLoading(false);
-    // }
+    try {
+      const { customerInfo, productIdentifier, transaction } =
+        await Purchases.purchasePackage(pkg);
+      if (
+        typeof customerInfo.entitlements.active[productIdentifier] !==
+        "undefined"
+      ) {
+        console.log("payment done");
+        // mutate(
+        //   {
+        //     revanue_id: customerInfo.,
+        //     transaction: transaction.transactionIdentifier,
+        //     plan_id: plan_id,
+        //     product_identifier: productIdentifier,
+        //   },
+        //   {
+        //     onSuccess: (res) => {
+        //       if (res.success) {
+        //         queryClient.invalidateQueries({
+        //           queryKey: ["plans"],
+        //         });
+        //         Alert.alert("payment verify successfully ");
+        //       } else {
+        //         console.log(res);
+        //         Alert.alert(
+        //           "payment completed but verification failed",
+        //           "please raise help token to get money back",
+        //         );
+        //       }
+        //
+        //       setLoading(false);
+        //     },
+        //     onError: () => {
+        //       Alert.alert(
+        //         "payment completed but verification failed",
+        //         "please raise help token to get money back",
+        //       );
+        setLoading(false);
+        //     },
+        //   },
+        // );
+      }
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
   };
 
   if (loading) {
