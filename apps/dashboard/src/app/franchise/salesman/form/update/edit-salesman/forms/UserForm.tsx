@@ -10,31 +10,36 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
-import type { EditAdminSalesmanType } from "..";
+import type { EditFranchiseSalesmanType } from "..";
 
-export const adminAddUserUpdateSchema = usersUpdateSchema.omit({
+export const franchiseEditUserUpdateSchema = usersUpdateSchema.omit({
   role: true,
 });
-type UserInsertSchema = z.infer<typeof adminAddUserUpdateSchema>;
+type UserUpdateSchema = z.infer<typeof franchiseEditUserUpdateSchema>;
 
-export default function UserForm({ data }: { data: EditAdminSalesmanType }) {
+export default function UserForm({
+  data,
+}: {
+  data: EditFranchiseSalesmanType;
+}) {
   const nextPage = useSalesmanFormStore((s) => s.nextPage);
+  const formValue = useSalesmanFormStore((s) => s.formValue);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<UserInsertSchema>({
-    resolver: zodResolver(adminAddUserUpdateSchema),
+  } = useForm<UserUpdateSchema>({
+    resolver: zodResolver(franchiseEditUserUpdateSchema),
     defaultValues: {
-      displayName: data.userData?.displayName ?? "",
-      email: data.userData?.email ?? "",
-      password: data.userData?.password ?? "",
-      phoneNumber: data.userData?.phoneNumber ?? "",
-      status: data.userData?.status ?? true,
+      displayName: data?.userData?.displayName,
+      email: data?.userData?.email,
+      password: data?.userData?.password,
+      phoneNumber: data?.userData?.phoneNumber,
+      status: data?.userData?.status,
     },
   });
 
-  const formFields: FormFieldProps<UserInsertSchema>[] = [
+  const formFields: FormFieldProps<UserUpdateSchema>[] = [
     {
       control,
       label: "Display Name",
@@ -80,7 +85,7 @@ export default function UserForm({ data }: { data: EditAdminSalesmanType }) {
     },
   ];
 
-  const onSubmit = async (data: UserInsertSchema) => {
+  const onSubmit = async (data: UserUpdateSchema) => {
     useSalesmanFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));

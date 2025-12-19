@@ -22,6 +22,8 @@ function SelectCell({ id }: { id: number }) {
 }
 
 function ActionCell({ id }: { id: number }) {
+  console.log("ID", id);
+
   return <EditEntiry id={id} />;
 }
 
@@ -58,7 +60,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type ListerArray = OutputTrpcType["adminSalemanRouter"]["list"]["data"];
+type ListerArray = OutputTrpcType["franchiseSalemanRouter"]["list"]["data"];
 type Lister = UnwrapArray<ListerArray>;
 
 export const columns: ColumnDef<Lister>[] = [

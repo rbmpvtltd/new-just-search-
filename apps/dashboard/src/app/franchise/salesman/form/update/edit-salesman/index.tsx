@@ -1,4 +1,5 @@
 "use client";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 import type { SetOpen } from "../../edit.form";
@@ -7,24 +8,23 @@ import ProfileForm from "./forms/ProfileForm";
 import SalesmanForm from "./forms/SalesmanForm";
 import UserForm from "./forms/UserForm";
 
-export type EditAdminSalesmanType =
-  OutputTrpcType["adminSalemanRouter"]["edit"];
-
+export type EditFranchiseSalesmanType =
+  OutputTrpcType["franchiseSalemanRouter"]["edit"];
 export function EditSalesmanPage({
   id,
   data,
   setOpen,
 }: {
   id: number;
-  data: EditAdminSalesmanType;
+  data: EditFranchiseSalesmanType;
   setOpen: SetOpen;
 }) {
-  console.log("Data Salesman", data);
-  console.log("Data Salesman id---------", id);
-
   const trpc = useTRPC();
+  // const { data } = useSuspenseQuery(trpc.franchiseSalemanRouter.add.queryOptions());
   const page = useSalesmanFormStore((state) => state.page);
   const steps = ["User Form", "Profile Form", "Salesman Form"];
+
+  console.log("data", data);
 
   const renderForm = () => {
     switch (page) {
@@ -33,7 +33,7 @@ export function EditSalesmanPage({
       case 1:
         return <ProfileForm data={data} />;
       case 2:
-        return <SalesmanForm data={data} setOpen={setOpen} />;
+        return <SalesmanForm data={data} setOpen={setOpen} id={id} />;
       default:
         return <UserForm data={data} />;
     }

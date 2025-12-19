@@ -1,8 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
-import { profileInsertSchema } from "@repo/db/dist/schema/user.schema";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
+import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
@@ -14,23 +14,26 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
-import type { EditAdminSalesmanType } from "..";
+import type { EditFranchiseSalesmanType } from "..";
 
-export const adminAddProfileInsertSchema = profileInsertSchema.omit({
-  userId: true,
-});
-type ProfileSchema = z.infer<typeof adminAddProfileInsertSchema>;
-export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
+type ProfilUpdateSchema = z.infer<typeof profileUpdateSchema>;
+export default function ProfileForm({
+  data,
+}: {
+  data: EditFranchiseSalesmanType;
+}) {
   const trpc = useTRPC();
   const prevPage = useSalesmanFormStore((state) => state.prevPage);
   const nextPage = useSalesmanFormStore((state) => state.nextPage);
+  const formValue = useSalesmanFormStore((state) => state.formValue);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<ProfileSchema>({
-    resolver: zodResolver(adminAddProfileInsertSchema),
+  } = useForm<ProfilUpdateSchema>({
+    resolver: zodResolver(profileUpdateSchema),
     defaultValues: {
+      userId: data.profileData?.userId,
       address: data.profileData?.address ?? "",
       profileImage: data.profileData?.profileImage ?? "",
       firstName: data.profileData?.firstName ?? "",
@@ -39,7 +42,6 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
       salutation: data.profileData?.salutation ?? "",
       occupation: data.profileData?.occupation ?? null,
       maritalStatus: data.profileData?.maritalStatus ?? "Married",
-      area: data.profileData?.area ?? "",
       pincode: data.profileData?.pincode ?? "",
       city: data.profileData?.city ?? NaN,
       state: data.profileData?.state ?? NaN,
@@ -48,23 +50,25 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
 
   const selectedState = useWatch({ control, name: "state" });
 
-  const { data: addData } = useSuspenseQuery(
-    trpc.adminUsersRouter.add.queryOptions(),
-  );
   const { data: cities, isLoading } = useQuery(
     trpc.adminUtilsRouter.getCities.queryOptions({
-      state: selectedState,
+      state: Number(selectedState),
     }),
   );
-  const onSubmit = async (data: ProfileSchema) => {
+
+  const onSubmit = async (data: ProfilUpdateSchema) => {
     const file = await uploadToCloudinary([data.profileImage], "profile");
     useSalesmanFormStore.setState((state) => ({
-      formValue: { ...state.formValue, ...data, profileImage: file[0] ?? "" },
+      formValue: {
+        ...state.formValue,
+        ...data,
+        profileImage: file[0] ?? "",
+      },
     }));
     nextPage();
   };
 
-  const formFields: FormFieldProps<ProfileSchema>[] = [
+  const formFields: FormFieldProps<ProfilUpdateSchema>[] = [
     {
       control,
       name: "profileImage",
@@ -123,7 +127,7 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
       placeholder: "Occupation",
       required: false,
       component: "select",
-      options: addData.occupation.map((item) => ({
+      options: data.getOccupation?.map((item) => ({
         label: item.name,
         value: item.id,
       })),
@@ -142,15 +146,7 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
         };
       }),
     },
-    {
-      control,
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
-      required: false,
-      component: "input",
-      error: "",
-    },
+
     {
       control,
       label: "Pincode",
@@ -168,7 +164,7 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
       required: false,
       component: "select",
       options:
-        addData.states.map((state) => ({
+        data.getStates?.map((state) => ({
           label: state.name,
           value: state.id,
         })) ?? [],

@@ -4,6 +4,7 @@ import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { profileInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
@@ -52,11 +53,16 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
 
   const selectedState = useWatch({ control, name: "state" });
 
-  const { data: cities, isLoading } = useQuery(
+  const {
+    data: cities,
+    isLoading,
+  } = useQuery(
     trpc.adminUtilsRouter.getCities.queryOptions({
       state: selectedState,
     }),
   );
+
+
   const onSubmit = async (data: ProfileSchema) => {
     const file = await uploadToCloudinary([data.profileImage], "profile");
     useSalesmanFormStore.setState((state) => ({

@@ -1,9 +1,9 @@
 import { db } from "@repo/db";
 import z from "zod";
-import { adminProcedure, router } from "@/utils/trpc";
+import { protectedProcedure, router } from "@/utils/trpc";
 
 export const adminUtilsRouter = router({
-  getSubCategories: adminProcedure
+  getSubCategories: protectedProcedure
     .input(z.object({ categoryId: z.number() }))
     .query(async ({ input }) => {
       const businessSubCategories = await db.query.subcategories.findMany({
@@ -13,7 +13,7 @@ export const adminUtilsRouter = router({
       return businessSubCategories;
     }),
 
-  getCities: adminProcedure
+  getCities: protectedProcedure
     .input(z.object({ state: z.number() }))
     .query(async ({ input }) => {
       const cities = await db.query.cities.findMany({

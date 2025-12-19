@@ -31,7 +31,7 @@ export function EditEntiry({ id }: { id: number }) {
         <Button>Edit</Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-[425px] lg:max-w-[80%] w-full p-4">
-        <SheetTitle>Edit Business Listing</SheetTitle>
+        <SheetTitle>Edit Salesman</SheetTitle>
         {open && (
           <Suspense fallback={<div> loading ...</div>}>
             <div className="overflow-y-scroll">
@@ -54,7 +54,7 @@ function GetData({ setOpen, id }: { setOpen: SetOpen; id: number }) {
   const trpc = useTRPC();
 
   const { data, isFetching } = useSuspenseQuery(
-    trpc.adminSalemanRouter.edit.queryOptions(
+    trpc.franchiseSalemanRouter.edit.queryOptions(
       { id },
       {
         staleTime: 0,
@@ -62,7 +62,7 @@ function GetData({ setOpen, id }: { setOpen: SetOpen; id: number }) {
     ),
   );
 
-  console.log("data", data);
+  console.log("Data", data);
 
   if (isFetching) return <Spinner />;
 
