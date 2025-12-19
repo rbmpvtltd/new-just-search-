@@ -1,9 +1,5 @@
 import { db } from "@repo/db";
-import {
-  users,
-  usersInsertSchema,
-  usersUpdateSchema,
-} from "@repo/db/dist/schema/auth.schema";
+import { users, usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
   categoryUpdateSchema,
@@ -13,14 +9,11 @@ import {
   franchises,
   profileInsertSchema,
   profiles,
-  profileUpdateSchema,
   salesmen,
   salesmenInsertSchema,
-  salesmenUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import bcrypt from "bcryptjs";
 import { desc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import z from "zod";
@@ -33,7 +26,7 @@ import {
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
-import { franchisesProcedure, router } from "@/utils/trpc";
+import { router, salesmanProcedure } from "@/utils/trpc";
 import {
   usersAllowedSortColumns,
   usersColumns,
@@ -41,8 +34,8 @@ import {
 } from "./franchise.admin.service";
 import { generateReferCode } from "./salesman.admin.service";
 
-export const franchiseSalemanRouter = router({
-  list: franchisesProcedure.input(tableInputSchema).query(async ({ input }) => {
+export const salemanUserRouter = router({
+  list: salesmanProcedure.input(tableInputSchema).query(async ({ input }) => {
     const where = buildWhereClause(
       input.filters,
       input.globalFilter,
@@ -97,7 +90,7 @@ export const franchiseSalemanRouter = router({
       pageCount: totalPages,
     };
   }),
-  add: franchisesProcedure.query(async ({ ctx }) => {
+  add: salesmanProcedure.query(async ({ ctx }) => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();
     const franchise = await db.query.franchises.findFirst({
@@ -110,7 +103,7 @@ export const franchiseSalemanRouter = router({
 
     return { states, occupation, franchise };
   }),
-  getReferCode: franchisesProcedure
+  getReferCode: salesmanProcedure
     .input(z.object({ franchiseId: z.number() }))
     .query(async ({ input }) => {
       const franchise = await db.query.franchises.findFirst({
@@ -130,7 +123,7 @@ export const franchiseSalemanRouter = router({
       const code = await generateReferCode(lastAssignCode, prifix);
       return code;
     }),
-  create: franchisesProcedure
+  create: salesmanProcedure
     .input(
       usersInsertSchema
         .omit({ role: true })
@@ -148,9 +141,6 @@ export const franchiseSalemanRouter = router({
         // .extend({ nextNumber: z.number() })
         .omit({ userId: true, franchiseId: true })
         .parse(input);
-
-      const salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT));
-      const hashPassword = await bcrypt.hash(String(userData?.password), salt);
 
       const franchise = await db.query.franchises.findFirst({
         where: (franchise, { eq }) => eq(franchise.userId, ctx.userId),
@@ -174,7 +164,7 @@ export const franchiseSalemanRouter = router({
       const newUserData = (
         await db
           .insert(users)
-          .values({ ...userData, role: "salesman", password: hashPassword })
+          .values({ ...userData, role: "salesman" })
           .returning()
       )[0];
       if (!newUserData?.id) {
@@ -201,7 +191,7 @@ export const franchiseSalemanRouter = router({
       });
       return { success: true, message: "Salesmen created successfully" };
     }),
-  edit: franchisesProcedure
+  edit: salesmanProcedure
     .input(
       z.object({
         id: z.number(),
@@ -210,94 +200,53 @@ export const franchiseSalemanRouter = router({
     .query(async ({ input }) => {
       const getStates = await db.query.states.findMany();
       const getOccupation = await db.query.occupation.findMany();
-
-      const salesmanData = await db.query.salesmen.findFirst({
-        where: (salesman, { eq }) => eq(salesman.id, Number(input?.id)),
+      const getFranchise = await db.query.users.findMany({
+        where: (user, { eq }) => eq(user.role, "franchises"),
+      });
+      const franchiseData = await db.query.franchises.findFirst({
+        where: (franchise, { eq }) => eq(franchise.id, Number(input?.id)),
       });
 
       const userData = await db.query.users.findFirst({
-        where: (user, { eq }) => eq(user.id, Number(salesmanData?.userId)),
+        where: (user, { eq }) => eq(user.id, 8),
       });
-
       const profileData = await db.query.profiles.findFirst({
         where: (profile, { eq }) => eq(profile.userId, Number(userData?.id)),
       });
 
+      const salesmanData = await db.query.salesmen.findFirst({
+        where: (salesman, { eq }) =>
+          eq(salesman.franchiseId, Number(input?.id)),
+      });
       return {
         userData,
-        getStates,
         profileData,
-        salesmanData,
+        getStates,
         getOccupation,
+        salesmanData,
+        franchiseData,
+        getFranchise,
       };
     }),
-  update: franchisesProcedure
-    .input(
-      usersUpdateSchema
-        .omit({ role: true })
-        .extend(profileUpdateSchema.shape)
-        .extend(salesmenUpdateSchema.omit({ franchiseId: true }).shape),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const userData = usersUpdateSchema.omit({ role: true }).parse(input);
-      const profileData = profileUpdateSchema.parse(input);
-      const salesmenData = salesmenUpdateSchema
-        .omit({ franchiseId: true })
-        .parse(input);
-
-      logger.info("input is", { userData: profileData });
-      const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
-        where: (user, { and, ne, eq, or }) =>
-          and(
-            or(
-              eq(user.email, String(userData.email)),
-              eq(user.phoneNumber, String(userData.phoneNumber)),
-            ),
-            ne(user.id, Number(profileData.userId)),
-          ),
-      });
-      if (isEmailOrPhoneNumberExist) {
+  update: salesmanProcedure
+    .input(categoryUpdateSchema)
+    .mutation(async ({ input }) => {
+      const { id, ...updateData } = input;
+      if (!id)
         throw new TRPCError({
-          code: "CONFLICT",
-          message: "Email already exists",
+          code: "BAD_REQUEST",
+          message: "Please pass id field",
         });
+      const olddata = (
+        await db.select().from(categories).where(eq(categories.id, id))
+      )[0];
+      if (olddata?.photo && olddata?.photo !== updateData.photo) {
+        await cloudinaryDeleteImageByPublicId(olddata.photo);
       }
-
-      await db
-        .update(users)
-        .set({
-          ...userData,
-        })
-        .where(eq(users.id, Number(profileData.userId)));
-
-      await db
-        .update(profiles)
-        .set({
-          profileImage: profileData.profileImage,
-          salutation: profileData.salutation,
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
-          dob: profileData.dob,
-          occupation: profileData.occupation,
-          maritalStatus: profileData.maritalStatus,
-          address: profileData.address,
-          // area: profileData.area,
-          city: profileData.city,
-          pincode: profileData.pincode,
-          state: profileData.state,
-        })
-        .where(eq(profiles.userId, Number(profileData.userId)));
-
-      await db
-        .update(salesmen)
-        .set({
-          ...salesmenData,
-        })
-        .where(eq(salesmen.userId, Number(profileData.userId)));
-      return { success: true, message: "Salesmen updated successfully" };
+      await db.update(categories).set(updateData).where(eq(categories.id, id));
+      return { success: true };
     }),
-
-  multidelete: franchisesProcedure
+  multidelete: salesmanProcedure
     .input(
       z.object({
         ids: z.array(z.number()),
@@ -321,7 +270,7 @@ export const franchiseSalemanRouter = router({
       await db.delete(categories).where(inArray(categories.id, input.ids));
       return { success: true };
     }),
-  multiactive: franchisesProcedure
+  multiactive: salesmanProcedure
     .input(
       z.array(
         z.object({
@@ -354,7 +303,7 @@ export const franchiseSalemanRouter = router({
 
       return { success: true };
     }),
-  multipopular: franchisesProcedure
+  multipopular: salesmanProcedure
     .input(
       z.array(
         z.object({

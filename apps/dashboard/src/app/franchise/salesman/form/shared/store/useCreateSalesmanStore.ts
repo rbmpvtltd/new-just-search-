@@ -47,6 +47,7 @@ const initialFormValue: CombinedForm = {
   //salesman
   franchiseId: NaN,
   referCode: "",
+  
 };
 
 export const useSalesmanFormStore = create<SalesmanFormProps>((set) => ({

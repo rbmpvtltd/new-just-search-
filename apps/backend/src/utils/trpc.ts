@@ -123,7 +123,7 @@ export const hireProcedure = protectedProcedure.use(async (opts) => {
     message: "please verify",
   });
 });
-export const salemanProcedure = protectedProcedure.use(async (opts) => {
+export const salesmanProcedure = protectedProcedure.use(async (opts) => {
   const { ctx } = opts;
 
   if (

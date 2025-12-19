@@ -126,6 +126,7 @@ export const salesmen = pgTable("salesmen", {
 });
 
 export const salesmenInsertSchema = createInsertSchema(salesmen);
+export const salesmenUpdateSchema = createUpdateSchema(salesmen);
 
 export const notification = pgTable("notification", {
   id: serial("id").primaryKey(),
