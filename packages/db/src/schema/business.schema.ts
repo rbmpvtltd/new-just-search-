@@ -222,10 +222,12 @@ export const insertBusinessReviewSchema = createInsertSchema(businessReviews, {
     z
       .string()
       .min(10, "Review must be at least 10 characters")
-      .max(500, "Review must not exceed 500 characters").optional(),
-  rate: () => z.number().min(1).max(5, "Rating must be between 1 and 5").optional(),
+      .max(500, "Review must not exceed 500 characters")
+      .optional(),
+  rate: () =>
+    z.number().min(1).max(5, "Rating must be between 1 and 5").optional(),
 }).omit({
-  userId : true
+  userId: true,
 });
 
 // // 7. comment_business
