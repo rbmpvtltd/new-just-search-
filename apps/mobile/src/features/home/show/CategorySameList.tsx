@@ -112,7 +112,11 @@ export const CategoryList = () => {
                   value === "hire" && "bg-primary"
                 } flex-row items-center justify-start rounded-md border border-secondary-content px-8 py-2 `}
               >
-                <Text className={`${value === "hire" ? "text-white": "text-secondary"}`}>Hire</Text>
+                <Text
+                  className={`${value === "hire" ? "text-white" : "text-secondary"}`}
+                >
+                  Hire
+                </Text>
               </View>
             </Pressable>
             <Pressable onPress={() => handleValueChange("business")}>
@@ -121,7 +125,11 @@ export const CategoryList = () => {
                   value === "business" && "bg-primary"
                 } flex-row items-center justify-start rounded-md border border-secondary-content px-8 py-2`}
               >
-                <Text className={`${value === "business" ? "text-white": "text-secondary"}`}>Business</Text>
+                <Text
+                  className={`${value === "business" ? "text-white" : "text-secondary"}`}
+                >
+                  Business
+                </Text>
               </View>
             </Pressable>
           </View>
@@ -145,7 +153,7 @@ export const CategoryList = () => {
                   setIsNavigating(true);
                   router.navigate({
                     pathname: "/(root)/(home)/subcategory/[subcategory]",
-                    params: { subcategory: item?.id,type : item.type },
+                    params: { subcategory: item?.id, type: item.type },
                   });
                   setTimeout(() => setIsNavigating(false), 500);
                 }}

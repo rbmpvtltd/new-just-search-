@@ -9,6 +9,8 @@ import { queryClient, trpc } from "@/lib/trpc";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../../../components/inputs/Input";
 import { type LoginFormData, loginSchema } from "../schema/loginSchema";
+import { deviceId, platform } from "@/utils/getDeviceId";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginFrom() {
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
@@ -49,8 +51,14 @@ export default function LoginFrom() {
     }),
   );
 
+  const { mutate: pushTokenMutation } = useMutation(
+    trpc.notificationRouter.createPushToken.mutationOptions(),
+  );
+
   const onSubmit = async (data: { username: string; password: string }) => {
     loginMutation.mutate(data);
+    const pushToken = await AsyncStorage.getItem("pushToken");
+    console.log("=========================>", pushToken);
   };
 
   return (
