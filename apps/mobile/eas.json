@@ -31,14 +31,14 @@
         "EAS_BUILD_PROFILE": "preview",
         "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/",
         "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
-        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt"
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "goog_oiSnuWepljgpdlqlTYEjrBmuAFp"
       }
     },
     "production": {
       "bun": "1.2.20",
       "autoIncrement": true,
       "channel": "production",
-      "developmentClient": true,
+      "developmentClient": false,
       "android": {
         "buildType": "app-bundle"
       },
@@ -46,7 +46,7 @@
         "EAS_BUILD_PROFILE": "production",
         "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/",
         "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
-        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt"
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "goog_oiSnuWepljgpdlqlTYEjrBmuAFp"
       }
     }
   },

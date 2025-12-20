@@ -2,13 +2,12 @@
   "expo": {
     "name": "Just Search",
     "slug": "justsearch",
-    "version": "2.0.00",
+    "version": "2.0.01",
     "orientation": "portrait",
     "icon": "./src/assets/images/app-icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "justsearch",
     "newArchEnabled": true,
-    "jsEngine": "hermes",
     "splash": {
       "image": "./src/assets/images/app-icon.png",
       "resizeMode": "cover",

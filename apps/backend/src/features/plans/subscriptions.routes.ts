@@ -27,7 +27,7 @@ export const subscriptionRouter = router({
     .input(z.object({ identifier: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const data = await db.query.plans.findFirst({
-        where: eq(plans.identifier, input.identifier),
+        where: eq(plans.razorPayIdentifier, input.identifier),
       });
       if (!data) {
         throw new TRPCError({
@@ -36,7 +36,7 @@ export const subscriptionRouter = router({
         });
       }
       const response = await razorpayInstance.subscriptions.create({
-        plan_id: data.identifier,
+        plan_id: data.razorPayIdentifier,
         customer_notify: 1,
         total_count: 1,
         // customer_id: userId,
@@ -137,25 +137,25 @@ export const subscriptionRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      await db
-        .update(planUserSubscriptions)
-        .set({
-          status: true,
-          transactionNumber: razorpay_payment_id,
-        })
-        .where(
-          eq(
-            planUserSubscriptions.subscriptionNumber,
-            input.razorpay_subscription_id,
-          ),
-        );
-
-      await db.insert(planUserActive).values({
-        userId: ctx.userId,
-        planId: subscription.plansId,
-        features: subscription.features,
-      });
-
+      // await db
+      //   .update(planUserSubscriptions)
+      //   .set({
+      //     status: true,
+      //     transactionNumber: razorpay_payment_id,
+      //   })
+      //   .where(
+      //     eq(
+      //       planUserSubscriptions.subscriptionNumber,
+      //       input.razorpay_subscription_id,
+      //     ),
+      //   );
+      //
+      // await db.insert(planUserActive).values({
+      //   userId: ctx.userId,
+      //   planId: subscription.plansId,
+      //   features: subscription.features,
+      // });
+      //
       return { success: true, message: "Subscription verified successfully" };
     }),
 

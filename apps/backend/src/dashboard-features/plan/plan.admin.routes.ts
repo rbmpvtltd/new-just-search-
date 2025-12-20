@@ -18,6 +18,7 @@ import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
 } from "@/lib/cloudinary";
+import { razorpayInstance } from "@/lib/razorpay";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -29,7 +30,6 @@ import {
   planColumns,
   planGlobalFilterColumns,
 } from "./plan.admin.service";
-import { razorpayInstance } from "@/lib/razorpay";
 
 export const adminPlanRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
@@ -102,7 +102,7 @@ export const adminPlanRouter = router({
 
       await db.insert(plans).values({
         ...dbData,
-        identifier: response.id,
+        razorPayIdentifier: response.id,
         features: {
           productLimit: input.productLimit,
           offerLimit: input.offerLimit,

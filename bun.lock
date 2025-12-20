@@ -144,7 +144,7 @@
     },
     "apps/mobile": {
       "name": "com.rbm.justsearch",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@azure/core-asynciterator-polyfill": "^1.0.2",
         "@expo/vector-icons": "^15.0.3",

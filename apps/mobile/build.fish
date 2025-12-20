@@ -62,9 +62,9 @@ switch $platform
                 cleanup
                 cd $mydir
                 TMPDIR=~/eas-build-tmp eas build --platform $platform --clear-cache --local --profile=$profile
-                java-24
                 notify-send -u critical "Build complete" "Please check your build"
                 kdeconnect-cli --device 8c540802_d102_461f_889c_ef589e293139 --ping-msg "Your Build is Completed"
+                java-24
             case '*'
                 usage
         end
