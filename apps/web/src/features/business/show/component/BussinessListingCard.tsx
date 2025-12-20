@@ -12,7 +12,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Favourite from "../../shared/Favourite";
 
-
 type BusinessListing = {
   objectID: string;
   name: string;
@@ -37,8 +36,15 @@ type BusinessListing = {
 };
 type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
-export const BussinessListingCard = ({ item }: { item: BusinessListing|businesses,category?:string,subcategory?:string[],rating?:string|undefined}) => {
-  const router = useRouter()
+export const BussinessListingCard = ({
+  item,
+}: {
+  item: BusinessListing | businesses;
+  category?: string;
+  subcategory?: string[];
+  rating?: string | undefined;
+}) => {
+  const router = useRouter();
   return (
     <div className="mx-auto p-4">
       <div className="flex flex-col justify-center gap-4">
@@ -47,7 +53,7 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/business/shop/${item.objectID}`,
+                  pathname: `/subcategory/aboutBusiness/${item.objectID}`,
                 }}
               >
                 <Image
@@ -64,7 +70,6 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
                   initialFav={initialFav ?? false}
                 />
               </div> TODO: navigate to single shop when trying clicked on favourite */}
-              
             </div>
           </div>
           <div className="flex flex-col py-2 justify-between gap-2 ">
@@ -72,11 +77,13 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
             <div className="flex gap-2 flex-wrap">
               <Badge variant="default">{item.category}</Badge>
 
-              {item.subcategories?.slice(0, 2)?.map((subcategory:string, index:number) => (
-                <Badge variant="destructive" key={index.toString()}>
-                  {subcategory}
-                </Badge>
-              ))}
+              {item.subcategories
+                ?.slice(0, 2)
+                ?.map((subcategory: string, index: number) => (
+                  <Badge variant="destructive" key={index.toString()}>
+                    {subcategory}
+                  </Badge>
+                ))}
             </div>
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
@@ -88,7 +95,7 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.objectID}`)
+                  router.push(`/business/shop/${item.objectID}`);
                   console.log("clicked", item.latitude, item.longitude);
                 }}
                 type="button"
@@ -99,7 +106,7 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
               </Button>
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.objectID}`)
+                  router.push(`/business/shop/${item.objectID}`);
                   console.log("chatting with", item.objectID);
                 }}
                 type="button"
@@ -111,7 +118,7 @@ export const BussinessListingCard = ({ item }: { item: BusinessListing|businesse
               {/* </div> */}
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${item.objectID}`)  
+                  router.push(`/business/shop/${item.objectID}`);
                   console.log("calling on", item.phoneNumber);
                 }}
                 type="button"

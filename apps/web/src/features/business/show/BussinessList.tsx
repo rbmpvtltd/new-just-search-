@@ -14,6 +14,7 @@ import {
 import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
 
 function Hit({ hit }: { hit: any }) {
+  console.log("=================================>", hit);
   return (
     <BussinessListingCard
       item={hit}
@@ -29,6 +30,7 @@ export default function BussinessList({ categoryId }: { categoryId: number }) {
   const lng = useRef<number | null>(null);
   const [radiusKm, setRadiusKm] = useState(10000);
   const [showFilters, setShowFilters] = useState(false);
+  console.log("==========> categoryId", categoryId);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
