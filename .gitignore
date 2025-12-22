@@ -51,3 +51,6 @@ package-lock.json
 yarn.lock
 apps/mobile/build
 apps/mobile/builds
+apps/mobile/GoogleService-Info.plist
+apps/mobile/google-services.json
+apps/mobile/google-services.json
