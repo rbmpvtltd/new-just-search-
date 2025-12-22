@@ -7,7 +7,7 @@ async function SingleProduct({
 }: {
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { id } = await params;
+  const { singleProduct: id } = await params;
   const { data, error } = await asyncHandler(
     trpcServer.businessrouter.singleProduct.query({ productId: Number(id) }),
   );

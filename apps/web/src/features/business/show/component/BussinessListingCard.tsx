@@ -36,8 +36,6 @@ type BusinessListing = {
 };
 type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
-
-
 export const BussinessListingCard = ({
   item,
 }: {
@@ -47,8 +45,6 @@ export const BussinessListingCard = ({
   rating?: string | undefined;
 }) => {
   const router = useRouter();
-  console.log("ITEM ----------------------->-----", item);
-
   return (
     <div className="mx-auto p-4">
       <div className="flex flex-col justify-center gap-4">
@@ -57,7 +53,7 @@ export const BussinessListingCard = ({
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/business/shop/${item.objectID}`,
+                  pathname: `/subcategory/aboutBusiness/${item.objectID}`,
                 }}
               >
                 <Image

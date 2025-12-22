@@ -15,7 +15,7 @@ export function PopularCategoryCard({
     <div className="min-h-[80px] mb-4 max-w-[100px] flex flex-col items-center justify-evenly border-2 rounded-2xl hover:scale-105 transform transition-all duration-300 hover:shadow-xl hover:border-amber-600">
       <Link
         href={{
-          pathname: `/business/listings/${id}`,
+          pathname: `/subcategory/${id}`,
           query: { page: 1 },
         }}
         className="flex items-center justify-center flex-col"
