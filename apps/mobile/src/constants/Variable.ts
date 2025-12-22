@@ -4,9 +4,8 @@ export const apiUrl = Constants.expoConfig?.extra?.PROD
   ? Constants.expoConfig?.extra?.API_URL_PROD
   : Constants.expoConfig?.extra?.API_URL_DEV;
 
-export const backendUrl = Constants.expoConfig?.extra?.BACKEND_URL;
-
+export const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
 export const iosPaymentApiKey =
-  Constants.expoConfig?.extra?.IOS_PAYMENT_API_KEY;
+  process.env.EXPO_PUBLIC_IOS_PAYMENT_API_KEY ?? "";
 export const androidPaymentApiKey =
-  Constants.expoConfig?.extra?.ANDROID_PAYMENT_API_KEY;
+  process.env.EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY ?? "";

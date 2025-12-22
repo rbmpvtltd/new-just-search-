@@ -13,13 +13,13 @@
     "drizzle-kit": "^0.31.4"
   },
   "scripts": {
-    "dev": "bunx drizzle-kit studio",
-    "migrate": "bunx drizzle-kit migrate",
+    "dev": "bun x drizzle-kit studio",
+    "migrate": "bun x drizzle-kit migrate",
     "query-test": "bun ./src/test.ts",
-    "generate": "bunx drizzle-kit generate",
-    "build": "bunx tsc -p tsconfig.json",
-    "setup": "bunx tsc -p tsconfig.json",
-    "dbsync": "bunx drizzle-kit generate && bunx drizzle-kit migrate"
+    "generate": "bun x drizzle-kit generate",
+    "build": "bun x tsc -p tsconfig.json",
+    "setup": "bun x tsc -p tsconfig.json",
+    "dbsync": "bun x drizzle-kit generate && bun x drizzle-kit migrate"
   },
   "peerDependencies": {
     "typescript": "5.9.2"

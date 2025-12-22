@@ -15,10 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rbm.justsearch",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+      "bundleIdentifier": "com.rbm.justsearch"
     },
     "android": {
       "config": {
@@ -40,8 +37,7 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.rbm.justsearch",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.rbm.justsearch"
     },
     "web": {
       "bundler": "metro",
@@ -58,7 +54,8 @@
         "expo-build-properties",
         {
           "ios": {
-            "useFrameworks": "static"
+            "useFrameworks": "static",
+            "forceStaticLinking": ["RNFBApp", "RNFBCrashlytics"]
           }
         }
       ],

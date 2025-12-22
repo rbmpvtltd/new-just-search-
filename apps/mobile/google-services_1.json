@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "41084064028",
-    "project_id": "justsearch-app-v2",
-    "storage_bucket": "justsearch-app-v2.firebasestorage.app"
+    "project_number": "275630850297",
+    "project_id": "justsearch-fa0b4",
+    "storage_bucket": "justsearch-fa0b4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:41084064028:android:07bfffb4f77091ebfd6ad9",
+        "mobilesdk_app_id": "1:275630850297:android:714461e06181ffe9fce228",
         "android_client_info": {
           "package_name": "com.rbm.justsearch"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCdZjSLdXR2fIMMI_iQgcQbf7eos_dLT-c"
+          "current_key": "AIzaSyAOzVgaltBq19xpHWFrub8BR7cmifrlw64"
         }
       ],
       "services": {

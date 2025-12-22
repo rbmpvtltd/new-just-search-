@@ -32,7 +32,6 @@
     "fs": "^0.0.1-security",
     "react-easy-crop": "^5.5.3",
     "react-instantsearch": "^7.19.0",
-    "react-native-keyboard-controller": "^1.19.4",
     "react-timeago": "^8.3.0"
   },
   "resolutions": {
