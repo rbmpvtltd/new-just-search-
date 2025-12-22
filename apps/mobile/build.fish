@@ -29,6 +29,24 @@ function cleanup
     else
         echo (set_color cyan)"[SKIP] .gradle/caches not found."(set_color normal)
     end
+    if test -d .gradle/wrapper
+        rm -rf .gradle/wrapper
+        echo (set_color green)"[OK] Removed .gradle/wrapper"(set_color normal)
+    else
+        echo (set_color cyan)"[SKIP] .gradle/wrapper not found."(set_color normal)
+    end
+    if test -d .gradle/native
+        rm -rf .gradle/native
+        echo (set_color green)"[OK] Removed .gradle/native"(set_color normal)
+    else
+        echo (set_color cyan)"[SKIP] .gradle/native not found."(set_color normal)
+    end
+    if test -d .gradle/daemon
+        rm -rf .gradle/daemon
+        echo (set_color green)"[OK] Removed .gradle/daemon"(set_color normal)
+    else
+        echo (set_color cyan)"[SKIP] .gradle/daemon not found."(set_color normal)
+    end
 end
 
 # Print usage helper

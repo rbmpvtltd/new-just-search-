@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.rbm.justsearch",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "config": {
