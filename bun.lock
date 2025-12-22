@@ -174,7 +174,7 @@
         "eslint-config-prettier": "^10.1.5",
         "expo": "~54.0.30",
         "expo-auth-session": "~7.0.9",
-        "expo-build-properties": "~1.0.9",
+        "expo-build-properties": "~1.0.10",
         "expo-constants": "^18.0.12",
         "expo-crypto": "~15.0.7",
         "expo-dev-client": "~6.0.18",
