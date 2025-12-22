@@ -22,7 +22,7 @@ export const fakeSeed = async () => {
       logger.error("fake user is not find");
       return;
     }
-    const business = await seedFakeBusiness(user.id);
+    // const business = await seedFakeBusiness(user.id);
     logger.info("adding fake admin");
     await seedRealUser("admin@gmail.com", "admin@123", "admin");
     await seedRealUser("ranjeet@gmail.com", "admin@123", "admin");
@@ -214,63 +214,64 @@ const seedFakeUser = async () => {
   }
 };
 
-const seedFakeBusiness = async (userId: number) => {
-  try {
-    // Pehle existing fake business delete karo
-    await db.delete(businessListings).where(eq(businessListings.slug, "fake"));
+// const seedFakeBusiness = async (userId: number) => {
+//   try {
+//     // Pehle existing fake business delete karo
+//     await db.delete(businessListings).where(eq(businessListings.slug, "fake"));
 
-    const [city] = await db
-      .select()
-      .from(cities)
-      .where(eq(cities.city, "Jodhpur"));
+//     const [city] = await db
+//       .select()
+//       .from(cities)
+//       .where(eq(cities.city, "Jodhpur"));
 
-    if (!city) {
-      throw new Error("City 'Jodhpur' not found in database");
-    }
+//     if (!city) {
+//       throw new Error("City 'Jodhpur' not found in database");
+//     }
 
-    const [insertedBusiness] = await db
-      .insert(businessListings)
-      .values({
-        userId,
-        name: "fake",
-        slug: "fake",
-        photo: "fake",
-        specialities: "fake",
-        description: '<p dir="ltr"><span>fake</span></p>',
-        homeDelivery: "no",
-        latitude: "26.2389",
-        longitude: "73.0243",
-        buildingName: "fake",
-        streetName: "fake",
-        area: "fake",
-        landmark: "fake",
-        pincode: "342001",
-        state: city.stateId,
-        city: city.id,
-        // schedules: {},
-        status: "Approved",
-        email: "fake@example.com",
-        contactPerson: "fake",
-        ownerNumber: "1234567890",
-        phoneNumber: "1234567890",
-        whatsappNo: "1234567890",
-        alternativeMobileNumber: "1234567890",
-        facebook: "https://facebook.com/fake",
-        twitter: "https://twitter.com/fake",
-        linkedin: "https://linkedin.com/fake",
-        listingVideo: "https://youtube.com/fake",
-        days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
-        fromHour: "10:00",
-        toHour: "18:00",
-        isFeature: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
+//     const [insertedBusiness] = await db
+//       .insert(businessListings)
+//       .values({
+//         userId,
+//         slaesmanId: 1,
+//         name: "fake",
+//         slug: "fake",
+//         photo: "fake",
+//         specialities: "fake",
+//         description: '<p dir="ltr"><span>fake</span></p>',
+//         homeDelivery: "no",
+//         latitude: "26.2389",
+//         longitude: "73.0243",
+//         buildingName: "fake",
+//         streetName: "fake",
+//         area: "fake",
+//         landmark: "fake",
+//         pincode: "342001",
+//         state: city.stateId,
+//         city: city.id,
+//         // schedules: {},
+//         status: "Approved",
+//         email: "fake@example.com",
+//         contactPerson: "fake",
+//         ownerNumber: "1234567890",
+//         phoneNumber: "1234567890",
+//         whatsappNo: "1234567890",
+//         alternativeMobileNumber: "1234567890",
+//         facebook: "https://facebook.com/fake",
+//         twitter: "https://twitter.com/fake",
+//         linkedin: "https://linkedin.com/fake",
+//         listingVideo: "https://youtube.com/fake",
+//         days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+//         fromHour: "10:00",
+//         toHour: "18:00",
+//         isFeature: true,
+//         createdAt: new Date(),
+//         updatedAt: new Date(),
+//       })
+//       .returning();
 
-    return insertedBusiness;
-  } catch (error) {
-    console.error("Error in seedFakeBusiness:", error);
-    throw error;
-  }
-};
+//     return insertedBusiness;
+//   } catch (error) {
+//     console.error("Error in seedFakeBusiness:", error);
+//     throw error;
+//   }
+// };

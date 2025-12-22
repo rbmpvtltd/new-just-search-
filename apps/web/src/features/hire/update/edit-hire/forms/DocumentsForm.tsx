@@ -6,7 +6,7 @@ import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -19,7 +19,15 @@ import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { UserHireListingType } from "..";
 
-type DocumentSchema = z.infer<typeof documentSchema>;
+export const documentInsertSchema = documentSchema
+  .omit({
+    salesmanId: true,
+  })
+  .extend({
+    referCode: z.string().optional(),
+  });
+
+type DocumentSchema = z.infer<typeof documentInsertSchema>;
 export default function DocumentsForm({
   hireListing,
 }: {
@@ -35,13 +43,14 @@ export default function DocumentsForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<DocumentSchema>({
-    resolver: zodResolver(documentSchema),
+    resolver: zodResolver(documentInsertSchema),
     defaultValues: {
       idProof: hireListing?.hire?.idProof ?? NaN,
       idProofPhoto: hireListing?.hire?.idProofPhoto ?? "",
       coverLetter: hireListing?.hire?.coverLetter ?? "",
       resumePhoto: hireListing?.hire?.resumePhoto ?? "",
       aboutYourself: hireListing?.hire?.aboutYourself ?? "",
+      referCode: hireListing?.referCode?.referCode ?? "",
     },
   });
   const storeFormValue = () => {
@@ -138,14 +147,14 @@ export default function DocumentsForm({
       required: false,
       error: errors.aboutYourself?.message,
     },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   placeholder: "Refer Code",
-    //   component: "input",
-    //   error: errors.referCode?.message,
-    // },
+    {
+      control,
+      label: "Refer Code",
+      name: "referCode",
+      placeholder: "Refer Code",
+      component: "input",
+      error: errors.referCode?.message,
+    },
   ];
 
   return (

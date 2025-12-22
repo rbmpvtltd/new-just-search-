@@ -13,10 +13,13 @@ import {
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
-import { queryClient, trpc } from "@/lib/trpc";
+import { type OutputTrpcType, queryClient, trpc } from "@/lib/trpc";
+export type AddBusinessPageType =
+  | OutputTrpcType["businessrouter"]["add"]["getSalesman"]
+  | null;
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
-export default function ContactDetail() {
+export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
   const router = useRouter();
   const clearPage = useBusinessFormStore((s) => s.clearPage);
   const formValue = useBusinessFormStore((s) => s.formValue);
@@ -38,6 +41,7 @@ export default function ContactDetail() {
       ownerNumber: "",
       whatsappNo: "",
       email: "",
+      salesmanId: NaN,
     },
   });
 
@@ -126,6 +130,19 @@ export default function ContactDetail() {
       className: "w-[90%] bg-base-200",
       required: false,
       error: errors.email?.message,
+    },
+    {
+      control,
+      name: "salesmanId",
+      label: "Refer code",
+      placeholder: "Select Refer code",
+      component: "dropdown",
+      data: data?.map((item) => ({
+        label: item.referCode,
+        value: item.id,
+      })),
+      className: "w-[90%] bg-base-200",
+      error: errors.salesmanId?.message,
     },
   ];
   return (

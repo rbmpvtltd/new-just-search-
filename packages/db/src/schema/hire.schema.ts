@@ -29,12 +29,16 @@ import {
   subcategories,
 } from "../schema/not-related.schema";
 import { users } from "./auth.schema";
+import { salesmen } from "./user.schema";
 
 export const hireListing = pgTable("hire_listing", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
+  salesmanId: integer("salesman_id")
+    .notNull()
+    .references(() => salesmen.id),
   name: varchar("name", { length: 255 }).notNull(),
   fatherName: varchar("father_name", { length: 255 }),
   dob: date("dob"),
@@ -99,6 +103,7 @@ export const hireListing = pgTable("hire_listing", {
 
 export const hireInsertSchema = createInsertSchema(hireListing, {
   photo: () => z.string().min(1, "Photo is required"),
+  salesmanId: () => z.number().min(1, "Refer code is required"),
   name: () => z.string().min(3, "Name should be minimum 3 characters long"),
   fatherName: () =>
     z.string().min(3, "Name should be minimum 3 characters long"),
@@ -214,6 +219,7 @@ export const documentSchema = hireInsertSchema.pick({
   coverLetter: true,
   resumePhoto: true,
   aboutYourself: true,
+  salesmanId: true,
 });
 
 export const recentViewHire = pgTable("recent_view_hire", {

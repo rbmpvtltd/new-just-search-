@@ -42,11 +42,9 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
       coverLetter: formValue.coverLetter ?? "",
       resumePhoto: formValue.resumePhoto ?? "",
       aboutYourself: formValue.aboutYourself ?? "",
-      // referCode: formValue.referCode ?? "RBMHORJ00000",
+      salesmanId: formValue.salesmanId ?? NaN,
     },
   });
-  console.log("GetValue", getValues());
-
   const onSubmit = async (data: DocumentSchema) => {
     const mergedData = { ...formValue, ...data };
     const files = await uploadToCloudinary(
@@ -134,10 +132,21 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
       control,
       label: "Describe About Yourself",
       name: "aboutYourself",
-      placeholder: "",
       component: "textarea",
       required: false,
       error: errors.aboutYourself?.message,
+    },
+    {
+      control,
+      label: "",
+      name: "salesmanId",
+      placeholder: "",
+      component: "select",
+      options: data.getSalesman.map((item) => ({
+        label: item.referCode,
+        value: item.id,
+      })),
+      error: errors.salesmanId?.message,
     },
   ];
   return (

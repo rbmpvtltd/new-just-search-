@@ -31,21 +31,21 @@ export const businessSeed = async () => {
 };
 
 export const clearAllTablesBusiness = async () => {
-  // await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
-  // );
-  // await db.execute(
-  //   `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
-  // );
+  await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(
+    `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
+  );
   // await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
   // await db.execute(
   //   `TRUNCATE TABLE recent_view_business RESTART IDENTITY CASCADE;`,
   // );
-  // await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
-  // );
+  await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
+  );
   console.log(" All tables cleared successfully!");
 };
 
@@ -305,6 +305,7 @@ const addBusiness = async () => {
         .insert(businessListings)
         .values({
           id: row.id,
+          slaesmanId: row.salesman_id ?? 1,
           userId: createUser!.id,
           name: row.name,
           days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -446,7 +447,7 @@ const businessesCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_category");
 
   for (const row of rows) {
-    console.log(row.listing_id)
+    console.log(row.listing_id);
     const [business] = await db
       .select()
       .from(businessListings)

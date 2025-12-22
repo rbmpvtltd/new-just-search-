@@ -17,6 +17,7 @@ import { useBusinessFormStore } from "@/features/business/shared/store/useCreate
 import { useTRPC } from "@/trpc/client";
 import type { AddBusinessPageType } from "..";
 
+
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
   const trpc = useTRPC();

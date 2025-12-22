@@ -101,7 +101,7 @@ function AddBusinessPage() {
       case 2:
         return <BusinessTiming />;
       case 3:
-        return <ContactDetail />;
+        return <ContactDetail data={data.getSalesman} />;
       default:
         return <BusinessDetail data={data} />;
     }

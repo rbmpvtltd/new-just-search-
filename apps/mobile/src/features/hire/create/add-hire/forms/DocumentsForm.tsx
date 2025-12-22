@@ -36,6 +36,7 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
       coverLetter: formValue?.coverLetter ?? "",
       resumePhoto: formValue?.resumePhoto ?? "",
       aboutYourself: formValue?.aboutYourself ?? "",
+      salesmanId: formValue?.salesmanId ?? NaN,
     },
   });
 
@@ -123,6 +124,18 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
       className: "mx-auto w-[90%] bg-base-200",
       required: false,
       error: errors.aboutYourself?.message,
+    },
+    {
+      control,
+      name: "salesmanId",
+      label: "Salesman",
+      component: "dropdown",
+      data: data?.getSalesman.map((salesman) => ({
+        label: salesman?.referCode,
+        value: salesman?.id,
+      })),
+      placeholder: "Select Salesman",
+      error: errors.salesmanId?.message,
     },
   ];
   return (

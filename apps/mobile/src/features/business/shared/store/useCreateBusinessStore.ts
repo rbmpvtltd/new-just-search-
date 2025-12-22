@@ -62,6 +62,7 @@ const initialFormValue: CombinedBusinessForm = {
   ownerNumber: "",
   email: "",
   whatsappNo: "",
+  salesmanId: NaN,
   // slug: "",
 };
 export const useBusinessFormStore = create<BusinessFormProps>((set) => ({

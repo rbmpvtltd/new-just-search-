@@ -143,6 +143,7 @@ export const addHire = async () => {
       }
       await db.insert(hireListing).values({
         id: row.id,
+        slaesmanId: row.salesman_id ?? 1,
         fromHour: "",
         toHour: "",
         userId: createUser?.id ?? 588,

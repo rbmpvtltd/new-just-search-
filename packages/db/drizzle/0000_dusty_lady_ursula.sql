@@ -32,6 +32,7 @@ CREATE TABLE "business_categories" (
 CREATE TABLE "business_listings" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
+	"salesman_id" integer NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"slug" varchar(255),
 	"photo" text,
@@ -167,6 +168,7 @@ CREATE TABLE "hire_categories" (
 CREATE TABLE "hire_listing" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
+	"salesman_id" integer NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"father_name" varchar(255),
 	"dob" date,
@@ -246,7 +248,6 @@ CREATE TABLE "recent_view_hire" (
 --> statement-breakpoint
 CREATE TABLE "banners" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"mysql_id" integer,
 	"route" text,
 	"photo" text NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
@@ -419,7 +420,8 @@ CREATE TABLE "plan_user_subscriptions" (
 CREATE TABLE "plans" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
-	"identifier" varchar(255) NOT NULL,
+	"razor_pay_identifier" varchar(255) NOT NULL,
+	"revenue_cat_identifier" varchar(255),
 	"period" "plan_period" NOT NULL,
 	"interval" integer NOT NULL,
 	"role" "user_role" DEFAULT 'guest' NOT NULL,
@@ -534,7 +536,6 @@ CREATE TABLE "notification" (
 CREATE TABLE "profiles" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
-	"mysql_user_id" integer,
 	"profileImage" varchar(255),
 	"salutation" varchar(100),
 	"first_name" varchar(100),
@@ -563,6 +564,7 @@ CREATE TABLE "salesmen" (
 ALTER TABLE "business_categories" ADD CONSTRAINT "business_categories_business_id_business_listings_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."business_listings"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "business_categories" ADD CONSTRAINT "business_categories_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "business_listings" ADD CONSTRAINT "business_listings_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "business_listings" ADD CONSTRAINT "business_listings_salesman_id_salesmen_id_fk" FOREIGN KEY ("salesman_id") REFERENCES "public"."salesmen"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "business_listings" ADD CONSTRAINT "business_listings_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "business_photos" ADD CONSTRAINT "business_photos_business_id_business_listings_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."business_listings"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "business_reviews" ADD CONSTRAINT "business_reviews_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -579,6 +581,7 @@ ALTER TABLE "chat_token_messages" ADD CONSTRAINT "chat_token_messages_chat_token
 ALTER TABLE "hire_categories" ADD CONSTRAINT "hire_categories_hire_id_hire_listing_id_fk" FOREIGN KEY ("hire_id") REFERENCES "public"."hire_listing"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_categories" ADD CONSTRAINT "hire_categories_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_salesman_id_salesmen_id_fk" FOREIGN KEY ("salesman_id") REFERENCES "public"."salesmen"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_subcategories" ADD CONSTRAINT "hire_subcategories_hire_id_hire_listing_id_fk" FOREIGN KEY ("hire_id") REFERENCES "public"."hire_listing"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_subcategories" ADD CONSTRAINT "hire_subcategories_subcategory_id_subcategories_id_fk" FOREIGN KEY ("subcategory_id") REFERENCES "public"."subcategories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

@@ -16,10 +16,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
+import type { OutputTrpcType } from "@/trpc/type";
 import { setRole } from "@/utils/session";
-
+export type AddBusinessPageType =
+  | OutputTrpcType["businessrouter"]["add"]["getSalesman"]
+  | null;
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
-export default function ContactDetail() {
+export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
   const trpc = useTRPC();
   const router = useRouter();
   const { mutate } = useMutation(trpc.businessrouter.create.mutationOptions());
@@ -39,6 +42,7 @@ export default function ContactDetail() {
       ownerNumber: formValue.ownerNumber ?? "",
       whatsappNo: formValue.whatsappNo ?? "",
       email: formValue.email ?? "",
+      salesmanId: formValue.salesmanId ?? "",
     },
   });
 
@@ -80,13 +84,17 @@ export default function ContactDetail() {
       required: false,
       error: errors.email?.message,
     },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   component: "input",
-    //   error: "",
-    // },
+    {
+      control,
+      label: "Refer Code",
+      name: "salesmanId",
+      component: "select",
+      options: data?.map((item) => ({
+        label: item.referCode,
+        value: item.id,
+      })),
+      error: errors.salesmanId?.message,
+    },
   ];
 
   const storeFormValue = () => {

@@ -1,5 +1,5 @@
 {
-  "id": "4fc72948-3b65-495c-9ecd-8dab14d8bbb7",
+  "id": "9e7a907f-9685-4980-8b6b-054bc00e7088",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -164,6 +164,12 @@
         },
         "user_id": {
           "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "salesman_id": {
+          "name": "salesman_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -373,6 +379,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "business_listings_salesman_id_salesmen_id_fk": {
+          "name": "business_listings_salesman_id_salesmen_id_fk",
+          "tableFrom": "business_listings",
+          "tableTo": "salesmen",
+          "columnsFrom": [
+            "salesman_id"
           ],
           "columnsTo": [
             "id"
@@ -1158,6 +1177,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "salesman_id": {
+          "name": "salesman_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
@@ -1527,6 +1552,19 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
+        "hire_listing_salesman_id_salesmen_id_fk": {
+          "name": "hire_listing_salesman_id_salesmen_id_fk",
+          "tableFrom": "hire_listing",
+          "tableTo": "salesmen",
+          "columnsFrom": [
+            "salesman_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "hire_listing_city_cities_id_fk": {
           "name": "hire_listing_city_cities_id_fk",
           "tableFrom": "hire_listing",
@@ -1702,12 +1740,6 @@
           "type": "serial",
           "primaryKey": true,
           "notNull": true
-        },
-        "mysql_id": {
-          "name": "mysql_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         },
         "route": {
           "name": "route",
@@ -2912,11 +2944,17 @@
           "primaryKey": false,
           "notNull": true
         },
-        "identifier": {
-          "name": "identifier",
+        "razor_pay_identifier": {
+          "name": "razor_pay_identifier",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
+        },
+        "revenue_cat_identifier": {
+          "name": "revenue_cat_identifier",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
         },
         "period": {
           "name": "period",
@@ -3798,12 +3836,6 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
-        },
-        "mysql_user_id": {
-          "name": "mysql_user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         },
         "profileImage": {
           "name": "profileImage",

@@ -74,9 +74,9 @@ export const adminSalemanRouter = router({
     // PostgreSQL returns `bigint` for count → cast to number
     const totalResult = await db
       .select({
-        count: sql<number>`count(distinct ${users.id})::int`,
+        count: sql<number>`count(distinct ${salesmen.id})::int`,
       })
-      .from(users)
+      .from(salesmen)
       .where(where);
 
     const total = totalResult[0]?.count ?? 0;

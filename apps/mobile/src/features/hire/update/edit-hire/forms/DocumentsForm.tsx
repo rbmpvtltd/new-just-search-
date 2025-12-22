@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import type z from "zod";
+import z from "zod";
 import { uploadToCloudinary } from "@/components/cloudinary/cloudinary";
 import {
   FormField,
@@ -17,7 +17,14 @@ import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStor
 import { trpc } from "@/lib/trpc";
 import type { UserHireListingType } from "..";
 
-type DocumentSchema = z.infer<typeof documentSchema>;
+export const documentInsertSchema = documentSchema
+  .omit({
+    salesmanId: true,
+  })
+  .extend({
+    referCode: z.string().optional(),
+  });
+type DocumentSchema = z.infer<typeof documentInsertSchema>;
 
 export default function DocumentsForm({ data }: { data: UserHireListingType }) {
   const setFormValue = useHireFormStore((s) => s.setFormValue);
@@ -32,13 +39,14 @@ export default function DocumentsForm({ data }: { data: UserHireListingType }) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<DocumentSchema>({
-    resolver: zodResolver(documentSchema),
+    resolver: zodResolver(documentInsertSchema),
     defaultValues: {
       idProof: data?.hire?.idProof ?? NaN,
       idProofPhoto: data?.hire?.idProofPhoto ?? "",
       coverLetter: data?.hire?.coverLetter ?? "",
       resumePhoto: data?.hire?.resumePhoto ?? "",
       aboutYourself: data?.hire?.aboutYourself ?? "",
+      referCode: data?.referCode?.referCode ?? "",
     },
   });
   const onSubmit = async (data: DocumentSchema) => {
@@ -121,6 +129,15 @@ export default function DocumentsForm({ data }: { data: UserHireListingType }) {
       className: "mx-auto w-[90%] bg-base-200",
       placeholder: "Write About Yourself",
       error: errors.aboutYourself?.message,
+    },
+    {
+      control,
+      name: "referCode",
+      label: "Refer Code",
+      component: "input",
+      disable: true,
+      placeholder: "Select Salesman",
+      error: errors.referCode?.message,
     },
   ];
   return (

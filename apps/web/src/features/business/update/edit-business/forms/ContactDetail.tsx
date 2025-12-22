@@ -6,7 +6,7 @@ import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -16,10 +16,17 @@ import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
-import { setRole } from "@/utils/session";
 import type { UserBusinessListingType } from "..";
 
-type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
+export const contactDetailInsertSchema = contactDetailSchema
+  .omit({
+    salesmanId: true,
+  })
+  .extend({
+    referCode: z.string().optional(),
+  });
+
+type ContactDetailSchema = z.infer<typeof contactDetailInsertSchema>;
 export default function ContactDetail({
   businessListing,
 }: {
@@ -36,13 +43,15 @@ export default function ContactDetail({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ContactDetailSchema>({
-    resolver: zodResolver(contactDetailSchema),
+    resolver: zodResolver(contactDetailInsertSchema),
     defaultValues: {
       contactPerson: businessListing?.business?.contactPerson ?? "",
       phoneNumber: businessListing?.business?.phoneNumber ?? "",
       ownerNumber: businessListing?.business?.ownerNumber ?? "",
       whatsappNo: businessListing?.business?.whatsappNo ?? "",
+
       email: businessListing?.business?.email ?? "",
+      referCode: businessListing?.referCode?.referCode ?? "",
     },
   });
 
@@ -90,13 +99,15 @@ export default function ContactDetail({
       required: false,
       error: errors.email?.message,
     },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   component: "input",
-    //   error: "",
-    // },
+    {
+      control,
+      label: "Refer Code",
+      name: "referCode",
+      component: "input",
+      placeholder: "Refer Code",
+      disabled: true,
+      error: errors.referCode?.message,
+    },
   ];
 
   const onSubmit = (data: ContactDetailSchema) => {

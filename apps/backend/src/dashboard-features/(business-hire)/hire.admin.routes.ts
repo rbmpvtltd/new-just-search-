@@ -211,6 +211,7 @@ export const adminHireRouter = router({
       .insert(hireListing)
       .values({
         userId: input.userId,
+        salesmanId: input.salesmanId,
         name: input.name,
         photo: input.photo,
         fatherName: input.fatherName,

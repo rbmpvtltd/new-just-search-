@@ -52,9 +52,16 @@ export const businessrouter = router({
       where: (categories, { eq }) => eq(categories.type, 1),
     });
     const getStates = await db.query.states.findMany();
+    const getSalesman = await db.query.salesmen.findMany({
+      columns: {
+        id: true,
+        referCode: true,
+      },
+    });
     return {
-      getBusinessCategories,
       getStates,
+      getSalesman,
+      getBusinessCategories,
     };
   }),
 
@@ -147,6 +154,7 @@ export const businessrouter = router({
         .insert(schemas.business.businessListings)
         .values({
           userId: ctx.userId,
+          salesmanId: input.salesmanId,
           name: input.name,
           slug: slugifyName,
           photo: input.photo,
@@ -257,7 +265,6 @@ export const businessrouter = router({
       const business = await db.query.businessListings.findFirst({
         where: (business, { eq }) => eq(business.id, input.id),
       });
-      logger.info("business", { business: business });
       const category = await db.query.businessCategories.findFirst({
         where: (businessCategories, { eq }) =>
           eq(businessCategories.businessId, input.id),
@@ -280,13 +287,24 @@ export const businessrouter = router({
           photo: true,
         },
       });
+
+      const referCode = await db.query.salesmen.findFirst({
+        where: (salesmen, { eq }) =>
+          eq(salesmen.id, Number(business?.salesmanId)),
+        columns: {
+          id: true,
+          referCode: true,
+        },
+      });
+
       return {
         business,
         category,
-        businessPhotos,
-        subcategories,
-        getBusinessCategories,
+        referCode,
         getStates,
+        subcategories,
+        businessPhotos,
+        getBusinessCategories,
       };
     }),
 

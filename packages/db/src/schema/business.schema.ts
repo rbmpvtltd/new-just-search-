@@ -17,6 +17,7 @@ import {
   subcategories,
 } from "../schema/not-related.schema";
 import { users } from "./auth.schema";
+import { salesmen } from "./user.schema";
 
 // 1. Business Listing Interface
 export const businessListings = pgTable("business_listings", {
@@ -24,6 +25,9 @@ export const businessListings = pgTable("business_listings", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
+  salesmanId: integer("salesman_id")
+    .notNull()
+    .references(() => salesmen.id),
   name: varchar("name", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }),
   photo: text("photo"),
@@ -62,6 +66,7 @@ export const businessListings = pgTable("business_listings", {
 
 export const businessInsertSchema = createInsertSchema(businessListings, {
   photo: () => z.string().min(1, "Photo is required"),
+  salesmanId: () => z.number().min(1, "Refer code is required"),
   name: () => z.string().min(3, "Name should be minimum 3 characters long"),
   buildingName: () =>
     z.string().min(3, "Building name should be minimum 3 characters long"),
@@ -154,6 +159,7 @@ export const contactDetailSchema = businessInsertSchema.pick({
   ownerNumber: true,
   whatsappNo: true,
   email: true,
+  salesmanId: true,
 });
 
 // 2. Business Photo Interface
@@ -222,10 +228,12 @@ export const insertBusinessReviewSchema = createInsertSchema(businessReviews, {
     z
       .string()
       .min(10, "Review must be at least 10 characters")
-      .max(500, "Review must not exceed 500 characters").optional(),
-  rate: () => z.number().min(1).max(5, "Rating must be between 1 and 5").optional(),
+      .max(500, "Review must not exceed 500 characters")
+      .optional(),
+  rate: () =>
+    z.number().min(1).max(5, "Rating must be between 1 and 5").optional(),
 }).omit({
-  userId : true
+  userId: true,
 });
 
 // // 7. comment_business

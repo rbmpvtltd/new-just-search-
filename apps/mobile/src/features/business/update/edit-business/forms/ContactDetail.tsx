@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -15,7 +15,14 @@ import { useBusinessFormStore } from "@/features/business/shared/store/useCreate
 import { queryClient, trpc } from "@/lib/trpc";
 import type { UserBusinessListingType } from "..";
 
-type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
+export const contactDetailInsertSchema = contactDetailSchema
+  .omit({
+    salesmanId: true,
+  })
+  .extend({
+    referCode: z.string().optional(),
+  });
+type ContactDetailSchema = z.infer<typeof contactDetailInsertSchema>;
 export default function ContactDetail({
   data,
 }: {
@@ -33,13 +40,14 @@ export default function ContactDetail({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ContactDetailSchema>({
-    resolver: zodResolver(contactDetailSchema),
+    resolver: zodResolver(contactDetailInsertSchema),
     defaultValues: {
       contactPerson: data?.business?.contactPerson ?? "",
       phoneNumber: data?.business?.phoneNumber ?? "",
       ownerNumber: data?.business?.ownerNumber ?? "",
       whatsappNo: data?.business?.whatsappNo ?? "",
       email: data?.business?.email ?? "",
+      referCode: data?.referCode?.referCode ?? "",
     },
   });
 
@@ -124,6 +132,16 @@ export default function ContactDetail({
       className: "w-[90%] bg-base-200",
       required: false,
       error: errors.email?.message,
+    },
+    {
+      control,
+      name: "referCode",
+      label: "Refer Code",
+      component: "input",
+      editable: false,
+      className: "w-[90%] bg-base-200",
+      required: false,
+      error: errors.referCode?.message,
     },
   ];
   return (

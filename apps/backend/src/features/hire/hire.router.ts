@@ -30,9 +30,16 @@ export const hirerouter = router({
       await db.query.highestQualification.findMany();
     const getLanguages = await db.query.languages.findMany();
     const getStates = await db.query.states.findMany();
+    const getSalesman = await db.query.salesmen.findMany({
+      columns: {
+        id: true,
+        referCode: true,
+      },
+    });
 
     return {
       getStates,
+      getSalesman,
       getLanguages,
       getDocuments,
       getHireCategories,
@@ -123,6 +130,7 @@ export const hirerouter = router({
         .insert(schemas.hire.hireListing)
         .values({
           userId: ctx.userId,
+          salesmanId: input.salesmanId,
           name: input.name,
           photo: input.photo,
           fatherName: input.fatherName,
@@ -264,9 +272,18 @@ export const hirerouter = router({
           subcategoryId: true,
         },
       });
+
+      const referCode = await db.query.salesmen.findFirst({
+        where: (salesmen, { eq }) => eq(salesmen.id, Number(hire?.salesmanId)),
+        columns: {
+          id: true,
+          referCode: true,
+        },
+      });
       return {
         hire,
         category,
+        referCode,
         getStates,
         subcategory,
         getLanguages,
