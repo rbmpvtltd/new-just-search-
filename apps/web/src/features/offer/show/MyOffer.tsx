@@ -42,7 +42,7 @@ export default function MyOffer() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-2">
       <div className="grid grid-cols-6 bg-gray-100 px-4 py-3 font-semibold rounded-t-lg text-sm">
         <div>#</div>
         <div>Image</div>

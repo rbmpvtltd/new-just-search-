@@ -56,13 +56,13 @@ export default function HelpAndSupport() {
     });
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen w-full">
+    <div className="flex justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
+        className="w-full max-w-3xl  bg-gray-50 rounded-2xl shadow-lg overflow-hidden"
       >
-        <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+        <div className="px-8 py-2 mt-4">
+          <div className="p-6 ">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Help and Support
             </h2>

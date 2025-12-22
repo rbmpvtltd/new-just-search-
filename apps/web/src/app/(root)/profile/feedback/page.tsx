@@ -3,8 +3,6 @@ import Feedback from "@/features/feedback/Feedback";
 
 export default function page() {
   return (
-    <div>
       <Feedback />
-    </div>
   );
 }

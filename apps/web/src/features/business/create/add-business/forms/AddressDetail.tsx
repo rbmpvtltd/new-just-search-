@@ -184,13 +184,10 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     nextPage();
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl ">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 shadow rounded-xl bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Business Address
             </h2>
@@ -199,10 +196,9 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
               location-based services and will remain confidential. This
               information will not be shared publicly.
             </p>
-            <div className="flex items-end justify-between mb-4 ">
+            <div className="flex justify-between mb-4 max-w-[30%]">
               <LocationAutoDetect
                 onResult={(data) => {
-                  console.log("Detected:", data);
                   const formatted = data.formattedAddress ?? "";
                   const parts = formatted.split(",").map((p) => p.trim());
                   const lat = data.latitude;

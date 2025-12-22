@@ -62,8 +62,8 @@ export default function LocationAutoDetect({ onResult, iconOnly }: Props) {
         onClick={handleDetect}
         className={`${
           iconOnly
-            ? "p-2 rounded-full hover:bg-gray-100 transition"
-            : "bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow w-full"
+            ? "p-2 rounded-full hover:bg-gray-100 transition "
+            : "bg-blue-500 hover:bg-blue-600 text-white cursor-pointer font-semibold py-2 px-4 rounded-md shadow w-full"
         } ${detecting ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         {iconOnly ? (

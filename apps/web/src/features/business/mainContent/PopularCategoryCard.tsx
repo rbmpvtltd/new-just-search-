@@ -1,6 +1,6 @@
 "use client";
-import { CldImage } from "next-cloudinary";
 import Link from "next/link";
+import { CldImage } from "next-cloudinary";
 
 export function PopularCategoryCard({
   photo,
@@ -16,7 +16,7 @@ export function PopularCategoryCard({
       <Link
         href={{
           pathname: `/business/listings/${id}`,
-          query: { page: 1 }, 
+          query: { page: 1 },
         }}
         className="flex items-center justify-center flex-col"
       >
@@ -27,7 +27,9 @@ export function PopularCategoryCard({
           src={photo ?? ""}
           className="mx-auto"
         />
-        <p className="w-full text-center mx-auto text-[10px] md:line-clamp-2 line-clamp-1">{title}</p>
+        <p className="w-full text-center mx-auto text-[10px] md:line-clamp-2 line-clamp-1">
+          {title}
+        </p>
       </Link>
     </div>
   );

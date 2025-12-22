@@ -45,7 +45,7 @@ export default function EditProduct({
       productName: myProduct?.product.productName,
       rate: myProduct?.product.rate,
       productDescription: myProduct?.product.productDescription,
-      photo: myProduct?.product.productPhotos[0]?.photo ?? "",
+      mainImage: myProduct?.product.mainImage ?? "",
       image2: myProduct?.product.productPhotos[1]?.photo ?? "",
       image3: myProduct?.product.productPhotos[2]?.photo ?? "",
       image4: myProduct?.product.productPhotos[3]?.photo ?? "",
@@ -115,10 +115,10 @@ export default function EditProduct({
     {
       control,
       // label: "Product Image",
-      name: "photo",
+      name: "mainImage",
       required: false,
       component: "image",
-      error: errors.photo?.message,
+      error: errors.mainImage?.message,
     },
     {
       control,
@@ -193,18 +193,15 @@ export default function EditProduct({
     );
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-4xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl ">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 shadow rounded-xl bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Edit Product
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-3">
               {formFields.map((field) => (
                 <div
                   key={field.name}
@@ -220,7 +217,7 @@ export default function EditProduct({
               Product Images
               <span className="text-red-500 ">*</span>
             </Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-3">
               {formFields2.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}

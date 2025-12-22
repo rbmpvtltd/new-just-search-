@@ -1,3 +1,8 @@
+import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
+import { trpc } from "@/lib/trpc";
+import { useNotificationCount } from "@/query/notification/notication";
+import { showLoginAlert } from "@/utils/alert";
 import { Ionicons } from "@expo/vector-icons";
 import {
   type DrawerContentComponentProps,
@@ -17,11 +22,6 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/features/auth/authStore";
-import { trpc } from "@/lib/trpc";
-import { useNotificationCount } from "@/query/notification/notication";
-import { showLoginAlert } from "@/utils/alert";
 import { Loading } from "../ui/Loading";
 import { SomethingWrong } from "../ui/SomethingWrong";
 
@@ -171,7 +171,7 @@ export default function DrawerLayout() {
                     },
                   });
                 } else {
-                  router.push("/(root)/chats");
+                  router.push("/(root)/(home)/chat");
                 }
               }}
             >

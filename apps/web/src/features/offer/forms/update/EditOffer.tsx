@@ -2,6 +2,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersUpdateSchema } from "@repo/db/dist/schema/offer.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError, TRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
@@ -29,13 +31,13 @@ export default function EditOffer({
   formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(trpc.offerrouter.update.mutationOptions());
   const categories = formReferenceData?.categoryRecord;
   const subCategories = formReferenceData?.subcategoryRecord;
   const {
     control,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<EditOfferSchema>({
     resolver: zodResolver(offersUpdateSchema),
@@ -188,17 +190,27 @@ export default function EditOffer({
       },
       {
         onSuccess: (data) => {
-          console.log("success", data);
-          Swal.fire({
-            title: data.message,
-            icon: "success",
-            draggable: true,
-          });
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.offerrouter.showOffer.queryKey(),
-          });
-          // router.push("/");
+          if (data.success) {
+            Swal.fire({
+              title: data.message,
+              icon: "success",
+              draggable: true,
+            });
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.offerrouter.showOffer.queryKey(),
+            });
+            router.push("/");
+          }
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            Swal.fire({
+              title: error.message,
+              icon: "error",
+              draggable: true,
+            });
+          }
         },
       },
     );
@@ -250,13 +262,6 @@ export default function EditOffer({
             ) : (
               "SUBMIT"
             )}
-          </Button>
-          <Button
-            onClick={() => console.log(getValues())}
-            type="button"
-            className="bg-gray-500 hover:bg-gray-700 font-bold"
-          >
-            Get Values
           </Button>
         </div>
       </form>

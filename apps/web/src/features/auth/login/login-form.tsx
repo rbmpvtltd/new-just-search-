@@ -60,7 +60,6 @@ export function LoginForm({
       },
     });
   }
-
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
@@ -127,7 +126,7 @@ export function LoginForm({
               </div>
             </form>
           </Form>
-          <div className="bg-muted relative hidden md:block">
+          {/* <div className="bg-muted relative hidden md:block">
             <Image
               src="https://www.justsearch.net.in/assets/images/banners/uDgo0nRB1738750520.png"
               alt="side snap"
@@ -135,7 +134,7 @@ export function LoginForm({
               height={500}
               width={400}
             />
-          </div>
+          </div> */}
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">

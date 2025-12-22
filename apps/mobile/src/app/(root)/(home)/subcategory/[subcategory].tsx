@@ -96,18 +96,18 @@
 // }
 
 import { Stack, useLocalSearchParams } from "expo-router";
-import { View, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Configure, InstantSearch } from "react-instantsearch-core";
 import type { Hit as AlgoliaHit } from "instantsearch.js";
-import { useState, useEffect } from "react";
-import { searchClient } from "@/lib/algoliaClient";
-import { SearchBox } from "@/components/home/SearchBox";
+import { useEffect, useState } from "react";
+import { Configure, InstantSearch } from "react-instantsearch-core";
+import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { InfiniteHits } from "@/components/home/InfiniteHits";
-import { MemoizedDetailCard } from "@/features/business/show/DetailCard";
-import HireCard from "@/features/hire/show/HireCard";
+import { SearchBox } from "@/components/home/SearchBox";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
+import { MemoizedDetailCard } from "@/features/business/show/DetailCard";
 import { SubcategoryFilters } from "@/features/business/show/SubcategoryFilter";
+import HireCard from "@/features/hire/show/HireCard";
+import { searchClient } from "@/lib/algoliaClient";
 
 export interface SubcategoryHitType extends AlgoliaHit {
   objectID: string;
@@ -174,7 +174,6 @@ export default function SubCategory() {
               <Configure hitsPerPage={10} filters={filters} />
               <SearchBox placeholder={`Search Anything In ${title}`} />
 
-              {/* Optional: Add filters component if needed */}
               <SubcategoryFilters
                 isDrawerOpen={isModalOpen}
                 onToggleDrawer={() => setModalOpen((isOpen) => !isOpen)}

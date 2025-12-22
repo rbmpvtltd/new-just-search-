@@ -68,16 +68,18 @@ function PrivateChat({
       .map((m) => m.id);
 
     if (unread.length > 0) {
-      markRead({ messageId: unread }, {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: trpc.chat.conversationList.queryKey()
-          })
-        }
-      });
+      markRead(
+        { messageId: unread },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: trpc.chat.conversationList.queryKey(),
+            });
+          },
+        },
+      );
     }
   }, [markRead, userData, store]);
-
 
   return (
     <View className="flex-1">
@@ -109,7 +111,7 @@ function PrivateChat({
               {msg.message && (
                 <View
                   className={`max-w-[80%] px-2 py-2 rounded-2xl shadow-sm ${
-                    msg.senderId === userData?.userId
+                    msg.senderId !== userData?.userId
                       ? "bg-blue-100 self-end"
                       : "bg-gray-200 self-start"
                   }`}
@@ -130,7 +132,7 @@ function PrivateChat({
               {msg.image && (
                 <View
                   className={`max-w-[65%] mt-1 ${
-                    msg.senderId === userData?.id ? "self-end" : "self-start"
+                    msg.senderId !== userData?.id ? "self-end" : "self-start"
                   }`}
                 >
                   <AdvancedImage

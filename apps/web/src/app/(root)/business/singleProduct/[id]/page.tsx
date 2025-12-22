@@ -11,7 +11,7 @@ async function SingleProduct({
   const { data, error } = await asyncHandler(
     trpcServer.businessrouter.singleProduct.query({ productId: Number(id) }),
   );
-  console.log("data", data);
+  console.log("data -=---------------------->", data);
   return (
     <div>
       <SingleProductComp productPhotos={data?.photos ?? []} product={data} />

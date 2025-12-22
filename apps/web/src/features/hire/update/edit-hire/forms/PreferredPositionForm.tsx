@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   JobDuration,
@@ -57,14 +57,11 @@ export default function PreferredPositionForm({
     nextPage();
   };
   return (
-    <div className="bg-gray-50 min-h-screen p-8">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden"
-      >
-        <div className="p-10 space-y-10">
-          <div className="border border-gray-200 p-8 rounded-xl bg-white">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
+        <div className="p-8 space-y-8">
+          <div className="p-6 bg-gray-50 rounded-xl shadow">
+            <h2 className="text-xl font-bold text-gray-800 mb-6">
               Preferred Position
             </h2>
 

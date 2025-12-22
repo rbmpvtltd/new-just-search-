@@ -69,12 +69,12 @@ const items = [
   },
   {
     title: "Pricing Plan",
-    url: "/plans",
+    url: "/profile/plans",
     icon: CreditCard,
   },
   {
     title: "Help & Support",
-    url: "#",
+    url: "/profile/help-and-support",
     icon: HelpCircle,
   },
   {

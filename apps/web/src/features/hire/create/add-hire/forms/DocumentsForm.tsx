@@ -141,18 +141,15 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
     },
   ];
   return (
-    <div className="min-h-screen p-4">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-gray-100 rounded-lg shadow-xl"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 bg-gray-50 rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Documents
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {formFields.map((field, index) => (
+              {formFields.map((field) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>

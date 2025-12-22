@@ -1,10 +1,9 @@
+import { cld } from "@/lib/cloudinary";
+import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, Text, View } from "react-native";
-import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
-import { cld } from "@/lib/cloudinary";
-import { type OutputTrpcType, trpc } from "@/lib/trpc";
 
 type ConversationListType = OutputTrpcType["chat"]["conversationList"] | null;
 export default function ConversationList() {
@@ -22,7 +21,7 @@ export default function ConversationList() {
             className=""
             onPress={() =>
               router.navigate({
-                pathname: "/(root)/chats/private-chat/[id]",
+                pathname: "/(root)/(home)/chat/[id]",
                 params: { id: item?.id },
               })
             }

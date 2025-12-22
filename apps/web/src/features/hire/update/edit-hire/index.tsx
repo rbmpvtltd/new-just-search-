@@ -36,8 +36,8 @@ export default function EditHirePage({
   };
 
   return (
-    <div className="max-w-[90%] mx-auto p-2">
-      <div className="mb-2">
+    <div className="max-w-5xl mx-auto">
+      <div className="">
         <div className="flex justify-between mb-2">
           {steps.map((label, index) => (
             <div

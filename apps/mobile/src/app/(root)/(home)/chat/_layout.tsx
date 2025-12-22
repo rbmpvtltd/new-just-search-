@@ -1,7 +1,7 @@
+import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
-import { Pressable, Text, useColorScheme, View } from "react-native";
-import Colors from "@/constants/Colors";
+import { Pressable, useColorScheme } from "react-native";
 
 export default function HomeLayout() {
   const colorScheme = useColorScheme();
@@ -27,7 +27,7 @@ export default function HomeLayout() {
         }}
       />
       <Stack.Screen
-        name="private-chat/[id]"
+        name="[id]"
         options={{
           headerShown: true,
           headerLeft: () => {

@@ -47,10 +47,10 @@ export default function AccountDeleteRequestForm() {
     });
   };
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="flex justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-hidden"
+        className="w-full max-w-3xl bg-gray-50 rounded-2xl shadow-lg overflow-hidden"
       >
         {/* Header */}
         <div className="px-8 py-6 border-b border-gray-200 bg-gray-50">
