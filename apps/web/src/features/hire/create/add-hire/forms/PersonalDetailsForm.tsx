@@ -344,13 +344,13 @@ export default function PersonalDetailsForm({
   };
 
   return (
-    <div className="min-h-screen p-4 ">
+    <div className="">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-gray-100 rounded-lg shadow-xl"
+        className="max-w-6xl"
       >
         <div className="p-8 space-y-8">
-          <div className="p-6 bg-white rounded-xl shadow">
+          <div className="p-6 bg-gray-50 rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Profile Information
             </h2>

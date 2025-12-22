@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "@repo/db/dist/schema/hire.schema";
 import { useMutation } from "@tanstack/react-query";
@@ -37,7 +37,7 @@ export default function DocumentsForm({
   } = useForm<DocumentSchema>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
-      idProof: hireListing?.hire?.idProof ?? "",
+      idProof: hireListing?.hire?.idProof ?? NaN,
       idProofPhoto: hireListing?.hire?.idProofPhoto ?? "",
       coverLetter: hireListing?.hire?.coverLetter ?? "",
       resumePhoto: hireListing?.hire?.resumePhoto ?? "",
@@ -95,13 +95,10 @@ export default function DocumentsForm({
       name: "idProof",
       placeholder: "Id Proof",
       component: "select",
-      options: [
-        { label: "Aadhar Card", value: "Aadhar Card" },
-        { label: "Pan Card", value: "Pan Card" },
-        { label: "Voter Id Card", value: "Voter Id Card" },
-        { label: "Driving License", value: "Driving License" },
-        { label: "Others", value: "Others" },
-      ],
+      options: hireListing?.getDocuments.map((doc) => ({
+        label: doc.name,
+        value: doc.id,
+      })),
       error: errors.idProof?.message,
     },
     {

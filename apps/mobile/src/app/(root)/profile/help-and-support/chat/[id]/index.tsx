@@ -1,7 +1,7 @@
+import HelpAndSupportChat from "@/features/help-and-support/chat/HelpAndSupportPrivateChat";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
-import HelpAndSupportChat from "@/features/help-and-support/chat/HelpAndSupportPrivateChat";
+import { View } from "react-native";
 
 export default function Chats() {
   const { id } = useLocalSearchParams();

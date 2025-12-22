@@ -178,13 +178,10 @@ export default function AddressDetail({
     nextPage();
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 shadow rounded-xl bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Business Address
             </h2>

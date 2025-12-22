@@ -58,8 +58,8 @@ function AddBusinessPage() {
     }
   };
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="mb-6">
+    <div className="max-w-5xl mx-auto">
+      <div className="">
         <div className="flex justify-between mb-2">
           {steps.map((label, index) => (
             <div
@@ -77,7 +77,7 @@ function AddBusinessPage() {
           ></div>
         </div>
       </div>
-      <div className="border p-4 rounded-lg">{renderForm()}</div>
+      <div className="rounded-lg">{renderForm()}</div>
     </div>
   );
 }

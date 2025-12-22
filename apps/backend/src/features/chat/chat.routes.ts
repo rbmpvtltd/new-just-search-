@@ -1,7 +1,7 @@
 import { EventEmitter, on } from "node:events";
 import { db, schemas } from "@repo/db";
-import { chatImages, chatSessions } from "@repo/db/dist/schema/chat.schema";
 import { users } from "@repo/db/dist/schema/auth.schema";
+import { chatImages, chatSessions } from "@repo/db/dist/schema/chat.schema";
 import { profiles } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError, tracked } from "@trpc/server";
@@ -106,20 +106,20 @@ export const chatRouter = router({
     .mutation(async ({ ctx, input }) => {
       logger.info("Input isConversationExists", input, typeof input.receiverId);
 
-      const business = await db.query.businessListings.findFirst({
-        where: (businessListings, { eq }) =>
-          eq(businessListings.id, input.receiverId),
-      });
-      logger.info("business is", { business: business });
-      if (!business) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Business not found",
-        });
-      }
+      // const business = await db.query.businessListings.findFirst({
+      //   where: (businessListings, { eq }) =>
+      //     eq(businessListings.id, input.receiverId),
+      // });
+      // logger.info("business is", { business: business });
+      // if (!business) {
+      //   throw new TRPCError({
+      //     code: "UNAUTHORIZED",
+      //     message: "Business not found",
+      //   });
+      // }
 
       const user = await db.query.users.findFirst({
-        where: (user, { eq }) => eq(user.id, business?.userId),
+        where: (user, { eq }) => eq(user.id, input.receiverId),
       });
       if (!user) {
         throw new TRPCError({
@@ -132,10 +132,10 @@ export const chatRouter = router({
           or(
             and(
               eq(chatSessions.participantOneId, ctx.userId),
-              eq(chatSessions.participantTwoId, business?.userId),
+              eq(chatSessions.participantTwoId, user.id),
             ),
             and(
-              eq(chatSessions.participantOneId, business?.userId),
+              eq(chatSessions.participantOneId, user.id),
               eq(chatSessions.participantTwoId, ctx.userId),
             ),
           ),
@@ -336,7 +336,6 @@ export const chatRouter = router({
   markAsRead: protectedProcedure
     .input(z.object({ messageId: z.array(z.number()) }))
     .mutation(async ({ ctx, input }) => {
-
       if (input.messageId.length > 0) {
         await db
           .update(schemas.chat.chatMessages)

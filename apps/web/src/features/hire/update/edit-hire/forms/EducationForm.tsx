@@ -29,7 +29,7 @@ export default function EducationForm({
   } = useForm<EducationSchema>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      highestQualification: hireListing?.hire?.highestQualification ?? "",
+      highestQualification: hireListing?.hire?.highestQualification ?? NaN,
       skillset: hireListing?.hire?.skillset ?? "",
       employmentStatus: hireListing?.hire?.employmentStatus ?? "",
       workExperienceYear: hireListing?.hire?.workExperienceYear ?? NaN,
@@ -47,90 +47,10 @@ export default function EducationForm({
       name: "highestQualification",
       placeholder: "Highest Qualification",
       component: "select",
-      options: [
-        { label: "B.E / B.Tech", value: "b-e / b-tech" },
-        { label: "M.E / M.Tech", value: "m-e / m-tech" },
-        { label: "M.S Engineering", value: "m-s engineering" },
-        { label: "M.Eng (Hons)", value: "m-eng (hons)" },
-        { label: "B.Eng (Hons)", value: "b-eng (hons)" },
-        { label: "Engineering Diploma", value: "engineering diploma" },
-        { label: "AE", value: "ae" },
-        { label: "AET", value: "aet" },
-        { label: "B.Plan", value: "b-plan" },
-        { label: "B.Arch", value: "b-arch" },
-        { label: "B.Tech L.L.B.", value: "b-tech l-l-b" },
-        { label: "B.L.L.B.", value: "b-l-l-b" },
-        { label: "CSE", value: "cse" },
-        { label: "IT", value: "it" },
-        { label: "M.Plan", value: "m-plan" },
-        { label: "M.Arch", value: "m-arch" },
-        { label: "M.Tech L.L.B.", value: "m-tech l-l-b" },
-        { label: "M.L.L.B.", value: "m-l-l-b" },
-        { label: "B.A", value: "b-a" },
-        { label: "B.A (Hons)", value: "b-a (hons)" },
-        { label: "M.A", value: "m-a" },
-        { label: "M.A (Hons)", value: "m-a (hons)" },
-        { label: "M.Phil", value: "m-phil" },
-        { label: "B.Sc", value: "b-sc" },
-        { label: "B.Sc (Hons)", value: "b-sc (hons)" },
-        { label: "M.Sc", value: "m-sc" },
-        { label: "M.Sc (Hons)", value: "m-sc (hons)" },
-        { label: "M.Lib.I.Sc", value: "m-lib-i-sc" },
-        { label: "M.Lib.Sc", value: "m-lib-sc" },
-        { label: "B.Lib.I.Sc", value: "b-lib-i-sc" },
-        { label: "B.Lib.Sc", value: "b-lib-sc" },
-        { label: "B.Com", value: "b-com" },
-        { label: "M.Com", value: "m-com" },
-        { label: "B.Com (Hons)", value: "b-com (hons)" },
-        { label: "M.Com (Hons)", value: "m-com (hons)" },
-        { label: "CA / CPA", value: "ca / cpa" },
-        { label: "CFA", value: "cfa" },
-        { label: "CS", value: "cs" },
-        { label: "BBM", value: "bbm" },
-        { label: "BCM", value: "bcm" },
-        { label: "BBA", value: "bba" },
-        { label: "MBA", value: "mba" },
-        { label: "MBA (Finance)", value: "mba (finance)" },
-        { label: "Executive MBA", value: "executive mba" },
-        { label: "PGDM", value: "pgdm" },
-        { label: "PGDBM", value: "pgdbm" },
-        { label: "PGDCA", value: "pgdca" },
-        { label: "CPT", value: "cpt" },
-        { label: "CIA", value: "cia" },
-        { label: "ICWA", value: "icwa" },
-        { label: "MFC", value: "mfc" },
-        { label: "MFM", value: "mfm" },
-        { label: "BFIA", value: "bfia" },
-        { label: "BBS", value: "bbs" },
-        { label: "BIBF", value: "bibf" },
-        { label: "BIT", value: "bit" },
-        { label: "BCA", value: "bca" },
-        { label: "B.Sc IT", value: "b-sc it" },
-        { label: "B.Sc Computer Science", value: "b-sc computer science" },
-        { label: "PGDCA", value: "pgdca" },
-        { label: "ADCA", value: "adca" },
-        { label: "DCA", value: "dca" },
-        { label: "DOEACC", value: "doeacc" },
-        { label: "NIIT", value: "niit" },
-        { label: "J.J.T.I", value: "j-j-t-i" },
-        { label: "D. Pharma", value: "d-pharma" },
-        { label: "B. Pharma", value: "b-pharma" },
-        { label: "M. Pharma", value: "m-pharma" },
-        { label: "LL.B", value: "ll-b" },
-        { label: "LL.M", value: "ll-m" },
-        { label: "Diploma", value: "diploma" },
-        { label: "Monograph", value: "monograph" },
-        { label: "Doctorate", value: "doctorate" },
-        { label: "Associate", value: "associate" },
-        { label: "High School", value: "high school" },
-        { label: "Less than High School", value: "less than high school" },
-        { label: "Diploma in Trade School", value: "diploma in trade school" },
-        { label: "Uneducated", value: "uneducated" },
-        { label: "5th Pass", value: "5th pass" },
-        { label: "8th Pass", value: "8th pass" },
-        { label: "10th Pass", value: "10th pass" },
-        { label: "10+2 Pass", value: "10+2 pass" },
-      ],
+      options: hireListing?.getHighestQualification?.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       error: errors.highestQualification?.message,
     },
     {
@@ -247,13 +167,10 @@ export default function EducationForm({
     nextPage();
   };
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 bg-white rounded-xl shadow">
+          <div className="p-6 bg-gray-50 rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Qualifications and Experience
             </h2>

@@ -1,52 +1,62 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSubscription } from "@trpc/tanstack-react-query";
 import {
   Stack,
   useFocusEffect,
   useLocalSearchParams,
   useRouter,
 } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
-  Alert,
   BackHandler,
   Dimensions,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   Text,
+  useColorScheme,
   View,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import RenderHTML from "react-native-render-html";
 import LoginRedirect from "@/components/cards/LoginRedirect";
 import Review from "@/components/forms/review";
+import PrimaryButton from "@/components/inputs/SubmitBtn";
+import TextAreaInput from "@/components/inputs/TextAreaInput";
+import Colors from "@/constants/Colors";
 import { OfferReviewForm } from "@/features/offer/forms/create/OfferReviewForm";
 import { trpc } from "@/lib/trpc";
-import { useStartOfferChat } from "@/query/startOfferChat";
 import { dialPhone } from "@/utils/getContact";
 
 const { width } = Dimensions.get("window");
 
 export default function TabOneScreen() {
+  const colorScheme = useColorScheme();
+
   const { singleOffer } = useLocalSearchParams();
-  const { mutate: startOfferChat } = useStartOfferChat();
+  const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState("");
+  const [conversation, setConversation] = useState<any>(null);
+
   const router = useRouter();
   const singleOfferId = Array.isArray(singleOffer)
     ? singleOffer[0]
     : singleOffer;
-  const { data } = useQuery(
+  const { data: offer } = useQuery(
     trpc.businessrouter.singleOffer.queryOptions({
       offerId: Number(singleOfferId),
     }),
   );
+
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        if (data?.businessId) {
+        if (offer?.businessId) {
           router.replace({
             pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-            params: { premiumshops: String(data.businessId) },
+            params: { premiumshops: String(offer.businessId) },
           });
         } else {
           router.replace("/(root)/(home)/home");
@@ -61,19 +71,36 @@ export default function TabOneScreen() {
       );
 
       return () => subscription.remove();
-    }, [data?.businessId, router]),
+    }, [offer?.businessId, router]),
   );
-  console.log(
-    "data of single offer in [singleOffer].tsx file line no 28",
-    JSON.stringify(data, null, 2),
-  );
+
   const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions());
 
+  const { mutateAsync: createConversation } = useMutation(
+    trpc.chat.createConversation.mutationOptions(),
+  );
+
+  async function handleChat() {
+    const conv = await createConversation({
+      receiverId: Number(offer?.userId),
+    });
+    setConversation(conv);
+  }
+  const { data, error } = useSubscription(
+    trpc.chat.onMessage.subscriptionOptions({
+      conversationId: conversation?.id,
+      // messageId: String(allMessages[allMessages.length -1]?.id),
+    }),
+  );
+
+  const { mutate, isPending } = useMutation(
+    trpc.chat.sendMessage.mutationOptions(),
+  );
   return (
     <>
       <Stack.Screen
         options={{
-          title: data?.name,
+          title: offer?.name,
         }}
       />
       <ScrollView className="flex-1">
@@ -84,7 +111,7 @@ export default function TabOneScreen() {
             height={300}
             autoPlay={true}
             autoPlayInterval={4000}
-            data={data?.photos ?? ["1"]}
+            data={offer?.photos ?? ["1"]}
             scrollAnimationDuration={1000}
             renderItem={() => (
               <View className="relative bg-base-200">
@@ -96,7 +123,7 @@ export default function TabOneScreen() {
                     }}
                   />
                   <Text className="absolute bg-error text-secondary mt-8 pl-8 pr-3 rounded-r-md t-10">
-                    -{data?.discountPercent}%
+                    -{offer?.discountPercent}%
                   </Text>
                 </View>
               </View>
@@ -105,24 +132,24 @@ export default function TabOneScreen() {
           <View className="p-8 bg-base-200 ">
             <View>
               <Text className="text-secondary text-lg mb-2">
-                {data?.shopName}
+                {offer?.shopName}
               </Text>
               <Text className="text-secondary text-[24px] font-semibold mb-2">
-                {data?.name}
+                {offer?.name}
               </Text>
               <RenderHTML
                 contentWidth={width}
-                source={{ html: data?.description || "" }}
+                source={{ html: offer?.description || "" }}
                 tagsStyles={{
                   body: { color: "#ff6600" }, // Orange text everywhere
                 }}
               />
               <View className="flex-row items-center gap-4">
                 <Text className="text-primary text-lg ">
-                  ₹{data?.finalPrice}
+                  ₹{offer?.finalPrice}
                 </Text>
                 <Text className="text-secondary line-through">
-                  ₹{data?.rate}
+                  ₹{offer?.rate}
                 </Text>
               </View>
             </View>
@@ -133,7 +160,7 @@ export default function TabOneScreen() {
                     router.navigate({
                       pathname:
                         "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                      params: { premiumshops: String(data?.businessId) },
+                      params: { premiumshops: String(offer?.businessId) },
                     });
                   }}
                 >
@@ -145,41 +172,10 @@ export default function TabOneScreen() {
               <View className="flex-row w-[100%] justify-center gap-6">
                 <View className="w-[45%] bg-primary rounded-lg px-4 py-2">
                   <Pressable
+                    disabled={isPending}
                     onPress={() => {
-                      startOfferChat(
-                        {
-                          listingId: String(data?.businessId),
-                          offerId: String(data?.id),
-                        },
-                        {
-                          onSuccess: (res) => {
-                            if (res?.chat_session_id) {
-                              router.push({
-                                pathname: "/(root)/chats", //TODO: add real chats redirect
-                                params: {
-                                  chat: res?.chat_session_id.toString(),
-                                },
-                              });
-                            } else {
-                              Alert.alert(
-                                "Authentication Required",
-                                "You must be logged in to use chat.",
-                                [
-                                  { text: "Cancel", style: "cancel" },
-                                  {
-                                    text: "Sign In",
-                                    onPress: () => {
-                                      router.navigate("/(root)/profile");
-                                    },
-                                  },
-                                ],
-                              );
-                              [];
-                              // console.error('Failed to start chat:', res);
-                            }
-                          },
-                        },
-                      );
+                      handleChat();
+                      setShowModal(true);
                     }}
                   >
                     <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
@@ -195,7 +191,7 @@ export default function TabOneScreen() {
                   </Pressable>
                 </View>
                 <View className="w-[45%] bg-primary rounded-lg py-2 px-4">
-                  <Pressable onPress={() => dialPhone(data?.phoneNo ?? "")}>
+                  <Pressable onPress={() => dialPhone(offer?.phoneNo ?? "")}>
                     <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
                       <Ionicons size={20} name="call" color={"white"} />
                       <Text className="text-[#ffffff] font-semibold">
@@ -211,11 +207,66 @@ export default function TabOneScreen() {
               <OfferReviewForm offerId={Number(singleOfferId ?? 0)} />
             )}
             <View className="">
-              <Review rating={data?.rating} />
+              <Review rating={offer?.rating} />
             </View>
           </View>
         </View>
       </ScrollView>
+      <Modal
+        visible={showModal}
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+        transparent
+      >
+        <View
+          className="flex-1 justify-center items-center bg-black/50"
+          style={{
+            backgroundColor:
+              colorScheme === "dark" ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            className="w-[85%] p-5 rounded-2xl shadow-lg"
+            style={{
+              backgroundColor: Colors[colorScheme ?? "light"]["base-100"],
+            }}
+          >
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-lg font-bold text-secondary w-[90%]">
+                Write your message below and click Send. The shop owner will
+                receive it instantly.
+              </Text>
+              <Pressable onPress={() => setShowModal(false)} className="mb-12">
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={Colors[colorScheme ?? "light"].secondary}
+                />
+              </Pressable>
+            </View>
+
+            <TextAreaInput
+              className="bg-base-200 w-[100%] mx-auto"
+              placeholder="Enter Your Message"
+              onChangeText={(text) => setMessage(text)}
+              value={message}
+            />
+            <PrimaryButton
+              title="Send"
+              onPress={() => {
+                mutate({
+                  message: message,
+                  conversationId: conversation?.id,
+                  image: offer?.photos[0],
+                  route: `business/singleProduct/${offer?.id}`,
+                });
+                setMessage("");
+              }}
+              className="w-[40%] mt-4 self-end"
+            />
+          </View>
+        </View>
+      </Modal>
     </>
   );
 }

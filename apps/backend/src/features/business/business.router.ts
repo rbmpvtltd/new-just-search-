@@ -619,6 +619,7 @@ export const businessrouter = router({
           businessId: products.businessId,
           description: products.productDescription,
           latitude: businessListing.latitude,
+          userId: businessListing.userId,
           longitude: businessListing.longitude,
           phone: businessListing.phoneNumber,
           photos: sql<string[]>`COALESCE(
@@ -659,6 +660,7 @@ export const businessrouter = router({
           businessListing.latitude,
           businessListing.longitude,
           businessListing.phoneNumber,
+          businessListing.userId,
         )
         .where(eq(products.id, input.productId));
       return product[0];
@@ -677,6 +679,7 @@ export const businessrouter = router({
           startDate: offers.offerStartDate,
           endDate: offers.offerEndDate,
           description: offers.offerDescription,
+          userId: businessListing.userId,
           createdAt: offers.createdAt,
           businessId: offers.businessId,
           phoneNo: businessListing.phoneNumber,
@@ -714,7 +717,7 @@ export const businessrouter = router({
         .leftJoin(offerReviews, eq(offers.id, offerReviews.offerId))
         .leftJoin(users, eq(users.id, offerReviews.userId))
         .leftJoin(businessListing, eq(businessListing.id, offers.businessId))
-        .groupBy(offers.id, businessListing.phoneNumber)
+        .groupBy(offers.id, businessListing.phoneNumber, businessListing.userId)
         .where(eq(offers.id, input.offerId));
 
       return offer[0];

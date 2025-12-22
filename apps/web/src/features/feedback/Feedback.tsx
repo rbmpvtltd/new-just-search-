@@ -61,12 +61,12 @@ export default function Feedback() {
     });
   };
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="flex  justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-3xl  bg-white rounded-2xl shadow-lg overflow-hidden"
+        className="w-full max-w-3xl  bg-gray-50 rounded-2xl shadow-lg overflow-hidden"
       >
-        <div className="px-8 py-2 mt-4 bg-gray-50">
+        <div className="px-8 py-2 mt-4">
           <h2 className="text-2xl font-semibold text-gray-800">
             What feedback do you have?
           </h2>

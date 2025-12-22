@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import {
   Alert,
@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import LoginRedirect from "@/components/cards/LoginRedirect";
+import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/features/auth/authStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useToggleWishlist } from "@/query/favorite";
@@ -33,6 +34,23 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
   const clearToken = useAuthStore((state) => state.clearToken);
   const { mutate: toggleWishlist } = useToggleWishlist();
 
+  const {
+    mutateAsync: createConversation,
+    isPending,
+    error,
+    isError,
+  } = useMutation(trpc.chat.createConversation.mutationOptions());
+
+  const handleChat = async () => {
+    const conv = await createConversation({
+      receiverId: Number(shop?.userId),
+    });
+    // setTimeout(() => {
+    // router.push(`/(root)/chats/private-chat/${conv?.id}`);
+    router.push(`/(root)/(home)/chat/${conv?.id}`);
+
+    // }, 5000);
+  };
   return (
     <View className="w-[93%] mx-auto mt-6 p-4 rounded-2xl bg-base-200 shadow-lg gap-4">
       <View className="flex-row items-center justify-between w-[100%]">
@@ -190,37 +208,30 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
         {/* Chat Now */}
         <View className="flex-1 bg-primary rounded-lg px-2 py-2">
           <Pressable
+            disabled={isPending}
             onPress={() => {
-              startChat(String(shop?.id), {
-                onSuccess: (res) => {
-                  if (res?.chat_session_id) {
-                    router.push({
-                      pathname: "/(root)/chats", // TODO: add real chats redirect
-                      params: { chat: res?.chat_session_id.toString() },
-                    });
-                  } else {
-                    Alert.alert(
-                      "Authentication Required",
-                      "You must be logged in to use chat.",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Sign In",
-                          onPress: () => {
-                            router.navigate("/(root)/profile");
-                          },
-                        },
-                      ],
-                    );
-                    [];
-                  }
-                },
-              });
+              if (isError) {
+                Alert.alert(
+                  "Authentication Required",
+                  "You must be logged in to use chat.",
+                  [
+                    { text: "Cancel", style: "cancel" },
+                    {
+                      text: "Login",
+                      onPress: () => router.navigate("/(root)/profile"),
+                    },
+                  ],
+                );
+              } else {
+                handleChat();
+              }
             }}
           >
             <View className="flex-row items-center justify-center gap-1">
               <Ionicons size={20} name="chatbox-ellipses" color={"white"} />
-              <Text className="text-white font-semibold text-sm">Chat Now</Text>
+              <Text className="text-white font-semibold text-sm">
+                {isPending ? <Loading size={"small"} /> : "Chat Now"}
+              </Text>
             </View>
           </Pressable>
         </View>

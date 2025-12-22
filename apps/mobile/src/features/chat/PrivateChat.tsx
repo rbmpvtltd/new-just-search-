@@ -110,7 +110,7 @@ function PrivateChat({
               {msg.message && (
                 <View
                   className={`max-w-[80%] px-2 py-2 rounded-2xl shadow-sm ${
-                    msg.senderId === userData?.userId
+                    msg.senderId !== userData?.userId
                       ? "bg-blue-100 self-end"
                       : "bg-gray-200 self-start"
                   }`}
@@ -131,7 +131,7 @@ function PrivateChat({
               {msg.image && (
                 <View
                   className={`max-w-[65%] mt-1 ${
-                    msg.senderId === userData?.id ? "self-end" : "self-start"
+                    msg.senderId !== userData?.id ? "self-end" : "self-start"
                   }`}
                 >
                   <AdvancedImage

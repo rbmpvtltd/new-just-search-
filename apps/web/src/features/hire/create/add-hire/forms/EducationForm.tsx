@@ -166,13 +166,10 @@ export default function EducationForm({ data }: { data: AddHirePageType }) {
     nextPage();
   };
   return (
-    <div className="min-h-screen p-4 relative">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 bg-white rounded-xl shadow">
+          <div className="p-6 bg-gray-50 rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Qualifications and Experience
             </h2>

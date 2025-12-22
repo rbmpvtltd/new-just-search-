@@ -1,26 +1,27 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertBusinessReviewSchema } from "@repo/db/dist/schema/business.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { CheckCircle2, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { FaPhoneAlt, FaRegCalendarAlt, FaWhatsappSquare } from "react-icons/fa";
 import { IoChatbubbleEllipses, IoMail } from "react-icons/io5";
 import { MdLocationPin } from "react-icons/md";
+import Swal from "sweetalert2";
+import type z from "zod";
+import LoginRedirect from "@/components/LoginRedirect";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import GoMap from "@/components/ui/Map";
-import Rating from "@/components/ui/Rating";
-import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTRPC } from "@/trpc/client";
-import type { OutputTrpcType } from "@/trpc/type";
-import { useForm } from "react-hook-form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, Star } from "lucide-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
-import { useState } from "react";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -30,15 +31,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import LoginRedirect from "@/components/LoginRedirect";
-import { insertBusinessReviewSchema } from "@repo/db/dist/schema/business.schema";
-import Swal from "sweetalert2";
+import GoMap from "@/components/ui/Map";
+import Rating from "@/components/ui/Rating";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useTRPC } from "@/trpc/client";
+import type { OutputTrpcType } from "@/trpc/type";
 
 type SingleShopType = OutputTrpcType["businessrouter"]["singleShop"] | null;
 
@@ -65,7 +65,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
 
   const handleChat = async () => {
     const conv = await createConversation({
-      receiverId: Number(singleShop?.id),
+      receiverId: Number(singleShop?.userId),
     });
     // setTimeout(() => {
     router.push(`/chat/${conv?.id}`);

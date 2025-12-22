@@ -98,7 +98,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       placeholder: "Date of Birth",
       required: false,
       component: "calendar",
-      error: "",
+      error: errors.dob?.message,
     },
     {
       control,
@@ -113,6 +113,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
           value: item.id,
         };
       }),
+      error: errors.occupation?.message,
     },
     {
       control,
@@ -127,6 +128,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
           value: item,
         };
       }),
+      error: errors.maritalStatus?.message,
     },
     {
       control,
@@ -135,7 +137,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       placeholder: "Enter Address",
       required: false,
       component: "input",
-      error: "",
+      error: errors.address?.message,
     },
     {
       control,
@@ -144,7 +146,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       placeholder: "Pincode",
       required: false,
       component: "input",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
@@ -156,7 +158,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       options:
         states?.map((state) => ({ label: state.label, value: state.value })) ??
         [],
-      error: "",
+      error: errors.state?.message,
     },
     {
       control,
@@ -168,15 +170,12 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       loading: isLoading,
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: "",
+      error: errors.city?.message,
     },
   ];
   return (
-    <div className="p-8 bg-muted/20 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-4xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-5xl ">
         <div className="w-[90%] mx-auto bg-white shadow rounded-xl p-6 flex flex-col md:flex-row items-center gap-6">
           <Avatar className="w-32 h-32 border shadow-sm">
             <AvatarImage src="/images/demo-img.webp" alt="User Profile" />

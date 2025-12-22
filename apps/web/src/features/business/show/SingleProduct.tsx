@@ -1,10 +1,19 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertBusinessReviewSchema } from "@repo/db/dist/schema/business.schema";
+import { insertProductReviewSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import parse from "html-react-parser";
+import { CheckCircle2, Star } from "lucide-react";
 import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
+import type z from "zod";
+import LoginRedirect from "@/components/LoginRedirect";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,11 +37,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import Rating from "@/components/ui/Rating";
-import { Textarea } from "@/components/ui/textarea";
-import { useTRPC } from "@/trpc/client";
-import type { OutputTrpcType } from "@/trpc/type";
 import {
   Form,
   FormControl,
@@ -42,16 +46,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { insertBusinessReviewSchema } from "@repo/db/dist/schema/business.schema";
-import type z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { insertProductReviewSchema } from "@repo/db/dist/schema/product.schema";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CheckCircle2, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import LoginRedirect from "@/components/LoginRedirect";
-import Swal from "sweetalert2";
+import { Label } from "@/components/ui/label";
+import Rating from "@/components/ui/Rating";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { useTRPC } from "@/trpc/client";
+import type { OutputTrpcType } from "@/trpc/type";
 
 type SingleProductType =
   | OutputTrpcType["businessrouter"]["singleProduct"]
@@ -65,6 +66,7 @@ function SingleProductComp({
   productPhotos: string[];
   product: SingleProductType;
 }) {
+
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState<any>(null);
   const content = parse(product?.description ?? "");
@@ -81,7 +83,7 @@ function SingleProductComp({
 
   async function handleChat() {
     const conv = await createConversation({
-      receiverId: Number(product?.businessId),
+      receiverId: Number(product?.userId),
     });
     setConversation(conv);
   }
@@ -106,12 +108,20 @@ function SingleProductComp({
                 <div className="py-1">
                   <Card>
                     <CardContent className="flex items-center justify-center">
-                      <Image
+                      {/* <Image
                         width={500}
                         height={400}
                         alt="banner image"
                         src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change photo url when upload on cloudinary
+                        
                         className="rounded-md"
+                      /> */}
+                      <CldImage
+                        width="500"
+                        height="400"
+                        className="border rounded"
+                        src={item}
+                        alt={item}
                       />
                     </CardContent>
                   </Card>

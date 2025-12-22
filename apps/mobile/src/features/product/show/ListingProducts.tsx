@@ -47,7 +47,8 @@ function ListingProduct({ shopId }: { shopId: string }) {
                   <Image
                     className="w-full rounded-lg aspect-[3/4] "
                     source={{
-                      uri: `https://www.justsearch.net.in/assets/images/19992115541759217624.jpeg`, // TODO : change image with item.item.photo when upload on cloudinary
+                      uri: `https://www.justsearch.net.in/assets/images/19992115541759217624.jpeg`,
+                      // TODO : change image with item.item.photo when upload on cloudinary
                     }}
                   />
                 </View>
@@ -64,33 +65,11 @@ function ListingProduct({ shopId }: { shopId: string }) {
             <View className="w-[80%] bg-primary p-2 rounded mt-2 mx-auto mb-4">
               <Pressable
                 onPress={() => {
-                  if (!isAuthenticated) {
-                    showLoginAlert({
-                      message: "Need to login to chat on your behalf",
-                      onConfirm: () => {
-                        clearToken();
-                        router.replace("/(root)/profile");
-                      },
-                    });
-                  } else {
-                    startChat(
-                      {
-                        listingId: shopId,
-                        productId: String(item?.item?.id),
-                      },
-                      {
-                        onSuccess: (res) => {
-                          router.push({
-                            pathname: "/(root)/chats", // TODO: add real chats redirect
-                            params: { chat: res?.chat_session_id.toString() },
-                          });
-                        },
-                        onError: (err) => {
-                          console.error("Failed to start chat:", err);
-                        },
-                      },
-                    );
-                  }
+                  router.push({
+                    pathname:
+                      "/(root)/(home)/subcategory/aboutBusiness/products/singleProduct/[singleProduct]",
+                    params: { singleProduct: item.item.id },
+                  });
                 }}
               >
                 <View className="flex-row justify-center items-center">

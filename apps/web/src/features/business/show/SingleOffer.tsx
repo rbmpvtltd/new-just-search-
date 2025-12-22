@@ -1,4 +1,19 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertOfferReviewSchema } from "@repo/db/dist/schema/offer.schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSubscription } from "@trpc/tanstack-react-query";
+import parse from "html-react-parser";
+import { CheckCircle2, Star } from "lucide-react";
+import Image from "next/image";
+import { CldImage } from "next-cloudinary";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
+import type z from "zod";
+import LoginRedirect from "@/components/LoginRedirect";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,13 +26,15 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import Image from "next/image";
-import React, { useState } from "react";
-import type { OutputTrpcType } from "@/trpc/type";
-import { Button } from "@/components/ui/button";
-import parse from "html-react-parser";
-import Rating from "@/components/ui/Rating";
-import { FaRegCalendarAlt } from "react-icons/fa";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -27,34 +44,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import z from "zod";
-import { useTRPC } from "@/trpc/client";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CheckCircle2, Star } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import LoginRedirect from "@/components/LoginRedirect";
-import { insertOfferReviewSchema } from "@repo/db/dist/schema/offer.schema";
-import Swal from "sweetalert2";
-
-const reviewSchema = z.object({
-  offerId: z.number().positive("Business ID is required"),
-  message: z
-    .string()
-    .min(10, "Review must be at least 10 characters")
-    .max(500, "Review must not exceed 500 characters"),
-  rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
-  email: z.email().min(8, "Email Must Be Contain 8 Characters").max(500),
-  name: z
-    .string()
-    .min(3, "Name Must Be Constain 3 Characters")
-    .max(255, "Too Long Name"),
-  view: z.boolean(),
-  status: z.boolean(),
-});
+import { Label } from "@/components/ui/label";
+import Rating from "@/components/ui/Rating";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { useTRPC } from "@/trpc/client";
+import type { OutputTrpcType } from "@/trpc/type";
 
 type SingleOfferType = OutputTrpcType["businessrouter"]["singleOffer"] | null;
 type ReviewFormValues = z.infer<typeof insertOfferReviewSchema>;
@@ -66,13 +62,37 @@ function SingleOfferComp({
   offerPhotos: string[];
   offer: SingleOfferType;
 }) {
+  const [message, setMessage] = useState("");
+  const [conversation, setConversation] = useState<any>(null);
+
   const content = parse(offer?.description ?? "");
   const trpc = useTRPC();
+
+  const { mutateAsync: createConversation } = useMutation(
+    trpc.chat.createConversation.mutationOptions(),
+  );
   const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions());
   const { data: submitted } = useQuery(
     trpc.offerrouter.offerReviewSubmitted.queryOptions({
       offerId: offer?.id ?? 0,
     }),
+  );
+
+  async function handleChat() {
+    const conv = await createConversation({
+      receiverId: Number(offer?.userId),
+    });
+    setConversation(conv);
+  }
+  const { data, error } = useSubscription(
+    trpc.chat.onMessage.subscriptionOptions({
+      conversationId: conversation?.id,
+      // messageId: String(allMessages[allMessages.length -1]?.id),
+    }),
+  );
+
+  const { mutate, isPending } = useMutation(
+    trpc.chat.sendMessage.mutationOptions(),
   );
   return (
     <div>
@@ -85,11 +105,18 @@ function SingleOfferComp({
                   <Card>
                     <CardContent className="flex items-center justify-center">
                       <div className="relative">
-                        <Image
+                        {/* <Image
                           width={500}
                           height={400}
                           alt="offer image"
                           src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change photo url when upload on cloudinary
+                        /> */}
+                        <CldImage
+                          width="500"
+                          height="400"
+                          className="border rounded"
+                          src={item}
+                          alt={item}
                         />
                         <span className="absolute z-1 top-5 w-[90px] bg-error text-end px-4 text-white rounded-r-md">
                           -{offer?.discountPercent}%
@@ -125,11 +152,53 @@ function SingleOfferComp({
             >
               View Shop Detail
             </Button>
-            <Button
-              onClick={() => console.log(`clicked on enquire now button`)}
-            >
-              Enquire Now
-            </Button>
+            <Dialog>
+              {/* <form> */}
+              <DialogTrigger asChild>
+                <Button onClick={handleChat}>Chat Now</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>
+                    Write your message below and click Send. The shop owner will
+                    receive it instantly.
+                  </DialogTitle>
+                  {/* <DialogDescription>
+                      Write your message and send it to the shop.
+                    </DialogDescription> */}
+                </DialogHeader>
+                <div className="grid gap-4">
+                  <div className="grid gap-3">
+                    <Label htmlFor="name-1">Your Message</Label>
+                    <Textarea
+                      name="name"
+                      placeholder="Type your message..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button
+                    onClick={() => {
+                      mutate({
+                        message: message,
+                        conversationId: conversation?.id,
+                        image: offer?.photos[0],
+                        route: `http://localhost:9000/business/singleProduct/${offer?.id}`,
+                      });
+                      setMessage("");
+                    }}
+                  >
+                    {isPending ? "Sending..." : "Send"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+              {/* </form> */}
+            </Dialog>
           </div>
         </div>
       </div>

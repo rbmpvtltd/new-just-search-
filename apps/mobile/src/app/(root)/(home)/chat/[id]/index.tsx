@@ -1,9 +1,9 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
-import { View } from "react-native";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import StoreChat from "@/features/chat/PrivateChat";
 import { trpc } from "@/lib/trpc";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { View } from "react-native";
 
 function Chats({ conversationId }: { conversationId: number }) {
   const { data: userData } = useSuspenseQuery(
@@ -31,8 +31,11 @@ export default function Chat() {
   const { id } = useLocalSearchParams();
   const conversationId = Array.isArray(id) ? id[0] : id;
   return (
+    <>
+    <Stack.Screen  options={{ headerShown: true, title: "Chat" }} />
     <BoundaryWrapper>
       <Chats conversationId={Number(conversationId)} />
     </BoundaryWrapper>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -11,11 +12,31 @@ import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 export default function MyProduct() {
+  const [page, setPage] = useState<number | null | undefined>(0); // current page cursor
+  const [prevCursors, setPrevCursors] = useState<number[]>([]); // store previous cursors
   const trpc = useTRPC();
-  const { data: myProducts, isLoading } = useQuery(
-    trpc.productrouter.showProduct.queryOptions(),
+  const {
+    data: myProducts,
+    isLoading,
+    isFetching,
+  } = useQuery(
+    trpc.productrouter.showProduct.queryOptions({
+      cursor: page ?? 0,
+      limit: 10,
+    }),
   );
+  const offersData = myProducts?.products ?? [];
 
+  const handleNext = () => {
+    setPrevCursors((prev) => [...prev, page ?? 0]);
+    setPage(myProducts?.nextCursor);
+  };
+
+  const handlePrev = () => {
+    const lastCursor = prevCursors[prevCursors.length - 1];
+    setPrevCursors((prev) => prev.slice(0, -1));
+    setPage(lastCursor ?? 0);
+  };
   if (isLoading) {
     return <Spinner />;
   }
@@ -29,6 +50,26 @@ export default function MyProduct() {
       ) : (
         <p className="text-center text-gray-500">No products found</p>
       )}
+      <div className="flex justify-center items-center gap-4 mt-6">
+        <Button
+          disabled={prevCursors.length === 0 || isFetching}
+          onClick={handlePrev}
+        >
+          Previous
+        </Button>
+        <Button
+          disabled={!myProducts?.nextCursor || isFetching}
+          onClick={handleNext}
+        >
+          {isFetching ? (
+            <>
+              <Spinner /> Loading...
+            </>
+          ) : (
+            "Next "
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

@@ -177,7 +177,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chats"
+        name="chat"
         options={{
           headerShown: false,
           href: null, // tab bar se hide

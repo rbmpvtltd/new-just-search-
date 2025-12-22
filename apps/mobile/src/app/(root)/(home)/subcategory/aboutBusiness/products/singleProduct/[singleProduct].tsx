@@ -1,27 +1,33 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSubscription } from "@trpc/tanstack-react-query";
 import {
   router,
   Stack,
   useFocusEffect,
   useLocalSearchParams,
 } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   Alert,
   BackHandler,
   Dimensions,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   Text,
+  useColorScheme,
   View,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import RenderHtml from "react-native-render-html";
 import LoginRedirect from "@/components/cards/LoginRedirect";
 import Review from "@/components/forms/review";
+import PrimaryButton from "@/components/inputs/SubmitBtn";
+import TextAreaInput from "@/components/inputs/TextAreaInput";
 import { Loading } from "@/components/ui/Loading";
+import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
 import { trpc } from "@/lib/trpc";
@@ -33,15 +39,17 @@ import { openInGoogleMaps } from "@/utils/getDirection";
 const { width } = Dimensions.get("window");
 
 export default function TabOneScreen() {
+  const colorScheme = useColorScheme();
   const { singleProduct } = useLocalSearchParams();
-  const clearToken = useAuthStore((state) => state.clearToken);
-  const { mutate: startChat } = useStartChat();
+  const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState("");
+  const [conversation, setConversation] = useState<any>(null);
 
   const productId = Array.isArray(singleProduct)
     ? singleProduct[0]
     : singleProduct;
 
-  const { data, isLoading } = useQuery(
+  const { data: product, isLoading } = useQuery(
     trpc.businessrouter.singleProduct.queryOptions({
       productId: Number(productId),
     }),
@@ -50,10 +58,10 @@ export default function TabOneScreen() {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        if (data?.businessId) {
+        if (product?.businessId) {
           router.replace({
             pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-            params: { premiumshops: String(data.businessId) },
+            params: { premiumshops: String(product.businessId) },
           });
         } else {
           router.replace("/(root)/(home)/home");
@@ -68,21 +76,41 @@ export default function TabOneScreen() {
       );
 
       return () => subscription.remove();
-    }, [data?.businessId]),
+    }, [product?.businessId]),
   );
 
+  const { mutateAsync: createConversation } = useMutation(
+    trpc.chat.createConversation.mutationOptions(),
+  );
+
+  async function handleChat() {
+    const conv = await createConversation({
+      receiverId: Number(product?.userId),
+    });
+    setConversation(conv);
+  }
+  const { data, error } = useSubscription(
+    trpc.chat.onMessage.subscriptionOptions({
+      conversationId: conversation?.id,
+      // messageId: String(allMessages[allMessages.length -1]?.id),
+    }),
+  );
+
+  const { mutate, isPending } = useMutation(
+    trpc.chat.sendMessage.mutationOptions(),
+  );
   if (isLoading) {
     return <Loading position="center" size={"large"} />;
   }
 
-  const latitude = Number(data?.latitude?.split(",").shift());
-  const longitude = Number(data?.longitude?.split(",").pop());
+  const latitude = Number(product?.latitude?.split(",").shift());
+  const longitude = Number(product?.longitude?.split(",").pop());
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: data?.name,
+          title: product?.name,
         }}
       />
       <ScrollView>
@@ -94,7 +122,7 @@ export default function TabOneScreen() {
               height={400}
               autoPlay={true}
               autoPlayInterval={4000}
-              data={data?.photos ?? []}
+              data={product?.photos ?? []}
               scrollAnimationDuration={1000}
               renderItem={({ item }) => (
                 <View className="relative  h-[500px]  mx-auto bg-base-200 w-[100%] ">
@@ -114,21 +142,21 @@ export default function TabOneScreen() {
             <View className="p-8 bg-base-200">
               <View>
                 <Text className="text-secondary text-lg mb-4">
-                  {data?.shopName}
+                  {product?.shopName}
                 </Text>
                 <Text className="text-secondary text-[24px] font-semibold mb-4">
-                  {data?.name}
+                  {product?.name}
                 </Text>
                 <RenderHtml
                   contentWidth={width}
-                  source={{ html: data?.description || "" }}
+                  source={{ html: product?.description || "" }}
                   tagsStyles={{
                     body: { color: "#ff6600" }, // Orange text everywhere
                   }}
                 />
 
                 <Text className="text-center text-primary text-[24px]">
-                  ₹ {data?.rate}
+                  ₹ {product?.rate}
                 </Text>
               </View>
               <View className="w-full items-center gap-4 my-4">
@@ -144,7 +172,7 @@ export default function TabOneScreen() {
                   </Pressable>
                 </View>
                 <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
-                  <Pressable onPress={() => dialPhone(data?.phone ?? "")}>
+                  <Pressable onPress={() => dialPhone(product?.phone ?? "")}>
                     <Text className="text-[#fff] font-semibold text-xl text-center ">
                       Contact Now
                     </Text>
@@ -152,53 +180,12 @@ export default function TabOneScreen() {
                 </View>
                 <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
                   <Pressable
+                    disabled={isPending}
                     onPress={() => {
-                      if (!authenticated?.success) {
-                        showLoginAlert({
-                          message: "Need to login to chat on your behalf",
-                          onConfirm: () => {
-                            clearToken();
-                            router.replace("/(root)/profile");
-                          },
-                        });
-                      } else {
-                        startChat(String(data?.id), {
-                          onSuccess: (res) => {
-                            if (!res?.chat_session_id) {
-                              Alert.alert(
-                                "Login Required ",
-                                "Need to login for start chatting on your behalf",
-                                [
-                                  {
-                                    text: "No Thanks",
-                                    style: "cancel",
-                                  },
-                                  {
-                                    text: "Login Now",
-                                    style: "destructive",
-                                    onPress: () => {
-                                      clearToken();
-                                      router.replace("/(root)/profile");
-                                    },
-                                  },
-                                ],
-                                { cancelable: false },
-                              );
-                            } else {
-                              router.push({
-                                pathname: "/(root)/chats", // TODO: add real chats redirect
-                                params: {
-                                  chat: res?.chat_session_id.toString(),
-                                },
-                              });
-                            }
-                          },
-                          onError: (err) => {
-                            Alert.alert("Something Went Wrong");
-                            console.error("Failed to start chat:", err);
-                          },
-                        });
-                      }
+                      handleChat();
+                      setShowModal(true);
+
+                      console.log("Statrt chat");
                     }}
                   >
                     <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
@@ -219,16 +206,71 @@ export default function TabOneScreen() {
             {authenticated?.success && (
               <ProductReviewForm
                 productId={Number(productId)}
-                businessId={Number(data?.businessId)}
+                businessId={Number(product?.businessId)}
               />
             )}
 
             <View className="mx-4 p-4 rounded-lg bg-base-200 mb-10 flex-shrink">
-              <Review rating={data?.rating} />
+              <Review rating={product?.rating} />
             </View>
           </View>
         </View>
       </ScrollView>
+      <Modal
+        visible={showModal}
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+        transparent
+      >
+        <View
+          className="flex-1 justify-center items-center bg-black/50"
+          style={{
+            backgroundColor:
+              colorScheme === "dark" ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            className="w-[85%] p-5 rounded-2xl shadow-lg"
+            style={{
+              backgroundColor: Colors[colorScheme ?? "light"]["base-100"],
+            }}
+          >
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-lg font-bold text-secondary w-[90%]">
+                Write your message below and click Send. The shop owner will
+                receive it instantly.
+              </Text>
+              <Pressable onPress={() => setShowModal(false)} className="mb-12">
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={Colors[colorScheme ?? "light"].secondary}
+                />
+              </Pressable>
+            </View>
+
+            <TextAreaInput
+              className="bg-base-200 w-[100%] mx-auto"
+              placeholder="Enter Your Message"
+              onChangeText={(text) => setMessage(text)}
+              value={message}
+            />
+            <PrimaryButton
+              title="Send"
+              onPress={() => {
+                mutate({
+                  message: message,
+                  conversationId: conversation?.id,
+                  image: product?.photos[0],
+                  route: `business/singleProduct/${product?.id}`,
+                });
+                setMessage("");
+              }}
+              className="w-[40%] mt-4 self-end"
+            />
+          </View>
+        </View>
+      </Modal>
     </>
   );
 }

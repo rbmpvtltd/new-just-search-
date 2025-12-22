@@ -7,7 +7,7 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
+    <SidebarProvider minHeight={true}>
       <AppSidebar />
 
       <main className="w-full">

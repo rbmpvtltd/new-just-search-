@@ -2,6 +2,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersInsertSchema } from "@repo/db/dist/schema/offer.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
@@ -26,6 +28,7 @@ export default function AddOffer({
   formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(trpc.offerrouter.addOffer.mutationOptions());
   const categories = formReferenceData?.categoryRecord;
   const subCategories = formReferenceData?.subcategoryRecord;
@@ -52,7 +55,6 @@ export default function AddOffer({
       subcategoryId: [],
     },
   });
-  console.log("Errror", errors);
   const formFields: FormFieldProps<AddOfferSchema>[] = [
     {
       control,
@@ -195,33 +197,41 @@ export default function AddOffer({
       },
       {
         onSuccess: (data) => {
-          Swal.fire({
-            title: data.message,
-            icon: "success",
-            draggable: true,
-          });
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.offerrouter.showOffer.queryKey(),
-          });
-          // router2.push("/");
+          if (data.success) {
+            Swal.fire({
+              title: data.message,
+              icon: "success",
+              draggable: true,
+            });
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.offerrouter.showOffer.queryKey(),
+            });
+            router.push("/");
+          }
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            Swal.fire({
+              title: error.message,
+              icon: "error",
+              draggable: true,
+            });
+          }
         },
       },
     );
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-4xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 shadow rounded-xl bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Add Offer
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-3">
               {formFields.map((field) => (
                 <div
                   key={field.name}
@@ -237,7 +247,7 @@ export default function AddOffer({
               Offer Images
               <span className="text-red-500 ">*</span>
             </Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-3">
               {formFields2.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
@@ -256,13 +266,6 @@ export default function AddOffer({
             ) : (
               "SUBMIT"
             )}
-          </Button>
-          <Button
-            onClick={() => console.log(getValues())}
-            type="button"
-            className="bg-gray-500 hover:bg-gray-700 font-bold"
-          >
-            Get Values
           </Button>
         </div>
       </form>
