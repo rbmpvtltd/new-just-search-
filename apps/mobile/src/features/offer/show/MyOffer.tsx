@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
 import {
@@ -43,7 +43,7 @@ export default function MyOffersList() {
       <View className="px-4 mt-4">
         <Pressable
           className="bg-primary py-3 rounded-xl w-full flex-row items-center justify-center shadow-sm"
-          onPress={() => router.push("/(root)/profile/offer/add-offer")}
+          onPress={() => router.push("/(root)/profile/offer/add")}
         >
           <Ionicons name="add-circle-outline" size={20} color="#fff" />
           <Text className="text-secondary ml-2 font-semibold">
@@ -154,7 +154,7 @@ function OfferCard({ item }: { item: OfferType }) {
             <Pressable
               className="bg-info flex-row items-center px-3 py-1.5 rounded-lg mr-2"
               onPress={() =>
-                router.push(`/(root)/profile/offer/edit-offer/${item?.id}`)
+                router.push(`/(root)/profile/offer/edit/${item?.id}`)
               }
             >
               <Ionicons name="create-outline" size={14} color="#fff" />

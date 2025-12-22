@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { memo } from "react";
+import { memo } from "react";
 import { Pressable, Text, useColorScheme, View } from "react-native";
 import { format } from "timeago.js";
 import Colors from "@/constants/Colors";
@@ -13,7 +13,8 @@ const MyToken = memo(({ myTokens }: { myTokens: MyTokenType }) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
 
-  const parseDate = (dateString: any) => {
+  const parseDate = (dateString: Date | null | undefined) => {
+    if (!dateString) return new Date();
     return new Date(dateString);
   };
   return (
@@ -78,8 +79,7 @@ const MyToken = memo(({ myTokens }: { myTokens: MyTokenType }) => {
           }}
           onPress={() =>
             router.navigate({
-              pathname:
-                "/(root)/profile/help-and-support/chats/private-chat/[id]",
+              pathname: "/(root)/profile/help-and-support/chat/[id]",
               params: { id: Number(myTokens?.id) },
             })
           }

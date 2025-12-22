@@ -59,6 +59,7 @@ const initialFormValue: CombinedForm = {
   resumePhoto: "",
   aboutYourself: "",
   // referCode: "RBMHORJ00000",
+  salesmanId: NaN,
 
   // PersonalDetailsSchema
   photo: "",

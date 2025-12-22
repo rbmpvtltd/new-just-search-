@@ -1,8 +1,3 @@
-import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/features/auth/authStore";
-import { trpc } from "@/lib/trpc";
-import { useNotificationCount } from "@/query/notification/notication";
-import { showLoginAlert } from "@/utils/alert";
 import { Ionicons } from "@expo/vector-icons";
 import {
   type DrawerContentComponentProps,
@@ -22,6 +17,11 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import Colors from "@/constants/Colors";
+import { useAuthStore } from "@/features/auth/authStore";
+import { trpc } from "@/lib/trpc";
+import { useNotificationCount } from "@/query/notification/notication";
+import { showLoginAlert } from "@/utils/alert";
 import { Loading } from "../ui/Loading";
 import { SomethingWrong } from "../ui/SomethingWrong";
 
@@ -56,7 +56,7 @@ const drawerFields: DrawerField[] = [
   },
   {
     name: "Add Offer",
-    route: "/(root)/profile/offer/add-offer",
+    route: "/(root)/profile/offer/add",
   },
   {
     name: "Add Product",
@@ -68,7 +68,7 @@ const drawerFields: DrawerField[] = [
   },
   {
     name: "Pricing Plans",
-    route: "/(root)/profile/plan",
+    route: "/(root)/profile/plans",
   },
   {
     name: "Request to Delete Account",

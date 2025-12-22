@@ -88,7 +88,7 @@ export default function OffersList({ item }: { item: OfferProductHitType }) {
                 onSuccess: (res) => {
                   if (res?.chat_session_id) {
                     router.push({
-                      pathname: "/(root)/chats", //TODO: add real chats redirect
+                      pathname: "/(root)/(home)/chat", //TODO: add real chats redirect
                       params: { chat: res?.chat_session_id.toString() },
                     });
                   } else {

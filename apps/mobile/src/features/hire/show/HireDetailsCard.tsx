@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -10,7 +10,6 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 import { useAuthStore } from "@/features/auth/authStore";
@@ -30,7 +29,7 @@ export default function HireDetailsCard(item: any) {
   const clearToken = useAuthStore((state) => state.clearToken);
 
   const hiredetails = item?.item;
-  const { data, isLoading, error } = useQuery(
+  const { data, isLoading } = useQuery(
     trpc.hirerouter.singleHire.queryOptions({ hireId: Number(hiredetails) }),
   );
   if (isLoading) {
@@ -240,7 +239,7 @@ export default function HireDetailsCard(item: any) {
                         console.log("Chat started:", res.chat_session_id);
 
                         router.push({
-                          pathname: "/(root)/chats", // TODO: add real chats redirect
+                          pathname: "/(root)/(home)/chat", // TODO: add real chats redirect
                           params: { chat: res?.chat_session_id.toString() },
                         });
                       },

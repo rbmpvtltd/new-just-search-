@@ -101,7 +101,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router, usePathname } from "expo-router";
 import { useForm } from "react-hook-form";
-import { Alert, Text, useColorScheme, View } from "react-native";
+import { Alert, useColorScheme, View } from "react-native";
 import Colors from "@/constants/Colors";
 import {
   type SearchFormData,
@@ -159,7 +159,7 @@ export default function HireSearchForm({ bgColor }: { bgColor?: string }) {
       return;
     }
     router.navigate({
-      pathname: "/(root)/chats", // TODO: add real allHireListing
+      pathname: "/(root)/(home)/chat", // TODO: add real allHireListing
       params: { location, category },
     });
   };

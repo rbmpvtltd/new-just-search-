@@ -35,9 +35,9 @@ const initialFormValue: CombinedForm = {
   jobType: [],
   workShift: [],
   jobDuration: [],
-  // fromHour: "",
+  fromHour: "",
   // fromPeriod: "",
-  // toHour: "",
+  toHour: "",
   // toPeriod: "",
   availability: "",
   locationPreferred: "",
@@ -62,6 +62,7 @@ const initialFormValue: CombinedForm = {
   resumePhoto: "",
   aboutYourself: "",
   // referCode: "RBMHORJ00000",
+  salesmanId: NaN,
 
   // PersonalDetailsSchema
   photo: "",
