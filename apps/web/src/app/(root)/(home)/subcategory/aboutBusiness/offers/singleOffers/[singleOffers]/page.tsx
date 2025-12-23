@@ -11,7 +11,6 @@ async function SingleProduct({
   const { data, error } = await asyncHandler(
     trpcServer.businessrouter.singleOffer.query({ offerId: Number(id) }),
   );
-  console.log("single offer is =========================> ", data);
   return (
     <div>
       <SingleOfferComp offerPhotos={data?.photos ?? []} offer={data} />
