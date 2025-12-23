@@ -26,7 +26,7 @@ export default function Page() {
       });
 
       console.log("Result ", result);
-      
+      console.log("Result ", result?.data);
 
       return {
         data: result?.data || [],

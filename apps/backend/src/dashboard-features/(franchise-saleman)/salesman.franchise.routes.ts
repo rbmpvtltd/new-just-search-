@@ -21,7 +21,7 @@ import {
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
-import { desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import z from "zod";
 import {
@@ -42,61 +42,78 @@ import {
 import { generateReferCode } from "./salesman.admin.service";
 
 export const franchiseSalemanRouter = router({
-  list: franchisesProcedure.input(tableInputSchema).query(async ({ input }) => {
-    const where = buildWhereClause(
-      input.filters,
-      input.globalFilter,
-      usersColumns,
-      usersGlobalFilterColumns,
-    );
+  list: franchisesProcedure
+    .input(tableInputSchema)
+    .query(async ({ input, ctx }) => {
+      const where = buildWhereClause(
+        input.filters,
+        input.globalFilter,
+        usersColumns,
+        usersGlobalFilterColumns,
+      );
 
-    const orderBy = buildOrderByClause(
-      input.sorting,
-      usersAllowedSortColumns,
-      desc(salesmen.createdAt),
-    );
+      const orderBy = buildOrderByClause(
+        input.sorting,
+        usersAllowedSortColumns,
+        desc(salesmen.createdAt),
+      );
 
-    // const orderBy = sql`created_at DESC`;
+      // const orderBy = sql`created_at DESC`;
 
-    const offset = input.pagination.pageIndex * input.pagination.pageSize;
+      const offset = input.pagination.pageIndex * input.pagination.pageSize;
 
-    const franchiseUser = alias(users, "franchise_user");
-    const salesmanUser = alias(users, "salesman_user");
-    const data = await db
-      .select({
-        id: salesmen.id,
-        franchise_name: franchiseUser.displayName,
-        refer_code: salesmen.referCode,
-        salesman_name: salesmanUser.displayName,
-        created_at: salesmen.createdAt,
-      })
-      .from(salesmen)
-      .where(where)
-      .orderBy(orderBy)
-      .limit(input.pagination.pageSize)
-      .leftJoin(franchises, eq(franchises.id, salesmen.franchiseId))
-      .leftJoin(franchiseUser, eq(franchises.userId, franchiseUser.id))
-      .leftJoin(salesmanUser, eq(salesmen.userId, salesmanUser.id))
-      .offset(offset);
+      const franchiseUser = alias(users, "franchise_user");
+      const salesmanUser = alias(users, "salesman_user");
+      const getThisFranchiseId = (
+        await db.query.franchises.findFirst({
+          where: (f, { eq }) => eq(f.userId, ctx.userId),
+          columns: {
+            id: true,
+          },
+        })
+      )?.id;
 
-    // PostgreSQL returns `bigint` for count → cast to number
-    const totalResult = await db
-      .select({
-        count: sql<number>`count(distinct ${users.id})::int`,
-      })
-      .from(users)
-      .where(where);
+      if (!getThisFranchiseId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "franchiseUser not found",
+        });
+      }
+      const data = await db
+        .select({
+          id: salesmen.id,
+          franchise_name: franchiseUser.displayName,
+          refer_code: salesmen.referCode,
+          salesman_name: salesmanUser.displayName,
+          created_at: salesmen.createdAt,
+        })
+        .from(salesmen)
+        .where(and(eq(salesmen.franchiseId, getThisFranchiseId), where))
+        .orderBy(orderBy)
+        .limit(input.pagination.pageSize)
+        .leftJoin(franchises, eq(franchises.id, salesmen.franchiseId))
+        .leftJoin(franchiseUser, eq(franchises.userId, franchiseUser.id))
+        .leftJoin(salesmanUser, eq(salesmen.userId, salesmanUser.id))
+        .offset(offset);
 
-    const total = totalResult[0]?.count ?? 0;
-    const totalPages = Math.ceil(total / input.pagination.pageSize);
+      // PostgreSQL returns `bigint` for count → cast to number
+      const totalResult = await db
+        .select({
+          count: sql<number>`count(distinct ${salesmen.id})::int`,
+        })
+        .from(salesmen)
+        .where(and(eq(salesmen.franchiseId, getThisFranchiseId), where));
 
-    return {
-      data,
-      totalCount: total,
-      totalPages,
-      pageCount: totalPages,
-    };
-  }),
+      const total = totalResult[0]?.count ?? 0;
+      const totalPages = Math.ceil(total / input.pagination.pageSize);
+
+      return {
+        data,
+        totalCount: total,
+        totalPages,
+        pageCount: totalPages,
+      };
+    }),
   add: franchisesProcedure.query(async ({ ctx }) => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();

@@ -7,15 +7,14 @@ export default async function page({
 }: {
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { productSlug } = await params;
+  const { id } = await params;
 
-  const slug = Array.isArray(productSlug) ? productSlug[0] : productSlug;
   const { data: referenceData, error } = await asyncHandler(
     trpcServer.productrouter.add.query(),
   );
 
   const { data: myProduct, error: myBusinessError } = await asyncHandler(
-    trpcServer.productrouter.edit.query({ productSlug: slug ?? "" }),
+    trpcServer.productrouter.edit.query({ id: Number(id) ?? "" }),
   );
 
   return (

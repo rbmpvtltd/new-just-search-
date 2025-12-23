@@ -37,11 +37,29 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.rbm.justsearch"
+      "package": "com.rbm.justsearch",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "www.justsearch.net.in",
+              "pathPrefix": "/"
+            },
+            {}
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "server",
       "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
@@ -55,7 +73,10 @@
         {
           "ios": {
             "useFrameworks": "static",
-            "forceStaticLinking": ["RNFBApp", "RNFBCrashlytics"]
+            "forceStaticLinking": [
+              "RNFBApp",
+              "RNFBCrashlytics"
+            ]
           }
         }
       ],
@@ -80,7 +101,11 @@
     "extra": {
       "PROD": true,
       "BUILD_TYPE": 0,
-      "BUILD_TYPE_FIELDS": ["closetest", "opentest", "production"],
+      "BUILD_TYPE_FIELDS": [
+        "closetest",
+        "opentest",
+        "production"
+      ],
       "API_URL_PROD": "https://justsearch.net.in",
       "API_URL_DEV": "http://192.168.1.59:8000",
       "router": {},

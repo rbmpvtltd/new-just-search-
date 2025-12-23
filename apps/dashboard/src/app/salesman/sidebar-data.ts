@@ -12,8 +12,13 @@ export const adminSidebarData: SidebarData = {
 
   documents: [
     {
-      name: "Manage Saleman",
-      url: "/salesman",
+      name: "Manage Business",
+      url: "/business",
+      icon: IconDatabase,
+    },
+    {
+      name: "Manage Hire",
+      url: "/hire",
       icon: IconDatabase,
     },
   ],

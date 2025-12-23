@@ -75,13 +75,21 @@ export const columns: ColumnDef<Lister>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ID" />
-    ),
-    cell: ({ row }) => <div className="w-20">{row.original.id}</div>,
-    enableHiding: false,
+    header: "S.No",
+    id: "sn",
+    cell: ({ row, table }) => {
+      const { pageIndex, pageSize } = table.getState().pagination;
+      return pageIndex * pageSize + row.index + 1;
+    },
   },
+  // {
+  //   accessorKey: "id",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="ID" />
+  //   ),
+  //   cell: ({ row }) => <div className="w-20">{row.original.id}</div>,
+  //   enableHiding: false,
+  // },
   {
     accessorKey: "business_name",
     header: ({ column }) => (
@@ -93,17 +101,17 @@ export const columns: ColumnDef<Lister>[] = [
       </div>
     ),
   },
-  {
-    accessorKey: "refer_code",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Refer Code" />
-    ),
-    cell: ({ row }) => (
-      <div className="max-w-50 truncate">
-        {row.original.refer_code || "No Name"}
-      </div>
-    ),
-  },
+  // {
+  //   accessorKey: "refer_code",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Refer Code" />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <div className="max-w-50 truncate">
+  //       {row.original.refer_code || "No Name"}
+  //     </div>
+  //   ),
+  // },
 
   {
     accessorKey: "created_at",
@@ -114,11 +122,11 @@ export const columns: ColumnDef<Lister>[] = [
       <div>{row?.original?.created_at?.toLocaleDateString() ?? "null"}</div>
     ),
   },
-  {
-    id: "action",
-    header: () => <div className="text-center">Action</div>,
-    cell: ({ row }) => <ActionCell id={row.original.id} />,
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: "action",
+  //   header: () => <div className="text-center ">Action</div>,
+  //   cell: ({ row }) => <ActionCell id={row.original.id} />,
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
 ];

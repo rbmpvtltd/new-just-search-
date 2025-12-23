@@ -215,15 +215,29 @@ export const offerrouter = router({
           offerSubcategory: true,
         },
       });
-
       if (!offer) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Offer not found or does not belong to this business",
         });
       }
+      const category = await db.query.businessCategories.findFirst({
+        where: (businessCategories, { eq }) =>
+          eq(businessCategories.businessId, offer?.id),
+        columns: {
+          categoryId: true,
+        },
+      });
+      const getSubCategories = await db.query.subcategories.findMany({
+        where: (subcategories, { eq }) =>
+          eq(subcategories.categoryId, Number(offer?.categoryId)),
+        columns: {
+          id: true,
+          name: true,
+        },
+      });
 
-      return { offer };
+      return { offer, category, getSubCategories };
     }),
 
   update: businessProcedure

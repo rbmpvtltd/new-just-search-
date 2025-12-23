@@ -1,8 +1,9 @@
 import { db } from "@repo/db";
-import { users } from "@repo/db/dist/schema/auth.schema";
-import { salesmen } from "@repo/db/dist/schema/user.schema";
-import { desc, eq, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { businessListings } from "@repo/db/dist/schema/business.schema";
+import { hireListing } from "@repo/db/dist/schema/hire.schema";
+import { logger } from "@repo/logger";
+import { TRPCError } from "@trpc/server";
+import { and, desc, eq, sql } from "drizzle-orm";
 import {
   buildOrderByClause,
   buildWhereClause,
@@ -14,8 +15,6 @@ import {
   usersColumns,
   usersGlobalFilterColumns,
 } from "./franchise.admin.service";
-import { businessListings } from "@repo/db/dist/schema/business.schema";
-import { hireListing } from "@repo/db/dist/schema/hire.schema";
 
 export const salesmanUserRouter = router({
   businessList: salesmanProcedure
@@ -31,63 +30,49 @@ export const salesmanUserRouter = router({
       const orderBy = buildOrderByClause(
         input.sorting,
         usersAllowedSortColumns,
-        desc(salesmen.createdAt),
+        desc(businessListings.createdAt),
       );
 
       // const orderBy = sql`created_at DESC`;
 
       const offset = input.pagination.pageIndex * input.pagination.pageSize;
 
-      // const franchiseUser = alias(users, "franchise_user");
-      // const salesmanUser = alias(users, "salesman_user");
-      // const data = await db
-      //   .select({
-      //     id: salesmen.id,
-      //     franchise_name: franchiseUser.displayName,
-      //     refer_code: salesmen.referCode,
-      //     salesman_name: salesmanUser.displayName,
-      //     created_at: salesmen.createdAt,
-      //   })
-      //   .from(salesmen)
-      //   .where(where)
-      //   .orderBy(orderBy)
-      //   .limit(input.pagination.pageSize)
-      //   .leftJoin(franchises, eq(franchises.id, salesmen.franchiseId))
-      //   .leftJoin(franchiseUser, eq(franchises.userId, franchiseUser.id))
-      //   .leftJoin(salesmanUser, eq(salesmen.userId, salesmanUser.id))
-      //   .offset(offset);
+      const getThisSalesmanId = (
+        await db.query.salesmen.findFirst({
+          where: (salesman, { eq }) => eq(salesman.userId, ctx.userId),
+          columns: {
+            id: true,
+          },
+        })
+      )?.id;
 
-      const salesMan = await db.query.salesmen.findFirst({
-        where: (salesman, { eq }) => eq(salesman.userId, ctx.userId),
-      });
-
-      console.log("Salesman", salesMan);
-
+      if (!getThisSalesmanId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Salesman not found",
+        });
+      }
       const data = await db
         .select({
-          id: salesmen.id,
+          id: businessListings.id,
           business_name: businessListings.name,
-          refer_code: salesmen.referCode,
-          created_at: salesmen.createdAt,
+          created_at: businessListings.createdAt,
         })
-        .from(salesmen)
-        .where(where)
+        .from(businessListings)
+        .where(and(eq(businessListings.salesmanId, getThisSalesmanId), where))
         .orderBy(orderBy)
         .limit(input.pagination.pageSize)
-        .leftJoin(
-          businessListings,
-          eq(businessListings.salesmanId, Number(salesMan?.id)),
-        )
+
         .offset(offset);
       // PostgreSQL returns `bigint` for count → cast to number
       console.log("Data");
-
+      logger.info("data is", { data: data });
       const totalResult = await db
         .select({
-          count: sql<number>`count(distinct ${users.id})::int`,
+          count: sql<number>`count(distinct ${businessListings.id})::int`,
         })
-        .from(salesmen)
-        .where(where);
+        .from(businessListings)
+        .where(and(eq(businessListings.salesmanId, getThisSalesmanId), where));
 
       const total = totalResult[0]?.count ?? 0;
       const totalPages = Math.ceil(total / input.pagination.pageSize);
@@ -112,33 +97,49 @@ export const salesmanUserRouter = router({
       const orderBy = buildOrderByClause(
         input.sorting,
         usersAllowedSortColumns,
-        desc(salesmen.createdAt),
+        desc(hireListing.createdAt),
       );
 
       // const orderBy = sql`created_at DESC`;
 
       const offset = input.pagination.pageIndex * input.pagination.pageSize;
 
+      const getThisSalesmanId = (
+        await db.query.salesmen.findFirst({
+          where: (salesman, { eq }) => eq(salesman.userId, ctx.userId),
+          columns: {
+            id: true,
+          },
+        })
+      )?.id;
+
+      if (!getThisSalesmanId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Salesman not found",
+        });
+      }
       const data = await db
         .select({
-          id: salesmen.id,
+          id: hireListing.id,
           hire_name: hireListing.name,
-          refer_code: salesmen.referCode,
-          created_at: salesmen.createdAt,
+          created_at: hireListing.createdAt,
         })
-        .from(salesmen)
-        .where(where)
+        .from(hireListing)
+        .where(and(eq(hireListing.salesmanId, getThisSalesmanId), where))
         .orderBy(orderBy)
         .limit(input.pagination.pageSize)
-        .leftJoin(hireListing, eq(hireListing.salesmanId, ctx.userId))
+
         .offset(offset);
       // PostgreSQL returns `bigint` for count → cast to number
+      console.log("Data");
+      logger.info("data is", { data: data });
       const totalResult = await db
         .select({
-          count: sql<number>`count(distinct ${users.id})::int`,
+          count: sql<number>`count(distinct ${hireListing.id})::int`,
         })
-        .from(salesmen)
-        .where(where);
+        .from(hireListing)
+        .where(and(eq(hireListing.salesmanId, getThisSalesmanId), where));
 
       const total = totalResult[0]?.count ?? 0;
       const totalPages = Math.ceil(total / input.pagination.pageSize);

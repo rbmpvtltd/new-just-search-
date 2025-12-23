@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.rbm.justsearch",
+      "sha256_cert_fingerprints": [
+        "00:99:F5:F1:3F:92:EC:50:84:54:04:6A:E3:2B:96:4C:7E:87:37:75:F7:71:C5:EE:C2:8F:60:69:C6:87:E2:F2"
+      ]
+    }
+  }
+]

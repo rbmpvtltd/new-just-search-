@@ -1,3 +1,4 @@
+/// <reference path="../../../global.d.ts" />
 "use client";
 
 import { useMutation } from "@tanstack/react-query";

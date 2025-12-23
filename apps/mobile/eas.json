@@ -12,7 +12,9 @@
       "env": {
         "EAS_BUILD_PROFILE": "development",
         "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
-        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt"
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt",
+        "GOOGLE_SERVICES_JSON": "./google-services.json",
+        "GOOGLE_SERVICE_PLIST": "./GoogleService-Info.plist"
       },
       "android": {
         "buildType": "apk"
@@ -31,7 +33,9 @@
         "EAS_BUILD_PROFILE": "preview",
         "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/",
         "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
-        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "goog_oiSnuWepljgpdlqlTYEjrBmuAFp"
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "goog_oiSnuWepljgpdlqlTYEjrBmuAFp",
+        "GOOGLE_SERVICES_JSON": "./google-services.json",
+        "GOOGLE_SERVICE_PLIST": "./GoogleService-Info.plist"
       }
     },
     "production": {
@@ -46,7 +50,9 @@
         "EAS_BUILD_PROFILE": "production",
         "EXPO_PUBLIC_BACKEND_URL": "https://backend-test.justsearch.net.in/",
         "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
-        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "goog_oiSnuWepljgpdlqlTYEjrBmuAFp"
+        "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "goog_oiSnuWepljgpdlqlTYEjrBmuAFp",
+        "GOOGLE_SERVICES_JSON": "./google-services.json",
+        "GOOGLE_SERVICE_PLIST": "./GoogleService-Info.plist"
       }
     }
   },

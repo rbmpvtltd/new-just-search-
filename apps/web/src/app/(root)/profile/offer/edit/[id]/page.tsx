@@ -7,18 +7,14 @@ export default async function page({
 }: {
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { offerSlug } = await params;
-  console.log("offer slug", offerSlug);
-
-  const slug = Array.isArray(offerSlug) ? offerSlug[0] : offerSlug;
-  console.log("param", offerSlug);
-
+  const { id } = await params;
+  
   const { data: referenceData, error } = await asyncHandler(
     trpcServer.offerrouter.add.query(),
   );
 
   const { data: myOffer, error: myBusinessError } = await asyncHandler(
-    trpcServer.offerrouter.edit.query({ offerSlug: slug ?? "" }),
+    trpcServer.offerrouter.edit.query({ id: Number(id) ?? "" }),
   );
 
   return <EditOffer myOffer={myOffer} formReferenceData={referenceData} />;
