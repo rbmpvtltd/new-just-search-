@@ -22,7 +22,7 @@ export const fakeSeed = async () => {
       logger.error("fake user is not find");
       return;
     }
-    const business = await seedFakeBusiness(user.id);
+    await seedFakeBusiness(user.id);
     logger.info("adding fake admin");
     await seedRealUser("admin@gmail.com", "admin@123", "admin");
     await seedRealUser("ranjeet@gmail.com", "admin@123", "admin");

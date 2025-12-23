@@ -70,23 +70,23 @@ export const clearAllTablesUser = async () => {
 export const seedUsers = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM users");
 
+  type DbUser = InferInsertModel<typeof users>;
   for (const row of rows) {
     if (row.status !== 1) {
       continue;
     }
 
-    // TODO: add revanuecat id
-    const user = {
+    const user: DbUser = {
       id: row.id,
-      displayName: "null",
-      username: row.username ?? "null",
-      phoneNumber: row.phone ?? "null",
-      email: row.email ?? `example${row.id}@mail.com`,
+      displayName: row.username,
+      phoneNumber: row.phone,
+      email: row.email,
+      status: true,
       password: row.password ?? null,
-      role: UserRole.visiter,
+      role: row.phone ? UserRole.visiter : UserRole.guest,
       googleId: row.google_id,
-      refreshToken: null,
-      profileId: null,
+      appleId: row.apple_id,
+      revanueCatId: row.revanue_cat_id,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -176,15 +176,6 @@ export const seedUsers = async () => {
       updatedAt: row.updated_at,
     });
   }
-
-  /*
-   * name | salutation | first_name | last_name
-   * "Mr. abc xyz" | "Mr." | "abc" | "xyz"
-   * "abc xyz" | "null" | "abc" | "xyz"
-   * "abc" | "null" | "abc" | "null"
-   * "abc xyz efg" | "null" | "abc" | "xyz efg"
-   *
-   * */
 
   console.log("users and Profiles seeding complete");
 };
