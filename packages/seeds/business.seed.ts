@@ -243,7 +243,7 @@ const addBusiness = async () => {
             .returning();
           console.log(createUser);
         } catch (e) {
-          console.error("error is ", e.message);
+          console.error("error is ", e);
         }
       } else {
         createUser = fakeUser;
@@ -305,7 +305,7 @@ const addBusiness = async () => {
         .insert(businessListings)
         .values({
           id: row.id,
-          slaesmanId: row.salesman_id ?? 1,
+          salesmanId: row.salesman_id ?? 1,
           userId: createUser!.id,
           name: row.name,
           days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],

@@ -36,6 +36,7 @@ import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
 import { mergeRouters, openRouter, router } from "./utils/trpc";
 import { notificationRouter } from "./features/notification/notification.router";
+import { salesmanUserRouter } from "./dashboard-features/(franchise-saleman)/user.salesman.routes";
 
 const usersRouter = router({
   auth: authRouter,
@@ -76,6 +77,7 @@ const adminRouter = router({
   adminHelpAndSupportRouter,
   adminAttributesRouter,
   franchiseSalemanRouter,
+  salesmanUserRouter,
 });
 
 export const openAppRouter = openRouter({

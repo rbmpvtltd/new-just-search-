@@ -28,7 +28,7 @@ const addplans = async () => {
   const plansData: PlanData[] = [
     {
       name: "PRO",
-      identifier: "plan_Rrrr2lJOWGFSLn",
+      razorPayIdentifier: "plan_Rrrr2lJOWGFSLn",
       period: "yearly",
       interval: 1,
       role: "business",
@@ -48,7 +48,7 @@ const addplans = async () => {
     },
     {
       name: "FREE",
-      identifier: "",
+      razorPayIdentifier: "",
       period: "yearly" as const,
       interval: 1,
       role: "all",
@@ -72,65 +72,65 @@ const addplans = async () => {
 };
 
 // 3. transactions
-const addtransactions = async () => {
-  const [transaction]: any[] = await sql.execute("SELECT * FROM transactions");
+// const addtransactions = async () => {
+//   const [transaction]: any[] = await sql.execute("SELECT * FROM transactions");
 
-  for (const row of transaction) {
-    await db.insert(transactions).values({
-      id: row.id,
-      amount: row.amount,
-      transactionsNo: row.txnid,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-  }
-  console.log("successfully seed of transaction");
-};
+//   for (const row of transaction) {
+//     await db.insert(transactions).values({
+//       id: row.id,
+//       amount: row.amount,
+//       transactionsNo: row.txnid,
+//       createdAt: row.created_at,
+//       updatedAt: row.updated_at,
+//     });
+//   }
+//   console.log("successfully seed of transaction");
+// };
 
-// 4. user_subscriptions
-const addUserSubscriptions = async () => {
-  const [subscriptions]: any[] = await sql.execute(
-    "SELECT * FROM user_subscriptions ",
-  );
-  for (const row of subscriptions) {
-    const [transaction] = await db
-      .select()
-      .from(transactions)
-      .where(eq(transactions.transactionsNo, row.txnid));
+// // 4. user_subscriptions
+// const addUserSubscriptions = async () => {
+//   const [subscriptions]: any[] = await sql.execute(
+//     "SELECT * FROM user_subscriptions ",
+//   );
+//   for (const row of subscriptions) {
+//     const [transaction] = await db
+//       .select()
+//       .from(transactions)
+//       .where(eq(transactions.transactionsNo, row.txnid));
 
-    if (!transaction) {
-      console.log("transaction not found", row.id);
-      continue;
-    }
+//     if (!transaction) {
+//       console.log("transaction not found", row.id);
+//       continue;
+//     }
 
-    const [plan] = await db
-      .select()
-      .from(plans1)
-      .where(eq(plans1.id, row.plan_id));
-    if (!plan) {
-      console.log("plan not found", row.id);
-      continue;
-    }
+//     const [plan] = await db
+//       .select()
+//       .from(plans1)
+//       .where(eq(plans1.id, row.plan_id));
+//     if (!plan) {
+//       console.log("plan not found", row.id);
+//       continue;
+//     }
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
-    if (!user) {
-      console.log("user not found", row.id);
-      continue;
-    }
-    await db.insert(userSubscriptions).values({
-      id: row.id,
-      userId: user.id,
-      subscriptionNumber: row.user_subscriptions,
-      transactionId: transaction.id,
-      price: row.price,
-      plansId: plan.id,
-      expiryDate: row.days,
-      status: Boolean(row.status),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-  }
-};
+//     const [user] = await db
+//       .select()
+//       .from(users)
+//       .where(eq(users.id, row.user_id));
+//     if (!user) {
+//       console.log("user not found", row.id);
+//       continue;
+//     }
+//     await db.insert(userSubscriptions).values({
+//       id: row.id,
+//       userId: user.id,
+//       subscriptionNumber: row.user_subscriptions,
+//       transactionId: transaction.id,
+//       price: row.price,
+//       plansId: plan.id,
+//       expiryDate: row.days,
+//       status: Boolean(row.status),
+//       createdAt: row.created_at,
+//       updatedAt: row.updated_at,
+//     });
+//   }
+// };

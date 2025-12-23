@@ -2,7 +2,7 @@ import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db, schemas } from "@repo/db";
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import dotenv from "dotenv";
-import { eq } from "drizzle-orm";
+import { sql as dbsql, eq, type InferInsertModel } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
@@ -48,8 +48,8 @@ dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
   await seedUsers();
-  // await seedfranchises();
-  // await seedOfSalesman();
+  await seedfranchises();
+  await seedOfSalesman();
 };
 
 const users = schemas.auth.users;
@@ -61,6 +61,8 @@ export const clearAllTablesUser = async () => {
   // await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE profiles RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE users RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE salesmen RESTART IDENTITY CASCADE;`);
 
   console.log(" All tables cleared successfully!");
 };
@@ -88,7 +90,6 @@ export const seedUsers = async () => {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
-    console.log("user", user);
 
     let [insertedUser] = await db
       .insert(users)
@@ -106,7 +107,6 @@ export const seedUsers = async () => {
     if (!insertedUser) {
       throw new Error(`User could not be inserted or found: ${user.email}`);
     }
-    console.log("insertedUser", insertedUser);
 
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
 
@@ -146,7 +146,6 @@ export const seedUsers = async () => {
 
     let occupationId = null;
     if (row.occupation) {
-      console.log("we get occupation", row.occupation);
       const occupationRow = row.occupation as string;
       const occupationData = await db.query.occupation.findFirst({
         where: (occupation, { eq, or, ilike }) =>
@@ -156,7 +155,6 @@ export const seedUsers = async () => {
           ),
       });
       occupationId = occupationData?.id;
-      console.log("occupationId is", occupationId);
     }
 
     const { salutation, firstName, lastName } = parseName(row.name);
@@ -192,52 +190,104 @@ export const seedUsers = async () => {
 };
 
 const seedfranchises = async () => {
-  const [rows]: any[] = await sql.execute("SELECT * FROM franchises");
+  const [rbmUser] = await db
+    .insert(users)
+    .values({
+      displayName: "ROTARY BALAJI MEDIA PRIVATE LIMITED",
+      email: "rbm.jodhpur03@gmail.com",
+      phoneNumber: "8875770555",
+      password: "$2y$10$xUF/tvN6VQdzUh3g21PbCORcoNIunlHLiMVLgi6BrFdcxKwyAJaju",
+      createdAt: new Date("2025-02-10 13:18:10"),
+      updatedAt: new Date("2025-05-04 08:47:19"),
+      role: "franchises",
+      status: true,
+    })
+    .returning();
 
-  for (const row of rows) {
-    const str = row.refer_code;
-    const refer_prifixed = str.slice(0, -4); // "RBMHORJ00"
-    const refer_suffix = str.slice(-4); // "0000"
-
-    const [user] = await db
-      .insert(users)
-      .values({
-        displayName: row.display_name,
-        role: UserRole.franchises,
-        email: row.email,
-        phoneNumber: row.phone,
-        password: row.password,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-      })
-      .returning();
-
-    await db.insert(franchises).values({
-      id: row.id,
-      userId: user!.id,
-      referPrifixed: refer_prifixed,
-      // status: Boolean(row.status),
-      employeeLimit: row.employee_limit,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
+  if (!rbmUser) {
+    throw new Error("rbmUser not found");
   }
-  console.log("successfully seed of franchises");
+  const [galaxyUser] = await db
+    .insert(users)
+    .values({
+      displayName: "GALAXY - the economical axis",
+      email: "upadhayaysanjay78@gmail.com",
+      phoneNumber: "8240770083",
+      password: "$2y$10$mq1e7/YjPJXRErZUpK4H5eHmLSfxsHkpoHUruoalREo1heB228huy",
+      createdAt: new Date("2025-02-22 05:37:19"),
+      updatedAt: new Date("2025-03-01 06:29:00"),
+      role: "franchises",
+      status: true,
+    })
+    .returning();
+
+  if (!galaxyUser) {
+    throw new Error("galaxyUser not found");
+  }
+
+  const [rbmFranchise] = await db
+    .insert(franchises)
+    .values({
+      id: 1,
+      userId: rbmUser?.id,
+
+      referPrifixed: "RBMHORJ",
+      employeeLimit: 50,
+      gstNo: "08AANCR4677E1ZX",
+      lastAssignCode: 0,
+    })
+    .returning();
+
+  const [galaxyFranchise] = await db
+    .insert(franchises)
+    .values({
+      id: 2,
+      userId: galaxyUser?.id,
+      referPrifixed: "GALAXY",
+      employeeLimit: 50,
+      gstNo: "",
+      lastAssignCode: 0,
+    })
+    .returning();
+
+  await db.execute(
+    dbsql`SELECT setval(
+        'franchises_id_seq',
+        COALESCE((SELECT MAX(id) + 1 FROM franchises), 1),
+        false
+      );`,
+  );
+  if (!rbmFranchise) {
+    throw new Error("rbmUser not found");
+  }
+  await db
+    .insert(salesmen)
+    .values({
+      franchiseId: 1,
+      referCode: "RBMHORJ00000",
+      userId: rbmUser.id,
+    })
+    .returning();
+  if (!galaxyFranchise) {
+    throw new Error("rbmUser not found");
+  }
+
+  await db
+    .insert(salesmen)
+    .values({
+      franchiseId: 2,
+      referCode: "GALAXY000000",
+      userId: galaxyUser.id,
+    })
+    .returning();
+
+  console.log("Franchise complete");
 };
 
 export const seedOfSalesman = async () => {
   const [sales]: any[] = await sql.execute("SELECT * FROM staff");
+  console.log("salesmen started");
   for (const row of sales) {
-    const [Franchises] = await db
-      .select()
-      .from(franchises)
-      .where(eq(franchises.id, row.franchise_id));
-
-    if (!Franchises) {
-      console.log("franchises id not found", row.id);
-      continue;
-    }
-
     const [user] = await db
       .insert(users)
       .values({
@@ -250,22 +300,21 @@ export const seedOfSalesman = async () => {
         updatedAt: row.updated_at,
       })
       .returning();
-
-    const [franchises1]: any[] = await sql.execute("SELECT * FROM franchises");
-    const str = franchises1.refer_code;
-    console.info("========================>", str);
-    const refer_prifixed = str ? str.slice(0, -4) : "RBMHORJ00"; // "RBMHORJ00"
-    const refer_suffix = str ? str.slice(-4) : "0000"; // "0000"
-    const refer_code = refer_prifixed + refer_suffix + row.id;
-
-    await db.insert(salesmen).values({
-      userId: user!.id,
-      franchiseId: Franchises.id,
-      referCode: refer_code,
-      // status: Boolean(row.status),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    try {
+      await db.insert(salesmen).values({
+        userId: user.id,
+        franchiseId: row.franchise_id === 10 ? 2 : 1,
+        referCode: row.refer_code,
+        // status: Boolean(row.status),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    } catch (error) {
+      console.log("error", row.id);
+    }
   }
   console.log("successfully seed of salesman");
 };

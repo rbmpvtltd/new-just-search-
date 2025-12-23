@@ -25,6 +25,7 @@ import {
   buildWhereClause,
   tableInputSchema,
 } from "@/lib/tableUtils";
+import { hashPassword } from "@/utils/hashpass";
 import { adminProcedure, router } from "@/utils/trpc";
 import {
   usersAllowedSortColumns,
@@ -160,10 +161,14 @@ export const adminSalemanRouter = router({
         });
       }
 
+      let newPassword = null;
+      if (userData.password) {
+        newPassword = await hashPassword(userData.password);
+      }
       const newUserData = (
         await db
           .insert(users)
-          .values({ ...userData, role: "salesman" })
+          .values({ ...userData, password: newPassword, role: "salesman" })
           .returning()
       )[0];
       if (!newUserData?.id) {

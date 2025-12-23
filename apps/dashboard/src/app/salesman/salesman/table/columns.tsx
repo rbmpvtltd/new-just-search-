@@ -58,7 +58,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type ListerArray = OutputTrpcType["adminSalemanRouter"]["list"]["data"];
+type ListerArray = OutputTrpcType["salesmanUserRouter"]["businessList"]["data"];
 type Lister = UnwrapArray<ListerArray>;
 
 export const columns: ColumnDef<Lister>[] = [
@@ -83,24 +83,13 @@ export const columns: ColumnDef<Lister>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "franchise_name",
+    accessorKey: "business_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Franchise Name" />
+      <DataTableColumnHeader column={column} title="Business Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-50 truncate">
-        {row.original.franchise_name || "No Name"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "salesman_name",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Salesman Name" />
-    ),
-    cell: ({ row }) => (
-      <div className="max-w-50 truncate">
-        {row.original.salesman_name || "No Name"}
+        {row.original.business_name || "No Name"}
       </div>
     ),
   },
@@ -109,7 +98,11 @@ export const columns: ColumnDef<Lister>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Refer Code" />
     ),
-    cell: ({ row }) => <div>{row.original.refer_code}</div>,
+    cell: ({ row }) => (
+      <div className="max-w-50 truncate">
+        {row.original.refer_code || "No Name"}
+      </div>
+    ),
   },
 
   {
