@@ -1,4 +1,8 @@
+import "dotenv/config";
+
 function required(name) {
+  console.log("Name", process.env[name]);
+
   const value = process.env[name];
   if (!value) {
     console.log("vlaue is", value);
@@ -12,14 +16,14 @@ export default ({ config }) => {
     ...config,
     ios: {
       ...config.ios,
-      // googleServicesFile: required("GOOGLE_SERVICE_PLIST"),
+      googleServicesFile: required("GOOGLE_SERVICE_PLIST"),
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
       },
     },
     android: {
       ...config.android,
-      // googleServicesFile: required("GOOGLE_SERVICES_JSON"),
+      googleServicesFile: required("GOOGLE_SERVICES_JSON"),
     },
     extra: {
       ...config.extra,
