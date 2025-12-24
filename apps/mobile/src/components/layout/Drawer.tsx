@@ -83,6 +83,10 @@ const drawerFields: DrawerField[] = [
     route: "/(root)/profile/help-and-support",
   },
   {
+    name: "Terms & Conditions",
+    route: "/(root)/profile/terms-and-conditions",
+  },
+  {
     name: "Logout",
     route: "/(root)/profile/logout",
   },
