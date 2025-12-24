@@ -8,6 +8,13 @@
       "when": 1766401220801,
       "tag": "0000_bent_stingray",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766552265444,
+      "tag": "0001_slimy_silvermane",
+      "breakpoints": true
     }
   ]
 }

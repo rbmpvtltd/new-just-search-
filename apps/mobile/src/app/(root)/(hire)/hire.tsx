@@ -74,7 +74,7 @@
 //     </SafeAreaView>
 //   );
 // }
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HireCard from "@/features/hire/show/HireCard";
 import { searchClient } from "@/lib/algoliaClient";
