@@ -1,38 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
-import { useSubscription } from "@trpc/tanstack-react-query";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
+import { Configure, InstantSearch } from "react-instantsearch-core";
 import {
   Button,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import CustomCarousel from "@/components/Carousel/CustomCaraousel";
+import { InfiniteHits } from "@/components/home/InfiniteHits";
+import { SearchBox } from "@/components/home/SearchBox";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
+import { Loading } from "@/components/ui/Loading";
 // import Banner1 from "@/features/home/show/Banner1";
 // import Banner2 from "@/features/home/show/Banner2";
 // import Banner3 from "@/features/home/show/Banner3";
 // import Banner4 from "@/features/home/show/Banner4";
 import { CategoryList } from "@/features/home/show/CategorySameList";
-import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
+import { UpdateModel } from "@/features/version/Component/UpdateModel";
 // import { Loading } from "@/components/ui/Loading";
 // import { trpc } from "@/lib/trpc";
 import { searchClient } from "@/lib/algoliaClient";
-import {
-  InstantSearch,
-  Index,
-  useHits,
-  Configure,
-} from "react-instantsearch-core";
-import { SearchBox } from "@/components/home/SearchBox";
-import { InfiniteHits } from "@/components/home/InfiniteHits";
-import { router } from "expo-router";
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
-import Constants from "expo-constants";
+import { trpc } from "@/lib/trpc";
 
 // import Banner1 from "@/components/home/Banner1";
 // import Banner2 from "@/components/home/Banner2";
@@ -126,9 +120,11 @@ async function registerForPushNotificationsAsync() {
 }
 
 export default function TabOneScreen() {
-  // const data = Banners();
-  // console.log("==============data from trpc============",data)
-  //
+  const { data: latestVersion, isLoading } = useQuery(
+    trpc.versionRouter.checkLatestVesion.queryOptions(),
+  );
+  console.log("Latest virsion", latestVersion);
+
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
@@ -156,9 +152,13 @@ export default function TabOneScreen() {
     };
   }, []);
 
+  if (isLoading) {
+    return <Loading position="center" />;
+  }
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View className="flex items-center r rounded-4xl">
+        <UpdateModel latestVersion={latestVersion ?? "1.0.0"} />
         <Button
           title="Press to Send Notification"
           onPress={async () => {
