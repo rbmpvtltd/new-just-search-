@@ -46,7 +46,7 @@
             {
               "scheme": "https",
               "host": "web-test.justsearch.net.in",
-              "pathPrefix": ""
+              "pathPrefix": "/"
             },
             {}
           ],

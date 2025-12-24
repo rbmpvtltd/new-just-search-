@@ -41,6 +41,9 @@
 
 //   const allData = data?.pages.flatMap((page) => page?.data || []) || [];
 
+import type { Hit as AlgoliaHit } from "instantsearch.js";
+import { useState } from "react";
+import { Configure, InstantSearch } from "react-instantsearch-core";
 //   return (
 //     <SafeAreaView className="flex-1">
 //       <View>
@@ -76,14 +79,11 @@
 // }
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import HireCard from "@/features/hire/show/HireCard";
-import { searchClient } from "@/lib/algoliaClient";
-import { Configure, InstantSearch } from "react-instantsearch-core";
 import { InfiniteHits } from "@/components/home/InfiniteHits";
-import type { Hit as AlgoliaHit } from "instantsearch.js";
 import { SearchBox } from "@/components/home/SearchBox";
+import HireCard from "@/features/hire/show/HireCard";
 import { HireFilters } from "@/features/hire/show/HireFilter";
-import { useState } from "react";
+import { searchClient } from "@/lib/algoliaClient";
 
 // Type definition for Hire Listing data - extends Algolia Hit
 export interface HireListingHitType extends AlgoliaHit {
