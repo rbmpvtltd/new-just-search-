@@ -17,7 +17,7 @@ import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.route
 import { adminBannerRouter } from "./dashboard-features/banners/banners.admin.routes";
 import { adminAttributesRouter } from "./dashboard-features/plan/attibutes.admin.routes";
 import { adminPlanRouter } from "./dashboard-features/plan/plan.admin.routes";
-import { revenueCatRouter } from "./dashboard-features/plan/revenue-cat.routes";
+import { revenueCatRouter } from "./dashboard-features/plan/webhooks/revenue-cat.routes";
 import { adminUtilsRouter } from "./dashboard-features/utils/util.admin.routes";
 import { authRouter } from "./features/auth/auth.router";
 import { bannerRouter } from "./features/banners/banners.routes";

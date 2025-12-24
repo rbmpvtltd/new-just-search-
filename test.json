@@ -1,0 +1,38 @@
+{
+  "api_version": "1.0",
+  "event": {
+    "aliases": [
+      "76d9040d-c3c2-452b-aeac-8fc590411f08",
+      "$RCAnonymousID:dc33045b7a1f4bba81b499f15ae40272"
+    ],
+    "app_id": "app49e6ca7788",
+    "app_user_id": "76d9040d-c3c2-452b-aeac-8fc590411f08",
+    "commission_percentage": 0.1271,
+    "country_code": "IN",
+    "currency": "INR",
+    "entitlement_id": null,
+    "entitlement_ids": ["test"],
+    "environment": "PRODUCTION",
+    "event_timestamp_ms": 1766570185345,
+    "expiration_at_ms": 1767163588270,
+    "id": "77995DF1-1921-4D5B-A557-593A835D7FD0",
+    "is_family_share": false,
+    "metadata": null,
+    "offer_code": null,
+    "original_app_user_id": "$RCAnonymousID:dc33045b7a1f4bba81b499f15ae40272",
+    "original_transaction_id": "GPA.3315-8574-1880-67656",
+    "period_type": "NORMAL",
+    "presented_offering_id": "test",
+    "price": 0,
+    "price_in_purchased_currency": 0,
+    "product_id": "test:test",
+    "purchased_at_ms": 1766570176899,
+    "renewal_number": 1,
+    "store": "PLAY_STORE",
+    "subscriber_attributes": {},
+    "takehome_percentage": 0.85,
+    "tax_percentage": 0.1525,
+    "transaction_id": "GPA.3315-8574-1880-67656",
+    "type": "INITIAL_PURCHASE"
+  }
+}
