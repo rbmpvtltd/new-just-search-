@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useSubscription } from "@trpc/tanstack-react-query";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -13,7 +14,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 // import { useVerityApplePay } from "@/query/razorPay";
 import { useAuthStore } from "@/features/auth/authStore";
-import { type OutputTrpcType, queryClient, type UnwrapArray } from "@/lib/trpc";
+import {
+  type OutputTrpcType,
+  queryClient,
+  trpc,
+  type UnwrapArray,
+} from "@/lib/trpc";
 
 type PlanArray = OutputTrpcType["planRouter"]["list"]["plans"];
 type ActivePlan = OutputTrpcType["planRouter"]["list"]["activePlan"];
@@ -30,10 +36,11 @@ export default function PricingCard({
   const colorScheme = useColorScheme();
   const [loading, setLoading] = useState(false);
 
-  // const { data, refetch } = useSuspenceData(PROFILE_URL.url, PROFILE_URL.key);
+  const { data: paymentVerify } = useSubscription(
+    trpc.subscriptionRouter.verifyPayement.subscriptionOptions(),
+  );
+  
   const currentRole = useAuthStore((state) => state.role);
-
-  // const { mutate } = useVerityApplePay();
 
   const showBtn = currentRole === plan.role || currentRole === "visiter";
   const buttonDisable =
@@ -56,45 +63,16 @@ export default function PricingCard({
         "undefined"
       ) {
         console.log("payment done");
-        // mutate(
-        //   {
-        //     revanue_id: customerInfo.,
-        //     transaction: transaction.transactionIdentifier,
-        //     plan_id: plan_id,
-        //     product_identifier: productIdentifier,
-        //   },
-        //   {
-        //     onSuccess: (res) => {
-        //       if (res.success) {
-        //         queryClient.invalidateQueries({
-        //           queryKey: ["plans"],
-        //         });
-        //         Alert.alert("payment verify successfully ");
-        //       } else {
-        //         console.log(res);
-        //         Alert.alert(
-        //           "payment completed but verification failed",
-        //           "please raise help token to get money back",
-        //         );
-        //       }
-        //
-        //       setLoading(false);
-        //     },
-        //     onError: () => {
-        //       Alert.alert(
-        //         "payment completed but verification failed",
-        //         "please raise help token to get money back",
-        //       );
-        setLoading(false);
-        //     },
-        //   },
-        // );
       }
     } catch (e) {
       console.log(e);
       setLoading(false);
     }
   };
+
+  if (paymentVerify) {
+    setLoading(false);
+  }
 
   if (loading) {
     return <ActivityIndicator size="small" />;

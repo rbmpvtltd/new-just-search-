@@ -1,6 +1,7 @@
 // features/banners/banners.admin.routes.ts
 
-import crypto from "node:crypto";
+import crypto, { verify } from "node:crypto";
+import { EventEmitter, on } from "node:events";
 import { db } from "@repo/db";
 import {
   banners,
@@ -22,7 +23,13 @@ import {
 import { razorpayInstance } from "@/lib/razorpay";
 import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
 
+const ee = new EventEmitter();
 export const subscriptionRouter = router({
+  verifyPayement: protectedProcedure.subscription(async function* ({ ctx }) {
+    for await (const [msg] of on(ee, `subscription${ctx.userId}`)) {
+      yield msg;
+    }
+  }),
   create: protectedProcedure
     .input(z.object({ identifier: z.string() }))
     .mutation(async ({ input, ctx }) => {
