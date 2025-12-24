@@ -23,6 +23,7 @@ const env = cleanEnv(process.env, {
   RAZOR_PAY_KEY_SECRET: str(),
   REVENUE_CAT_PROJECT_ID: str(),
   REVENUE_CAT_SECRET: str(),
+  REVENUECAT_TOKEN: str(),
 });
 
 export default env;

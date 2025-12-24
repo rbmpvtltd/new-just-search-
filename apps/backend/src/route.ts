@@ -1,3 +1,4 @@
+import express from "express";
 import { adminBusinessRouter } from "./dashboard-features/(business-hire)/business.admin.routes";
 import { adminHireRouter } from "./dashboard-features/(business-hire)/hire.admin.routes";
 import { adminCategoryRouter } from "./dashboard-features/(category)/category.admin.routes";
@@ -16,7 +17,7 @@ import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.route
 import { adminBannerRouter } from "./dashboard-features/banners/banners.admin.routes";
 import { adminAttributesRouter } from "./dashboard-features/plan/attibutes.admin.routes";
 import { adminPlanRouter } from "./dashboard-features/plan/plan.admin.routes";
-import { razorpayRouter } from "./dashboard-features/plan/razorpay.routes";
+import { revenueCatRouter } from "./dashboard-features/plan/revenue-cat.routes";
 import { adminUtilsRouter } from "./dashboard-features/utils/util.admin.routes";
 import { authRouter } from "./features/auth/auth.router";
 import { bannerRouter } from "./features/banners/banners.routes";
@@ -36,7 +37,7 @@ import { subcategoryRouter } from "./features/subcategory/subcategory.route";
 import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
 import { versionRouter } from "./features/version/version.routes";
-import { mergeRouters, openRouter, router } from "./utils/trpc";
+import { mergeRouters, router } from "./utils/trpc";
 
 const usersRouter = router({
   auth: authRouter,
@@ -81,10 +82,9 @@ const adminRouter = router({
   salesmanUserRouter,
 });
 
-export const openAppRouter = openRouter({
-  razorpay: razorpayRouter,
-});
+const openRouter = express.Router();
+openRouter.post("/revenue", revenueCatRouter);
 
+export { openRouter };
 export const appRouter = mergeRouters(usersRouter, adminRouter);
-
 export type AppRouter = typeof appRouter;

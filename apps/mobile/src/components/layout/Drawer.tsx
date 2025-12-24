@@ -285,7 +285,7 @@ export default function DrawerLayout() {
               name={field.name}
               key={field.key ?? field.name}
               options={{
-                headerShown: true, // TODO: do something here
+                headerShown: true,
               }}
             />
           );

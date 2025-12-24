@@ -9,7 +9,7 @@ import cors from "cors";
 import { eq } from "drizzle-orm";
 import express from "express";
 import jwt from "jsonwebtoken";
-import { appRouter, openAppRouter } from "./route";
+import { appRouter, openRouter } from "./route";
 import { createContext } from "./utils/context";
 import { limiter } from "./utils/limiter";
 
@@ -20,6 +20,7 @@ app.use(limiter);
 app.get("/", (_, res) => {
   return res.send("hello");
 });
+
 app.use(
   "/trpc",
   createExpressMiddleware({
@@ -32,18 +33,10 @@ app.use(
   }),
 );
 
-app.use(
-  "/api",
-  createExpressMiddleware({
-    router: openAppRouter,
-    middleware: cors({ origin: "*" }),
-    onError: (opts) => {
-      logger.error(opts.error.code);
-    },
-  }),
-);
-
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use("/api", openRouter);
 
 app.post("/auth/apple/callback", async (req, res) => {
   const code = req.body.code as string;
