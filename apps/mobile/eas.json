@@ -14,6 +14,7 @@
         "EXPO_PUBLIC_IOS_PAYMENT_API_KEY": "appl_RiTjBDuyekUKpwXeFXIFzKujefz",
         "EXPO_PUBLIC_ANDROID_PAYMENT_API_KEY": "test_OlGUPjHqBFswfIxwlLKklPFNVjt",
         "EXPO_PUBLIC_ALGOLIA_APP_ID": "XLHL5IDFH9",
+        "EXPO_PUBLIC_BACKEND_URL": "http://192.168.1.49:4000",
         "EXPO_PUBLIC_ALGOLIA_SEARCH_API_KEY": "4b94ea6117cbe235a2e3794e8060ee38"
       },
       "android": {

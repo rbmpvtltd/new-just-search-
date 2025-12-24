@@ -18,7 +18,7 @@ export const dummyImageUrl = "dummyImageUrl";
   try {
     // Postgres seeding
     await notRelated();
-    await userSeed();
+    // await userSeed();
     await fakeSeed();
     // await businessSeed();
     // await hireSeed();

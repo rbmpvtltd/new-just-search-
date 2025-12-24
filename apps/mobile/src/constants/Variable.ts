@@ -27,7 +27,8 @@ if (!extra) {
   throw new Error("Expo extra config missing");
 }
 
-export const backendUrl = extra.backendUrl;
+export const backendUrl =
+  process.env.EXPO_PUBLIC_BACKEND_URL ?? extra.backendUrl;
 export const androidPaymentApiKey = extra.androidPaymentApiKey;
 export const iosPaymentApiKey = extra.iosPaymentApiKey;
 export const algoliaAppId = extra.algoliaAppId;
