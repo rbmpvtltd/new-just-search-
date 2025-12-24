@@ -20,10 +20,13 @@ import {
 import { adminProcedure, router } from "@/utils/trpc";
 import {
   expandInputDataOfNotification,
+  getUsersMatchingCriteria,
   notificationAllowedSortColumns,
   notificationColumns,
   notificationGlobalFilterColumns,
 } from "./notification.admin.service";
+import { sendPushNotifications } from "@/utils/fcmService";
+import { pushTokens } from "@repo/db/dist/schema/notification.schema";
 
 export const adminNotificationRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
@@ -167,7 +170,102 @@ export const adminNotificationRouter = router({
     .input(notificationInsertSchema)
     .mutation(async ({ input }) => {
       const data = expandInputDataOfNotification(input);
-      await db.insert(notification).values(data);
+      const insertedNotification = await db
+        .insert(notification)
+        .values(data)
+        .returning();
+
+      console.log(`insertd ${insertedNotification.length} Notifications`);
+      const uniqueCriteria = new Map<string, (typeof data)[0]>();
+      data.forEach((notif) => {
+        const key = `${notif.role}-${notif.categoryId}-${notif.subCategoryId}-${notif.state}-${notif.city}`;
+        if (!uniqueCriteria.has(key)) {
+          uniqueCriteria.set(key, notif);
+        }
+      });
+      console.log(
+        `Processing ${uniqueCriteria.size} unique criteria combinations...`,
+      );
+
+      let totalUsersFound = 0;
+      let totalNotificationsSent = 0;
+      let totalNotificationsFailed = 0;
+      const allInvalidTokens: string[] = [];
+      // Process each criteria combination
+      for (const [key, criteria] of uniqueCriteria) {
+        console.log(`\n--- Processing criteria: ${key} ---`);
+
+        // Get matching users with their tokens
+        const matchingUsers = await getUsersMatchingCriteria({
+          role: criteria.role,
+          categoryId: criteria.categoryId ?? 0,
+          subCategoryId: criteria.subCategoryId ?? 0,
+          state: criteria.state ?? 0,
+          city: criteria.city ?? 0,
+        });
+
+        // Extract unique push tokens (filter out null tokens and duplicates)
+        const pushTokenList = matchingUsers
+          .filter((u) => u.pushToken && u.pushToken.trim() !== "") // Only users with valid tokens
+          .map((u) => u.pushToken!)
+          .filter((token, index, self) => self.indexOf(token) === index); // Remove duplicates
+
+        console.log(
+          `Found ${matchingUsers.length} user records, ${pushTokenList.length} unique valid tokens`,
+        );
+
+        totalUsersFound += new Set(matchingUsers.map((u) => u.userId)).size;
+
+        if (pushTokenList.length > 0) {
+          try {
+            // Send push notifications
+            const result = await sendPushNotifications({
+              tokens: pushTokenList,
+              title: input.title,
+              body: input.description ?? "",
+              data: {
+                notificationId: insertedNotification?.[0]?.id.toString() ?? "",
+                type: "admin_notification",
+                role: criteria.role,
+              },
+              channelId: "default",
+            });
+
+            totalNotificationsSent += result.success;
+            totalNotificationsFailed += result.failure;
+            allInvalidTokens.push(...(result.invalidTokens ?? []));
+
+            console.log(
+              `✅ Sent ${result.success} notifications, ${result.failure} failed`,
+            );
+          } catch (error) {
+            console.error(
+              `Error sending notifications for criteria ${key}:`,
+              error,
+            );
+            totalNotificationsFailed += pushTokenList.length;
+          }
+        } else {
+          console.log(`No valid push tokens found for criteria: ${key}`);
+        }
+      }
+      if (allInvalidTokens.length > 0) {
+        console.log(`\n Removing ${allInvalidTokens.length} invalid tokens...`);
+        try {
+          await db
+            .delete(pushTokens)
+            .where(inArray(pushTokens.token, allInvalidTokens));
+          console.log(`Cleaned up invalid tokens`);
+        } catch (error) {
+          console.error("Error cleaning up invalid tokens:", error);
+        }
+      }
+      console.log("\n=== Notification creation complete ===");
+      console.log(`======== totalUsersFound: ${totalUsersFound} ========`);
+      console.log(`==== totalNotificationsSent: ${totalNotificationsSent}====`);
+      console.log(
+        `=== totalNotificationsFailed: ${totalNotificationsFailed} ====`,
+      );
 
       return { success: true };
     }),

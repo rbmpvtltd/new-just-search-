@@ -20,7 +20,7 @@ export const pushTokens = pgTable(
 
     token: varchar("token", { length: 512 }).notNull(),
 
-    deviceId: varchar("device_id", { length: 255 }).notNull(),
+    deviceId: varchar("device_id", { length: 255 }).notNull().unique(),
 
     platform: varchar("platform", { length: 20 }).notNull(),
 

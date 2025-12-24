@@ -7,10 +7,11 @@ if (Platform.OS === "android") {
   deviceId = Application.getAndroidId();
 }
 
-if (Platform.OS === "ios") {
-  deviceId = await Application.getIosIdForVendorAsync();
-}
-
 const platform = Platform.OS; // "android" | "ios" | "web"
 
+if (platform === "ios") {
+  Application.getIosIdForVendorAsync().then((data) => {
+    deviceId = data;
+  });
+}
 export { platform, deviceId };

@@ -34,6 +34,7 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { deviceId, platform } from "@/utils/getDeviceId";
 
 // import Banner1 from "@/components/home/Banner1";
 // import Banner2 from "@/components/home/Banner2";
@@ -123,6 +124,7 @@ export default function TabOneScreen() {
   // const data = Banners();
   // console.log("==============data from trpc============",data)
   //
+
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined

@@ -4,31 +4,63 @@ import {
   pushTokenInsertSchema,
   pushTokens,
 } from "@repo/db/dist/schema/notification.schema";
+import { TRPCError } from "@trpc/server";
 
 export const notificationRouter = router({
-  getNotification: protectedProcedure.query(async ({ ctx }) => {
-    return { success: true, data: ctx };
-  }),
   createPushToken: protectedProcedure
     .input(pushTokenInsertSchema)
     .mutation(async ({ input, ctx }) => {
-      const userId = ctx.userId;
-      const { token, deviceId, platform } = input;
+      try {
+        const userId = ctx.userId;
+        const { token, deviceId, platform } = input;
 
-      await db
-        .insert(pushTokens)
-        .values({
+        console.log("Attempting to insert push token:", {
           userId,
           token,
           deviceId,
           platform,
-        })
-        .onConflictDoUpdate({
-          target: [pushTokens.deviceId],
-          set: {
-            token,
-            lastActiveAt: new Date(),
-          },
         });
+
+        if (!userId) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "User ID not found in context",
+          });
+        }
+
+        const result = await db
+          .insert(pushTokens)
+          .values({
+            userId: userId,
+            token: token,
+            deviceId: deviceId,
+            platform: platform,
+          })
+          .onConflictDoUpdate({
+            target: [pushTokens.deviceId],
+            set: {
+              token,
+              lastActiveAt: new Date(),
+            },
+          })
+          .returning();
+
+        console.log("Push token is  saved successfully:", result);
+
+        return {
+          success: true,
+          data: result[0],
+        };
+      } catch (error) {
+        console.error("Error saving push token:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to save push token",
+          cause: error,
+        });
+      }
     }),
 });
