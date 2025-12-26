@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Gender, MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { personalDetailsHireSchema } from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
+import React, { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import {
@@ -10,6 +11,7 @@ import {
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
+import LocationAutoDetect from "@/components/LocationAutoDetect";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
@@ -29,11 +31,14 @@ export default function PersonalDetailsForm({
   const trpc = useTRPC();
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const nextPage = useHireFormStore((state) => state.nextPage);
-
+  const [detectedCityName, setDetectedCityName] = React.useState<null | string>(
+    null,
+  );
   const {
     control,
     handleSubmit,
-    formState: { isSubmitting },
+    setValue,
+    formState: { isSubmitting, errors },
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(adminPersonalDetailsHireSchema),
     defaultValues: {
@@ -67,8 +72,12 @@ export default function PersonalDetailsForm({
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
 
-  const { data: subCategories, isLoading } = useQuery(
-    trpc.hirerouter.getSubCategories.queryOptions({
+  const {
+    data: subCategories,
+    isLoading,
+    isFetching,
+  } = useQuery(
+    trpc.adminHireRouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
   );
@@ -83,10 +92,33 @@ export default function PersonalDetailsForm({
   const selectedStateId = useWatch({ control, name: "state" });
 
   const { data: cities, isLoading: cityLoading } = useQuery(
-    trpc.hirerouter.getCities.queryOptions({
+    trpc.adminHireRouter.getCities.queryOptions({
       state: Number(selectedStateId),
     }),
   );
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isFetching &&
+      cities &&
+      cities.length > 0 &&
+      detectedCityName
+    ) {
+      const matchedCity = cities?.find(
+        (c) => c.city.toLowerCase() === detectedCityName.toLowerCase(),
+      );
+      if (matchedCity && matchedCity.id !== control._formValues.cityId) {
+        setValue("city", matchedCity.id, { shouldValidate: true });
+      }
+    }
+  }, [
+    detectedCityName,
+    control._formValues.cityId,
+    isFetching,
+    isLoading,
+    setValue,
+    cities,
+  ]);
 
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
     {
@@ -96,7 +128,7 @@ export default function PersonalDetailsForm({
       placeholder: "Upload your photo",
       component: "image",
       section: "profile",
-      error: "",
+      error: errors.photo?.message,
     },
     {
       control,
@@ -110,7 +142,7 @@ export default function PersonalDetailsForm({
         label: item.label,
         value: Number(item.value),
       })),
-      error: "",
+      error: errors.categoryId?.message,
     },
     {
       control,
@@ -125,7 +157,7 @@ export default function PersonalDetailsForm({
         label: item.name,
         value: Number(item.id),
       })),
-      error: "",
+      error: errors.subcategoryId?.message,
     },
     {
       control,
@@ -134,9 +166,8 @@ export default function PersonalDetailsForm({
       name: "name",
       placeholder: "Full Name",
       component: "input",
-      className: "",
       section: "profile",
-      error: "",
+      error: errors.name?.message,
     },
     {
       control,
@@ -150,7 +181,7 @@ export default function PersonalDetailsForm({
         label: item,
         value: item,
       })),
-      error: "",
+      error: errors.gender?.message,
     },
     {
       control,
@@ -166,7 +197,7 @@ export default function PersonalDetailsForm({
           value: item,
         };
       }),
-      error: "",
+      error: errors.maritalStatus?.message,
     },
     {
       control,
@@ -176,7 +207,7 @@ export default function PersonalDetailsForm({
       placeholder: "Father's Name",
       component: "input",
       section: "profile",
-      error: "",
+      error: errors.fatherName?.message,
     },
     {
       control,
@@ -186,7 +217,7 @@ export default function PersonalDetailsForm({
       placeholder: "Date of Birth",
       component: "input",
       section: "profile",
-      error: "",
+      error: errors.dob?.message,
     },
     {
       control,
@@ -196,13 +227,11 @@ export default function PersonalDetailsForm({
       placeholder: "Select Languages",
       component: "multiselect",
       section: "profile",
-      options: [
-        { value: "English", label: "English" },
-        { value: "Hindi", label: "Hindi" },
-        { value: "Telugu", label: "Telugu" },
-        { value: "Punjabi", label: "Punjabi" },
-      ],
-      error: "",
+      options: data.getLanguages.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
+      error: errors.languages?.message,
     },
     {
       control,
@@ -212,7 +241,7 @@ export default function PersonalDetailsForm({
       placeholder: "Mobile Number",
       component: "input",
       section: "profile",
-      error: "",
+      error: errors.mobileNumber?.message,
     },
     {
       control,
@@ -223,7 +252,7 @@ export default function PersonalDetailsForm({
       component: "input",
       required: false,
       section: "profile",
-      error: "",
+      error: errors.alternativeMobileNumber?.message,
     },
     {
       control,
@@ -234,7 +263,7 @@ export default function PersonalDetailsForm({
       component: "input",
       required: false,
       section: "profile",
-      error: "",
+      error: errors.email?.message,
     },
     {
       control,
@@ -244,7 +273,7 @@ export default function PersonalDetailsForm({
       placeholder: "Latitude",
       section: "loction",
       component: "input",
-      error: "",
+      error: errors.latitude?.message,
     },
     {
       control,
@@ -254,7 +283,7 @@ export default function PersonalDetailsForm({
       placeholder: "Longitude",
       component: "input",
       section: "loction",
-      error: "",
+      error: errors.longitude?.message,
     },
     {
       control,
@@ -264,7 +293,7 @@ export default function PersonalDetailsForm({
       placeholder: "Address",
       component: "input",
       section: "loction",
-      error: "",
+      error: errors.area?.message,
     },
     {
       control,
@@ -274,7 +303,7 @@ export default function PersonalDetailsForm({
       placeholder: "Pincode",
       component: "input",
       section: "loction",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
@@ -287,7 +316,7 @@ export default function PersonalDetailsForm({
       options:
         states?.map((state) => ({ label: state.label, value: state.value })) ??
         [],
-      error: "",
+      error: errors.state?.message,
     },
     {
       control,
@@ -299,7 +328,7 @@ export default function PersonalDetailsForm({
       section: "loction",
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: "",
+      error: errors.city?.message,
     },
   ];
 
@@ -327,13 +356,10 @@ export default function PersonalDetailsForm({
     nextPage();
   };
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-white rounded-lg shadow-xl"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 bg-white rounded-xl shadow">
+          <div className="p-6 bg-gray-50 rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Profile Information
             </h2>
@@ -346,10 +372,45 @@ export default function PersonalDetailsForm({
             </div>
 
             <div className="md:col-span-2 lg:col-span-3 mt-10">
+              <p className="mt-3 text-sm text-gray-500 italic mb-4">
+                Your latitude and longitude will only be used to improve
+                location-based services and will remain confidential. This
+                information will not be shared publicly.
+              </p>
               <div className="flex items-end justify-between mb-4">
                 <h3 className="text-md font-medium text-gray-700">
                   Location Details
                 </h3>
+
+                <div className="flex items-end justify-between mb-4 ">
+                  <LocationAutoDetect
+                    onResult={(data) => {
+                      const formatted = data.formattedAddress ?? "";
+                      const parts = formatted
+                        .split(",")
+                        .map((part) => part.trim());
+                      const lat = data.latitude;
+                      const long = data.longitude;
+                      const pincode = data.postalCode || "";
+                      const cityName = data.city || "";
+                      const stateName = data.region || "";
+                      const area = parts[0]?.match(/[A-Za-z]/)
+                        ? parts[0]
+                        : formatted;
+                      const matchedState = states?.find(
+                        (state) =>
+                          state.label === stateName.toLocaleUpperCase(),
+                      );
+                      setDetectedCityName(cityName);
+
+                      setValue("latitude", String(lat));
+                      setValue("longitude", String(long));
+                      setValue("area", area);
+                      setValue("pincode", pincode);
+                      setValue("state", matchedState?.value ?? 0);
+                    }}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

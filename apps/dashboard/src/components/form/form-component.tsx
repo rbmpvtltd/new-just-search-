@@ -106,6 +106,7 @@ export const FormField = <T extends FieldValues>({
               return (
                 <div>
                   <Input
+                    inputMode="numeric"
                     type={type}
                     name={name}
                     className={className}
@@ -256,7 +257,7 @@ export const FormField = <T extends FieldValues>({
       />
 
       {/* for error */}
-      {error && <div>{error}</div>}
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };

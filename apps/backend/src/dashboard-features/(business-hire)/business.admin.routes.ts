@@ -143,10 +143,17 @@ export const adminBusinessRouter = router({
         id: true,
       },
     });
+    const getSalesman = await db.query.salesmen.findMany({
+      columns: {
+        id: true,
+        referCode: true,
+      },
+    });
     return {
       users,
-      getBusinessCategories,
       getStates,
+      getSalesman,
+      getBusinessCategories,
     };
   }),
 
@@ -312,17 +319,30 @@ export const adminBusinessRouter = router({
           photo: true,
         },
       });
+      const referCode = await db.query.salesmen.findFirst({
+        where: (salesmen, { eq }) =>
+          eq(salesmen.id, Number(business?.salesmanId)),
+        columns: {
+          id: true,
+          referCode: true,
+        },
+      });
       return {
-        business,
         category,
-        businessPhotos,
-        subcategories,
-        getBusinessCategories,
+        business,
+        referCode,
         getStates,
+        subcategories,
+        businessPhotos,
+        getBusinessCategories,
       };
     }),
   update: adminProcedure
-    .input(businessUpdateSchema)
+    .input(
+      businessUpdateSchema.omit({
+        salesmanId: true,
+      }),
+    )
     .mutation(async ({ input }) => {
       const isBusinessExists = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>

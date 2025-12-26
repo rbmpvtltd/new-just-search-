@@ -15,9 +15,16 @@ import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { SetOpen } from "../../../add.form";
 import { useBusinessFormStore } from "../../../shared/store/useCreateBusinessStore";
+import type { AddBusinessPageType } from "..";
 
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
-export default function ContactDetail({ setOpen }: { setOpen: SetOpen }) {
+export default function ContactDetail({
+  data,
+  setOpen,
+}: {
+  data: AddBusinessPageType;
+  setOpen: SetOpen;
+}) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
     trpc.adminBusinessRouter.create.mutationOptions(),
@@ -38,6 +45,7 @@ export default function ContactDetail({ setOpen }: { setOpen: SetOpen }) {
       ownerNumber: formValue.ownerNumber ?? "",
       whatsappNo: formValue.whatsappNo ?? "",
       email: formValue.email ?? "",
+      salesmanId: formValue.salesmanId ?? "",
     },
   });
 
@@ -79,13 +87,17 @@ export default function ContactDetail({ setOpen }: { setOpen: SetOpen }) {
       required: false,
       error: errors.email?.message,
     },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   component: "input",
-    //   error: "",
-    // },
+    {
+      control,
+      label: "Select Salesman",
+      name: "salesmanId",
+      component: "select",
+      options: data?.getSalesman.map((item) => ({
+        label: item.referCode,
+        value: item.id,
+      })),
+      error: errors.salesmanId?.message,
+    },
   ];
 
   const onSubmit = (data: ContactDetailSchema) => {
@@ -114,18 +126,15 @@ export default function ContactDetail({ setOpen }: { setOpen: SetOpen }) {
     });
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className=" max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 shadow rounded-xl bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Business Contact
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-              {formFields.map((field) => (
+              {formFields.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>
@@ -139,6 +148,7 @@ export default function ContactDetail({ setOpen }: { setOpen: SetOpen }) {
           >
             PREVIOUS
           </Button>
+
           <Button
             type="submit"
             className="bg-orange-500 hover:bg-orange-700 font-bold"

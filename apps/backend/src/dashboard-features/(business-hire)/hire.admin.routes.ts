@@ -119,6 +119,11 @@ export const adminHireRouter = router({
     const getHireCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 2),
     });
+    const getDocuments = await db.query.documents.findMany();
+    const getHighestQualification =
+      await db.query.highestQualification.findMany();
+    const getLanguages = await db.query.languages.findMany();
+
     const getStates = await db.query.states.findMany();
     const users = await db.query.users.findMany({
       where: (user, { eq }) => eq(user.role, "visiter"),
@@ -127,10 +132,20 @@ export const adminHireRouter = router({
         id: true,
       },
     });
+    const getSalesman = await db.query.salesmen.findMany({
+      columns: {
+        id: true,
+        referCode: true,
+      },
+    });
     return {
       users,
-      getHireCategories,
       getStates,
+      getSalesman,
+      getLanguages,
+      getDocuments,
+      getHireCategories,
+      getHighestQualification,
     };
   }),
 
@@ -329,6 +344,10 @@ export const adminHireRouter = router({
         },
       });
       const getStates = await db.query.states.findMany();
+      const getLanguages = await db.query.languages.findMany();
+      const getDocuments = await db.query.documents.findMany();
+      const getHighestQualification =
+        await db.query.highestQualification.findMany();
       const hire = await db.query.hireListing.findFirst({
         where: (hire, { eq }) => eq(hire.id, input.id),
       });
@@ -345,115 +364,133 @@ export const adminHireRouter = router({
           subcategoryId: true,
         },
       });
+
+      const referCode = await db.query.salesmen.findFirst({
+        where: (salesmen, { eq }) => eq(salesmen.id, Number(hire?.salesmanId)),
+        columns: {
+          id: true,
+          referCode: true,
+        },
+      });
       return {
         hire,
         category,
-        subcategory,
-        getHireCategories,
         getStates,
+        referCode,
+        subcategory,
+        getLanguages,
+        getDocuments,
+        getHireCategories,
+        getHighestQualification,
       };
     }),
-  update: adminProcedure.input(hireUpdateSchema).mutation(async ({ input }) => {
-    //TODO: delete photo from cloudinary
-    const isHireExists = await db.query.hireListing.findFirst({
-      where: (hireListing, { eq }) =>
-        eq(hireListing.userId, Number(input.userId)),
-    });
-
-    if (!isHireExists) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Hire listing not found",
+  update: adminProcedure
+    .input(
+      hireUpdateSchema.omit({
+        salesmanId: true,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      //TODO: delete photo from cloudinary
+      const isHireExists = await db.query.hireListing.findFirst({
+        where: (hireListing, { eq }) =>
+          eq(hireListing.userId, Number(input.userId)),
       });
-    }
 
-    const updateHire = await db
-      .update(hireListing)
-      .set({
-        name: input.name,
-        photo: input.photo,
-        fatherName: input.fatherName,
-        dob: input.dob,
-        gender: input.gender,
-        maritalStatus: input.maritalStatus,
-        languages: Array.isArray(input.languages)
-          ? input.languages
-          : JSON.parse(input.languages || "[]"),
-        slug: input.name,
-        specialities: input.specialities,
-        description: input.description,
-        latitude: input.latitude,
-        longitude: input.longitude,
-        area: input.area,
-        pincode: input.pincode,
-        state: input.state,
-        city: input.city,
-        email: input.email,
-        mobileNumber: input.mobileNumber,
-        alternativeMobileNumber: input.alternativeMobileNumber,
-        highestQualification: input.highestQualification,
-        workExperienceYear: input.workExperienceYear,
-        workExperienceMonth: input.workExperienceMonth,
-        jobRole: input.jobRole,
-        previousJobRole: input.previousJobRole,
-        skillset: input.skillset,
-        jobType: Array.isArray(input.jobType)
-          ? input.jobType
-          : JSON.parse(input.jobType || "[]"),
-        jobDuration: Array.isArray(input.jobDuration)
-          ? input.jobDuration
-          : JSON.parse(input.jobDuration || "[]"),
-        workShift: Array.isArray(input.workShift)
-          ? input.workShift
-          : JSON.parse(input.workShift || "[]"),
-        locationPreferred: input.locationPreferred,
-        certificates: input.certificates,
-        expectedSalaryFrom: input.expectedSalaryFrom,
-        expectedSalaryTo: input.expectedSalaryTo,
-        employmentStatus: input.employmentStatus,
-        relocate: input.relocate,
-        availability: input.availability,
-        idProof: input.idProof,
-        idProofPhoto: input.idProofPhoto,
-        coverLetter: input.coverLetter,
-        resumePhoto: input.resumePhoto,
-        aboutYourself: input.aboutYourself,
-      })
-      .where(eq(hireListing.userId, isHireExists.userId));
+      if (!isHireExists) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Hire listing not found",
+        });
+      }
 
-    // return { updateHire: updateHire };
-    if (!updateHire) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Something went wrong",
-      });
-    }
+      const updateHire = await db
+        .update(hireListing)
+        .set({
+          name: input.name,
+          photo: input.photo,
+          fatherName: input.fatherName,
+          dob: input.dob,
+          gender: input.gender,
+          maritalStatus: input.maritalStatus,
+          languages: Array.isArray(input.languages)
+            ? input.languages
+            : JSON.parse(input.languages || "[]"),
+          slug: input.name,
+          specialities: input.specialities,
+          description: input.description,
+          latitude: input.latitude,
+          longitude: input.longitude,
+          area: input.area,
+          pincode: input.pincode,
+          state: input.state,
+          city: input.city,
+          email: input.email,
+          mobileNumber: input.mobileNumber,
+          alternativeMobileNumber: input.alternativeMobileNumber,
+          highestQualification: input.highestQualification,
+          workExperienceYear: input.workExperienceYear,
+          workExperienceMonth: input.workExperienceMonth,
+          jobRole: input.jobRole,
+          previousJobRole: input.previousJobRole,
+          skillset: input.skillset,
+          jobType: Array.isArray(input.jobType)
+            ? input.jobType
+            : JSON.parse(input.jobType || "[]"),
+          jobDuration: Array.isArray(input.jobDuration)
+            ? input.jobDuration
+            : JSON.parse(input.jobDuration || "[]"),
+          workShift: Array.isArray(input.workShift)
+            ? input.workShift
+            : JSON.parse(input.workShift || "[]"),
+          locationPreferred: input.locationPreferred,
+          certificates: input.certificates,
+          expectedSalaryFrom: input.expectedSalaryFrom,
+          expectedSalaryTo: input.expectedSalaryTo,
+          employmentStatus: input.employmentStatus,
+          relocate: input.relocate,
+          availability: input.availability,
+          idProof: input.idProof,
+          idProofPhoto: input.idProofPhoto,
+          coverLetter: input.coverLetter,
+          resumePhoto: input.resumePhoto,
+          aboutYourself: input.aboutYourself,
+        })
+        .where(eq(hireListing.userId, isHireExists.userId));
 
-    await db
-      .delete(hireCategories)
-      .where(eq(hireCategories.hireId, isHireExists.id));
+      // return { updateHire: updateHire };
+      if (!updateHire) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
 
-    await db
-      .delete(hireSubcategories)
-      .where(eq(hireSubcategories.hireId, isHireExists.id));
+      await db
+        .delete(hireCategories)
+        .where(eq(hireCategories.hireId, isHireExists.id));
 
-    await db.insert(hireCategories).values({
-      categoryId: input.categoryId,
-      hireId: isHireExists.id,
-    });
+      await db
+        .delete(hireSubcategories)
+        .where(eq(hireSubcategories.hireId, isHireExists.id));
 
-    await db.insert(hireSubcategories).values(
-      input.subcategoryId.map((subCategoryId) => ({
-        subcategoryId: subCategoryId,
+      await db.insert(hireCategories).values({
+        categoryId: input.categoryId,
         hireId: isHireExists.id,
-      })),
-    );
+      });
 
-    return {
-      success: true,
-      message: "Hire listing updated successfully",
-    };
-  }),
+      await db.insert(hireSubcategories).values(
+        input.subcategoryId.map((subCategoryId) => ({
+          subcategoryId: subCategoryId,
+          hireId: isHireExists.id,
+        })),
+      );
+
+      return {
+        success: true,
+        message: "Hire listing updated successfully",
+      };
+    }),
   multidelete: adminProcedure
     .input(
       z.object({

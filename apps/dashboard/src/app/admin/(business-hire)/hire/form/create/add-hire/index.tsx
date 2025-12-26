@@ -28,11 +28,11 @@ export function AddHirePage({
       case 0:
         return <PersonalDetailsForm data={data} />;
       case 1:
-        return <EducationForm />;
+        return <EducationForm data={data} />;
       case 2:
         return <PreferredPositionForm />;
       case 3:
-        return <DocumentsForm setOpen={setOpen} />;
+        return <DocumentsForm setOpen={setOpen} data={data} />;
       default:
         return <PersonalDetailsForm data={data} />;
     }
@@ -58,7 +58,7 @@ export function AddHirePage({
           ></div>
         </div>
       </div>
-      <div className="border p-4 rounded-lg">{renderForm()}</div>
+      <div className="border rounded-lg">{renderForm()}</div>
     </div>
   );
 }

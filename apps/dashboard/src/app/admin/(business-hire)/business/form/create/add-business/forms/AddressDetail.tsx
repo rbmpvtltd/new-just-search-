@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addressDetailSchema } from "@repo/db/dist/schema/business.schema";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
@@ -58,7 +58,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     isLoading,
     isFetching,
   } = useQuery(
-    trpc.businessrouter.getCities.queryOptions({
+    trpc.adminBusinessRouter.getCities.queryOptions({
       state: selectedStateId,
     }),
   );
@@ -124,7 +124,6 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     },
     {
       control,
-
       label: "Latitude",
       name: "latitude",
       placeholder: "Latitude",
@@ -133,7 +132,6 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     },
     {
       control,
-
       label: "Longitude",
       name: "longitude",
       placeholder: "Longitude",
@@ -185,13 +183,10 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     nextPage();
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl ">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 shadow rounded-xl bg-gray-50 border">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Business Address
             </h2>
@@ -200,10 +195,9 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
               location-based services and will remain confidential. This
               information will not be shared publicly.
             </p>
-            <div className="flex items-end justify-between mb-4 ">
+            <div className="flex justify-between mb-4 max-w-[30%]">
               <LocationAutoDetect
                 onResult={(data) => {
-                  console.log("Detected:", data);
                   const formatted = data.formattedAddress ?? "";
                   const parts = formatted.split(",").map((p) => p.trim());
                   const lat = data.latitude;
@@ -222,8 +216,6 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
                     (item) => item.label === stateName.toLocaleUpperCase(),
                   );
 
-                  console.log("matchedState", cityName);
-
                   setDetectedCityName(cityName);
 
                   setValue("buildingName", building_name ?? "");
@@ -239,7 +231,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-              {formFields.map((field) => (
+              {formFields.map((field, index) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>

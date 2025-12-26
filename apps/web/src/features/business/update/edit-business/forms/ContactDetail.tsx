@@ -49,7 +49,6 @@ export default function ContactDetail({
       phoneNumber: businessListing?.business?.phoneNumber ?? "",
       ownerNumber: businessListing?.business?.ownerNumber ?? "",
       whatsappNo: businessListing?.business?.whatsappNo ?? "",
-
       email: businessListing?.business?.email ?? "",
       referCode: businessListing?.referCode?.referCode ?? "",
     },

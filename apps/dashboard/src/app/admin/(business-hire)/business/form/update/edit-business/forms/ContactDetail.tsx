@@ -6,8 +6,7 @@ import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Swal from "sweetalert2";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -20,7 +19,14 @@ import type { SetOpen } from "../../../edit.form";
 import { useBusinessFormStore } from "../../../shared/store/useCreateBusinessStore";
 import type { EditAdminBusinessType } from "..";
 
-type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
+export const adminContactDetailInsertSchema = contactDetailSchema
+  .omit({
+    salesmanId: true,
+  })
+  .extend({
+    referCode: z.string().optional(),
+  });
+type ContactDetailSchema = z.infer<typeof adminContactDetailInsertSchema>;
 export default function ContactDetail({
   data,
   setOpen,
@@ -42,13 +48,14 @@ export default function ContactDetail({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ContactDetailSchema>({
-    resolver: zodResolver(contactDetailSchema),
+    resolver: zodResolver(adminContactDetailInsertSchema),
     defaultValues: {
       contactPerson: data?.business?.contactPerson ?? "",
       phoneNumber: data?.business?.phoneNumber ?? "",
       ownerNumber: data?.business?.ownerNumber ?? "",
       whatsappNo: data?.business?.whatsappNo ?? "",
       email: data?.business?.email ?? "",
+      referCode: data?.referCode?.referCode ?? "",
     },
   });
 
@@ -95,13 +102,15 @@ export default function ContactDetail({
       required: false,
       error: errors.email?.message,
     },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   component: "input",
-    //   error: "",
-    // },
+    {
+      control,
+      label: "Refer Code",
+      name: "referCode",
+      component: "input",
+      placeholder: "Refer Code",
+      disabled: true,
+      error: errors.referCode?.message,
+    },
   ];
 
   const onSubmit = (data: ContactDetailSchema) => {
@@ -110,12 +119,6 @@ export default function ContactDetail({
     useBusinessFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));
-
-    // Optional: verify merged data immediately
-    // console.log(
-    //   "Final merged Zustand data:",
-    //   useBusinessFormStore.getState().formValue,
-    // );
 
     mutate(
       { ...finalData, pincode: formValue.pincode },
@@ -132,7 +135,6 @@ export default function ContactDetail({
             });
             setOpen(false);
           }
-          console.log("Success", data);
         },
         onError: (error) => {
           if (isTRPCClientError(error)) {

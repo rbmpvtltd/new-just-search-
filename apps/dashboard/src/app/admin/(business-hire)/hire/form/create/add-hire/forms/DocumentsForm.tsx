@@ -19,12 +19,19 @@ import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { SetOpen } from "../../../add.form";
 import { useHireFormStore } from "../../../shared/store/useCreateHireStore";
+import type { AddAdminHireType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
-export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
+export default function DocumentsForm({
+  data,
+  setOpen,
+}: {
+  data: AddAdminHireType;
+  setOpen: SetOpen;
+}) {
   const router = useRouter();
   const trpc = useTRPC();
-  const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
+  const { mutate } = useMutation(trpc.adminHireRouter.create.mutationOptions());
   const formValue = useHireFormStore((state) => state.formValue);
   const prevPage = useHireFormStore((state) => state.prevPage);
   const clearPage = useHireFormStore((state) => state.clearPage);
@@ -42,7 +49,7 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
       coverLetter: formValue.coverLetter ?? "",
       resumePhoto: formValue.resumePhoto ?? "",
       aboutYourself: formValue.aboutYourself ?? "",
-      // referCode: formValue.referCode ?? "RBMHORJ00000",
+      salesmanId: formValue.salesmanId ?? "",
     },
   });
 
@@ -57,7 +64,7 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
     setFormValue("coverLetter", data.coverLetter ?? "");
     setFormValue("resumePhoto", files[1] ?? "");
     setFormValue("aboutYourself", data.aboutYourself ?? "");
-    // setFormValue("referCode", data.referCode ?? "");
+    setFormValue("salesmanId", data.salesmanId ?? "");
 
     mutate(finalData, {
       onSuccess: async (data) => {
@@ -92,13 +99,10 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
       name: "idProof",
       placeholder: "Id Proof",
       component: "select",
-      options: [
-        { label: "Aadhar Card", value: "Aadhar Card" },
-        { label: "Pan Card", value: "Pan Card" },
-        { label: "Voter Id Card", value: "Voter Id Card" },
-        { label: "Driving License", value: "Driving License" },
-        { label: "Others", value: "Others" },
-      ],
+      options: data.getDocuments.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       error: errors.idProof?.message,
     },
     {
@@ -138,20 +142,29 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
       required: false,
       error: errors.aboutYourself?.message,
     },
+    {
+      control,
+      label: "Salesman",
+      name: "salesmanId",
+      placeholder: "",
+      component: "select",
+      options: data.getSalesman.map((item) => ({
+        label: item.referCode,
+        value: item.id,
+      })),
+      error: errors.salesmanId?.message,
+    },
   ];
   return (
-    <div className="min-h-screen p-4">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl mx-auto bg-gray-100 rounded-lg shadow-xl"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 bg-gray-50 rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Documents
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {formFields.map((field, index) => (
+              {formFields.map((field) => (
                 <FormField key={field.name} {...field} />
               ))}
             </div>
@@ -160,7 +173,7 @@ export default function DocumentsForm({ setOpen }: { setOpen: SetOpen }) {
         <div className="flex justify-end p-6 border-t border-gray-200 gap-4">
           <Button
             onClick={prevPage}
-            type="submit"
+            type="button"
             className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             PREVIOUS

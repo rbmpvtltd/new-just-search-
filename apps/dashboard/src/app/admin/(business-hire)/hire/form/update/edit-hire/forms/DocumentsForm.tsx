@@ -2,11 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "@repo/db/dist/schema/hire.schema";
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Swal from "sweetalert2";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -20,7 +18,14 @@ import type { SetOpen } from "../../../edit.form";
 import { useHireFormStore } from "../../../shared/store/useCreateHireStore";
 import type { EditAdminHireType } from "..";
 
-type DocumentSchema = z.infer<typeof documentSchema>;
+export const adminDocumentInsertSchema = documentSchema
+  .omit({
+    salesmanId: true,
+  })
+  .extend({
+    referCode: z.string().optional(),
+  });
+type DocumentSchema = z.infer<typeof adminDocumentInsertSchema>;
 export default function DocumentsForm({
   data,
   setOpen,
@@ -40,19 +45,19 @@ export default function DocumentsForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<DocumentSchema>({
-    resolver: zodResolver(documentSchema),
+    resolver: zodResolver(adminDocumentInsertSchema),
     defaultValues: {
-      idProof: data?.hire?.idProof ?? "",
+      idProof: data?.hire?.idProof,
       idProofPhoto: data?.hire?.idProofPhoto ?? "",
       coverLetter: data?.hire?.coverLetter ?? "",
       resumePhoto: data?.hire?.resumePhoto ?? "",
       aboutYourself: data?.hire?.aboutYourself ?? "",
+      referCode: data?.referCode?.referCode ?? "",
     },
   });
 
+  
   const onSubmit = async (data: DocumentSchema) => {
-    // console.log("data", data);
-
     const files = await uploadToCloudinary(
       [data.idProofPhoto, data.resumePhoto],
       "hire",
@@ -63,7 +68,6 @@ export default function DocumentsForm({
     setFormValue("coverLetter", data.coverLetter ?? "");
     setFormValue("resumePhoto", files[1] ?? "");
     setFormValue("aboutYourself", data.aboutYourself ?? "");
-    // setFormValue("referCode", data.referCode ?? "");
 
     const newData = {
       ...data,
@@ -71,32 +75,34 @@ export default function DocumentsForm({
       resumePhoto: files[1] ?? "",
     };
     const finalData = { ...formValue, ...newData };
-    console.log("finalData", finalData);
 
-    mutate(finalData, {
-      onSuccess: async (data) => {
-        if (data?.success) {
-          clearPage();
-          toast("success", {
-            description: data.message,
-          });
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.adminHireRouter.list.queryKey(),
-          });
-          setOpen(false);
-        }
-        console.log("success", data);
+    mutate(
+      { ...finalData },
+      {
+        onSuccess: async (data) => {
+          if (data?.success) {
+            clearPage();
+            toast("success", {
+              description: data.message,
+            });
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.adminHireRouter.list.queryKey(),
+            });
+            setOpen(false);
+          }
+          console.log("success", data);
+        },
+        onError: async (error) => {
+          if (isTRPCClientError(error)) {
+            toast.error("Error", {
+              description: error.message,
+            });
+            console.error("error,", error.message);
+          }
+        },
       },
-      onError: async (error) => {
-        if (isTRPCClientError(error)) {
-          toast.error("Error", {
-            description: error.message,
-          });
-          console.error("error,", error.message);
-        }
-      },
-    });
+    );
   };
   const formFields: FormFieldProps<DocumentSchema>[] = [
     {
@@ -105,13 +111,10 @@ export default function DocumentsForm({
       name: "idProof",
       placeholder: "Id Proof",
       component: "select",
-      options: [
-        { label: "Aadhar Card", value: "Aadhar Card" },
-        { label: "Pan Card", value: "Pan Card" },
-        { label: "Voter Id Card", value: "Voter Id Card" },
-        { label: "Driving License", value: "Driving License" },
-        { label: "Others", value: "Others" },
-      ],
+      options: data.getDocuments.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       error: errors.idProof?.message,
     },
     {
@@ -151,14 +154,15 @@ export default function DocumentsForm({
       required: false,
       error: errors.aboutYourself?.message,
     },
-    // {
-    //   control,
-    //   label: "Refer Code",
-    //   name: "referCode",
-    //   placeholder: "Refer Code",
-    //   component: "input",
-    //   error: errors.referCode?.message,
-    // },
+    {
+      control,
+      label: "Refer Code",
+      name: "referCode",
+      placeholder: "Refer Code",
+      component: "input",
+      disabled: true,
+      error: errors.referCode?.message,
+    },
   ];
 
   return (
