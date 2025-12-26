@@ -28,6 +28,7 @@ import * as offer from "./schema/offer.schema";
 import * as plan from "./schema/plan.schema";
 import * as product from "./schema/product.schema";
 import * as user from "./schema/user.schema";
+import * as notification from "./schema/notification.schema";
 
 export type UserRole = (typeof UserRoleType)[keyof typeof UserRoleType];
 
@@ -49,6 +50,7 @@ export const schemas = {
   user,
   chat,
   help_and_support,
+  notification,
 };
 
 export const db = drizzle({

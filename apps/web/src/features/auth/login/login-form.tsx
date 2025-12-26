@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { setRole, setToken } from "@/utils/session";
+import GoogleLoginBtn from "./google-login";
+import AppleLoginBtn from "./apple-login";
 
 const formSchema = z.object({
   username: z.string(),
@@ -123,6 +125,10 @@ export function LoginForm({
                 <Button type="submit" className="w-full">
                   Login
                 </Button>
+                <div className="flex justify-between">
+                  <GoogleLoginBtn />
+                  <AppleLoginBtn />
+                </div>
               </div>
             </form>
           </Form>

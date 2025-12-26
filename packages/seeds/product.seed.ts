@@ -23,7 +23,7 @@ import { clouadinaryFake } from "./seeds";
 dotenv.config();
 export const productSeed = async () => {
   // await clearAllTablesBusiness();
-  await addProduct();
+  // await addProduct();
   await addProductReviews();
   // await addRecentViewProduct();
   await addProductSubCategroy();
@@ -34,7 +34,7 @@ export const clearAllTablesBusiness = async () => {
     `TRUNCATE TABLE product_subcategories RESTART IDENTITY CASCADE;`,
   );
   await db.execute(`TRUNCATE TABLE product_reviews RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE products RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
 
@@ -130,6 +130,7 @@ const addProductReviews = async () => {
     if (!business) {
       console.log(`business not found ${row.id} using faKe business`);
       business = fakeBusiness as any;
+      continue;
     }
 
     const [Product] = await db
@@ -140,7 +141,7 @@ const addProductReviews = async () => {
       console.log("Product not found", row.id);
       continue;
     }
-
+    console.log("conflicts is here", business);
     await db.insert(productReviews).values({
       id: row.id,
       userId: user!.id,

@@ -77,7 +77,7 @@ import { Configure, InstantSearch } from "react-instantsearch-core";
 //     </SafeAreaView>
 //   );
 // }
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InfiniteHits } from "@/components/home/InfiniteHits";
 import { SearchBox } from "@/components/home/SearchBox";

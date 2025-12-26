@@ -12,6 +12,7 @@ import jwt from "jsonwebtoken";
 import { appRouter, openRouter } from "./route";
 import { createContext } from "./utils/context";
 import { limiter } from "./utils/limiter";
+import { createSession } from "./features/auth/lib/session";
 
 const app = express();
 
@@ -47,7 +48,7 @@ app.post("/auth/apple/callback", async (req, res) => {
 
   try {
     const privateKey = fs.readFileSync(
-      "/home/meekail/Desktop/justsearch/application/new-just-search-/apps/backend/keys/AuthKey_LSC5HAHRF8.p8",
+      "/home/meekail/Desktop/justsearch/application/new-justsearch/apps/backend/keys/AuthKey_LSC5HAHRF8.p8",
     );
 
     const clientSecret = jwt.sign(
@@ -98,15 +99,39 @@ app.post("/auth/apple/callback", async (req, res) => {
           displayName: name,
           email,
           role: UserRole.guest,
-          googleId: appleId,
+          appleId: appleId,
           createdAt: new Date(),
         })
         .returning();
 
       user = inserted[0];
     }
+    const session = await createSession(Number(user?.id));
 
-    return res.redirect(`http://localhost:3000?email=${user?.email}`);
+    // Set HTTP-only cookie with the session token
+
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Login Success</title>
+        </head>
+        <body>
+          <script>
+            window.opener.postMessage(
+              {
+                type: 'GOOGLE_AUTH_SUCCESS',
+                session: '${session?.token}',
+                role: '${session?.role}'
+              },
+              '${process.env.FRONTEND_URL || "http://localhost:9000"}'
+            );
+            window.close();
+          </script>
+          <p>Login successful! This window will close automatically...</p>
+        </body>
+      </html>
+    `);
   } catch (err) {
     console.error("Apple login error:", err);
     res.status(500).json({ error: "Apple login failed" });
@@ -115,11 +140,9 @@ app.post("/auth/apple/callback", async (req, res) => {
 
 app.get("/auth/google/callback", async (req, res) => {
   const code = req.query.code as string;
-
   if (!code) {
     return res.status(400).json({ error: "Missing code parameter" });
   }
-
   try {
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -128,7 +151,7 @@ app.get("/auth/google/callback", async (req, res) => {
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
         code,
-        redirect_uri: "http://localhost:4000/auth/google/callback",
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
         grant_type: "authorization_code",
       }),
     });
@@ -166,9 +189,30 @@ app.get("/auth/google/callback", async (req, res) => {
 
       user = inserted[0];
     }
-
+    const session = await createSession(Number(user?.id));
     // You can store a session or JWT here before redirecting to frontend
-    res.redirect(`http://localhost:3000?email=${user?.email}`);
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Login Success</title>
+        </head>
+        <body>
+          <script>
+            window.opener.postMessage(
+              {
+                type: 'GOOGLE_AUTH_SUCCESS',
+                session: '${session?.token}',
+                role: '${session?.role}'
+              },
+              '${process.env.FRONTEND_URL || "http://localhost:9000"}'
+            );
+            window.close();
+          </script>
+          <p>Login successful! This window will close automatically...</p>
+        </body>
+      </html>
+    `);
   } catch (err) {
     console.error("Google login error:", err);
     res.status(500).json({ error: "Google login failed" });

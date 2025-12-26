@@ -1,17 +1,12 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@tanstack/react-query";
+import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Configure, InstantSearch } from "react-instantsearch-core";
-import {
-  Button,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import CustomCarousel from "@/components/Carousel/CustomCaraousel";
 import { InfiniteHits } from "@/components/home/InfiniteHits";
 import { SearchBox } from "@/components/home/SearchBox";
@@ -27,6 +22,7 @@ import { UpdateModel } from "@/features/version/Component/UpdateModel";
 // import { trpc } from "@/lib/trpc";
 import { searchClient } from "@/lib/algoliaClient";
 import { trpc } from "@/lib/trpc";
+import { deviceId, platform } from "@/utils/getDeviceId";
 
 // import Banner1 from "@/components/home/Banner1";
 // import Banner2 from "@/components/home/Banner2";
@@ -41,37 +37,28 @@ import { trpc } from "@/lib/trpc";
 //   return firstBanner;
 // }
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// async function sendPushNotification(expoPushToken: string) {
+//   console.log("sending notification===");
+//   const message = {
+//     to: expoPushToken,
+//     sound: "default",
+//     title: "Original Title",
+//     body: "And here is the body!",
+//     data: { someData: "goes here" },
+//   };
 
-async function sendPushNotification(expoPushToken: string) {
-  console.log("sending notification===");
-  const message = {
-    to: expoPushToken,
-    sound: "default",
-    title: "Original Title",
-    body: "And here is the body!",
-    data: { someData: "goes here" },
-  };
-
-  const response = await fetch("https://exp.host/--/api/v2/push/send", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Accept-encoding": "gzip, deflate",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
-  });
-  const res = await response.json();
-  console.log(res);
-}
+//   const response = await fetch("https://exp.host/--/api/v2/push/send", {
+//     method: "POST",
+//     headers: {
+//       Accept: "application/json",
+//       "Accept-encoding": "gzip, deflate",
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(message),
+//   });
+//   const res = await response.json();
+//   console.log(res);
+// }
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === "android") {
@@ -97,19 +84,21 @@ async function registerForPushNotificationsAsync() {
       );
       return;
     }
-    // const projectId =
-    //   Constants?.expoConfig?.extra?.eas?.projectId ??
-    //   Constants?.easConfig?.projectId;
-    // if (!projectId) {
-    //   console.log("Project ID not found");
-    // }
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ??
+      Constants?.easConfig?.projectId;
+    if (!projectId) {
+      console.log("Project ID not found");
+    }
+    console.log("project id is ===>", projectId);
     try {
       const pushTokenString = (
         await Notifications.getExpoPushTokenAsync({
-          projectId: "8c3b55c8-9c53-44c6-8402-5c8a46a0242c",
+          projectId,
         })
       ).data;
       console.log(pushTokenString);
+      await AsyncStorage.setItem("pushToken", pushTokenString);
       return pushTokenString;
     } catch (e: unknown) {
       console.log(`${e}`);
@@ -159,12 +148,6 @@ export default function TabOneScreen() {
     <ScrollView keyboardShouldPersistTaps="handled">
       <View className="flex items-center r rounded-4xl">
         <UpdateModel latestVersion={latestVersion ?? "1.0.0"} />
-        <Button
-          title="Press to Send Notification"
-          onPress={async () => {
-            await sendPushNotification(expoPushToken);
-          }}
-        />
         <CustomCarousel />
         <InstantSearch searchClient={searchClient} indexName="all_listing">
           <SearchBox />

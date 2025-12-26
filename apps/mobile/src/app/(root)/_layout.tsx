@@ -6,6 +6,17 @@ import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useNotificationCount } from "@/query/notification/notication";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function TabLayout() {
   const {

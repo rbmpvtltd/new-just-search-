@@ -26,7 +26,7 @@ export const authRouter = router({
       "https://accounts.google.com/o/oauth2/v2/auth?" +
       new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID!,
-        redirect_uri: "http://localhost:4000/auth/google/callback", // oo url apne google console me authorized redirect url me add karno howe
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!, // oo url apne google console me authorized redirect url me add karno howe
         response_type: "code",
         scope: "profile email",
       }).toString();
