@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Pressable, Text } from "react-native";
 import LoginFrom from "@/features/auth/forms/LoginFrom";
 import SignupComponent from "@/features/auth/forms/SignUpForm";
+import { deviceId, platform } from "@/utils/getDeviceId";
 
 const LoginComponent: React.FC = () => {
   const [alreadHaveAc, setAlreadyHaveAc] = useState<boolean>(true);

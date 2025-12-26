@@ -9,6 +9,8 @@ import { queryClient, trpc } from "@/lib/trpc";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../../../components/inputs/Input";
 import { type LoginFormData, loginSchema } from "../schema/loginSchema";
+import { deviceId, platform } from "@/utils/getDeviceId";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginFrom() {
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
@@ -23,23 +25,49 @@ export default function LoginFrom() {
       password: "",
     },
   });
+  const { mutate: pushTokenMutation } = useMutation(
+    trpc.notificationRouter.createPushToken.mutationOptions(),
+  );
 
   const loginMutation = useMutation(
     trpc.auth.loginMobile.mutationOptions({
       onSuccess: async (data) => {
-        console.log("data isn businessHireLogin.tsx line 36", data);
         if (data) {
-          console.log("data is =dfsfsfsdfsdfsdfsdf=====>", data);
           setAuthStoreToken(data?.session ?? "", data.role ?? "visiter");
           // await Purchases.logIn(data?.revanueCatToken ?? "");
           await setTokenRole(data?.session ?? "", data.role ?? "visiter");
           queryClient.invalidateQueries({
             queryKey: trpc.auth.verifyauth.queryKey(),
           });
-          await Purchases.logIn(data?.ravanueCatId ?? "");
-          Alert.alert("Login Successfully");
+          const pushToken = await AsyncStorage.getItem("pushToken");
+
+          if (!pushToken) {
+            console.log("No push token found in AsyncStorage");
+            return;
+          }
+
+          console.log("Push token found:", pushToken);
+          pushTokenMutation(
+            {
+              deviceId: String(deviceId),
+              platform: platform,
+              token: String(pushToken),
+            },
+            {
+              onSuccess: (data) => {
+                console.log("data inserted successfully=========>", data);
+                // return router.back();
+              },
+              onError: (err) => {
+                console.log("failed data insertion ====>", err);
+              },
+            },
+          );
+          // await Purchases.logIn(data?.ravanueCatId ?? "");
+          // Alert.alert("Login Successfully");
+          console.log("Login Successfully");
+
           // router.push("/(root)/(home)/home");
-          return router.back();
         }
       },
       onError: async (error) => {
