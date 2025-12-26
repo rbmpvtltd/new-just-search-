@@ -89,13 +89,10 @@ export const revenueCatRouter = asyncHandler(
             .where(eq(planUserActive.userId, user.id));
         }
 
-        console.log("event subitting successfully");
-        console.log(`subscription${user.id}`);
-
-        subcriptionEventEmit.emit(
-          `subscription${user.id}`,
-          "subscription created successfully",
-        );
+        // subcriptionEventEmit.emit(
+        //   `subscription${user.id}`,
+        //   "subscription created successfully",
+        // );
         console.log("event subitted successfully");
         break;
       }

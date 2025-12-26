@@ -1,26 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useSubscription } from "@trpc/tanstack-react-query";
-import { useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
-import Purchases, { type PurchasesPackage } from "react-native-purchases";
+import { Pressable, Text, useColorScheme, View } from "react-native";
+import type { PurchasesPackage } from "react-native-purchases";
 import { SafeAreaView } from "react-native-safe-area-context";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import Colors from "@/constants/Colors";
-// import { useVerityApplePay } from "@/query/razorPay";
 import { useAuthStore } from "@/features/auth/authStore";
-import {
-  type OutputTrpcType,
-  queryClient,
-  trpc,
-  type UnwrapArray,
-} from "@/lib/trpc";
+import type { OutputTrpcType, UnwrapArray } from "@/lib/trpc";
 import { usePlanStore } from "./planStore";
+import { PlanSubmit } from "./planSubmit";
 
 type PlanArray = OutputTrpcType["planRouter"]["list"]["plans"];
 type ActivePlan = OutputTrpcType["planRouter"]["list"]["activePlan"];
@@ -28,33 +15,27 @@ type Plan = UnwrapArray<PlanArray>;
 export default function PricingCard({
   plan,
   activePlan,
-  // pkg,
+  pkg,
 }: {
   plan: Plan;
   activePlan: ActivePlan;
-  // pkg: PurchasesPackage | null | undefined;
+  pkg: PurchasesPackage | null | undefined;
 }) {
   const colorScheme = useColorScheme();
-  const loading = usePlanStore((state) => state.loading);
-  const offerings = usePlanStore((state) => state.offerings);
-  const getPkg = (title: string) => {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle === "free") {
-      return null;
-    }
-    return offerings?.all[lowerTitle].availablePackages[0];
-  };
-
-  const pkg = getPkg(plan.title);
-
+  const storePlan = usePlanStore((state) => state.activePlan);
+  const setNewStore = usePlanStore((state) => state.setNew);
   const currentRole = useAuthStore((state) => state.role);
-
   const showBtn = currentRole === plan.role || currentRole === "visiter";
   const buttonDisable =
     (plan.role === "all" || !showBtn) && activePlan.isactive;
 
-  if (loading) {
-    return <ActivityIndicator size="small" />;
+  if (storePlan.id === plan.id && storePlan.active && pkg) {
+    console.log("loading is", storePlan);
+    return (
+      <BoundaryWrapper>
+        <PlanSubmit pkg={pkg} />
+      </BoundaryWrapper>
+    );
   }
 
   return (
@@ -123,7 +104,7 @@ export default function PricingCard({
             }}
             className={`rounded-full py-3 items-center justify-center bg-base-300`}
             disabled={buttonDisable}
-            onPress={() => handleSubscribe(pkg)}
+            onPress={() => setNewStore(plan.id, true)}
           >
             <Text className={`font-semibold text-lg text-secondary `}>
               {plan.id === activePlan.planid

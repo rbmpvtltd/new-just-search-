@@ -1,7 +1,7 @@
 // features/banners/banners.admin.routes.ts
 
 import crypto from "node:crypto";
-import { EventEmitter, on } from "node:events";
+import { on } from "node:events";
 import { db } from "@repo/db";
 import {
   banners,
@@ -24,18 +24,22 @@ import {
 import { razorpayInstance } from "@/lib/razorpay";
 import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
 export const subscriptionRouter = router({
-  verifyPayement: protectedProcedure.subscription(async function* ({ ctx }) {
-    console.log("I am inside verifyPayement");
-    console.log(`subscription${ctx.userId}`);
+  verifyPayment: protectedProcedure
+    .input(
+      z.object({
+        planId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const currentPlan = await db.query.planUserActive.findFirst({
+        where: eq(planUserActive.userId, ctx.userId),
+      });
 
-    for await (const [msg] of on(
-      subcriptionEventEmit,
-      `subscription${ctx.userId}`,
-    )) {
-      console.log("subscriptions is trigger and mes is ", msg);
-      yield msg;
-    }
-  }),
+      if (currentPlan?.planId === input.planId) {
+        return true;
+      }
+      return false;
+    }),
   create: protectedProcedure
     .input(z.object({ identifier: z.string() }))
     .mutation(async ({ input, ctx }) => {

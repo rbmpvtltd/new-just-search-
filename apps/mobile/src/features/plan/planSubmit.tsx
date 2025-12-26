@@ -1,69 +1,116 @@
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
-import { Alert, View } from "react-native";
+import { Alert, Modal, Pressable, Text, View } from "react-native";
 import Purchases, { type PurchasesPackage } from "react-native-purchases";
 import { Loading } from "@/components/ui/Loading";
 import { queryClient, trpc } from "@/lib/trpc";
 import { usePlanStore } from "./planStore";
 
-export const planSubmit = () => {
-  const activeOffering = usePlanStore((state) => state.activeOffering);
-  const offerings = usePlanStore((state) => state.offerings);
-  const loading = usePlanStore((state) => state.loading);
-  const setLoading = usePlanStore((state) => state.setLoading);
-  const { data: paymentVerify } = useSubscription(
-    trpc.subscriptionRouter.verifyPayement.subscriptionOptions(),
-  );
-  console.log("Payment verify emit", paymentVerify);
-
-  const getPkg = (title: string) => {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle === "free") {
-      return null;
-    }
-    return offerings?.all[lowerTitle].availablePackages[0];
-  };
-
-  const pkg = getPkg(activeOffering || "");
-  if (pkg) {
-    Purchases.purchasePackage(pkg);
-  }
-
-  const handleSubscribe = async (pkg: PurchasesPackage | null | undefined) => {
-    setLoading(true);
-    if (!pkg) {
-      setLoading(false);
-      return;
-    }
-    try {
-      const { customerInfo, productIdentifier, transaction } =
+export const PlanSubmit = ({ pkg }: { pkg: PurchasesPackage }) => {
+  console.log("submition is started");
+  const reverseCurrent = usePlanStore((state) => state.reverseCurrent);
+  const { data, isError, isFetched } = useSuspenseQuery({
+    queryKey: ["purchasing"],
+    queryFn: async () => {
+      const { customerInfo, productIdentifier } =
         await Purchases.purchasePackage(pkg);
       if (
         typeof customerInfo.entitlements.active[productIdentifier] !==
         "undefined"
       ) {
-        console.log("payment done");
+        return true;
+      } else {
+        return false;
       }
-    } catch (e) {
-      console.log(e);
-      setLoading(false);
-    }
-  };
+    },
+  });
+
+  if (isError || !data) {
+    Alert.alert("Verification Failed");
+    reverseCurrent(false);
+    return null;
+  }
+
+  if (isFetched && data) {
+    return <SubscriptionEventComponent />;
+  }
+
+  return (
+    <View className="absolute bg-black opacity-60 inset-0 items-center justify-center">
+      <Loading position="center" size="large" />
+    </View>
+  );
+};
+
+const SubscriptionEventComponent = () => {
+  const reverseCurrent = usePlanStore((state) => state.reverseCurrent);
+  const currentPlan = usePlanStore((state) => state.activePlan);
+  const { data: paymentVerify } = useQuery(
+    trpc.subscriptionRouter.verifyPayment.queryOptions(
+      {
+        planId: currentPlan.id,
+      },
+      {
+        refetchInterval: 1000,
+      },
+    ),
+  );
 
   if (paymentVerify) {
     queryClient.invalidateQueries({
       queryKey: trpc.planRouter.list.queryKey(),
     });
-    Alert.alert("Payment Successfull", "Your plan has been activated");
-    setLoading(false);
-  }
 
-  if (loading) {
     return (
-      <View className="absolute bg-black opacity-60 inset-0 items-center justify-center">
-        <Loading position="center" size="large" />
+      <View style={{ flex: 1 }}>
+        <Modal visible={true} transparent animationType="fade">
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.5)",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 20,
+                borderRadius: 12,
+                width: "85%",
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                Payment Done
+              </Text>
+
+              <View style={{ marginTop: 20 }}>
+                <Pressable
+                  style={{
+                    backgroundColor: "#2563eb",
+                    padding: 12,
+                    borderRadius: 8,
+                    marginBottom: 10,
+                  }}
+                  onPress={() => {
+                    reverseCurrent(false);
+                  }}
+                >
+                  <Text style={{ color: "white", textAlign: "center" }}>
+                    Okay
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
-
-  return <div></div>;
+  return (
+    <View className="absolute bg-black opacity-60 inset-0 items-center justify-center">
+      <Text className="text-secondary">Waiting for responet</Text>
+      <Loading position="center" size="large" />
+    </View>
+  );
 };
