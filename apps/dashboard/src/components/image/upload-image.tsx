@@ -60,7 +60,7 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
 
   return (
     <>
-      <div className="h-50 relative w-50 overflow-hidden">
+      <div className="h-50 relative w-50 overflow-hidden border-2 border-gray-600 ">
         <input
           className="absolute opacity-0 inset-0 cursor-pointer z-10"
           type="file"
@@ -68,25 +68,33 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
           onChange={onFileChange}
         />
 
-        {!firstTime.current &&
-          (value ? (
-            // biome-ignore lint/performance/noImgElement: Using <img> is intentional here
-            <img src={value} alt="Cropped preview" className="w-full h-full " />
+        {value ? (
+          firstTime.current ? (
+            <CldImage
+              width="100"
+              height="100"
+              className="w-full h-full object-cover p-4"
+              src={value}
+              alt="Cloudinary image"
+              onError={(e) =>
+                console.error("Error loading Cloudinary image:", e)
+              }
+            />
           ) : (
-            <span>no image</span>
-          ))}
-
-        {firstTime.current && value && (
-          <CldImage
-            width="100"
-            height="100"
-            className="p-4 w-full h-full"
-            src={value}
-            alt="Cloudinary image not loaded"
-            onError={(error) =>
-              console.error("Error loading Cloudinary image:", error)
-            }
-          />
+            // biome-ignore lint/performance/noImgElement: <explanation>
+            <img
+              src={value}
+              alt="Cropped preview"
+              className="w-full h-full object-cover"
+            />
+          )
+        ) : (
+          <label
+            htmlFor="image-upload"
+            className="absolute inset-0 flex cursor-pointer items-center justify-center text-gray-500"
+          >
+            Select image
+          </label>
         )}
       </div>
 

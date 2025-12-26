@@ -62,7 +62,7 @@ export default function BusinessDetail({
   });
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
   const { data: subCategories, isLoading } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
+    trpc.adminBusinessRouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
   );
@@ -162,7 +162,7 @@ export default function BusinessDetail({
       name: "image1",
       component: "image",
       required: false,
-      error: "",
+      error: errors.image1?.message,
     },
     {
       control,
@@ -171,7 +171,7 @@ export default function BusinessDetail({
       component: "image",
       className: "mt-5",
       required: false,
-      error: "",
+      error: errors.image2?.message,
     },
     {
       control,
@@ -179,7 +179,7 @@ export default function BusinessDetail({
       name: "image3",
       component: "image",
       required: false,
-      error: "",
+      error: errors.image3?.message,
     },
     {
       control,
@@ -187,7 +187,7 @@ export default function BusinessDetail({
       name: "image4",
       component: "image",
       required: false,
-      error: "",
+      error: errors.image4?.message,
     },
     {
       control,
@@ -195,7 +195,7 @@ export default function BusinessDetail({
       name: "image5",
       component: "image",
       required: false,
-      error: "",
+      error: errors.image5?.message,
     },
   ];
 
@@ -227,18 +227,15 @@ export default function BusinessDetail({
     nextPage();
   };
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-4xl bg-white"
-      >
-        <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className=" max-w-6xl ">
+        <div className="p-8 space-y-8 ">
+          <div className="p-6 shadow rounded-xl bg-gray-50 border ">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Business Details
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-3">
               {formFields.map((field) => (
                 <div
                   key={field.name}
@@ -252,11 +249,11 @@ export default function BusinessDetail({
             </div>
             <Label className="mt-3 gap-0 ">
               Shop Images
-              {/* <span className="text-red-500 ">*</span> */}
+              <span className="text-red-500 ">*</span>
             </Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-3">
               {formFields2.map((field) => (
-                <FormField labelHidden key={field.name} {...field} />
+                <FormField key={field.name} {...field} />
               ))}
             </div>
           </div>

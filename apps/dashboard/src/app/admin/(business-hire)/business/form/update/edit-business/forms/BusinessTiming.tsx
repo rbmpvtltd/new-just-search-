@@ -68,17 +68,14 @@ export default function BusinessTiming({
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="shadow-xl mx-auto rounded-xl max-w-6xl bg-white"
-      >
+    <div className="">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl ">
         <div className="p-8 space-y-8">
-          <div className="p-6 shadow rounded-xl bg-white">
+          <div className="p-6 shadow rounded-xl bg-gray-50 border">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Business Timing
             </h2>
-            <p className="mt-3 text-sm text-gray-500 italic mb-4">
+            <p className="mt-2 text-sm text-gray-500 italic mb-4">
               Let your customers know when you are available for them
             </p>
             <div className="grid grid-cols-1 gap-6">
@@ -107,7 +104,7 @@ export default function BusinessTiming({
                 Perffered Working Hours
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
-                {formFields.map((field, index) => (
+                {formFields.map((field) => (
                   <FormField key={field.name} {...field} />
                 ))}
               </div>
@@ -118,13 +115,13 @@ export default function BusinessTiming({
           <Button
             type="submit"
             onClick={prevPage}
-            className="bg-orange-500 hover:bg-orange-700 font-bold cursor-pointer"
+            className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             PREVIOUS
           </Button>
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-700 font-bold cursor-pointer"
+            className="bg-orange-500 hover:bg-orange-700 font-bold"
           >
             {isSubmitting ? (
               <>

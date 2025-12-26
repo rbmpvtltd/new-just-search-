@@ -409,7 +409,7 @@ CREATE TABLE "plan_user_subscriptions" (
 	"transaction_number" varchar(255) NOT NULL,
 	"amount" integer NOT NULL,
 	"currency" varchar,
-	"expiry_date" integer NOT NULL,
+	"expiry_date" bigint NOT NULL,
 	"features" jsonb NOT NULL,
 	"status" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now(),

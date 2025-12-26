@@ -86,7 +86,7 @@ export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
     },
     {
       control,
-      label: "Refer Code",
+      label: "Select Salesman",
       name: "salesmanId",
       component: "select",
       options: data?.map((item) => ({

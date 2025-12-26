@@ -58,7 +58,7 @@ export default function EditBusinessPage({
           ></div>
         </div>
       </div>
-      <div className="border p-4 rounded-lg">{renderForm()}</div>
+      <div className="rounded-lg">{renderForm()}</div>
     </div>
   );
 }

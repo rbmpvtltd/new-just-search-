@@ -35,10 +35,7 @@ const initialFormValue: CombinedForm = {
   workShift: [],
   jobDuration: [],
   fromHour: "",
-  // fromPeriod: "",
   toHour: "",
-  // toPeriod: "",
-  // preferredWorkingHours: "",
   availability: "",
   locationPreferred: "",
   expectedSalaryFrom: "",
@@ -46,7 +43,7 @@ const initialFormValue: CombinedForm = {
   relocate: "",
 
   // EducationSchema
-  highestQualification: "",
+  highestQualification: NaN,
   employmentStatus: "",
   workExperienceYear: 0,
   workExperienceMonth: 0,
@@ -56,13 +53,12 @@ const initialFormValue: CombinedForm = {
   certificates: "",
 
   // DocumentSchema
-  idProof: "",
+  idProof: NaN,
   idProofPhoto: "",
   coverLetter: "",
   resumePhoto: "",
   aboutYourself: "",
-  // referCode: "RBMHORJ00000",
-
+  salesmanId: NaN,
   // PersonalDetailsSchema
   userId: NaN,
   photo: "",

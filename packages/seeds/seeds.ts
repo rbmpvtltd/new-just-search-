@@ -18,10 +18,10 @@ export const dummyImageUrl = "dummyImageUrl";
   try {
     // Postgres seeding
     await notRelated();
-    // await userSeed();
+    await userSeed();
     await fakeSeed();
-    // await businessSeed();
-    // await hireSeed();
+    await businessSeed();
+    await hireSeed();
     // await productSeed();
     // await offerSeed();
     // await feedbackseed();

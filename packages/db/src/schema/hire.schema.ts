@@ -109,7 +109,12 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
     z.string().min(3, "Name should be minimum 3 characters long"),
   dob: () => z.string().min(1, "Date of birth is required"),
   mobileNumber: () =>
-    z.string().min(10, "Mobile number should be minimum 10 characters long"),
+    z
+      .string()
+      .regex(/^[0-9]+$/, "Mobile number must contain only digits")
+      .min(10, "Mobile number should be minimum 10 digits")
+      .max(10, "Mobile number should be maximum 10 digits"),
+
   languages: () => z.array(z.number()).min(1, "Select at least one language"),
   latitude: () =>
     z.string().refine(
