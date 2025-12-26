@@ -37,7 +37,7 @@ export interface RevenueCatEventData {
   // Dates
   purchased_at_ms: number;
   grace_period_expiration_at_ms?: number | null;
-  expiration_at_ms?: number | null;
+  expiration_at_ms: bigint;
   auto_resume_at_ms?: number | null;
 
   // Transaction Details

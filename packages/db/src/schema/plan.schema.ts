@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   integer,
   jsonb,
@@ -105,7 +106,9 @@ export const planUserSubscriptions = pgTable("plan_user_subscriptions", {
   transactionNumber: varchar("transaction_number", { length: 255 }).notNull(),
   amount: integer("amount").notNull(),
   currency: varchar("currency"),
-  expiryDate: integer("expiry_date").notNull(),
+  expiryDate: bigint("expiry_date", {
+    mode: "bigint",
+  }).notNull(),
   features: jsonb("features").$type<PlanFeatures>().notNull(),
   status: boolean("status").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),

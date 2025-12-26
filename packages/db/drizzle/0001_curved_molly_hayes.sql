@@ -1,0 +1,1 @@
+ALTER TABLE "plan_user_subscriptions" ALTER COLUMN "expiry_date" SET DATA TYPE bigint;

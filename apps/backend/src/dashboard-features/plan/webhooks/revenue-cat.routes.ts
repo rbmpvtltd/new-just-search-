@@ -4,14 +4,13 @@ import {
   planUserActive,
   planUserSubscriptions,
 } from "@repo/db/dist/schema/plan.schema";
-import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, type InferInsertModel } from "drizzle-orm";
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import env from "@/utils/envaild";
 import type { RevenueCatWebhookEvent } from "./types";
 
-const ee = new EventEmitter();
+export const subcriptionEventEmit = new EventEmitter();
 export const asyncHandler =
   (
     fn: (req: Request, res: Response, next: NextFunction) => Promise<any>,
@@ -32,7 +31,7 @@ export const revenueCatRouter = asyncHandler(
       case "INITIAL_PURCHASE": {
         const plan = await db.query.plans.findFirst({
           where: (plans, { eq }) =>
-            eq(plans.revenueCatIdentifier, String(event.presented_offering_id)),
+            eq(plans.revenueCatIdentifier, String(event.entitlement_ids?.[0])),
         });
 
         const user = await db.query.users.findFirst({
@@ -40,24 +39,36 @@ export const revenueCatRouter = asyncHandler(
             eq(users.revanueCatId, String(event.app_user_id)),
         });
 
-        if (!plan || !user) {
+        if (!plan) {
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Plan not found",
           });
         }
-        await db.insert(planUserSubscriptions).values({
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        type PlanUserSubscription = InferInsertModel<
+          typeof planUserSubscriptions
+        >;
+        const planUserSubscriptionData: PlanUserSubscription = {
           amount: event?.price_in_purchased_currency || 0,
           subscriptionNumber: event?.id,
           transactionNumber: event?.transaction_id,
-          planIdentifier: event.presented_offering_id,
+          planIdentifier: event?.entitlement_ids?.[0],
           plansId: plan.id,
           userId: user.id,
           currency: event?.currency || "INR",
           features: plan?.features,
-          expiryDate: event.expiration_at_ms || 0,
+          expiryDate: event.expiration_at_ms,
           status: true,
-        });
+        };
+
+        await db.insert(planUserSubscriptions).values(planUserSubscriptionData);
 
         const activePlan = await db.query.planUserActive.findFirst({
           where: (planUserActive, { eq }) => eq(planUserActive.userId, user.id),
@@ -78,7 +89,14 @@ export const revenueCatRouter = asyncHandler(
             .where(eq(planUserActive.userId, user.id));
         }
 
-        ee.emit(`subscription${user.id}`, "subscription created successfully");
+        console.log("event subitting successfully");
+        console.log(`subscription${user.id}`);
+
+        subcriptionEventEmit.emit(
+          `subscription${user.id}`,
+          "subscription created successfully",
+        );
+        console.log("event subitted successfully");
         break;
       }
       case "EXPIRATION":
@@ -88,7 +106,6 @@ export const revenueCatRouter = asyncHandler(
         console.log("Unhandled event type:", event.type);
     }
 
-    logger.info("revenueCatRouter", { body: body });
     return res.send("revenueCatRouter");
   },
 );

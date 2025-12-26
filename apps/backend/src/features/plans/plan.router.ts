@@ -45,6 +45,7 @@ export const planRouter = router({
         updatedAt: plans.updatedAt,
       })
       .from(plans)
+      .where(eq(plans.status, true))
       .leftJoin(planAttributes, eq(plans.id, planAttributes.planId))
       .groupBy(plans.id);
 

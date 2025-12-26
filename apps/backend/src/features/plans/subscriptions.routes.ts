@@ -1,6 +1,6 @@
 // features/banners/banners.admin.routes.ts
 
-import crypto, { verify } from "node:crypto";
+import crypto from "node:crypto";
 import { EventEmitter, on } from "node:events";
 import { db } from "@repo/db";
 import {
@@ -16,17 +16,23 @@ import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
+import { subcriptionEventEmit } from "@/dashboard-features/plan/webhooks/revenue-cat.routes";
 import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
 } from "@/lib/cloudinary";
 import { razorpayInstance } from "@/lib/razorpay";
 import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
-
-const ee = new EventEmitter();
 export const subscriptionRouter = router({
   verifyPayement: protectedProcedure.subscription(async function* ({ ctx }) {
-    for await (const [msg] of on(ee, `subscription${ctx.userId}`)) {
+    console.log("I am inside verifyPayement");
+    console.log(`subscription${ctx.userId}`);
+
+    for await (const [msg] of on(
+      subcriptionEventEmit,
+      `subscription${ctx.userId}`,
+    )) {
+      console.log("subscriptions is trigger and mes is ", msg);
       yield msg;
     }
   }),
@@ -59,7 +65,7 @@ export const subscriptionRouter = router({
         userId: ctx.userId,
         currency: data?.currency || "INR",
         features: data?.features,
-        expiryDate: response.expire_by || 0,
+        expiryDate: BigInt(response.expire_by || 0),
         status: false,
       });
       return { success: true, response: response };

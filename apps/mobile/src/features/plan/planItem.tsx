@@ -20,6 +20,7 @@ import {
   trpc,
   type UnwrapArray,
 } from "@/lib/trpc";
+import { usePlanStore } from "./planStore";
 
 type PlanArray = OutputTrpcType["planRouter"]["list"]["plans"];
 type ActivePlan = OutputTrpcType["planRouter"]["list"]["activePlan"];
@@ -27,52 +28,30 @@ type Plan = UnwrapArray<PlanArray>;
 export default function PricingCard({
   plan,
   activePlan,
-  pkg,
+  // pkg,
 }: {
   plan: Plan;
   activePlan: ActivePlan;
-  pkg: PurchasesPackage | null | undefined;
+  // pkg: PurchasesPackage | null | undefined;
 }) {
   const colorScheme = useColorScheme();
-  const [loading, setLoading] = useState(false);
+  const loading = usePlanStore((state) => state.loading);
+  const offerings = usePlanStore((state) => state.offerings);
+  const getPkg = (title: string) => {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle === "free") {
+      return null;
+    }
+    return offerings?.all[lowerTitle].availablePackages[0];
+  };
 
-  const { data: paymentVerify } = useSubscription(
-    trpc.subscriptionRouter.verifyPayement.subscriptionOptions(),
-  );
-  
+  const pkg = getPkg(plan.title);
+
   const currentRole = useAuthStore((state) => state.role);
 
   const showBtn = currentRole === plan.role || currentRole === "visiter";
   const buttonDisable =
     (plan.role === "all" || !showBtn) && activePlan.isactive;
-
-  const handleSubscribe = async (
-    pkg: PurchasesPackage | null | undefined,
-    plan_id: number,
-  ) => {
-    setLoading(true);
-    if (!pkg) {
-      setLoading(false);
-      return;
-    }
-    try {
-      const { customerInfo, productIdentifier, transaction } =
-        await Purchases.purchasePackage(pkg);
-      if (
-        typeof customerInfo.entitlements.active[productIdentifier] !==
-        "undefined"
-      ) {
-        console.log("payment done");
-      }
-    } catch (e) {
-      console.log(e);
-      setLoading(false);
-    }
-  };
-
-  if (paymentVerify) {
-    setLoading(false);
-  }
 
   if (loading) {
     return <ActivityIndicator size="small" />;
@@ -144,7 +123,7 @@ export default function PricingCard({
             }}
             className={`rounded-full py-3 items-center justify-center bg-base-300`}
             disabled={buttonDisable}
-            onPress={() => handleSubscribe(pkg, plan.id)}
+            onPress={() => handleSubscribe(pkg)}
           >
             <Text className={`font-semibold text-lg text-secondary `}>
               {plan.id === activePlan.planid

@@ -1,39 +1,28 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { Button, Linking, ScrollView, Text, View } from "react-native";
-import Purchases, { type PurchasesOfferings } from "react-native-purchases";
+import Purchases from "react-native-purchases";
 import { trpc } from "@/lib/trpc";
 import PricingCard from "./planItem";
+import { usePlanStore } from "./planStore";
 
 export default function PricingPlansComponent() {
-  const [offerings, setOfferings] = useState<PurchasesOfferings | null>();
+  const setOfferings = usePlanStore((state) => state.setOfferings);
   const { data } = useSuspenseQuery(trpc.planRouter.list.queryOptions());
-
-  useEffect(() => {
-    const fetchOfferings = async () => {
-      try {
-        const offering = await Purchases.getOfferings();
-        if (
-          offering.current !== null &&
-          offering.current.availablePackages.length !== 0
-        ) {
-          setOfferings(offering);
-        }
-      } catch (error) {
-        // TODO:  handle error
-        console.error("Error fetching offerings:", error);
+  const { error, isError } = useSuspenseQuery({
+    queryKey: ["fetchOfferings"],
+    queryFn: async () => {
+      const offering = await Purchases.getOfferings();
+      if (
+        offering.current !== null &&
+        offering.current.availablePackages.length !== 0
+      ) {
+        setOfferings(offering);
       }
-    };
-    fetchOfferings();
-  }, []);
-
-  const getPkg = (title: string) => {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle === "free") {
-      return null;
-    }
-    return offerings?.all[lowerTitle].availablePackages[0];
-  };
+    },
+  });
+  if (isError) {
+    console.log("error", error);
+  }
 
   // if (loading.current) {
   //   return <ActivityIndicator size="large" />;
@@ -49,13 +38,12 @@ export default function PricingPlansComponent() {
     Linking.openURL("https://justsearch.net.in/privacy");
   };
   return (
-    <ScrollView>
+    <ScrollView className="relative">
       {data.plans.map((item, index) => (
         <PricingCard
           key={`${index}-${item.title}`}
           plan={item}
           activePlan={data.activePlan}
-          pkg={getPkg(item.title)}
         />
       ))}
       <View className="flex flex-row justify-center items-center">
