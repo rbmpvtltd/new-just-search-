@@ -1,8 +1,14 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
-import { db, schemas } from "@repo/db";
+import { db } from "@repo/db";
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import {
+  franchises,
+  profiles,
+  salesmen,
+} from "@repo/db/dist/schema/user.schema";
 import dotenv from "dotenv";
-import { sql as dbsql, eq, type InferInsertModel } from "drizzle-orm";
+import { sql as dbsql, type InferInsertModel } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
@@ -52,11 +58,6 @@ export const userSeed = async () => {
   await seedOfSalesman();
 };
 
-const users = schemas.auth.users;
-const profiles = schemas.user.profiles;
-const franchises = schemas.user.franchises;
-const salesmen = schemas.user.salesmen;
-
 export const clearAllTablesUser = async () => {
   // await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE profiles RESTART IDENTITY CASCADE;`);
@@ -91,21 +92,14 @@ export const seedUsers = async () => {
       updatedAt: row.updated_at,
     };
 
-    let [insertedUser] = await db
+    const [insertedUser] = await db
       .insert(users)
       .values(user)
       .onConflictDoNothing()
       .returning();
 
     if (!insertedUser) {
-      // fallback: fetch existing user by unique key (email is usually safe)
-      insertedUser = await db.query.users.findFirst({
-        where: (u, { eq }) => eq(u.email, user.email),
-      });
-    }
-
-    if (!insertedUser) {
-      throw new Error(`User could not be inserted or found: ${user.email}`);
+      throw new Error(`User could not be inserted or found:`);
     }
 
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
@@ -118,14 +112,13 @@ export const seedUsers = async () => {
       )) ?? dummyImageUrl;
 
     // resolve city id
-    let cityId: number;
+    let cityId: number | null = null;
     if (row.city) {
       const cityRecord = await db.query.cities.findFirst({
-        where: (c, { eq }) => eq(c.city, row.city),
+        where: (c, { eq, or }) =>
+          or(eq(c.city, row.city), eq(c.id, Number(row.city))),
       });
-      cityId = cityRecord?.id ?? 1; // 👈 fallback to "Unknown" city id
-    } else {
-      cityId = 1; // 👈 fallback
+      cityId = cityRecord?.id ?? null; // 👈 fallback to "Unknown" city id
     }
 
     if (row.marital_status === "married") {

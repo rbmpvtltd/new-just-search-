@@ -14,6 +14,8 @@ import { userSeed } from "./user.seed";
 
 export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
+export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
+
 (async () => {
   try {
     // Postgres seeding
