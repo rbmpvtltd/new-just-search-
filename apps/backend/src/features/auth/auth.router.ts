@@ -86,6 +86,7 @@ export const authRouter = router({
     .input(z.object({ identifier: z.string() }))
     .mutation(async ({ input }) => {
       //TODO: add rate limiter for send otp in one minute
+      console.log("========>", input);
       const result = await sendSMSOTP(input.identifier);
       return {
         method: result?.method,
@@ -139,14 +140,20 @@ export const authRouter = router({
         phoneNumber: z.string().length(10),
         otp: z.string().length(6),
         displayName: z.string().min(3).max(20),
-        email: z.string().email().optional().nullable(),
+        email: z.string().email().optional().or(z.literal("")),
         password: z.string().min(6),
       }),
     )
     .mutation(async ({ input }) => {
       const { phoneNumber, otp, displayName, email, password } = input;
+      console.log("auth.router.ts:149 :: input is =>", input);
 
-      const isValid = await verifyOTP(String(email), otp);
+      let isValid = true;
+      if (email) {
+        isValid = await verifyOTP(String(email), otp);
+      } else {
+        isValid = await verifyOTP(String(phoneNumber), otp);
+      }
       if (!isValid) {
         throw new TRPCError({
           code: "UNAUTHORIZED",

@@ -1,7 +1,7 @@
 import { redis } from "@/lib/redis";
 import { logger } from "@repo/logger";
 import { isEmail } from "./identifier";
-import { sendEmailOTP, sendSMSViaFast2SMS } from "./sendOtp";
+import { sendEmailOTP, sendSMSViaFast2SMSDLT } from "./sendOtp";
 import { success } from "zod";
 
 function otpGenerator() {
@@ -10,7 +10,7 @@ function otpGenerator() {
     .padStart(6, "0");
 }
 
-export const sendSMSOTP = async (identifier: string)=> {
+export const sendSMSOTP = async (identifier: string) => {
   const otp = otpGenerator();
 
   logger.info("otp is", {
@@ -20,13 +20,13 @@ export const sendSMSOTP = async (identifier: string)=> {
 
   redis.set(`otpsession:${identifier}`, otp, "EX", 60 * 20); // TODO: set short life time for expiry otp
 
-  if(isEmail(identifier)){
-    await sendEmailOTP(identifier,otp)
-    return {success :true,method : "email"}
-  }else{
+  if (isEmail(identifier)) {
+    await sendEmailOTP(identifier, otp);
+    return { success: true, method: "email" };
+  } else {
     // TODO: implement fast to sms when identifier is number
-    await sendSMSViaFast2SMS(identifier,otp)
-    return {success:true,method:"sms"}
+    await sendSMSViaFast2SMSDLT(identifier, otp);
+    return { success: true, method: "sms" };
   }
 };
 

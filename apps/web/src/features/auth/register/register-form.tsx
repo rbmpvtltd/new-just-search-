@@ -154,36 +154,43 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
     console.log("====================> execution comes here");
     try {
       console.log("verifying otp");
-      verifyOTP(
-        {
-          phoneNumber: tempFormData.mobileNumber,
-          displayName: tempFormData.displayName,
-          password: tempFormData.password,
-          otp: data.otp,
-          email: tempFormData.email,
+
+      // Prepare the payload, making email optional if not provided
+      const verificationPayload: any = {
+        phoneNumber: tempFormData.mobileNumber,
+        displayName: tempFormData.displayName,
+        password: tempFormData.password,
+        otp: data.otp,
+      };
+
+      // Only include email if it exists and is valid
+      if (tempFormData.email && tempFormData.email.trim() !== "") {
+        verificationPayload.email = tempFormData.email.trim();
+      }
+
+      console.log("Verification payload:", verificationPayload);
+
+      verifyOTP(verificationPayload, {
+        onSuccess: async (data) => {
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Account created successfully!",
+          });
+          setToken(data?.session || "");
+          setRole(data?.role || "");
+          console.log("registration sucessfully");
+          router.push("/");
         },
-        {
-          onSuccess: async (data) => {
-            Swal.fire({
-              icon: "success",
-              title: "Success!",
-              text: "Account created successfully!",
-            });
-            setToken(data?.session || "");
-            setRole(data?.role || "");
-            console.log("registration sucessfully");
-            router.push("/");
-          },
-          onError: async (err) => {
-            console.error("OTP verification failed:", err);
-            Swal.fire({
-              icon: "error",
-              title: "Something Wents Wrong",
-              text: err?.message || "Please check the code and try again.",
-            });
-          },
+        onError: async (err) => {
+          console.error("OTP verification failed:", err);
+          Swal.fire({
+            icon: "error",
+            title: "Something Wents Wrong",
+            text: err?.message || "Please check the code and try again.",
+          });
         },
-      );
+      });
     } catch (err) {
       console.log(err);
     }

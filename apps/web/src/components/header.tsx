@@ -7,7 +7,7 @@ import React from "react";
 import { IoMdChatboxes } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { User } from 'lucide-react';
+import { User } from "lucide-react";
 
 const menuItems = [
   { name: "Home", href: "/" },
@@ -20,7 +20,6 @@ export const HeroHeader = () => {
   const trpc = useTRPC();
   const [menuState, setMenuState] = React.useState(false);
   const authenticated = useQuery(trpc.auth.verifyauth.queryOptions());
-  console.log("user is ", authenticated);
   return (
     <header className="sticky top-0 z-50">
       <nav

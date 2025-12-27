@@ -2,8 +2,6 @@ import { logger } from "@repo/logger";
 import axios from "axios";
 import nodemailer from "nodemailer";
 
-
-
 const emailTransporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
@@ -14,22 +12,13 @@ const emailTransporter = nodemailer.createTransport({
   },
 });
 
-
-export async function sendEmailOTP(email: string, otp: string): Promise<boolean> {
-  console.log("otp email per bhej diya hai")
-  console.log({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-})
-
+export async function sendEmailOTP(
+  email: string,
+  otp: string,
+): Promise<boolean> {
   try {
     const mailOptions = {
-      from: process.env.SMTP_FROM || "noreply@justsearch.net.in",
+      from: process.env.SMTP_FROM || "info@justsearch.net.in",
       to: email,
       subject: "Your OTP for Password Reset - Just Search",
       html: getOTPEmailHTML(otp),
@@ -48,39 +37,69 @@ export async function sendEmailOTP(email: string, otp: string): Promise<boolean>
   }
 }
 
-export async function sendSMSViaFast2SMS(mobile: string, otp: string): Promise<boolean> {
+export async function sendSMSViaFast2SMSDLT(
+  mobile: string,
+  otp: string,
+): Promise<boolean> {
   try {
-    const message = `${otp} is your OTP for Just Search password reset. Valid for 20 minutes. Do not share.`;
+    const cleanMobile = mobile.replace(/\D/g, "").slice(-10);
+
+    // For DLT route, you need to register a template with TRAI
+    // Template example: "Your OTP is {#var#} for Just Search. Valid for 20 minutes."
+    // After registration, you'll get a template_id
+
+    const payload = {
+      route: "dlt",
+      sender_id: "RBMPLA",
+      template_id: "1207174228739240000",
+      variables_values: otp,
+      numbers: mobile,
+      flash: "0",
+      schedule_time: "",
+      message: "181881",
+    };
+
+    logger.info("Sending SMS OTP via Fast2SMS (DLT)", {
+      mobile: cleanMobile,
+    });
 
     const response = await axios.post(
       "https://www.fast2sms.com/dev/bulkV2",
-      {
-        route: "v3",
-        sender_id: process.env.FAST2SMS_SENDER_ID || "TXTIND",
-        message: message,
-        language: "english",
-        flash: 0,
-        numbers: mobile,
-      },
+      payload,
       {
         headers: {
           authorization: process.env.FAST2SMS_API_KEY,
-          // "Content-Type": "application/json",
         },
-      }
+        timeout: 10000,
+      },
     );
 
-    logger.info("SMS OTP sent via Fast2SMS", {
-      mobile,
-      response: response.data,
-    });
-    return true;
+    if (response.data?.return === true) {
+      logger.info("SMS OTP sent via Fast2SMS (DLT) successfully", {
+        mobile: cleanMobile,
+        response: response.data,
+      });
+      return true;
+    } else {
+      logger.error("Fast2SMS (DLT) returned non-success response", {
+        mobile: cleanMobile,
+        response: response.data,
+      });
+      throw new Error(
+        `Fast2SMS error: ${response.data?.message || "Unknown error"}`,
+      );
+    }
   } catch (error) {
-    logger.error("Failed to send SMS via Fast2SMS", { error, mobile });
+    if (axios.isAxiosError(error)) {
+      logger.error("Failed to send SMS via Fast2SMS (DLT)", {
+        mobile,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
     throw new Error("Failed to send OTP via SMS");
   }
 }
-
 
 function getOTPEmailHTML(otp: string): string {
   return `
