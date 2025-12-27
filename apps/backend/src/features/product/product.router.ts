@@ -6,7 +6,7 @@ import {
 } from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
@@ -91,10 +91,36 @@ export const productrouter = router({
           message: "Business not found",
         });
       }
+
+      const activeplan = await db.query.planUserActive.findFirst({
+        where: (planUserActive, { eq }) =>
+          eq(planUserActive.userId, ctx.userId),
+      });
+      if (!activeplan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Plan not found",
+        });
+      }
+
+      const totalProduct = (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${products.id})::int`,
+          })
+          .from(products)
+      )[0]?.count;
+
+      if (activeplan.features.productLimit <= (totalProduct ?? 0)) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product limit exceeded",
+        });
+      }
       const slugifyName = slugify(input.productName);
 
       const [product] = await db
-        .insert(schemas.product.products)
+        .insert(products)
         .values({
           mainImage: input.mainImage,
           businessId: business.id,
