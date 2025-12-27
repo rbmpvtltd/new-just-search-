@@ -1,4 +1,5 @@
 "use server";
+import type { UserRole } from "@repo/db";
 import { cookies } from "next/headers";
 
 export async function setToken(token: string) {
@@ -58,7 +59,8 @@ export async function setRole(role: string, persist = false) {
   return true;
 }
 
-export async function getRole() {
+export async function getRole(): Promise<UserRole> {
   const cookieStore = await cookies();
-  return cookieStore.get("role");
+  if (!cookieStore.get("role")) return "guest";
+  return cookieStore.get("role")?.value as UserRole;
 }

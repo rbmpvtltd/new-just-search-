@@ -4,6 +4,7 @@
 import { useMutation } from "@tanstack/react-query";
 import React from "react";
 import Swal from "sweetalert2";
+import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
 
 interface RazorpayPaymentResponse {
@@ -98,16 +99,17 @@ const PaymentButton = ({
     );
   };
 
+  console.log("innerBtn disabled", disabled);
   return (
-    <button
-      disabled={disabled}
+    <Button
+      disabled={false}
       type="button"
       onClick={createSubscription}
       className={className}
       style={style}
     >
       {title}
-    </button>
+    </Button>
   );
 };
 

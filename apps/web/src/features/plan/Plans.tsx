@@ -1,17 +1,32 @@
 import { CheckCircle, XCircle } from "lucide-react";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
+import { getRole } from "@/utils/session";
 import PaymentButton from "./components/PaymentButton";
 
 type PlanArray = OutputTrpcType["planRouter"]["list"]["plans"];
+type ActivePlan = OutputTrpcType["planRouter"]["list"]["activePlan"];
 type Plan = UnwrapArray<PlanArray>;
 
-export default function PricingCard({ plan }: { plan: Plan }) {
+export default async function PricingCard({
+  plan,
+  activePlan,
+}: {
+  plan: Plan;
+  activePlan: ActivePlan;
+}) {
+  const currentRole = await getRole();
+  console.log("currentRole", currentRole);
+  const showBtn = currentRole === plan.role || currentRole === "visiter";
+  console.log("showBtn", showBtn);
+  const buttonDisable =
+    (!showBtn && activePlan.isactive) || plan.role === "all";
+  console.log("buttonDisable", buttonDisable);
   return (
     <div className=" rounded-3xl shadow-lg m-4 overflow-hidden w-full max-w-sm">
       <div className={`{py-5 rounded-t-3xl text-center relative} `}>
         <h2 className="text-2xl font-bold text-secondary">{plan?.title}</h2>
 
-        {plan.status && (
+        {plan.id === activePlan.planid && (
           <span className="absolute top-2 right-4 bg-accent rounded-full px-3 py-1 text-xs font-bold ">
             ACTIVE
           </span>
@@ -44,16 +59,18 @@ export default function PricingCard({ plan }: { plan: Plan }) {
 
       <div className="px-5 pb-5">
         <PaymentButton
-          disabled={!!plan.status}
+          disabled={buttonDisable}
           identifier={plan.identifier}
-          className={`w-full rounded-full py-3 font-semibold text-lg text-secondary transition
-            ${plan.status ? "cursor-not-allowed" : "hover:opacity-90"}`}
+          className={`w-full rounded-full py-3 font-semibold text-lg text-secondary transition`}
           style={{
             backgroundColor: plan.status
               ? "#E5E7EB"
               : (plan.planColor ?? "#CBD5E1"),
+            opacity: buttonDisable ? "0.5" : "1",
           }}
-          title={plan.status ? "Current Plan" : `Get ${plan.title}`}
+          title={
+            plan.id === activePlan.planid ? "Current Plan" : `Get ${plan.title}`
+          }
         />
       </div>
     </div>
