@@ -54,8 +54,8 @@ dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
   await seedUsers();
-  await seedfranchises();
-  await seedOfSalesman();
+  // await seedfranchises();
+  // await seedOfSalesman();
 };
 
 export const clearAllTablesUser = async () => {
@@ -79,7 +79,7 @@ export const seedUsers = async () => {
 
     const user: DbUser = {
       id: row.id,
-      displayName: row.username,
+      displayName: row.name,
       phoneNumber: row.phone,
       email: row.email,
       status: true,
@@ -87,7 +87,7 @@ export const seedUsers = async () => {
       role: row.phone ? UserRole.visiter : UserRole.guest,
       googleId: row.google_id,
       appleId: row.apple_id,
-      revanueCatId: row.revanue_cat_id,
+      revanueCatId: row.revanue_cat_id ?? undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -114,10 +114,17 @@ export const seedUsers = async () => {
     // resolve city id
     let cityId: number | null = null;
     if (row.city) {
-      const cityRecord = await db.query.cities.findFirst({
-        where: (c, { eq, or }) =>
-          or(eq(c.city, row.city), eq(c.id, Number(row.city))),
-      });
+      const cityIdOrName = Number(row.city);
+      let cityRecord = null;
+      if (Number.isNaN(cityIdOrName)) {
+        cityRecord = await db.query.cities.findFirst({
+          where: (c, { eq }) => eq(c.city, row.city),
+        });
+      } else {
+        cityRecord = await db.query.cities.findFirst({
+          where: (c, { eq }) => eq(c.id, Number(row.city)),
+        });
+      }
       cityId = cityRecord?.id ?? null; // 👈 fallback to "Unknown" city id
     }
 
