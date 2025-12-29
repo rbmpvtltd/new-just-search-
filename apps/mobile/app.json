@@ -62,8 +62,12 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "@react-native-google-signin/google-signin",
-      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.571980400521-nd45lmn71u436lbj62gi5t7i82osuve1"
+        }
+      ],
       "expo-notifications",
       "@react-native-firebase/app",
       "@react-native-firebase/crashlytics",

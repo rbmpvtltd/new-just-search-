@@ -1,9 +1,11 @@
-import { Pressable, Text, View } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { Pressable, Text, View } from "react-native";
+
 GoogleSignin.configure({
   webClientId:
-    "571980400521-es8jn3ged1mu8elmrpei5p765isacrn7.apps.googleusercontent.com",
-  offlineAccess: true,
+    "968676221050-brhretmcqmd0pavpus0rg38vall2fbfp.apps.googleusercontent.com",
+  iosClientId:
+    "571980400521-nd45lmn71u436lbj62gi5t7i82osuve1.apps.googleusercontent.com",
 });
 
 const GoogleLogin = () => {
