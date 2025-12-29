@@ -44,7 +44,6 @@ export const usersInsertSchema = createInsertSchema(users, {
   role: z.enum(UserRole),
 });
 
-
 export const usersUpdateSchema = createUpdateSchema(users, {
   email: () => z.email().min(8, "Email Must Be Contain 8 Characters").max(500),
   password: () =>

@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as Notifications from "expo-notifications";
 import { Tabs, usePathname } from "expo-router";
 import { useColorScheme } from "react-native";
 import { Loading } from "@/components/ui/Loading";
@@ -6,7 +7,6 @@ import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useNotificationCount } from "@/query/notification/notication";
-import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -182,6 +182,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: isAuthenticated ? "Profile" : "Login",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-outline" size={24} color={color} />
           ),

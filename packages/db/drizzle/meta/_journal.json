@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1766738920806,
-      "tag": "0000_bitter_mad_thinker",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1766552265444,
-      "tag": "0001_slimy_silvermane",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1766211764491,
-      "tag": "0001_bitter_captain_flint",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1766213958843,
-      "tag": "0002_small_pyro",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1766384758307,
-      "tag": "0003_mature_white_tiger",
+      "when": 1766992131352,
+      "tag": "0000_daffy_overlord",
       "breakpoints": true
     }
   ]
