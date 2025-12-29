@@ -23,10 +23,6 @@ import {
 import { trpc } from "@/lib/trpc";
 
 export default function Notification() {
-  const { data } = useQuery(
-    trpc.notificationRouter.getNotification.queryOptions(),
-  );
-  console.log(data?.data.role);
   // const colorScheme = useColorScheme();
   // const queryClient = useQueryClient();
   // const isAuthenticated = useAuthStore((state) => state.authenticated);
