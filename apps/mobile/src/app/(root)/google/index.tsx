@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "react-native";
 
 GoogleSignin.configure({
   webClientId:
-    "571980400521-es8jn3ged1mu8elmrpei5p765isacrn7.apps.googleusercontent.com",
+    "571980400521-9idj6c5b7ga8ecsngjur45or6uhk65c5.apps.googleusercontent.com",
   iosClientId:
     "571980400521-nd45lmn71u436lbj62gi5t7i82osuve1.apps.googleusercontent.com",
 });

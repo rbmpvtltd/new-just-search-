@@ -39,6 +39,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
+import Favourite from "../../shared/Favourite";
 
 type SingleShopType = OutputTrpcType["businessrouter"]["singleShop"] | null;
 
@@ -84,9 +85,16 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
         </TabsList>
         <TabsContent value="about" className="mt-10 sm:mt-0">
           <div className="p-4 flex flex-col gap-4">
-            <h1 className="text-2xl font-semibold line-clamp-1">
-              {singleShop?.name}
-            </h1>
+            <div className="flex items-baseline gap-4">
+              <h1 className="text-2xl font-semibold line-clamp-1">
+                {singleShop?.name}
+              </h1>
+              <Favourite
+                initialFav={singleShop?.isFavourite ?? false}
+                businessId={singleShop?.id ?? 0}
+              />
+            </div>
+
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
               <p className="text-sm">
@@ -131,11 +139,13 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
               </p>
               <Badge variant="default">{singleShop?.category}</Badge>
 
-              {singleShop?.subcategories.map((subcategory, index) => (
-                <Badge variant="destructive" key={index.toString()}>
-                  {subcategory}
-                </Badge>
-              ))}
+              {singleShop?.subcategories.map(
+                (subcategory: string, index: number) => (
+                  <Badge variant="destructive" key={index.toString()}>
+                    {subcategory}
+                  </Badge>
+                ),
+              )}
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-[70%] justify-between mx-auto sm:mx-0">
               <Button
@@ -251,30 +261,44 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                   </h1>
                 </div>
               )}
-              {singleShop?.rating?.map((item, index) => {
-                return (
-                  <div
-                    key={index.toString()}
-                    className="p-2 m-2 shadow-[0_4px_12px_rgba(0,0,0,0.650)] w-full rounded-md flex flex-col gap-2"
-                  >
-                    <div className="flex justify-between items-center w-full ">
-                      <h1 className="text-xl font-medium text-secondary">
-                        {item.user ?? "Unknown"}
-                      </h1>
-                      <p className="flex items-center gap-2 text-sm">
-                        <FaRegCalendarAlt className="text-primary" />{" "}
-                        {new Date(item.created_at).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </p>
+              {singleShop?.rating?.map(
+                (
+                  item: {
+                    id: number;
+                    created_at: string;
+                    rating: number;
+                    message: string;
+                    user: string;
+                  },
+                  index: number,
+                ) => {
+                  return (
+                    <div
+                      key={index.toString()}
+                      className="p-2 m-2 shadow-[0_4px_12px_rgba(0,0,0,0.650)] w-full rounded-md flex flex-col gap-2"
+                    >
+                      <div className="flex justify-between items-center w-full ">
+                        <h1 className="text-xl font-medium text-secondary">
+                          {item.user ?? "Unknown"}
+                        </h1>
+                        <p className="flex items-center gap-2 text-sm">
+                          <FaRegCalendarAlt className="text-primary" />{" "}
+                          {new Date(item.created_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
+                        </p>
+                      </div>
+                      <Rating rating={item.rating} />
+                      <p>{item.message}</p>
                     </div>
-                    <Rating rating={item.rating} />
-                    <p>{item.message}</p>
-                  </div>
-                );
-              })}
+                  );
+                },
+              )}
             </div>
           </div>
         </TabsContent>

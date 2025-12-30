@@ -136,7 +136,6 @@
 //   );
 // }
 
-
 import {
   InstantSearch,
   SearchBox,
@@ -158,8 +157,8 @@ function Hit({ hit }: { hit: any }) {
       <Link
         href={{
           pathname: hit.discountPercent
-            ? `/business/singleOffer/${hit.navigationId}`
-            : `/business/singleProduct/${hit.navigationId}`,
+            ? `/subcategory/aboutBusiness/offers/singleOffers/${hit.navigationId}`
+            : `/subcategory/aboutBusiness/products/singleProduct/${hit.navigationId}`,
         }}
         className="w-full"
       >

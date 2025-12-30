@@ -12,7 +12,7 @@ import { User } from "lucide-react";
 const menuItems = [
   { name: "Home", href: "/" },
   { name: "Hire", href: "/hire" },
-  { name: "Offers", href: "/offers" },
+  { name: "Offers", href: "/allOffers" },
   { name: "Favourite", href: "/favourite" },
 ];
 
