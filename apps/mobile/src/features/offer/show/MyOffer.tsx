@@ -38,7 +38,7 @@ export default function MyOffersList() {
 
   if (isError) return <SomethingWrong />;
 
-  if (!data?.pages[0].offers || data.pages[0].offers.length === 0)
+  if (!data?.pages[0].offersData || data.pages[0].offersData.length === 0)
     return (
       <View className="px-4 mt-4">
         <Pressable
@@ -52,7 +52,7 @@ export default function MyOffersList() {
         </Pressable>
       </View>
     );
-  const offersData = data?.pages.flatMap((page) => page.offers || []) ?? [];
+  const offersData = data?.pages.flatMap((page) => page.offersData || []) ?? [];
 
   return (
     <View className="flex-1 bg-base-100">
@@ -71,14 +71,14 @@ export default function MyOffersList() {
 
 type OfferType = NonNullable<
   OutputTrpcType["offerrouter"]["showOffer"]
->["offers"][number];
+>["offersData"][number];
 function OfferCard({ item }: { item: OfferType }) {
   const router = useRouter();
   const { mutate: deleteOffer, isPending } = useMutation(
     trpc.offerrouter.deleteOffer.mutationOptions(),
   );
-  const isoStringStartDate = item.offerStartDate;
-  const isoStringEndDate = item.offerEndDate;
+  const isoStringStartDate = item.offer.offerStartDate;
+  const isoStringEndDate = item.offer.offerEndDate;
   const startDate = new Date(isoStringStartDate);
   const endDate = new Date(isoStringEndDate);
   const formattedStartDate = startDate.toLocaleDateString("en-US", {
@@ -101,15 +101,15 @@ function OfferCard({ item }: { item: OfferType }) {
         style: "destructive",
         onPress: () => {
           deleteOffer(
-            { id: item?.id },
+            { id: item?.offer.id },
             {
               onSuccess: async (data) => {
-                console.log("data is", data);
                 if (!data?.success) {
                   console.warn(
                     "Delete product mutation returned no data:",
                     data,
                   );
+                  Alert.alert("Offer deleted successfully");
                   return;
                 }
               },
@@ -124,7 +124,7 @@ function OfferCard({ item }: { item: OfferType }) {
       <View className="flex-row bg-base-200 p-4 rounded-2xl shadow-sm">
         <View className="w-28 h-28 rounded-lg">
           <AdvancedImage
-            cldImg={cld.image(item?.mainImage || "")}
+            cldImg={cld.image(item?.offer?.mainImage || "")}
             className="w-[100%] h-[100%] rounded-lg"
           />
         </View>
@@ -134,17 +134,17 @@ function OfferCard({ item }: { item: OfferType }) {
               className="text-secondary font-bold text-base"
               numberOfLines={1}
             >
-              {item?.offerName}
+              {item?.offer?.offerName}
             </Text>
             <Text className="text-sm text-secondary mb-1">
               🕒 {formattedStartDate} → {formattedEndDate}
             </Text>
 
             <Text className="text-secondary font-bold text-lg">
-              ₹{item.finalPrice}{" "}
-              {item.discountPercent && (
+              ₹{item?.offer.finalPrice}{" "}
+              {item?.offer.discountPercent && (
                 <Text className="text-error text-sm ml-1">
-                  🔖 {item.discountPercent}% OFF
+                  🔖 {item?.offer.discountPercent}% OFF
                 </Text>
               )}
             </Text>
@@ -154,7 +154,7 @@ function OfferCard({ item }: { item: OfferType }) {
             <Pressable
               className="bg-info flex-row items-center px-3 py-1.5 rounded-lg mr-2"
               onPress={() =>
-                router.push(`/(root)/profile/offer/edit/${item?.id}`)
+                router.push(`/(root)/profile/offer/edit/${item?.offer?.id}`)
               }
             >
               <Ionicons name="create-outline" size={14} color="#fff" />

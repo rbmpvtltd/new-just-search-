@@ -1,1 +1,0 @@
-ALTER TABLE "push_tokens" ADD CONSTRAINT "push_tokens_device_id_unique" UNIQUE("device_id");

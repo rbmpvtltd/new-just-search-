@@ -161,7 +161,7 @@ export const seedUsers = async () => {
 
     await db.insert(profiles).values({
       userId: Number(insertedUser.id),
-      salutation: salutation,
+      salutation: salutation === "Mr." ? 1 : salutation === "Ms." ? 2 : 3,
       firstName: firstName,
       lastName: lastName,
       city: cityId,

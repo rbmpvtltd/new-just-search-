@@ -34,6 +34,7 @@ export const offers = pgTable("offers", {
   offerEndDate: timestamp("offer_end_date").notNull(),
   reuploadCount: integer("reupload_count").default(0).notNull(),
   status: boolean("status").notNull().default(true),
+  expires_at: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -52,6 +53,7 @@ export const offersInsertSchema = createInsertSchema(offers, {
     offerStartDate: true,
     offerEndDate: true,
     businessId: true,
+    expires_at: true,
   })
   .extend({
     subcategoryId: z

@@ -17,7 +17,6 @@ import { useBusinessFormStore } from "@/features/business/shared/store/useCreate
 import { useTRPC } from "@/trpc/client";
 import type { AddBusinessPageType } from "..";
 
-
 type AddressDetailSchema = z.infer<typeof addressDetailSchema>;
 export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
   const trpc = useTRPC();
@@ -39,8 +38,8 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
       streetName: formValue.streetName ?? "",
       area: formValue.area ?? "",
       landmark: formValue.landmark ?? "",
-      latitude: formValue.latitude ?? "",
-      longitude: formValue.longitude ?? "",
+      latitude: formValue.latitude ?? 0,
+      longitude: formValue.longitude ?? 0,
       pincode: formValue.pincode ?? "",
       state: formValue.state ?? "",
       city: formValue.city ?? "",
@@ -124,7 +123,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     },
     {
       control,
-
+      type: "number",
       label: "Latitude",
       name: "latitude",
       placeholder: "Latitude",
@@ -133,7 +132,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     },
     {
       control,
-
+      type: "number",
       label: "Longitude",
       name: "longitude",
       placeholder: "Longitude",
@@ -224,8 +223,8 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
                   setValue("streetName", street_name ?? "");
                   setValue("area", area ?? "");
                   setValue("landmark", landmark ?? "");
-                  setValue("latitude", String(lat));
-                  setValue("longitude", String(long));
+                  setValue("latitude", Number(lat));
+                  setValue("longitude", Number(long));
                   setValue("pincode", pincode ?? "");
                   setValue("state", matchedState?.value ?? 0);
                 }}

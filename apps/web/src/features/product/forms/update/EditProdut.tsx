@@ -2,6 +2,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
@@ -31,7 +33,10 @@ export default function EditProduct({
   myProduct: MyProductType;
   formReferenceData: FormReferenceDataType;
 }) {
+  console.log("MY Product", myProduct);
+
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(trpc.productrouter.update.mutationOptions());
   const categories = formReferenceData?.categoryRecord;
   const subCategories = formReferenceData?.subcategoryRecord;
@@ -114,7 +119,6 @@ export default function EditProduct({
   const formFields2: FormFieldProps<EditProductSchema>[] = [
     {
       control,
-      // label: "Product Image",
       name: "mainImage",
       required: false,
       component: "image",
@@ -122,19 +126,14 @@ export default function EditProduct({
     },
     {
       control,
-      type: "",
-      label: "dadasdad",
       name: "image2",
       component: "image",
-      className: "mt-10",
       required: false,
       labelHidden: true,
       error: errors.image2?.message,
     },
     {
       control,
-      type: "",
-      // label: "",
       name: "image3",
       component: "image",
       required: false,
@@ -142,8 +141,6 @@ export default function EditProduct({
     },
     {
       control,
-      type: "",
-      // label: "",
       name: "image4",
       component: "image",
       required: false,
@@ -151,43 +148,51 @@ export default function EditProduct({
     },
     {
       control,
-      type: "",
-      // label: "",
       name: "image5",
       component: "image",
       required: false,
-
       error: errors.image5?.message,
     },
   ];
   const onSubmit = async (data: any) => {
     const file = await uploadToCloudinary(
-      [data.photo, data.image2, data.image3, data.image4, data.image5],
-      "offers",
+      [data.mainImage, data.image2, data.image3, data.image4, data.image5],
+      "products",
     );
     mutate(
       {
         ...data,
-        photo: file[0],
+        mainImage: file[0],
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",
         image5: file[4] ?? "",
-        productSlug: myProduct?.product.productSlug,
+        id: myProduct?.product.id,
       },
       {
         onSuccess: (data) => {
           console.log("success", data);
-          Swal.fire({
-            title: data.message,
-            icon: "success",
-            draggable: true,
-          });
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.productrouter.showProduct.queryKey(),
-          });
-          // router.push("/");
+          if (data.success) {
+            Swal.fire({
+              title: data.message,
+              icon: "success",
+              draggable: true,
+            });
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.productrouter.showProduct.queryKey(),
+            });
+            router.push("/");
+          }
+        },
+        onError: (error) => {
+          if (isTRPCClientError(error)) {
+            Swal.fire({
+              title: error.message,
+              icon: "error",
+              draggable: true,
+            });
+          }
         },
       },
     );

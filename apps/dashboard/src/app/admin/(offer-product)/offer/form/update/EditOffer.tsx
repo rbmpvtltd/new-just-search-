@@ -34,6 +34,8 @@ export default function EditOffer({
   const { mutate } = useMutation(
     trpc.adminOfferRouter.update.mutationOptions(),
   );
+  const categories = data?.getBusinessCategories;
+  const subCategories = data?.getSubCategories;
   const {
     control,
     handleSubmit,
@@ -59,18 +61,6 @@ export default function EditOffer({
     },
   });
 
-  const categories = data?.getBusinessCategories?.map((item) => {
-    return {
-      label: item.title,
-      value: item.id,
-    };
-  });
-  const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories, isLoading } = useQuery(
-    trpc.businessrouter.getSubCategories.queryOptions({
-      categoryId: selectedCategoryId,
-    }),
-  );
   const formFields: FormFieldProps<EditOfferSchema>[] = [
     {
       control,
@@ -127,7 +117,7 @@ export default function EditOffer({
       placeholder: "Category",
       component: "select",
       options:
-        categories?.map((item) => ({ label: item.label, value: item.value })) ??
+        categories?.map((item) => ({ label: item.title, value: item.id })) ??
         [],
       error: errors.categoryId?.message,
     },
@@ -137,7 +127,6 @@ export default function EditOffer({
       name: "subcategoryId",
       placeholder: "Sub Category",
       component: "multiselect",
-      loading: isLoading,
       options:
         subCategories?.map((item) => ({
           label: item.name,
@@ -210,6 +199,7 @@ export default function EditOffer({
         image3: file[2] ?? "",
         image4: file[3] ?? "",
         image5: file[4] ?? "",
+        businessId: Number(data?.businessId) ?? "",
       },
       {
         onSuccess: (data) => {

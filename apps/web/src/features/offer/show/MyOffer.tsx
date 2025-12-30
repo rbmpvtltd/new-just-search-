@@ -1,8 +1,7 @@
 "use client";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ export default function MyOffer() {
       limit: 10,
     }),
   );
-  const offersData = myOffers?.offers ?? [];
+  const offersData = myOffers?.offersData ?? [];
 
   const handleNext = () => {
     setPrevCursors((prev) => [...prev, page ?? 0]);
@@ -54,7 +53,7 @@ export default function MyOffer() {
 
       {offersData ? (
         offersData.map((offer, index) => (
-          <OfferCard key={offer.id} offer={offer} index={index} />
+          <OfferCard key={offer.offer.id} offer={offer} index={index} />
         ))
       ) : (
         <p className="text-center text-gray-500">No offers found</p>
@@ -85,31 +84,30 @@ export default function MyOffer() {
 
 type OfferType = NonNullable<
   OutputTrpcType["offerrouter"]["showOffer"]
->["offers"][number];
+>["offersData"][number];
 function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
-  const router = useRouter();
-
   const today = new Date();
-  const end = new Date(offer.offerEndDate);
+  const end = new Date(offer.offer.offerEndDate);
 
   const status = today <= end ? "Active" : "Expired";
+  console.log("OFFERS Data", offer);
 
   return (
     <div className="">
       <div
-        key={offer.id}
+        key={offer.offer.id}
         className="grid grid-cols-6 items-center px-4 py-3 border-b text-sm hover:bg-gray-50 transition"
       >
         <div>{index + 1}</div>
 
         <div>
-          {offer?.offerPhotos?.[0]?.photo ? (
+          {offer?.offer?.mainImage ? (
             <CldImage
               width="100"
               height="100"
               className="border rounded"
-              src={offer.offerPhotos[0].photo}
-              alt={offer.offerName}
+              src={offer.offer.mainImage}
+              alt={offer.offer.offerName}
             />
           ) : (
             <div className="flex items-center justify-center h-40 w-40 border rounded text-gray-400">
@@ -118,7 +116,7 @@ function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
           )}
         </div>
 
-        <div className="font-medium">{offer.offerName}</div>
+        <div className="font-medium">{offer.offer.offerName}</div>
 
         <div>
           <span
@@ -133,13 +131,13 @@ function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
         </div>
 
         <div>
-          {offer.offerEndDate
-            ? new Date(offer.offerEndDate).toLocaleDateString()
+          {offer.offer.offerEndDate
+            ? new Date(offer.offer.offerEndDate).toLocaleDateString()
             : "—"}
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href={`/user/offer/edit/${offer.offerSlug}`}>
+          <Link href={`/profile/offer/edit/${offer.offer.id}`}>
             <Button size="icon" variant="secondary" className="cursor-pointer">
               <Pencil className="w-4 h-4" />
             </Button>

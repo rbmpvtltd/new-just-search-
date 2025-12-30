@@ -105,7 +105,6 @@ export default function AddProduct() {
       component: "input",
       keyboardType: "default",
       placeholder: "Product Name",
-      className: "w-[90%] bg-base-200",
       error: errors.productName?.message,
     },
     {
@@ -115,7 +114,6 @@ export default function AddProduct() {
       component: "input",
       keyboardType: "numeric",
       placeholder: "Product Price",
-      className: "w-[90%] bg-base-200",
       error: errors.rate?.message,
     },
     {
@@ -153,7 +151,6 @@ export default function AddProduct() {
       label: "Product Description",
       component: "editor",
       placeholder: "Offer Description",
-      className: "w-[90%] bg-base-200",
       error: errors.productDescription?.message,
     },
   ];

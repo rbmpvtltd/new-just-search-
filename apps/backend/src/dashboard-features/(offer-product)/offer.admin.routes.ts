@@ -8,7 +8,7 @@ import {
   offersUpdateSchema,
 } from "@repo/db/dist/schema/offer.schema";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import z from "zod";
 import { slugify } from "@/lib/slugify";
 import {
@@ -103,6 +103,9 @@ export const adminOfferRouter = router({
   create: adminProcedure
     .input(offersInsertSchema.extend({ businessId: z.number() }))
     .mutation(async ({ input }) => {
+      const now = new Date();
+      const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.id, input.businessId),
@@ -111,6 +114,60 @@ export const adminOfferRouter = router({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Business not found",
+        });
+      }
+
+      const activeplan = await db.query.planUserActive.findFirst({
+        where: (planUserActive, { eq }) =>
+          eq(planUserActive.userId, business.userId),
+      });
+
+      if (!activeplan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Plan not found",
+        });
+      }
+
+      const offerDuration = activeplan.features.offerDuration;
+      const expireAt = new Date(
+        now.getTime() + offerDuration * 24 * 60 * 60 * 1000,
+      );
+
+      const maxOfferPerDay = (
+        await db
+          .select({
+            count: sql<number>`count(*)`,
+          })
+          .from(offers)
+          .innerJoin(businessListings, eq(offers.businessId, business.id))
+          .where(
+            and(
+              eq(businessListings.userId, business.userId),
+              gte(offers.createdAt, last24Hours),
+            ),
+          )
+      )[0]?.count;
+
+      if (activeplan.features.maxOfferPerDay <= (maxOfferPerDay ?? 0)) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Today offer limit exceeded",
+        });
+      }
+
+      const totalOffer = (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${offers.id})::int`,
+          })
+          .from(offers)
+      )[0]?.count;
+
+      if (activeplan.features.offerLimit <= (totalOffer ?? 0)) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Offer limit exceeded",
         });
       }
       const slugifyName = slugify(input.offerName);
@@ -132,6 +189,7 @@ export const adminOfferRouter = router({
           offerDescription: input.offerDescription,
           offerStartDate: startDate,
           offerEndDate: endDate,
+          expires_at: expireAt,
         })
         .returning({
           id: offers.id,
@@ -227,6 +285,15 @@ export const adminOfferRouter = router({
           subcategoryId: true,
         },
       });
+
+      const getSubCategories = await db.query.subcategories.findMany({
+        where: (subcategories, { eq }) =>
+          eq(subcategories.categoryId, Number(offer?.categoryId)),
+        columns: {
+          id: true,
+          name: true,
+        },
+      });
       const offerPhotos = await db.query.offerPhotos.findMany({
         where: (offerPhotos, { eq }) => eq(offerPhotos.offerId, input.offerId),
         columns: {
@@ -236,10 +303,11 @@ export const adminOfferRouter = router({
       return {
         offer,
         category,
-        subcategories,
         offerPhotos,
-        getBusinessCategories,
+        subcategories,
+        getSubCategories,
         allBusinessListings,
+        getBusinessCategories,
       };
     }),
 

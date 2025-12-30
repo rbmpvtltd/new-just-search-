@@ -1,6 +1,6 @@
 {
-  "id": "88a543f1-22cb-44e5-84d4-5aa3efac059c",
-  "prevId": "ebf8a362-1529-453e-b674-eb7a41dc3761",
+  "id": "a05b4b39-0f45-4837-99ed-ce2790405921",
+  "prevId": "f2fe5690-e81f-4e44-8c9a-d3e7ab5d1767",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -297,19 +297,19 @@
         },
         "owner_number": {
           "name": "owner_number",
-          "type": "varchar",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "phone_number": {
           "name": "phone_number",
-          "type": "varchar",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "whatsapp_no": {
           "name": "whatsapp_no",
-          "type": "varchar",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -2609,6 +2609,12 @@
           "notNull": true,
           "default": true
         },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2947,7 +2953,7 @@
         },
         "expiry_date": {
           "name": "expiry_date",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
@@ -3939,7 +3945,7 @@
         },
         "salutation": {
           "name": "salutation",
-          "type": "varchar(100)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },

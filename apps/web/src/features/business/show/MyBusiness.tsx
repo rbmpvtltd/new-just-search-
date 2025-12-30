@@ -27,7 +27,7 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
           });
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.hirerouter.show.queryKey(),
+            queryKey: trpc.businessrouter.show.queryKey(),
           });
           router.push("/");
         }

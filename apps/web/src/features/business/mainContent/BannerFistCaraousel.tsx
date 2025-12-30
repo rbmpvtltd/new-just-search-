@@ -1,6 +1,7 @@
 "use client";
-import { useSubscription } from "@trpc/tanstack-react-query";
+import { useMutation } from "@tanstack/react-query";
 import { CldImage } from "next-cloudinary";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -20,9 +21,26 @@ function FirstCaraousel({
   bannerFirst: BannerFirstCaraousel[] | null;
 }) {
   console.log(bannerFirst);
+  const trpc = useTRPC();
+  const { mutate } = useMutation(trpc.businessrouter.test.mutationOptions());
 
   return (
     <Carousel opts={{ loop: true }} className="w-full ">
+      <Button
+        title="Test"
+        onClick={() =>
+          mutate(
+            {},
+            {
+              onSuccess: (data) => {
+                console.log(data);
+              },
+            },
+          )
+        }
+      >
+        Test{" "}
+      </Button>
       <CarouselContent className="ml-10">
         {bannerFirst?.map((item, index: number) => (
           <CarouselItem

@@ -61,22 +61,11 @@ export const productrouter = router({
       columns: { id: true, name: true },
     });
 
-    logger.info("Subcategory Record", subcategoryRecord);
     return {
       categoryRecord,
       subcategoryRecord,
     };
   }),
-
-  getSubCategories: visitorProcedure
-    .input(z.object({ categoryId: z.number() }))
-    .query(async ({ ctx, input }) => {
-      const businessSubCategories = await db.query.subcategories.findMany({
-        where: (subcategories, { eq }) =>
-          eq(subcategories.categoryId, input.categoryId),
-      });
-      return businessSubCategories;
-    }),
 
   addProduct: businessProcedure
     .input(productInsertSchema)
@@ -264,6 +253,8 @@ export const productrouter = router({
         where: (businessListings, { eq }) =>
           eq(businessListings.userId, ctx.userId),
       });
+      console.log("Product Update 1", input);
+
       if (!business) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -274,6 +265,8 @@ export const productrouter = router({
       const isProductExists = await db.query.products.findFirst({
         where: (products, { eq }) => eq(products.id, Number(input.id)),
       });
+
+      console.log("Product Update 2");
 
       if (!isProductExists) {
         throw new TRPCError({
@@ -287,7 +280,6 @@ export const productrouter = router({
         .set({
           productName: input.productName,
           mainImage: input.mainImage,
-          categoryId: input.categoryId,
           rate: input.rate,
           productDescription: input.productDescription,
         })

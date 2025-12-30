@@ -29,7 +29,7 @@ app.use(
     createContext, // TODO: add rate limiter
     middleware: cors({ origin: "*" }),
     onError: (opts) => {
-      logger.error(opts.error.code);
+      logger.error(opts.error.code, { message: opts.error.message });
     },
   }),
 );

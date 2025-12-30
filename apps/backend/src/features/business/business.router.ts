@@ -47,7 +47,11 @@ const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
 
 export const businessrouter = router({
-  add: visitorProcedure.query(async ({ ctx }) => {
+  test: protectedProcedure.input(z.object({})).mutation(async ({ ctx }) => {
+    const role = await changeRoleInSession(ctx.sessionId, "business");
+    return { success: true, message: "Role changed successfully", role };
+  }),
+  add: visitorProcedure.query(async () => {
     const getBusinessCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 1),
     });
@@ -161,8 +165,8 @@ export const businessrouter = router({
           specialities: input.specialities,
           description: input.description,
           homeDelivery: input.homeDelivery,
-          latitude: input.latitude,
-          longitude: input.longitude,
+          latitude: String(input.latitude),
+          longitude: String(input.longitude),
           buildingName: input.buildingName,
           streetName: input.streetName,
           area: input.area,
@@ -225,24 +229,15 @@ export const businessrouter = router({
           })),
         );
       }
-      // await db.insert(schemas.business.businessPhotos).values({
-      //   businessId,
-      //   photo: input.photo,
-      // });
-      // await db.insert(schemas.business.businessPhotos).values(
-      //   input.shopImages.map((image) => ({
-      //     businessId,
-      //     photo: image,
-      //   })),
-      // );
-      await db
-        .update(schemas.auth.users)
+
+      const role = await db
+        .update(users)
         .set({
           role: "business",
         })
-        .where(eq(schemas.auth.users.id, ctx.userId));
+        .where(eq(users.id, ctx.userId));
 
-      changeRoleInSession(ctx.sessionId, "business");
+      await changeRoleInSession(ctx.sessionId, "business");
       return { success: true, message: "Business created successfully" };
     }),
 
@@ -338,8 +333,8 @@ export const businessrouter = router({
           specialities: input.specialities,
           description: input.description,
           homeDelivery: input.homeDelivery,
-          latitude: input.latitude,
-          longitude: input.longitude,
+          latitude: String(input.latitude),
+          longitude: String(input.longitude),
           buildingName: input.buildingName,
           streetName: input.streetName,
           area: input.area,
@@ -423,12 +418,16 @@ export const businessrouter = router({
     }),
 
   show: businessProcedure.query(async ({ ctx }) => {
+    console.log("Business Show", ctx);
+    logger.info("Business Show", { ctx });
     if (!ctx.userId) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "User not logged in",
       });
     }
+    console.log("Business show");
+
     const business = await db.query.businessListings.findFirst({
       where: (businessListings, { eq }) =>
         eq(businessListings.userId, ctx.userId),
@@ -436,6 +435,8 @@ export const businessrouter = router({
         businessPhotos: true,
       },
     });
+
+    console.log("Business", business);
 
     if (!business) {
       throw new TRPCError({

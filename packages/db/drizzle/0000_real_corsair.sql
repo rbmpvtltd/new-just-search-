@@ -324,6 +324,16 @@ CREATE TABLE "subcategories" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "push_tokens" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"token" varchar(512) NOT NULL,
+	"device_id" varchar(255) NOT NULL,
+	"platform" varchar(20) NOT NULL,
+	"last_active_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "push_tokens_device_id_unique" UNIQUE("device_id")
+);
+--> statement-breakpoint
 CREATE TABLE "offer_photos" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"offer_id" integer NOT NULL,
@@ -367,6 +377,7 @@ CREATE TABLE "offers" (
 	"offer_end_date" timestamp NOT NULL,
 	"reupload_count" integer DEFAULT 0 NOT NULL,
 	"status" boolean DEFAULT true NOT NULL,
+	"expires_at" timestamp NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -537,7 +548,7 @@ CREATE TABLE "profiles" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"profileImage" varchar(255),
-	"salutation" varchar(100),
+	"salutation" integer,
 	"first_name" varchar(100),
 	"last_name" varchar(100),
 	"dob" date,
@@ -589,6 +600,7 @@ ALTER TABLE "recent_view_hire" ADD CONSTRAINT "recent_view_hire_user_id_users_id
 ALTER TABLE "recent_view_hire" ADD CONSTRAINT "recent_view_hire_hire_id_hire_listing_id_fk" FOREIGN KEY ("hire_id") REFERENCES "public"."hire_listing"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "cities" ADD CONSTRAINT "cities_state_id_states_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."states"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "subcategories" ADD CONSTRAINT "subcategories_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "push_tokens" ADD CONSTRAINT "push_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "offer_photos" ADD CONSTRAINT "offer_photos_offer_id_offers_id_fk" FOREIGN KEY ("offer_id") REFERENCES "public"."offers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "offer_reviews" ADD CONSTRAINT "offer_reviews_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "offer_reviews" ADD CONSTRAINT "offer_reviews_offer_id_offers_id_fk" FOREIGN KEY ("offer_id") REFERENCES "public"."offers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -622,4 +634,5 @@ ALTER TABLE "notification" ADD CONSTRAINT "notification_sub_category_id_subcateg
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_franchise_id_franchises_id_fk" FOREIGN KEY ("franchise_id") REFERENCES "public"."franchises"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "salesmen" ADD CONSTRAINT "salesmen_franchise_id_franchises_id_fk" FOREIGN KEY ("franchise_id") REFERENCES "public"."franchises"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "uniq_device_token" ON "push_tokens" USING btree ("device_id","token");

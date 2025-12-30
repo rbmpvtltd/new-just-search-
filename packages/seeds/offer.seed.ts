@@ -79,6 +79,7 @@ export const addOffer = async () => {
         reuploadCount: row.reupload_count,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
+        expires_at: row.expires_at ?? new Date(),
       })
       .returning({ id: offers.id });
 

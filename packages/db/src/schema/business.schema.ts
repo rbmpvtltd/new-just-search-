@@ -74,18 +74,16 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
     z.string().min(3, "Street name should be minimum 3 characters long"),
   area: () => z.string().min(3, "Area should be minimum 3 characters long"),
   latitude: () =>
-    z.string().refine(
+    z.number().refine(
       (val) => {
-        const num = parseFloat(val);
-        return !Number.isNaN(num) && num >= -90 && num <= 90;
+        return !Number.isNaN(val) && val >= -90 && val <= 90;
       },
       { message: "Latitude must be a number between -90 and 90" },
     ),
   longitude: () =>
-    z.string().refine(
+    z.number().refine(
       (val) => {
-        const num = parseFloat(val);
-        return !Number.isNaN(num) && num >= -180 && num <= 180;
+        return !Number.isNaN(val) && val >= -180 && val <= 180;
       },
       { message: "Longitude must be a number between -180 and 180" },
     ),

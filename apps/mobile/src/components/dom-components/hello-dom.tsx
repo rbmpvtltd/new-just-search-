@@ -1,72 +1,86 @@
 "use dom";
 import "./styles.css";
-
-import { $generateHtmlFromNodes } from "@lexical/html";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { $getRoot, $insertNodes } from "lexical";
+import { useEffect } from "react";
+
 import ExampleTheme from "./ExampleTheme";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 
-const placeholder = "Enter some rich text...";
+// 1. Ye Plugin DB se aaye HTML ko Editor me load karega
+function InitialValuePlugin({ value }: { value?: string }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (value) {
+      editor.update(() => {
+        const root = $getRoot();
+        // Sirf tab load karein agar editor khali ho
+        if (root.getTextContentSize() === 0) {
+          const parser = new DOMParser();
+          const dom = parser.parseFromString(value, "text/html");
+          const nodes = $generateNodesFromDOM(editor, dom);
+          root.clear();
+          root.append(...nodes);
+        }
+      });
+    }
+  }, [value, editor]);
+
+  return null;
+}
 
 const editorConfig = {
-  namespace: "React.js Demo",
-  nodes: [],
-  // Handling of errors during update
+  namespace: "Expo-Lexical-Editor",
+  nodes: [], // Agar Tables ya Lists use kar rahe ho to unke Nodes yaha dalna zaroori hai
   onError(error: Error) {
-    throw error;
+    console.error(error);
   },
-  // The editor theme
   theme: ExampleTheme,
 };
+
 export default function Editor({
   setPlainText,
-  // setEditorState,
-  value,
+  value, // DB se aaya hua HTML string
   onChange,
 }: {
-  setPlainText: React.Dispatch<React.SetStateAction<string>>;
-  // setEditorState: React.Dispatch<React.SetStateAction<string | null>>;
+  setPlainText: (val: string) => void;
   value?: string;
   onChange?: (value: string) => void;
 }) {
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <div className="editor-container">
+      <div className="editor-container ">
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                className="editor-input"
-                aria-placeholder={placeholder}
-                placeholder={
-                  <div className="editor-placeholder">{placeholder}</div>
-                }
-              />
+            contentEditable={<ContentEditable className="editor-input" />}
+            placeholder={
+              <div className="editor-placeholder">Enter text...</div>
             }
             ErrorBoundary={LexicalErrorBoundary}
           />
+
+          {/* 2. Is Plugin ko yaha add karein */}
+          <InitialValuePlugin value={value} />
+
           <OnChangePlugin
-            onChange={(editorState, editor, tags) => {
+            onChange={(editorState, editor) => {
               editorState.read(() => {
                 const htmlString = $generateHtmlFromNodes(editor, null);
                 setPlainText(htmlString);
                 if (onChange) onChange(htmlString);
               });
-              // setEditorState(JSON.stringify(editorState.toJSON()));
             }}
-            ignoreHistoryMergeTagChange
-            ignoreSelectionChange
           />
           <HistoryPlugin />
-          <AutoFocusPlugin />
-          {/* <TreeViewPlugin /> */}
         </div>
       </div>
     </LexicalComposer>
