@@ -5,7 +5,9 @@ export default function ProfileLayout() {
   return (
     <BoundaryWrapper>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" options={{ title: "Profile" }} />
+        <Stack.Screen name="business" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="hire" options={{ headerShown: false }} />
       </Stack>
     </BoundaryWrapper>
   );

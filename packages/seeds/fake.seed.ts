@@ -22,7 +22,6 @@ export const fakeSeed = async () => {
       logger.error("fake user is not find");
       return;
     }
-    await seedFakeBusiness(user.id);
     logger.info("adding fake admin");
     await seedRealUser("admin@gmail.com", "admin@123", "admin");
     await seedRealUser("ranjeet@gmail.com", "admin@123", "admin");
@@ -30,7 +29,11 @@ export const fakeSeed = async () => {
     await seedRealUser("meekail@gmail.com", "admin@123", "admin");
     await seedRealUser("salonimam@gmail.com", "admin@123", "visiter");
     await seedRealUser("visitor@gmail.com", "visitor@123", "visiter");
+    await seedRealUser("visitor@rbm.com", "rbm.justsearch@123", "visiter");
+    await seedRealUser("business@rbm.com", "rbm.justsearch@123", "business");
+    await seedRealUser("hire@rbm.com", "rbm.justsearch@123", "hire");
 
+    await seedFakeBusiness(user.id);
     logger.info("added fake admin");
     return { user };
   } catch (error) {
@@ -39,20 +42,20 @@ export const fakeSeed = async () => {
   }
 };
 
-export const fakeUserSeed = async () => {
+export const getFakeBusinessUser = async () => {
   const [fakeUser] = await db
     .select()
     .from(users)
-    .where(eq(users.phoneNumber, "fake"));
+    .where(eq(users.email, "business@rbm.com"));
   return fakeUser;
 };
 
-export const fakeBusinessSeed = async () => {
-  const [fakeBusiness] = await db
+export const getFakeHireUser = async () => {
+  const [fakeUser] = await db
     .select()
-    .from(businessListings)
-    .where(eq(businessListings.slug, "fake"));
-  return fakeBusiness;
+    .from(users)
+    .where(eq(users.email, "hire@rbm.com"));
+  return fakeUser;
 };
 
 const seedRealUser = async (
@@ -233,7 +236,7 @@ const seedFakeBusiness = async (userId: number) => {
       .values({
         userId,
         salesmanId: 1,
-        name: "fake",
+        name: "rbm",
         slug: "fake",
         photo: "fake",
         specialities: "fake",

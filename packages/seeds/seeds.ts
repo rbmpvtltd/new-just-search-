@@ -4,7 +4,7 @@ import { businessSeed } from "./business.seed";
 import { fakeSeed } from "./fake.seed";
 import { feedbackseed } from "./feedback.seed";
 import { hireSeed } from "./hires.seeds";
-// import { sql } from "./mysqldb.seed";
+import { sql } from "./mysqldb.seed";
 import { notRelated } from "./notrelated.seed";
 import { offerSeed } from "./offer.seed";
 import { planSeed } from "./plan.seed";
@@ -20,8 +20,8 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
   try {
     // Postgres seeding
     // await notRelated();
-    await userSeed();
-    // await fakeSeed();
+    // await userSeed();
+    await fakeSeed();
     // await businessSeed();
     // await hireSeed();
     await productSeed();

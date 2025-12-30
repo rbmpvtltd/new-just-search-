@@ -557,7 +557,7 @@ CREATE TABLE "profiles" (
 	"address" varchar(255),
 	"pincode" varchar(10),
 	"state" integer NOT NULL,
-	"city" integer NOT NULL,
+	"city" integer,
 	"created_at" timestamp DEFAULT NOW(),
 	"updated_at" timestamp DEFAULT NOW()
 );

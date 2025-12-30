@@ -77,6 +77,30 @@ export const seedUsers = async () => {
       continue;
     }
 
+    // plan id
+    // ad_limit
+    // products_limit
+    // offers_limit
+    // plan_end_date
+    // payment_date
+    // area,
+
+    // await db.insert(profiles).values({
+    //   userId: Number(insertedUser.id),
+    //   salutation: salutation,
+    //   firstName: firstName,
+    //   lastName: lastName,
+    //   city: cityId,
+    //   profileImage: profilePhotoUrl,
+    //   address: row.address ?? "null",
+    //   dob: row.dob ?? null,
+    //   maritalStatus: row.marital_status ?? null,
+    //   occupation: occupationId,
+    //   state: row.state ?? 19,
+    //   pincode: row.zip ?? "000000",
+    //   createdAt: row.created_at,
+    //   updatedAt: row.updated_at,
+    // });
     const user: DbUser = {
       id: row.id,
       displayName: row.name,
@@ -87,16 +111,11 @@ export const seedUsers = async () => {
       role: row.phone ? UserRole.visiter : UserRole.guest,
       googleId: row.google_id,
       appleId: row.apple_id,
-      revanueCatId: row.revanue_cat_id ?? undefined,
+      revanueCatId: row.revanue_id ?? undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
-
-    const [insertedUser] = await db
-      .insert(users)
-      .values(user)
-      .onConflictDoNothing()
-      .returning();
+    const [insertedUser] = await db.insert(users).values(user).returning();
 
     if (!insertedUser) {
       throw new Error(`User could not be inserted or found:`);
@@ -166,7 +185,7 @@ export const seedUsers = async () => {
       lastName: lastName,
       city: cityId,
       profileImage: profilePhotoUrl,
-      address: row.address ?? "null",
+      address: row.area ?? row.address,
       dob: row.dob ?? null,
       maritalStatus: row.marital_status ?? null,
       occupation: occupationId,
