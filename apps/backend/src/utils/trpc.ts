@@ -1,8 +1,12 @@
 import type { ORPCMeta } from "@orpc/trpc";
+import { logger } from "@repo/logger";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 // import { ZodError } from "zod";
-import { changeRoleInSession, validateSessionToken } from "@/features/auth/lib/session";
+import {
+  changeRoleInSession,
+  validateSessionToken,
+} from "@/features/auth/lib/session";
 import type { Context } from "./context";
 
 export const t = initTRPC.context<Context>().meta<ORPCMeta>().create({
@@ -60,19 +64,21 @@ export const guestProcedure = publicProcedure.use(async (opts) => {
 
 export const protectedProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
-
+  logger.info("ctx", ctx);
   if (!ctx.token) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "cannot find token" });
   }
 
   const session = await validateSessionToken(ctx.token);
   if (!session) {
+    logger.info("session not found");
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "token is not valid",
     });
   }
 
+  logger.info("session", session);
   return opts.next({
     ctx: {
       userId: session.userId,
