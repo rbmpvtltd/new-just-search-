@@ -38,8 +38,10 @@ type businesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
 export const BussinessListingCard = ({
   item,
+  navigationId,
 }: {
   item: BusinessListing | businesses;
+  navigationId?: number;
   category?: string;
   subcategory?: string[];
   rating?: string | undefined;
@@ -53,7 +55,7 @@ export const BussinessListingCard = ({
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/subcategory/aboutBusiness/${item.objectID}`,
+                  pathname: `/subcategory/aboutBusiness/${navigationId ?? item.objectID}`,
                 }}
               >
                 <Image
