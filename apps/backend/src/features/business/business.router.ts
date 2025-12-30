@@ -802,7 +802,19 @@ export const businessrouter = router({
     const data = await db
       .select({
         id: favourites.id,
-        shop: sql<string[]>`COALESCE(
+        shop: sql<
+          {
+            id: number;
+            name: string;
+            photo: string | null;
+            latitude: number | null;
+            longitude: number | null;
+            phoneNumber: string | null;
+            area: string | null;
+            streetName: string | null;
+            buildingName: string | null;
+          }[]
+        >`COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
             'id', business_listings.id,
             'name', business_listings.name,
