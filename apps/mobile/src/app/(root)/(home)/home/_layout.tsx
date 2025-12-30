@@ -12,8 +12,9 @@
 // }
 
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { Stack } from "expo-router";
 import { useEffect } from "react";
-import DrawerLayout from "@/components/layout/Drawer";
+import { DrawerMenu } from "@/components/layout/Drawer";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useLoadToken } from "@/hooks/useLoadToken";
 
@@ -23,9 +24,16 @@ export default function HomeLayout() {
 
   useEffect(() => {
     if (data?.token && data.role) {
-      setAuthStoreToken(data.token, UserRole.admin);
+      setAuthStoreToken(data.token, data.role);
     }
   }, [data, setAuthStoreToken]);
 
-  return <DrawerLayout />;
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: true, headerLeft: () => <DrawerMenu /> }}
+      />
+    </Stack>
+  );
 }

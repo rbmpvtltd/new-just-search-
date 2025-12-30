@@ -8,6 +8,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { Drawer } from "react-native-drawer-layout";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useHeadingStore } from "@/store/heading";
 import "react-native-reanimated";
@@ -19,6 +20,10 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
+import {
+  CustomDrawerContent,
+  useDrawerStore,
+} from "@/components/layout/Drawer";
 import ErrorHandler from "@/components/layout/NativeErrorBoundry";
 import { androidPaymentApiKey, iosPaymentApiKey } from "@/constants/Variable";
 import { queryClient } from "@/lib/trpc";
@@ -68,6 +73,8 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const heading = useHeadingStore((state) => state.heading);
+  const open = useDrawerStore((state) => state.open);
+  const setOpen = useDrawerStore((state) => state.setOpen);
 
   useEffect(() => {
     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
@@ -82,120 +89,130 @@ function RootLayoutNav() {
   return (
     <GestureHandlerRootView>
       <QueryClientProvider client={queryClient}>
-        <BoundaryWrapper>
-          <View className={colorScheme === "dark" ? "dark h-full" : "h-full"}>
-            <ThemeProvider
-              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
-              {/* <Drawer /> */}
-              <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(root)" options={{ headerShown: false }} />
+        <Drawer
+          open={open}
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
+          renderDrawerContent={() => <CustomDrawerContent />}
+        >
+          <BoundaryWrapper>
+            <View className={colorScheme === "dark" ? "dark h-full" : "h-full"}>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                {/* <Drawer /> */}
+                <Stack>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(root)"
+                    options={{ headerShown: false }}
+                  />
 
-                <Stack.Screen
-                  name="category/[category]"
-                  options={({ route }) => {
-                    const { category } = route.params as { category: string };
-                    const title =
-                      category.charAt(0).toUpperCase() + category.slice(1);
-                    return {
-                      headerShown: true,
-                      title,
-                    };
-                  }}
-                />
-                <Stack.Screen
-                  name="chatSessions"
-                  options={{ headerShown: true, title: "Chats" }}
-                />
+                  <Stack.Screen
+                    name="category/[category]"
+                    options={({ route }) => {
+                      const { category } = route.params as { category: string };
+                      const title =
+                        category.charAt(0).toUpperCase() + category.slice(1);
+                      return {
+                        headerShown: true,
+                        title,
+                      };
+                    }}
+                  />
+                  <Stack.Screen
+                    name="chatSessions"
+                    options={{ headerShown: true, title: "Chats" }}
+                  />
 
-                <Stack.Screen
-                  name="subcategory/[subcategory]"
-                  options={() => {
-                    return {
-                      headerShown: true,
-                      title: heading,
-                    };
-                  }}
-                />
-                <Stack.Screen
-                  name="hireDetail/[hiredetails]"
-                  options={({ route }) => {
-                    const { hiredetails } = route.params as {
-                      hiredetails: string;
-                    };
-                    const arr = hiredetails.split("-");
-                    let title = "";
-                    if (arr.length === 1) {
-                      // sirf ek word hai
-                      title = `${arr[0][0].toUpperCase()}${arr[0].slice(1)}`;
-                    } else if (arr.length >= 2) {
-                      // do ya zyada word hain
-                      title = `${arr[0][0].toUpperCase()}${arr[0].slice(1)} ${arr[1][0].toUpperCase()}${arr[1].slice(1)}`;
-                    }
+                  <Stack.Screen
+                    name="subcategory/[subcategory]"
+                    options={() => {
+                      return {
+                        headerShown: true,
+                        title: heading,
+                      };
+                    }}
+                  />
+                  <Stack.Screen
+                    name="hireDetail/[hiredetails]"
+                    options={({ route }) => {
+                      const { hiredetails } = route.params as {
+                        hiredetails: string;
+                      };
+                      const arr = hiredetails.split("-");
+                      let title = "";
+                      if (arr.length === 1) {
+                        // sirf ek word hai
+                        title = `${arr[0][0].toUpperCase()}${arr[0].slice(1)}`;
+                      } else if (arr.length >= 2) {
+                        // do ya zyada word hain
+                        title = `${arr[0][0].toUpperCase()}${arr[0].slice(1)} ${arr[1][0].toUpperCase()}${arr[1].slice(1)}`;
+                      }
 
-                    return {
-                      headerShown: true,
-                      title,
-                    };
-                  }}
-                />
+                      return {
+                        headerShown: true,
+                        title,
+                      };
+                    }}
+                  />
 
-                <Stack.Screen
-                  name="aboutBusiness"
-                  options={() => {
-                    return {
-                      headerShown: true,
-                      title: "About Business",
-                    };
-                  }}
-                />
-                <Stack.Screen
-                  name="businessEditForms"
-                  options={{
-                    title: "Edit Business Listing",
-                  }}
-                />
-                <Stack.Screen
-                  name="user"
-                  options={() => {
-                    return {
-                      headerShown: false,
-                    };
-                  }}
-                />
-                <Stack.Screen
-                  name="chat"
-                  options={() => {
-                    return {
-                      headerShown: false,
-                    };
-                    //
-                    // headerTitle: () => (
-                    //   <View className="flex-row items-center gap-4  px-4 py-2 rounded-lg sticky">
-                    //     <AvatarWithFallback
-                    //       uri={`https://www.justsearch.net.in/assets/images/${imageUri}`}
-                    //       imageClass="w-[40px] h-[40px]"
-                    //       iconSize={20}
-                    //     />
-                    //     <Text className="text-secondary font-semibold text-xl">
-                    //       {heading
-                    //         ? heading.length > 20
-                    //           ? `${heading.slice(0, 20)}...`
-                    //           : heading
-                    //         : "Loading..."}
-                    //     </Text>
-                    //   </View>
-                    // ),
-                  }}
-                />
-              </Stack>
-            </ThemeProvider>
-          </View>
-          {Platform.OS !== "web" ? null : (
-            <ReactQueryDevtools initialIsOpen={false} />
-          )}
-        </BoundaryWrapper>
+                  <Stack.Screen
+                    name="aboutBusiness"
+                    options={() => {
+                      return {
+                        headerShown: true,
+                        title: "About Business",
+                      };
+                    }}
+                  />
+                  <Stack.Screen
+                    name="businessEditForms"
+                    options={{
+                      title: "Edit Business Listing",
+                    }}
+                  />
+                  <Stack.Screen
+                    name="user"
+                    options={() => {
+                      return {
+                        headerShown: false,
+                      };
+                    }}
+                  />
+                  <Stack.Screen
+                    name="chat"
+                    options={() => {
+                      return {
+                        headerShown: false,
+                      };
+                      //
+                      // headerTitle: () => (
+                      //   <View className="flex-row items-center gap-4  px-4 py-2 rounded-lg sticky">
+                      //     <AvatarWithFallback
+                      //       uri={`https://www.justsearch.net.in/assets/images/${imageUri}`}
+                      //       imageClass="w-[40px] h-[40px]"
+                      //       iconSize={20}
+                      //     />
+                      //     <Text className="text-secondary font-semibold text-xl">
+                      //       {heading
+                      //         ? heading.length > 20
+                      //           ? `${heading.slice(0, 20)}...`
+                      //           : heading
+                      //         : "Loading..."}
+                      //     </Text>
+                      //   </View>
+                      // ),
+                    }}
+                  />
+                </Stack>
+              </ThemeProvider>
+            </View>
+            {Platform.OS !== "web" ? null : (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
+          </BoundaryWrapper>
+        </Drawer>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

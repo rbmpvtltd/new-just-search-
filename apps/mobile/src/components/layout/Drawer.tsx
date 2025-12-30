@@ -1,9 +1,22 @@
-import { DrawerItem } from "@react-navigation/drawer";
 import type { HeaderBackButtonProps } from "@react-navigation/elements";
 import { type Href, router, useSegments } from "expo-router";
 import { useState } from "react";
-import { Button, Text, View } from "react-native";
+import { Button, Pressable, Text, View } from "react-native";
 import { Drawer } from "react-native-drawer-layout";
+
+import { create } from "zustand";
+
+type DrawerStore = {
+  open: boolean;
+  toggleOpen: () => void;
+  setOpen: (open: boolean) => void;
+};
+
+export const useDrawerStore = create<DrawerStore>((set) => ({
+  open: false,
+  toggleOpen: () => set((state) => ({ open: !state.open })),
+  setOpen: (open: boolean) => set({ open }),
+}));
 
 const drawerFields: DrawerField[] = [
   {
@@ -94,7 +107,7 @@ interface DrawerField {
   route: Href;
 }
 
-function CustomDrawerContent() {
+export function CustomDrawerContent() {
   const segment = useSegments();
   const currentRoute = segment.join("/");
   return (
@@ -102,34 +115,29 @@ function CustomDrawerContent() {
       {drawerFields.map((field) => {
         const isFocused = `/${currentRoute}` === field.route;
         return (
-          <DrawerItem
+          <Pressable
             key={field.key ?? field.name}
-            label={field.name}
-            activeTintColor="#ff2"
-            focused={isFocused}
-            onPress={() => {
-              router.navigate(field.route);
-            }}
-          />
+            className={`${isFocused ? "bg-primary" : ""}`}
+            onPress={() => router.navigate(field.route)}
+          >
+            <Text>{field.name}</Text>
+          </Pressable>
         );
       })}
     </View>
   );
 }
 
+// key={field.key ?? field.name}
+// label={field.name}
+// activeTintColor="#ff2"
+// focused={isFocused}
+// onPress={() => {
+//   router.navigate(field.route);
+// }}
+//  />
+
 export function DrawerMenu() {
-  const [open, setOpen] = useState(false);
-  return (
-    <Drawer
-      open={open}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
-      renderDrawerContent={() => <CustomDrawerContent />}
-    >
-      <Button
-        onPress={() => setOpen((prevOpen) => !prevOpen)}
-        title={`${open ? "Close" : "Open"}`}
-      />
-    </Drawer>
-  );
+  const toggleOpen = useDrawerStore((state) => state.toggleOpen);
+  return <Button onPress={() => toggleOpen()} title={`Menu`} />;
 }
