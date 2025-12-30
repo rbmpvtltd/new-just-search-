@@ -90,7 +90,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
                 {singleShop?.name}
               </h1>
               <Favourite
-                initialFav={singleShop.isFavourite}
+                initialFav={singleShop?.isFavourite ?? false}
                 businessId={singleShop?.id ?? 0}
               />
             </div>

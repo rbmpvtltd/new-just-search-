@@ -491,187 +491,105 @@ export const businessrouter = router({
   singleShop: guestProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ input, ctx }) => {
-      let shop: any;
-      if (ctx.userId) {
-        shop = await db
-          .select({
-            id: businessListing.id,
-            userId: businessListing.userId,
-            name: businessListing.name,
-            email: businessListing.email,
-            photo: businessListing.photo,
-            phoneNumber: businessListing.phoneNumber,
-            pincode: businessListing.pincode,
-            homeDelivery: businessListing.homeDelivery,
-            // schedule: businessListing.schedules,
-            status: businessListing.status,
-            area: businessListing.area,
-            streetName: businessListing.streetName,
-            buildingName: businessListing.buildingName,
-            createdAt: businessListing.createdAt,
-            latitude: businessListing.latitude,
-            longitude: businessListing.longitude,
-            landMark: businessListing.landmark,
-            whatsappNo: businessListing.whatsappNo,
-            description: businessListing.description,
-            updatedAt: businessListing.updatedAt,
-            specialities: businessListing.specialities,
-            rating: sql<
-              {
-                id: number;
-                created_at: string;
-                rating: number;
-                message: string;
-                user: string;
-              }[]
-            >`COALESCE(
-              JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
-                'id', business_reviews.id,
-                'created_at', business_reviews.created_at,
-                'rating', business_reviews.rate,
-                'message', business_reviews.message,
-                'user', users.display_name
-              ))
-                FILTER (WHERE business_reviews.id IS NOT NULL),
-              '[]'
-            )`,
-            subcategories: sql<string[]>`
-              COALESCE(
-                ARRAY_AGG(DISTINCT subcategories.name) 
-                FILTER (WHERE subcategories.id IS NOT NULL),
-                '{}'
+      const commonSelect = {
+        id: businessListing.id,
+        userId: businessListing.userId,
+        name: businessListing.name,
+        email: businessListing.email,
+        photo: businessListing.photo,
+        phoneNumber: businessListing.phoneNumber,
+        pincode: businessListing.pincode,
+        homeDelivery: businessListing.homeDelivery,
+        status: businessListing.status,
+        area: businessListing.area,
+        streetName: businessListing.streetName,
+        buildingName: businessListing.buildingName,
+        createdAt: businessListing.createdAt,
+        latitude: businessListing.latitude,
+        longitude: businessListing.longitude,
+        landMark: businessListing.landmark,
+        whatsappNo: businessListing.whatsappNo,
+        description: businessListing.description,
+        updatedAt: businessListing.updatedAt,
+        specialities: businessListing.specialities,
+        rating: sql<
+          {
+            id: number;
+            created_at: string;
+            rating: number;
+            message: string;
+            user: string;
+          }[]
+        >`COALESCE(
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
+            'id', business_reviews.id,
+            'created_at', business_reviews.created_at,
+            'rating', business_reviews.rate,
+            'message', business_reviews.message,
+            'user', users.display_name
+          ))
+            FILTER (WHERE business_reviews.id IS NOT NULL),
+          '[]'
+        )`,
+        subcategories: sql<string[]>`
+          COALESCE(
+            ARRAY_AGG(DISTINCT subcategories.name) 
+            FILTER (WHERE subcategories.id IS NOT NULL),
+            '{}'
+          )
+        `,
+        category: sql<
+          string | null
+        >`MAX(${schemas.not_related.categories.title})`,
+        businessPhotos: sql<string[]>`
+        COALESCE(
+          ARRAY_AGG(DISTINCT business_photos.photo)
+          FILTER (WHERE business_photos.id IS NOT NULL),
+          '{}'
+        )
+      `,
+      } as const;
+
+      const shop = await db
+        .select({
+          ...commonSelect,
+          isFavourite: ctx.userId
+            ? sql<boolean>`CASE WHEN ${favourites.id} IS NOT NULL THEN true ELSE false END`
+            : sql<boolean>`false`,
+        })
+        .from(businessListing)
+        .leftJoin(
+          businessSubcategories,
+          eq(businessListing.id, businessSubcategories.businessId),
+        )
+        .leftJoin(
+          subcategories,
+          eq(
+            schemas.business.businessSubcategories.subcategoryId,
+            subcategories.id,
+          ),
+        )
+        .leftJoin(categories, eq(subcategories.categoryId, categories.id))
+        .leftJoin(
+          businessPhotos,
+          eq(businessListing.id, businessPhotos.businessId),
+        )
+        .leftJoin(
+          business_reviews,
+          eq(businessListing.id, business_reviews.businessId),
+        )
+        .leftJoin(
+          favourites,
+          ctx.userId
+            ? and(
+                eq(favourites.businessId, businessListing.id),
+                eq(favourites.userId, ctx.userId),
               )
-            `,
-            category: sql<
-              string | null
-            >`MAX(${schemas.not_related.categories.title})`,
-            businessPhotos: sql<string[]>`
-            COALESCE(
-              ARRAY_AGG(DISTINCT business_photos.photo)
-              FILTER (WHERE business_photos.id IS NOT NULL),
-              '{}'
-            )
-          `,
-            isFavourite: sql<boolean>`CASE WHEN ${favourites.id} IS NOT NULL THEN true ELSE false END`,
-          })
-          .from(businessListing)
-          .leftJoin(
-            businessSubcategories,
-            eq(businessListing.id, businessSubcategories.businessId),
-          )
-          .leftJoin(
-            subcategories,
-            eq(
-              schemas.business.businessSubcategories.subcategoryId,
-              subcategories.id,
-            ),
-          )
-          .leftJoin(categories, eq(subcategories.categoryId, categories.id))
-          .leftJoin(
-            businessPhotos,
-            eq(businessListing.id, businessPhotos.businessId),
-          )
-          .leftJoin(
-            business_reviews,
-            eq(businessListing.id, business_reviews.businessId),
-          )
-          .leftJoin(
-            favourites,
-            and(
-              eq(favourites.businessId, businessListings.id),
-              eq(favourites.userId, ctx.userId),
-            ),
-          )
-          .leftJoin(users, eq(business_reviews.userId, users.id))
-          .groupBy(businessListing.id, favourites.id)
-          .where(eq(businessListing.id, input.businessId));
-      } else {
-        shop = await db
-          .select({
-            id: businessListing.id,
-            userId: businessListing.userId,
-            name: businessListing.name,
-            email: businessListing.email,
-            photo: businessListing.photo,
-            phoneNumber: businessListing.phoneNumber,
-            pincode: businessListing.pincode,
-            homeDelivery: businessListing.homeDelivery,
-            // schedule: businessListing.schedules,
-            status: businessListing.status,
-            area: businessListing.area,
-            streetName: businessListing.streetName,
-            buildingName: businessListing.buildingName,
-            createdAt: businessListing.createdAt,
-            latitude: businessListing.latitude,
-            longitude: businessListing.longitude,
-            landMark: businessListing.landmark,
-            whatsappNo: businessListing.whatsappNo,
-            description: businessListing.description,
-            updatedAt: businessListing.updatedAt,
-            specialities: businessListing.specialities,
-            rating: sql<
-              {
-                id: number;
-                created_at: string;
-                rating: number;
-                message: string;
-                user: string;
-              }[]
-            >`COALESCE(
-              JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
-                'id', business_reviews.id,
-                'created_at', business_reviews.created_at,
-                'rating', business_reviews.rate,
-                'message', business_reviews.message,
-                'user', users.display_name
-              ))
-                FILTER (WHERE business_reviews.id IS NOT NULL),
-              '[]'
-            )`,
-            subcategories: sql<string[]>`
-              COALESCE(
-                ARRAY_AGG(DISTINCT subcategories.name) 
-                FILTER (WHERE subcategories.id IS NOT NULL),
-                '{}'
-              )
-            `,
-            category: sql<
-              string | null
-            >`MAX(${schemas.not_related.categories.title})`,
-            businessPhotos: sql<string[]>`
-            COALESCE(
-              ARRAY_AGG(DISTINCT business_photos.photo)
-              FILTER (WHERE business_photos.id IS NOT NULL),
-              '{}'
-            )
-          `,
-            isFavourite: sql<boolean>`false`,
-          })
-          .from(businessListing)
-          .leftJoin(
-            businessSubcategories,
-            eq(businessListing.id, businessSubcategories.businessId),
-          )
-          .leftJoin(
-            subcategories,
-            eq(
-              schemas.business.businessSubcategories.subcategoryId,
-              subcategories.id,
-            ),
-          )
-          .leftJoin(categories, eq(subcategories.categoryId, categories.id))
-          .leftJoin(
-            businessPhotos,
-            eq(businessListing.id, businessPhotos.businessId),
-          )
-          .leftJoin(
-            business_reviews,
-            eq(businessListing.id, business_reviews.businessId),
-          )
-          .leftJoin(users, eq(business_reviews.userId, users.id))
-          .groupBy(businessListing.id)
-          .where(eq(businessListing.id, input.businessId));
-      }
+            : undefined,
+        )
+        .leftJoin(users, eq(business_reviews.userId, users.id))
+        .groupBy(businessListing.id, ...(ctx.userId ? [favourites.id] : []))
+        .where(eq(businessListing.id, input.businessId));
 
       return shop[0];
     }),
