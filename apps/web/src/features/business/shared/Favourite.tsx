@@ -28,7 +28,7 @@ function Favourite({
           Swal.fire({
             title: "Login Require",
             icon: "warning",
-            text : "Need To Login For Add In Favourite",
+            text: "Need To Login For Add In Favourite",
             draggable: true,
             timer: 5000,
           });

@@ -14,15 +14,14 @@ async function page() {
     data,
   );
 
-  console.log(`${JSON.stringify(error,null,2)}`)
+  console.log(`${JSON.stringify(error, null, 2)}`);
   // if (error?.error?.shape?.data?.httpStatus === 401) {
   //   redirect("/login");
   // }
-   if (error?.trpcError ) {
-    
-    if( error.error.shape?.data.code === "UNAUTHORIZED"){
-      // redirect("/login");
-      console.log("---- I am here ------");
+  if (error?.trpcError) {
+    if (error.error.shape?.data.code === "UNAUTHORIZED") {
+      redirect("/login");
+      // console.log("---- I am here ------");
     }
   }
   if (data?.data?.length === 0) {

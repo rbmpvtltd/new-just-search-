@@ -7,12 +7,12 @@ import React from "react";
 import { IoMdChatboxes } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { User } from 'lucide-react';
+import { User } from "lucide-react";
 
 const menuItems = [
   { name: "Home", href: "/" },
   { name: "Hire", href: "/hire" },
-  { name: "Offers", href: "/offers" },
+  { name: "Offers", href: "/allOffers" },
   { name: "Favourite", href: "/favourite" },
 ];
 
