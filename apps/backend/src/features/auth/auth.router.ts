@@ -12,6 +12,7 @@ import {
   router,
   visitorProcedure,
 } from "@/utils/trpc";
+import { OAuth2Client } from "google-auth-library";
 import { verifyOTP } from "@/utils/varifyOTP";
 import { checkPasswordGetUser } from "./auth.service";
 import {
@@ -19,6 +20,8 @@ import {
   deleteSession,
   validateSessionToken,
 } from "./lib/session";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_ANDROID_CLIENT_ID);
 
 export const authRouter = router({
   googleLogin: publicProcedure.query(async ({ ctx }) => {
@@ -46,6 +49,73 @@ export const authRouter = router({
       }).toString();
     return { url: redirectUrl };
   }),
+  mobileOauth: publicProcedure
+    .input(
+      z.object({
+        provider: z.enum(["google", "apple"]),
+        idToken: z.string().nullable(),
+        user: z.object({
+          id: z.string(),
+          email: z.string().nullable(),
+          name: z.string().nullable(),
+        }),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      try {
+        let verifiedUser: {
+          id: string;
+          email: string | null;
+          name: string | null;
+        };
+
+        if (input.provider === "google") {
+          // Verify Google token
+          if (!input.idToken) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "ID token required for Google sign-in",
+            });
+          }
+
+          const ticket = await googleClient.verifyIdToken({
+            idToken: input.idToken,
+            audience: process.env.GOOGLE_ANDROID_CLIENT_ID,
+          });
+
+          const payload = ticket.getPayload();
+          if (!payload) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "Invalid Google token",
+            });
+          }
+
+          verifiedUser = {
+            id: payload.sub,
+            email: payload.email || null,
+            name: payload.name || null,
+          };
+        } else {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid provider",
+          });
+        }
+        console.log("======= Verified User =========", input);
+
+        return {
+          data: input,
+          success: true,
+        };
+      } catch (error: any) {
+        console.error("Login error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message || "Authentication failed",
+        });
+      }
+    }),
 
   login: publicProcedure
     .input(z.object({ username: z.string(), password: z.string().min(6) }))
