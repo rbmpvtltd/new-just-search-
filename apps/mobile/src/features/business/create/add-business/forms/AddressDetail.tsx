@@ -141,7 +141,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
       name: "latitude",
       label: "Latitude",
       placeholder: "e.g. 26.9124",
-      
+      type: "number",
       component: "input",
       keyboardType: "numeric",
       className: "w-[90%] bg-base-200",
@@ -150,6 +150,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
     {
       control,
       name: "longitude",
+      type: "number",
       label: "Longitude",
       placeholder: "e.g. 75.7878",
       component: "input",
