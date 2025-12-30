@@ -136,21 +136,19 @@ export default function EditOffer({
     {
       control,
       name: "mainImage",
+      required: false,
       component: "image",
       error: errors.mainImage?.message,
     },
     {
       control,
-      type: "",
       name: "image2",
       component: "image",
-      className: "mt-5",
       required: false,
       error: errors.image2?.message,
     },
     {
       control,
-      type: "",
       name: "image3",
       component: "image",
       required: false,
@@ -166,7 +164,6 @@ export default function EditOffer({
     },
     {
       control,
-      type: "",
       name: "image5",
       component: "image",
       required: false,
@@ -186,7 +183,7 @@ export default function EditOffer({
         image3: file[2] ?? "",
         image4: file[3] ?? "",
         image5: file[4] ?? "",
-        offerSlug: myOffer?.offer.offerSlug,
+        id: myOffer?.offer.id,
       },
       {
         onSuccess: (data) => {

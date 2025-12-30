@@ -34,8 +34,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
   const categories = data?.categoryRecord;
   const subCategories = data?.subcategoryRecord;
 
-  console.log("offer id is ", myOffer);
-
   const {
     control,
     handleSubmit,
@@ -111,11 +109,10 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
     {
       control,
       name: "offerName",
-      label: "Product Name",
+      label: "Offer Name",
       component: "input",
       keyboardType: "default",
       placeholder: "Offer Name",
-      className: "w-[90%] bg-base-200",
       error: errors.offerName?.message,
     },
     {
@@ -125,7 +122,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       component: "input",
       keyboardType: "numeric",
       placeholder: "Offer Price",
-      className: "w-[90%] bg-base-200",
       error: errors.rate?.message,
       onValueChange: (value) => {
         if (!value) return;
@@ -139,7 +135,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       component: "input",
       keyboardType: "numeric",
       placeholder: "e.g 10",
-      className: "w-[90%] bg-base-200",
       error: errors.discountPercent?.message,
       onValueChange: (value) => {
         if (!value) return;
@@ -157,7 +152,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       component: "input",
       keyboardType: "numeric",
       placeholder: "Final Price",
-      className: "w-[90%] bg-base-200",
       error: errors.finalPrice?.message,
     },
     {
@@ -170,7 +164,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
         : [],
       component: "dropdown",
       multiselect: 1,
-      className: "w-[90%] bg-base-200",
       disable: true,
       error: errors.categoryId?.message,
     },
@@ -186,7 +179,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
         })) ?? [],
       component: "multiselectdropdown",
       multiselect: Infinity,
-      className: "w-[90%] bg-base-200",
       error: errors?.subcategoryId?.message,
     },
     {
@@ -196,7 +188,6 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       component: "editor",
       keyboardType: "default",
       placeholder: "Offer Description",
-      className: "w-[90%] bg-base-200",
       error: errors.offerDescription?.message,
     },
   ];

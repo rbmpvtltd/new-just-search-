@@ -6,13 +6,11 @@ import { getRole } from "@/utils/session";
 
 export default async function page() {
   const role = await getRole();
+  console.log("");
+
   return (
     <div>
-      {role?.value === "business" ? (
-        <MyBusinessList />
-      ) : (
-        <CreateBusinessListing />
-      )}
+      {role === "business" ? <MyBusinessList /> : <CreateBusinessListing />}
     </div>
   );
 }
@@ -21,6 +19,7 @@ async function MyBusinessList() {
   const { data: myBusiness, error } = await asyncHandler(
     trpcServer.businessrouter.show.query(),
   );
+  console.log("Error", error);
 
   if (!myBusiness) return <CreateBusinessListing />;
 

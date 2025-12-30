@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
@@ -26,6 +27,7 @@ export default function AddProduct({
   formReferenceData: FormReferenceDataType;
 }) {
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(
     trpc.productrouter.addProduct.mutationOptions(),
   );
@@ -108,7 +110,6 @@ export default function AddProduct({
   const formFields2: FormFieldProps<AddProductSchema>[] = [
     {
       control,
-      // label: "Product Image",
       name: "mainImage",
       required: false,
       component: "image",
@@ -116,8 +117,6 @@ export default function AddProduct({
     },
     {
       control,
-      type: "",
-      label: "dadasdad",
       name: "image2",
       component: "image",
       className: "mt-10",
@@ -127,8 +126,6 @@ export default function AddProduct({
     },
     {
       control,
-      type: "",
-      // label: "",
       name: "image3",
       component: "image",
       required: false,
@@ -136,8 +133,6 @@ export default function AddProduct({
     },
     {
       control,
-      type: "",
-      // label: "",
       name: "image4",
       component: "image",
       required: false,
@@ -145,8 +140,6 @@ export default function AddProduct({
     },
     {
       control,
-      type: "",
-      // label: "",
       name: "image5",
       component: "image",
       required: false,
@@ -157,13 +150,13 @@ export default function AddProduct({
 
   const onSubmit = async (data: any) => {
     const file = await uploadToCloudinary(
-      [data.photo, data.image2, data.image3, data.image4, data.image5],
+      [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "products",
     );
     mutate(
       {
         ...data,
-        photo: file[0],
+        mainImage: file[0],
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",
@@ -172,16 +165,26 @@ export default function AddProduct({
       {
         onSuccess: (data) => {
           console.log("success", data);
+          if (data.success) {
+            Swal.fire({
+              title: data.message,
+              icon: "success",
+              draggable: true,
+            });
+            const queryClient = getQueryClient();
+            queryClient.invalidateQueries({
+              queryKey: trpc.productrouter.showProduct.queryKey(),
+            });
+            router.push("/");
+          }
+        },
+        onError: (error) => {
           Swal.fire({
-            title: data.message,
-            icon: "success",
+            title: error.message,
+            icon: "error",
+            color: "red",
             draggable: true,
           });
-          const queryClient = getQueryClient();
-          queryClient.invalidateQueries({
-            queryKey: trpc.productrouter.showProduct.queryKey(),
-          });
-          // router.push("/");
         },
       },
     );

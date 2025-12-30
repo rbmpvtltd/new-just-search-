@@ -119,7 +119,7 @@ export default function EditProduct({
     {
       control,
       name: "rate",
-      label: "Offer Price",
+      label: "Product Price",
       component: "input",
       keyboardType: "numeric",
       placeholder: "Offer Price",
@@ -158,11 +158,10 @@ export default function EditProduct({
     {
       control,
       name: "productDescription",
-      label: "Offer Description",
+      label: "Product Description",
       component: "editor",
       keyboardType: "default",
       placeholder: "Offer Description",
-      className: "w-[90%] bg-base-200",
       error: errors.productDescription?.message,
     },
   ];
@@ -170,7 +169,6 @@ export default function EditProduct({
     {
       control,
       name: "mainImage",
-      label: "",
       placeholder: "Select Image 1",
       component: "image",
       required: false,
@@ -179,7 +177,6 @@ export default function EditProduct({
     {
       control,
       name: "image2",
-      label: "",
       placeholder: "Select Image 2",
       component: "image",
       required: false,
@@ -188,7 +185,6 @@ export default function EditProduct({
     {
       control,
       name: "image3",
-      label: "",
       placeholder: "Select Image 3",
       component: "image",
       required: false,
@@ -197,7 +193,6 @@ export default function EditProduct({
     {
       control,
       name: "image4",
-      label: "",
       placeholder: "Select Image 4",
       component: "image",
       required: false,
@@ -206,7 +201,6 @@ export default function EditProduct({
     {
       control,
       name: "image5",
-      label: "",
       placeholder: "Select Image 5",
       component: "image",
       required: false,
@@ -232,7 +226,7 @@ export default function EditProduct({
           ))}
         </View>
         <View className="flex-row items-center ml-8 w-[90%]">
-          <LableText title="Offer Images" className="" />
+          <LableText title="Product Images" className="" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>

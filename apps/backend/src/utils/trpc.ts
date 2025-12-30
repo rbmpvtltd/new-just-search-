@@ -2,7 +2,7 @@ import type { ORPCMeta } from "@orpc/trpc";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 // import { ZodError } from "zod";
-import { validateSessionToken } from "@/features/auth/lib/session";
+import { changeRoleInSession, validateSessionToken } from "@/features/auth/lib/session";
 import type { Context } from "./context";
 
 export const t = initTRPC.context<Context>().meta<ORPCMeta>().create({
@@ -100,6 +100,7 @@ export const visitorProcedure = protectedProcedure.use(async (opts) => {
 
 export const businessProcedure = protectedProcedure.use(async (opts) => {
   const { ctx } = opts;
+
   if (ctx.role === "business" || ctx.role === "admin") {
     return opts.next();
   }

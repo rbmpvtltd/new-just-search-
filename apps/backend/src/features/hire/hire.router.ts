@@ -227,7 +227,7 @@ export const hirerouter = router({
         })
         .where(eq(schemas.auth.users.id, ctx.userId));
 
-      changeRoleInSession(ctx.sessionId, "hire");
+      await changeRoleInSession(ctx.sessionId, "hire");
 
       logger.info("we not get here");
       return {

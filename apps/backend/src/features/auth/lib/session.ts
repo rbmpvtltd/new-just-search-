@@ -128,7 +128,7 @@ async function changeRoleInSession(sessionId: string, role: UserRole) {
   const sessionData = {
     id: jsonParseData.id,
     secretHash: Buffer.from(jsonParseData.secretHash).toString("base64"),
-    createdAt: jsonParseData.createdAt.toISOString(),
+    createdAt: jsonParseData.createdAt,
     token: jsonParseData.token,
     userId: jsonParseData.id,
     role: role,

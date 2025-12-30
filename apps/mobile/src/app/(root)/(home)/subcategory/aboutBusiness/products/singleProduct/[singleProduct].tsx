@@ -14,8 +14,10 @@ import {
   Dimensions,
   Image,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   Text,
   useColorScheme,
   View,
@@ -106,6 +108,38 @@ export default function TabOneScreen() {
   const latitude = Number(product?.latitude?.split(",").shift());
   const longitude = Number(product?.longitude?.split(",").pop());
 
+  const onShare = async () => {
+    try {
+      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutBusiness/products/singleProduct/${product?.id}`;
+
+      const result = await Share.share(
+        {
+          title: product?.name ?? "Check this Product",
+          message:
+            Platform.OS === "android"
+              ? `${product?.name ?? "Amazing Product"}\n\n${shareUrl}`
+              : (product?.name ?? "Amazing Product"),
+          url: shareUrl, // iOS uses this
+        },
+        {
+          dialogTitle: "Share Offer",
+        },
+      );
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // iOS specific (AirDrop, WhatsApp, etc.)
+          console.log("Shared via:", result.activityType);
+        } else {
+          console.log("Shared successfully");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share dismissed");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error?.message ?? "Unable to share");
+    }
+  };
   return (
     <>
       <Stack.Screen
@@ -158,6 +192,14 @@ export default function TabOneScreen() {
                 <Text className="text-center text-primary text-[24px]">
                   ₹ {product?.rate}
                 </Text>
+
+                <Pressable
+                  hitSlop={10}
+                  onPress={onShare}
+                  className="absolute right-0 top-1/2 -translate-y-1/2"
+                >
+                  <Ionicons name="share-social" size={22} color="black" />
+                </Pressable>
               </View>
               <View className="w-full items-center gap-4 my-4">
                 <View className="w-[100%] bg-primary rounded-lg py-2 px-4">

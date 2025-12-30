@@ -1,6 +1,6 @@
 {
-  "id": "d2f0d91a-4e55-4335-9b7e-d604d47c1363",
-  "prevId": "20481317-f05c-4bc1-b4bc-82b8b9865cd3",
+  "id": "227d3c13-3ea7-405d-b2ee-c2c906a4f66b",
+  "prevId": "a05b4b39-0f45-4837-99ed-ce2790405921",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -164,6 +164,12 @@
         },
         "user_id": {
           "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "salesman_id": {
+          "name": "salesman_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -373,6 +379,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "business_listings_salesman_id_salesmen_id_fk": {
+          "name": "business_listings_salesman_id_salesmen_id_fk",
+          "tableFrom": "business_listings",
+          "tableTo": "salesmen",
+          "columnsFrom": [
+            "salesman_id"
           ],
           "columnsTo": [
             "id"
@@ -1158,6 +1177,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "salesman_id": {
+          "name": "salesman_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
@@ -1520,6 +1545,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "hire_listing_salesman_id_salesmen_id_fk": {
+          "name": "hire_listing_salesman_id_salesmen_id_fk",
+          "tableFrom": "hire_listing",
+          "tableTo": "salesmen",
+          "columnsFrom": [
+            "salesman_id"
           ],
           "columnsTo": [
             "id"
@@ -2241,7 +2279,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "push_tokens_device_id_unique": {
+          "name": "push_tokens_device_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "device_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -2562,6 +2608,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -2901,7 +2953,7 @@
         },
         "expiry_date": {
           "name": "expiry_date",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
@@ -2992,11 +3044,17 @@
           "primaryKey": false,
           "notNull": true
         },
-        "identifier": {
-          "name": "identifier",
+        "razor_pay_identifier": {
+          "name": "razor_pay_identifier",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
+        },
+        "revenue_cat_identifier": {
+          "name": "revenue_cat_identifier",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
         },
         "period": {
           "name": "period",
@@ -3887,7 +3945,7 @@
         },
         "salutation": {
           "name": "salutation",
-          "type": "varchar(100)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },

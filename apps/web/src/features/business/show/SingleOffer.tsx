@@ -109,7 +109,7 @@ function SingleOfferComp({
                           width={500}
                           height={400}
                           alt="offer image"
-                          src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change photo url when upload on cloudinary
+                          src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" 
                         /> */}
                         <CldImage
                           width="500"

@@ -32,10 +32,12 @@ export default function HireDetailsCard(item: any) {
   const { data, isLoading } = useQuery(
     trpc.hirerouter.singleHire.queryOptions({ hireId: Number(hiredetails) }),
   );
+
   if (isLoading) {
     return <Loading position="center" size={"large"} />;
   }
   console.log("data is ===========>", JSON.stringify(data, null, 2));
+
   // return <Text className="text-secondary text-3xl">for test purpose {hiredetails}</Text>
 
   // useEffect(() => {
@@ -113,6 +115,9 @@ export default function HireDetailsCard(item: any) {
             {data?.data?.gender}, AGE=
             {calculateAge(data?.data?.dob)}
           </Text>
+          <Pressable hitSlop={10}>
+            <Ionicons name="share-social" size={22} color="black" />
+          </Pressable>
         </View>
         <View className="flex-row gap-2 mb-2 flex-wrap">
           <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">

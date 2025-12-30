@@ -46,13 +46,19 @@ export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
   });
 
   const onSubmit = (data: ContactDetailSchema) => {
-    const finalData = { ...formValue, ...data };
+    const finalData = {
+      ...formValue,
+      ...data,
+    };
     useBusinessFormStore.setState((state) => ({
       formValue: { ...state.formValue, ...data },
     }));
 
     mutate(
-      { ...finalData, pincode: formValue.pincode },
+      {
+        ...finalData,
+        pincode: formValue.pincode,
+      },
       {
         onSuccess: async (data) => {
           if (data.success) {

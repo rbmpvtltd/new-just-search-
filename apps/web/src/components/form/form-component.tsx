@@ -96,35 +96,21 @@ export const FormField = <T extends FieldValues>({
               );
             }
             case "multiselect": {
-              if (loading)
-                return (
-                  <div className="">
-                    <MultiSelect
-                      options={options}
-                      // defaultValues={
-                      //   Array.isArray(value)
-                      //     ? options?.filter((opt) => value.includes(opt.value))
-                      //     : []
-                      // }
-                      // onChange={(selected) =>
-                      //   onChange(selected.map((s) => s.value))
-                      // }
-                    />
-                    <Spinner />
-                  </div>
-                );
               return (
-                <MultiSelect
-                  options={options}
-                  defaultValues={
-                    Array.isArray(value)
-                      ? options?.filter((opt) => value.includes(opt.value))
-                      : []
-                  }
-                  onChange={(selected) =>
-                    onChange(selected.map((s) => s.value))
-                  }
-                />
+                <>
+                  <MultiSelect
+                    options={options}
+                    defaultValues={
+                      Array.isArray(value)
+                        ? options?.filter((opt) => value.includes(opt.value))
+                        : []
+                    }
+                    onChange={(selected) =>
+                      onChange(selected.map((s) => s.value))
+                    }
+                  />
+                  {loading && <Spinner />}
+                </>
               );
             }
 
@@ -198,7 +184,9 @@ export const FormField = <T extends FieldValues>({
                 />
               );
             case "image":
-              return <CropperComponent onChange={onChange} value={value ?? ""} />;
+              return (
+                <CropperComponent onChange={onChange} value={value ?? ""} />
+              );
             case "editor":
               return (
                 <Editor

@@ -86,6 +86,8 @@ export const offerrouter = router({
         });
       }
 
+      console.log("HIII");
+
       const activeplan = await db.query.planUserActive.findFirst({
         where: (planUserActive, { eq }) =>
           eq(planUserActive.userId, ctx.userId),
@@ -97,10 +99,14 @@ export const offerrouter = router({
           message: "Plan not found",
         });
       }
+      console.log("Hiii 2");
+
       const offerDuration = activeplan.features.offerDuration;
       const expireAt = new Date(
         now.getTime() + offerDuration * 24 * 60 * 60 * 1000,
       );
+
+      console.log("Hiii 3");
 
       const maxOfferPerDay = (
         await db
@@ -116,6 +122,8 @@ export const offerrouter = router({
             ),
           )
       )[0]?.count;
+
+      console.log("Hii4 ");
 
       if (activeplan.features.maxOfferPerDay <= (maxOfferPerDay ?? 0)) {
         throw new TRPCError({

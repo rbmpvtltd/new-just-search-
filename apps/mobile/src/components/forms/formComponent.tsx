@@ -34,6 +34,7 @@ import LableText from "../inputs/LableText";
 import MultiSelectDropdown from "../inputs/MultiSelectDropdown";
 import TextAreaInput from "../inputs/TextAreaInput";
 import ErrorText from "../ui/ErrorText";
+import { Loading } from "../ui/Loading";
 import TimePickerField from "../ui/TimePickerField";
 
 export interface FormFieldProps<T extends FieldValues> {
@@ -41,6 +42,7 @@ export interface FormFieldProps<T extends FieldValues> {
   name: Path<T>;
   label?: string;
   placeholder?: string;
+  type?: "text" | "number";
   keyboardType?: "default" | "numeric" | "email-address";
   onBlurEvent?: (value: string | undefined | null) => void;
   onValueChange?: (value: string | number | undefined | null) => void;
@@ -65,6 +67,7 @@ export interface FormFieldProps<T extends FieldValues> {
   fileSize?: number;
   editable?: boolean;
   disable?: boolean;
+  isLoading?: boolean;
   mode?: "date" | "time";
 }
 
@@ -76,6 +79,7 @@ export const FormField = <T extends FieldValues>({
   onValueChange,
   keyboardType,
   error,
+  type,
   component,
   data,
   className,
@@ -86,6 +90,7 @@ export const FormField = <T extends FieldValues>({
   fileSize = 2,
   editable = true,
   disable = false,
+  isLoading = false,
   mode,
   ...props
 }: FormFieldProps<T>) => {
@@ -119,7 +124,7 @@ export const FormField = <T extends FieldValues>({
                     if (props.onBlurEvent) props.onBlurEvent(value);
                   }}
                   onChangeText={(text) => {
-                    onChange(keyboardType === "numeric" ? Number(text) : text);
+                    onChange(type === "number" ? Number(text) : text);
                     if (onValueChange) onValueChange(text);
                   }}
                   value={value?.toString() ?? ""}
@@ -206,6 +211,7 @@ export const FormField = <T extends FieldValues>({
                       backgroundColor:
                         Colors[colorScheme ?? "light"]["base-200"],
                     }}
+                    className="border"
                   >
                     {value ? (
                       value.startsWith("file") ? (
@@ -291,14 +297,17 @@ export const FormField = <T extends FieldValues>({
               );
             case "multiselectdropdown":
               return (
-                <MultiSelectDropdown
-                  value={value || []}
-                  onChange={onChange}
-                  data={(data as any) ?? []}
-                  placeholder={placeholder}
-                  multiselect={multiselect}
-                  dropdownPosition={dropdownPosition}
-                />
+                <>
+                  <MultiSelectDropdown
+                    value={value || []}
+                    onChange={onChange}
+                    data={(data as any) ?? []}
+                    placeholder={placeholder}
+                    multiselect={multiselect}
+                    dropdownPosition={dropdownPosition}
+                  />
+                  {isLoading && <Loading position="center" />}
+                </>
               );
             case "switch":
               return (
@@ -321,7 +330,11 @@ export const FormField = <T extends FieldValues>({
               );
             case "editor":
               return (
-                <ScrollView className="flex-1">
+                <ScrollView
+                  className="flex-1"
+                  nestedScrollEnabled
+                  keyboardShouldPersistTaps="handled"
+                >
                   <View style={{ height: 270 }}>
                     {Platform.OS !== "web" ? (
                       <Editor
@@ -331,6 +344,7 @@ export const FormField = <T extends FieldValues>({
                           // if (onValueChange) onValueChange(text);
                         }}
                         setPlainText={setPlainText}
+
                         // setEditorState={setEditorState}
                       />
                     ) : null}

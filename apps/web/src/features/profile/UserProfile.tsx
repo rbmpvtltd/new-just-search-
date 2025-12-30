@@ -33,7 +33,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
     resolver: zodResolver(profileUpdateSchema),
     defaultValues: {
       profileImage: user?.profile?.profileImage ?? "",
-      salutation: user?.profile?.salutation ?? "",
+      salutation: user?.profile?.salutation ?? NaN,
       firstName: user?.profile?.firstName ?? "",
       lastName: user?.profile?.lastName ?? "",
       dob: user?.profile?.dob ?? "",
@@ -216,7 +216,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
                 options={user?.getSlutation.map((item) => {
                   return {
                     label: item.name,
-                    value: item.name,
+                    value: item.id,
                   };
                 })}
               />
