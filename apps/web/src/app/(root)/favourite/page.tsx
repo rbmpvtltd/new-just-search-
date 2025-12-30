@@ -37,7 +37,7 @@ async function page() {
       {data?.data?.map((item, i) => (
         <div key={i.toString()}>
           <BussinessListingCard
-            navigationId={item.id}
+            navigationId={item.shop[0]?.id}
             item={item.shop[0]}
             rating={item.rating}
             category={item.category ?? ""}
