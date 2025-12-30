@@ -2,6 +2,7 @@
 import type { UserRole } from "@repo/db";
 import { cookies } from "next/headers";
 
+const EXPIRY_TIME = 3 * 24 * 60 * 60 * 1000;
 export async function setToken(token: string) {
   const cookieStore = await cookies();
   const persist = process.env.NODE_ENV === "production";
@@ -12,7 +13,7 @@ export async function setToken(token: string) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      expires: new Date(Date.now() + EXPIRY_TIME),
     });
   } else {
     cookieStore.set("token", token, {
@@ -22,6 +23,14 @@ export async function setToken(token: string) {
       path: "/",
     });
   }
+
+  cookieStore.set("authenticated", "true", {
+    httpOnly: false,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    expires: new Date(Date.now() + EXPIRY_TIME),
+  });
 
   return true;
 }

@@ -127,10 +127,10 @@ async function changeRoleInSession(sessionId: string, role: UserRole) {
 
   const sessionData = {
     id: jsonParseData.id,
-    secretHash: Buffer.from(jsonParseData.secretHash).toString("base64"),
+    secretHash: jsonParseData.secretHash,
     createdAt: jsonParseData.createdAt,
     token: jsonParseData.token,
-    userId: jsonParseData.id,
+    userId: jsonParseData.userId,
     role: role,
   };
 
@@ -156,6 +156,7 @@ async function hashSecret(secret: string): Promise<Uint8Array> {
 }
 
 function validSecret(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 }
 

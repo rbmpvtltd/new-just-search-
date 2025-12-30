@@ -1,13 +1,11 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { Menu, X } from "lucide-react";
+import Cookies from "js-cookie";
+import { Menu, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { useState } from "react";
 import { IoMdChatboxes } from "react-icons/io";
 import { Button } from "@/components/ui/button";
-import { useTRPC } from "@/trpc/client";
-import { User } from 'lucide-react';
 
 const menuItems = [
   { name: "Home", href: "/" },
@@ -17,10 +15,8 @@ const menuItems = [
 ];
 
 export const HeroHeader = () => {
-  const trpc = useTRPC();
-  const [menuState, setMenuState] = React.useState(false);
-  const authenticated = useQuery(trpc.auth.verifyauth.queryOptions());
-  console.log("user is ", authenticated);
+  const [menuState, setMenuState] = useState(false);
+  const data = Cookies.get("authenticated");
   return (
     <header className="sticky top-0 z-50">
       <nav
@@ -88,7 +84,7 @@ export const HeroHeader = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 md:w-fit">
-                {authenticated.data?.success && (
+                {data && (
                   <div className="flex gap-2">
                     <Button
                       asChild
@@ -112,7 +108,7 @@ export const HeroHeader = () => {
                     </Button>
                   </div>
                 )}
-                {!authenticated.data?.success && (
+                {!data && (
                   <>
                     <Button
                       asChild

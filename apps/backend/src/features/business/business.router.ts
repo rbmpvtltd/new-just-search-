@@ -48,11 +48,10 @@ const business_reviews = schemas.business.businessReviews;
 
 export const businessrouter = router({
   test: protectedProcedure.input(z.object({})).mutation(async ({ ctx }) => {
-    console.log("Test");
     const role = await changeRoleInSession(ctx.sessionId, "business");
     return { success: true, message: "Role changed successfully", role };
   }),
-  add: visitorProcedure.query(async ({ ctx }) => {
+  add: visitorProcedure.query(async () => {
     const getBusinessCategories = await db.query.categories.findMany({
       where: (categories, { eq }) => eq(categories.type, 1),
     });
