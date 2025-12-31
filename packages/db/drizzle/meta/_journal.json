@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1767001753845,
-      "tag": "0000_real_corsair",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1767008646680,
-      "tag": "0001_damp_leopardon",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1767008757470,
-      "tag": "0002_brief_reavers",
+      "when": 1767173837264,
+      "tag": "0000_outstanding_human_torch",
       "breakpoints": true
     }
   ]

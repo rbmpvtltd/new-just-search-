@@ -138,6 +138,7 @@ export const offerrouter = router({
             count: sql<number>`count(distinct ${offers.id})::int`,
           })
           .from(offers)
+          .where(eq(offers.businessId, business.id))
       )[0]?.count;
 
       if (activeplan.features.offerLimit <= (totalOffer ?? 0)) {

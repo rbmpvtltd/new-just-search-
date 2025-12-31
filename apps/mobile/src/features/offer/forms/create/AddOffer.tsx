@@ -113,6 +113,7 @@ export default function AddOffer() {
     {
       control,
       name: "rate",
+      type: "number",
       label: "Offer Price",
       component: "input",
       keyboardType: "numeric",
@@ -152,6 +153,7 @@ export default function AddOffer() {
       control,
       name: "finalPrice",
       label: " Final Price",
+      type: "number",
       component: "input",
       keyboardType: "numeric",
       placeholder: "Final Price",

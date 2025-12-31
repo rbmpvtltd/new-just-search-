@@ -61,6 +61,7 @@ export default function PersonalDetailsForm({
   });
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
+  
   const { data: subCategories, isLoading: subCategoriesLoading } = useQuery(
     trpc.hirerouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,

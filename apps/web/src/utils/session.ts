@@ -26,7 +26,7 @@ export async function setToken(token: string) {
 
   cookieStore.set("authenticated", "true", {
     httpOnly: false,
-    secure: true,
+    secure: false,
     sameSite: "lax",
     path: "/",
     expires: new Date(Date.now() + EXPIRY_TIME),

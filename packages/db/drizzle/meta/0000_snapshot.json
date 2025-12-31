@@ -1,5 +1,5 @@
 {
-  "id": "f2fe5690-e81f-4e44-8c9a-d3e7ab5d1767",
+  "id": "bd61de72-8456-415a-817e-0885206c620e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -4001,7 +4001,7 @@
           "name": "city",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",

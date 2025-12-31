@@ -112,6 +112,7 @@ export default function AddProduct() {
       name: "rate",
       label: "Product Price",
       component: "input",
+      type: "number",
       keyboardType: "numeric",
       placeholder: "Product Price",
       error: errors.rate?.message,

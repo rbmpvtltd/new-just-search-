@@ -17,6 +17,7 @@ const menuItems = [
 export const HeroHeader = () => {
   const [menuState, setMenuState] = useState(false);
   const data = Cookies.get("authenticated");
+
   return (
     <header className="sticky top-0 z-50">
       <nav

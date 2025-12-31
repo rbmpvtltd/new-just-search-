@@ -98,8 +98,9 @@ export const productrouter = router({
             count: sql<number>`count(distinct ${products.id})::int`,
           })
           .from(products)
+          .where(eq(products.businessId, business.id))
       )[0]?.count;
-
+      console.log("totalProduct", totalProduct);
       if (activeplan.features.productLimit <= (totalProduct ?? 0)) {
         throw new TRPCError({
           code: "NOT_FOUND",
