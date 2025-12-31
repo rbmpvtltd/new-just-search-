@@ -19,6 +19,8 @@ import "../../global.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { is } from "zod/v4/locales";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import {
   CustomDrawerContent,
@@ -26,6 +28,7 @@ import {
 } from "@/components/layout/Drawer";
 import ErrorHandler from "@/components/layout/NativeErrorBoundry";
 import { androidPaymentApiKey, iosPaymentApiKey } from "@/constants/Variable";
+import { useAuthStore } from "@/features/auth/authStore";
 import { queryClient } from "@/lib/trpc";
 
 export {
@@ -75,7 +78,7 @@ function RootLayoutNav() {
   const heading = useHeadingStore((state) => state.heading);
   const open = useDrawerStore((state) => state.open);
   const setOpen = useDrawerStore((state) => state.setOpen);
-
+  const isAuthenticated = useAuthStore((state) => state.authenticated);
   useEffect(() => {
     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
 
@@ -88,11 +91,15 @@ function RootLayoutNav() {
   // crashlytics().log("hello from root layout crashlytics");
   return (
     <GestureHandlerRootView>
+      {/* <SafeAreaView className="flex-1"> */}
       <QueryClientProvider client={queryClient}>
         <Drawer
           open={open}
-          onOpen={() => setOpen(true)}
+          onOpen={() => {
+            setOpen(true);
+          }}
           onClose={() => setOpen(false)}
+          // swipeEnabled={isAuthenticated}
           renderDrawerContent={() => <CustomDrawerContent />}
         >
           <BoundaryWrapper>
@@ -111,7 +118,9 @@ function RootLayoutNav() {
                   <Stack.Screen
                     name="category/[category]"
                     options={({ route }) => {
-                      const { category } = route.params as { category: string };
+                      const { category } = route.params as {
+                        category: string;
+                      };
                       const title =
                         category.charAt(0).toUpperCase() + category.slice(1);
                       return {
@@ -214,6 +223,7 @@ function RootLayoutNav() {
           </BoundaryWrapper>
         </Drawer>
       </QueryClientProvider>
+      {/* </SafeAreaView> */}
     </GestureHandlerRootView>
   );
 }

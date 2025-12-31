@@ -7,7 +7,7 @@ import {
 import { logger } from "@repo/logger";
 import { eq, sql } from "drizzle-orm";
 import z from "zod";
-import { protectedProcedure, router } from "@/utils/trpc";
+import { guestProcedure, protectedProcedure, router } from "@/utils/trpc";
 
 z.object({
   name: z.string(),
@@ -18,7 +18,8 @@ z.object({
   // period: z.enum(PlanPeriod),
 });
 export const planRouter = router({
-  list: protectedProcedure.query(async ({ ctx }) => {
+  list: guestProcedure.query(async ({ ctx }) => {
+    console.log("list started");
     const allPlan = await db
       .select({
         id: plans.id,
@@ -53,6 +54,16 @@ export const planRouter = router({
     logger.info("freePlan", { freePlan: freePlan });
     if (!freePlan) {
       throw new Error("Free plan not found");
+    }
+    if (!ctx.userId) {
+      console.log("retuen");
+      return {
+        plans: allPlan,
+        activePlan: {
+          planid: freePlan.id,
+          isactive: false,
+        },
+      };
     }
     const isActivePlanExist = (
       await db

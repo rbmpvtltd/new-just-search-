@@ -1,13 +1,13 @@
+import { useQuery } from "@tanstack/react-query";
+import { AdvancedImage } from "cloudinary-react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Dimensions, Image, ScrollView, Text, View } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
+import { Loading } from "@/components/ui/Loading";
 import ShposCard from "@/features/business/show/PremiumShopsCard";
-import { useQuery } from "@tanstack/react-query";
 import { cld } from "@/lib/cloudinary";
-import { AdvancedImage } from "cloudinary-react-native";
 import { trpc } from "@/lib/trpc";
 import { useShopIdStore } from "@/store/shopIdStore";
-import { Loading } from "@/components/ui/Loading";
 
 const { width } = Dimensions.get("window");
 
@@ -94,11 +94,6 @@ export default function TabOneScreen() {
   // if (!listing) return null;
   return (
     <ScrollView>
-      <Stack.Screen
-        options={{
-          title: data?.name,
-        }}
-      />
       <View className="flex-1 items-center">
         <View className="flex-1 justify-center">
           <Carousel

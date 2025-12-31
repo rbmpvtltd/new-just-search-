@@ -32,7 +32,11 @@ export default function HomeLayout() {
     <Stack>
       <Stack.Screen
         name="index"
-        options={{ headerShown: true, headerLeft: () => <DrawerMenu /> }}
+        options={{
+          headerShown: true,
+          headerLeft: () => <DrawerMenu />,
+          title: "",
+        }}
       />
     </Stack>
   );
