@@ -8,11 +8,11 @@ function AllOffers() {
 
   return (
     <BoundaryWrapper>
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{
           title: "Offers",
         }}
-      />
+      /> */}
       <ShopOffersList listingId={shopId} />
     </BoundaryWrapper>
   );

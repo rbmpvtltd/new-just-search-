@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, usePathname } from "expo-router";
-import { useColorScheme } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { router, Stack, Tabs, usePathname } from "expo-router";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Pressable, useColorScheme } from "react-native";
 import Colors from "@/constants/Colors";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -15,33 +16,41 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const pathname = usePathname()
-  const [showTabbar,setShowTabbar] = useState<boolean>(false)
-  useEffect(()=>{
-    const excludedTabRoute = ["/subcategory/aboutBusiness/products/singleProduct","/subcategory/aboutBusiness/offers/singleOffers"]
-    for(let val of excludedTabRoute){
-  
-      if(pathname.startsWith(val)){
-        setShowTabbar(true)
-        return
-      } else{
-        setShowTabbar(false)
+  const pathname = usePathname();
+  const [showTabbar, setShowTabbar] = useState<boolean>(false);
+  useEffect(() => {
+    const excludedTabRoute = [
+      "/subcategory/aboutBusiness/products/singleProduct",
+      "/subcategory/aboutBusiness/offers/singleOffers",
+    ];
+    for (const val of excludedTabRoute) {
+      if (pathname.startsWith(val)) {
+        setShowTabbar(true);
+        return;
+      } else {
+        setShowTabbar(false);
       }
     }
-  },[pathname])
+  }, [pathname]);
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].primary,
-        headerShown: true,
-        tabBarStyle : showTabbar ? { display: "none" } : {}
+        headerShown: false,
+        tabBarStyle: showTabbar ? { display: "none" } : {},
+        sceneStyle: { backgroundColor: "white" },
       }}
     >
       <Tabs.Screen
         name="[premiumshops]"
         options={{
-          title: "About Business",
+          title: "About Business ",
           headerShown: true,
+          headerLeft: () => (
+            <Pressable className="ml-2" onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} />
+            </Pressable>
+          ),
           tabBarLabel: "Business",
           tabBarIcon: ({ color }) => (
             <Ionicons
@@ -69,16 +78,6 @@ export default function TabLayout() {
           title: "Products",
           tabBarIcon: ({ color }) => (
             <Ionicons name="cart-outline" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="hireform"
-        options={{
-          headerShown: false,
-          title: "Hire",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="pricetags-outline" size={24} color={color} />
           ),
         }}
       />

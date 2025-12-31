@@ -158,12 +158,12 @@ export default function SubCategory() {
 
   return (
     <BoundaryWrapper>
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{
           title: title || "Subcategory",
           headerShown: false,
         }}
-      />
+      /> */}
       <SafeAreaView className="flex-1">
         <View className="-mb-14 flex-1">
           <View className="flex-1">

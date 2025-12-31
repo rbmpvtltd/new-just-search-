@@ -18,6 +18,8 @@ import DocumentsForm from "./forms/DocumentsForm";
 import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
+import { Stack } from "expo-router";
+import { DrawerMenu } from "@/components/layout/Drawer";
 
 export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
 
@@ -25,23 +27,35 @@ export default function CreateHireListing() {
   const [open, setOpen] = useState(false);
 
   return (
-    <View className="bg-white h-full">
-      {!open ? (
-        <View className="px-4 mt-4">
-          <Pressable
-            className="bg-primary py-3 rounded-xl w-[50%] mx-auto flex-row items-center justify-center"
-            onPress={() => setOpen(true)}
-          >
-            <Ionicons name="add-circle-outline" size={20} color="#fff" />
-            <Text className="text-secondary ml-2 font-semibold">
-              Add Hire Listing
-            </Text>
-          </Pressable>
-        </View>
-      ) : (
-        <AddHirePage />
-      )}
-    </View>
+    <>
+      {/* <Stack>
+        <Stack.Screen
+          name="profile/hire/index"
+          options={{
+            headerShown: true,
+            // headerLeft: () => <DrawerMenu />,
+            title: "Hire Listing",
+          }}
+        />
+      </Stack> */}
+      <View className="bg-white h-full">
+        {!open ? (
+          <View className="px-4 mt-4">
+            <Pressable
+              className="bg-primary py-3 rounded-xl w-[50%] mx-auto flex-row items-center justify-center"
+              onPress={() => setOpen(true)}
+            >
+              <Ionicons name="add-circle-outline" size={20} color="#fff" />
+              <Text className="text-secondary ml-2 font-semibold">
+                Add Hire Listing
+              </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <AddHirePage />
+        )}
+      </View>
+    </>
   );
 }
 

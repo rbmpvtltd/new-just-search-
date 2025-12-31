@@ -1,8 +1,10 @@
+import { useAuthStore } from "@/features/auth/authStore";
+import { Ionicons } from "@expo/vector-icons";
 import type { HeaderBackButtonProps } from "@react-navigation/elements";
+import { UserRole } from "@repo/db";
 import { type Href, router, useSegments } from "expo-router";
-import { useState } from "react";
-import { Button, Pressable, Text, View } from "react-native";
-import { Drawer } from "react-native-drawer-layout";
+import { Pressable, Text, View } from "react-native";
+import { fi } from "zod/v4/locales";
 
 import { create } from "zustand";
 
@@ -20,7 +22,7 @@ export const useDrawerStore = create<DrawerStore>((set) => ({
 
 const drawerFields: DrawerField[] = [
   {
-    name: "home",
+    name: "Home",
     route: "/(root)/(home)/home",
     title: "hi",
     headerLeft: () => {
@@ -30,58 +32,87 @@ const drawerFields: DrawerField[] = [
         </View>
       );
     },
+    icon: "home-outline",
+    role: "all",
   },
   {
     name: "Profile",
     route: "/(root)/profile",
+    icon: "person-circle-outline",
+    role: "all",
   },
   {
-    name: "Hire Listings",
+    name: "Hire Listing",
     route: "/(root)/profile/hire",
+    icon: "briefcase-outline",
+    role: ["hire", "visitor", "guest"],
   },
   {
-    name: "Business Listings",
+    name: "Business Listing",
     route: "/(root)/profile/business",
+    icon: "business-outline",
+    role: ["business", "visitor", "guest"],
   },
   {
     name: "My Offers",
     route: "/(root)/profile/offer",
+    icon: "gift-outline",
+    role: "business",
   },
   {
     name: "Add Offer",
     route: "/(root)/profile/offer/add",
+    icon: "add-circle-outline",
+    role: "business",
   },
   {
     name: "Add Product",
     route: "/(root)/profile/product/add",
+    icon: "add-circle-outline",
+    role: "business",
   },
   {
     name: "My Products",
     route: "/(root)/profile/product",
+    icon: "cube-outline",
+    role: "business",
   },
   {
     name: "Pricing Plans",
     route: "/(root)/profile/plans",
+    icon: "cash-outline",
+    role: "all",
   },
   {
     name: "Request to Delete Account",
     route: "/(root)/profile/account-delete-request",
+    icon: "trash-outline",
+    role: "all",
   },
   {
     name: "Feedback",
     route: "/(root)/profile/feedback",
+    icon: "chatbox-ellipses-outline",
+    role: "all",
   },
   {
     name: "Help and Support",
     route: "/(root)/profile/help-and-support",
+    icon: "help-circle-outline",
+    role: "all",
   },
   {
     name: "Terms & Conditions",
     route: "/(root)/profile/terms-and-conditions",
+    icon: "document-text-outline",
+    role: "all",
   },
   {
     name: "Logout",
     route: "/(root)/profile/logout",
+    icon: "log-out-outline",
+    role: "all",
+    authenticated: true,
   },
 ];
 
@@ -105,22 +136,77 @@ interface DrawerField {
     | undefined;
 
   route: Href;
+  icon?: keyof typeof Ionicons.glyphMap;
+  role?: string[] | string;
+  authenticated?: boolean;
 }
 
 export function CustomDrawerContent() {
   const segment = useSegments();
   const currentRoute = segment.join("/");
+  const toggleOpen = useDrawerStore((state) => state.toggleOpen);
+  let role = useAuthStore((s) => s.role);
+  const authenticated = useAuthStore((s) => s.authenticated);
+
+  if (!role) {
+    role = "all";
+  }
+
+  const items = drawerFields.filter(
+    (item) =>
+      (item?.role?.includes(role) || item?.role === "all") &&
+      (!item?.authenticated || authenticated),
+  );
   return (
-    <View>
-      {drawerFields.map((field) => {
+    // <View>
+    //   {drawerFields.map((field) => {
+    //     const isFocused = `/${currentRoute}` === field.route;
+    //     return (
+    //       <Pressable
+    //         key={field.key ?? field.name}
+    //         className={`${isFocused ? "bg-primary" : ""}`}
+    //         onPress={() => router.navigate(field.route)}
+    //       >
+    //         <Text>{field.name}</Text>
+    //       </Pressable>
+    //     );
+    //   })}
+    // </View>
+    <View className="flex-1 bg-background px-3 pt-6">
+      {items.map((field) => {
         const isFocused = `/${currentRoute}` === field.route;
         return (
           <Pressable
             key={field.key ?? field.name}
-            className={`${isFocused ? "bg-primary" : ""}`}
-            onPress={() => router.navigate(field.route)}
+            onPress={() => {
+              toggleOpen();
+              router.navigate(field.route);
+            }}
+            className={`flex-row items-center gap-3 rounded-xl px-4 py-3 mb-2
+              ${isFocused ? "bg-primary-content" : "active:bg-gray-100"}
+            `}
           >
-            <Text>{field.name}</Text>
+            {isFocused && (
+              <View className="absolute left-0 h-6 w-1 rounded-r-full bg-primary" />
+            )}
+
+            {field.icon && (
+              <Ionicons
+                name={field.icon}
+                size={20}
+                color={isFocused ? "#2563eb" : "#6b7280"}
+              />
+            )}
+
+            <Text
+              className={`text-base font-medium
+                ${isFocused ? "bg-primary-content" : "text-gray-700"}
+              `}
+            >
+              {field.name === "Profile" && !authenticated
+                ? field.name === "Profile" && "Log In"
+                : field.name}
+            </Text>
           </Pressable>
         );
       })}
@@ -139,5 +225,15 @@ export function CustomDrawerContent() {
 
 export function DrawerMenu() {
   const toggleOpen = useDrawerStore((state) => state.toggleOpen);
-  return <Button onPress={() => toggleOpen()} title={`Menu`} />;
+  return (
+    <Pressable onPress={() => toggleOpen()}>
+      <Ionicons
+        name="menu"
+        size={24}
+        color="black"
+        onPress={() => toggleOpen()}
+      />
+    </Pressable>
+  );
+  // <Button  onPress={() => toggleOpen()} title={`Menu`} />;
 }

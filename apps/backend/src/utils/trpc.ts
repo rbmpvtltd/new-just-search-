@@ -32,6 +32,7 @@ export const mergeRouters = t.mergeRouters;
 export const publicProcedure = t.procedure;
 
 export const guestProcedure = publicProcedure.use(async (opts) => {
+  logger.info("GUEST  started");
   const { ctx } = opts;
 
   if (!ctx.token) {
