@@ -54,8 +54,8 @@ dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
   await seedUsers();
-  // await seedfranchises();
-  // await seedOfSalesman();
+  await seedfranchises();
+  await seedOfSalesman();
 };
 
 export const clearAllTablesUser = async () => {
@@ -115,6 +115,8 @@ export const seedUsers = async () => {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
+
+    //TODO: add current user plan
     const [insertedUser] = await db.insert(users).values(user).returning();
 
     if (!insertedUser) {

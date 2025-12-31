@@ -1,27 +1,13 @@
-import { db, schemas, type UserRole } from "@repo/db";
-import {
-  businessCategories,
-  businessListings,
-  businessPhotos,
-  businessReviews,
-  businessSubcategories,
-} from "@repo/db/dist/schema/business.schema";
-import { productReviews } from "@repo/db/dist/schema/product.schema";
+import { db, type UserRole } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import { logger } from "@repo/logger";
 import bcrypt from "bcryptjs";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
-const users = schemas.auth.users;
 // const businessListings = schemas.business.businessListings;
-const cities = schemas.not_related.cities;
 
 export const fakeSeed = async () => {
   try {
-    const user = await seedFakeUser();
-    if (!user) {
-      logger.error("fake user is not find");
-      return;
-    }
     logger.info("adding fake admin");
     await seedRealUser("admin@gmail.com", "admin@123", "admin");
     await seedRealUser("ranjeet@gmail.com", "admin@123", "admin");
@@ -33,9 +19,8 @@ export const fakeSeed = async () => {
     await seedRealUser("business@rbm.com", "rbm.justsearch@123", "business");
     await seedRealUser("hire@rbm.com", "rbm.justsearch@123", "hire");
 
-    await seedFakeBusiness(user.id);
     logger.info("added fake admin");
-    return { user };
+    return;
   } catch (error) {
     console.error("Error in fakeSeed:", error);
     throw error;
@@ -98,183 +83,6 @@ const seedRealUser = async (
     return insertedAdmin;
   } catch (error) {
     console.error("Error in seedFakeUser:", error);
-    throw error;
-  }
-};
-
-const seedFakeUser = async () => {
-  try {
-    // Pehle associated business listings delete karo
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.displayName, "fake user"))
-      .limit(1);
-
-    if (existingUser) {
-      // await db.delete(hireListing).where(eq(hireListing.userId, existingUser.id))
-      try {
-        // Delete all reviews tied to business listings
-        await db
-          .delete(businessReviews)
-          .where(
-            inArray(
-              businessReviews.businessId,
-              db
-                .select({ id: businessListings.id })
-                .from(businessListings)
-                .where(eq(businessListings.userId, existingUser.id)),
-            ),
-          );
-
-        // Delete product reviews (foreign key constraint shows this is required)
-        await db
-          .delete(productReviews)
-          .where(
-            inArray(
-              productReviews.businessId,
-              db
-                .select({ id: businessListings.id })
-                .from(businessListings)
-                .where(eq(businessListings.userId, existingUser.id)),
-            ),
-          );
-
-        await db
-          .delete(businessPhotos)
-          .where(
-            inArray(
-              businessPhotos.businessId,
-              db
-                .select({ id: businessListings.id })
-                .from(businessListings)
-                .where(eq(businessListings.userId, existingUser.id)),
-            ),
-          );
-
-        await db
-          .delete(businessCategories)
-          .where(
-            inArray(
-              businessCategories.businessId,
-              db
-                .select({ id: businessListings.id })
-                .from(businessListings)
-                .where(eq(businessListings.userId, existingUser.id)),
-            ),
-          );
-
-        await db
-          .delete(businessSubcategories)
-          .where(
-            inArray(
-              businessSubcategories.businessId,
-              db
-                .select({ id: businessListings.id })
-                .from(businessListings)
-                .where(eq(businessListings.userId, existingUser.id)),
-            ),
-          );
-
-        // Finally, delete the business listings
-        await db
-          .delete(businessListings)
-          .where(eq(businessListings.userId, existingUser.id));
-      } catch (err: any) {
-        console.error(
-          "Error deleting businessListings line 105:",
-          err?.cause?.message || err,
-        );
-      }
-
-      try {
-        await db.delete(users).where(eq(users.displayName, "fake user"));
-      } catch (err: any) {
-        console.error("Error deleting user:", err?.cause?.message || err);
-      }
-    }
-
-    const uniqueEmail = `fake${Math.floor(Math.random() * 1000)}@example.com`;
-
-    const [insertedUser] = await db
-      .insert(users)
-      .values({
-        displayName: "fake user",
-        phoneNumber: "fake",
-        email: uniqueEmail,
-        password: "fake",
-        role: "visiter",
-        googleId: "fake",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
-
-    return insertedUser;
-  } catch (error) {
-    console.error("Error in seedFakeUser:", error);
-    throw error;
-  }
-};
-
-const seedFakeBusiness = async (userId: number) => {
-  try {
-    // Pehle existing fake business delete karo
-    await db.delete(businessListings).where(eq(businessListings.slug, "fake"));
-
-    const [city] = await db
-      .select()
-      .from(cities)
-      .where(eq(cities.city, "Jodhpur"));
-
-    if (!city) {
-      throw new Error("City 'Jodhpur' not found in database");
-    }
-
-    const [insertedBusiness] = await db
-      .insert(businessListings)
-      .values({
-        userId,
-        salesmanId: 1,
-        name: "rbm",
-        slug: "fake",
-        photo: "fake",
-        specialities: "fake",
-        description: '<p dir="ltr"><span>fake</span></p>',
-        homeDelivery: "no",
-        latitude: "26.2389",
-        longitude: "73.0243",
-        buildingName: "fake",
-        streetName: "fake",
-        area: "fake",
-        landmark: "fake",
-        pincode: "342001",
-        state: city.stateId,
-        city: city.id,
-        // schedules: {},
-        status: "Approved",
-        email: "fake@example.com",
-        contactPerson: "fake",
-        ownerNumber: "1234567890",
-        phoneNumber: "1234567890",
-        whatsappNo: "1234567890",
-        alternativeMobileNumber: "1234567890",
-        facebook: "https://facebook.com/fake",
-        twitter: "https://twitter.com/fake",
-        linkedin: "https://linkedin.com/fake",
-        listingVideo: "https://youtube.com/fake",
-        days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
-        fromHour: "10:00",
-        toHour: "18:00",
-        isFeature: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
-
-    return insertedBusiness;
-  } catch (error) {
-    console.error("Error in seedFakeBusiness:", error);
     throw error;
   }
 };
