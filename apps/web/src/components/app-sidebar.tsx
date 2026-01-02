@@ -1,3 +1,4 @@
+"use client";
 import {
   Briefcase,
   Building2,
@@ -13,7 +14,6 @@ import {
   User,
 } from "lucide-react";
 
-import { title } from "process";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +24,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
+import { delToken } from "@/utils/session";
+import { useRouter } from "next/navigation";
 // Menu items.
 const items = [
   {
@@ -87,14 +88,14 @@ const items = [
     url: "/profile/account-delete-request",
     icon: Trash2,
   },
-  {
-    title: "Logout",
-    url: "/logout",
-    icon: LogOut,
-  },
 ];
 
 export function AppSidebar() {
+  const router = useRouter();
+  async function handleLogout() {
+    router.push("/");
+    await delToken();
+  }
   return (
     <Sidebar>
       <SidebarContent>
@@ -112,6 +113,11 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuButton onClick={handleLogout}>
+                <LogOut />
+                <span>Logout</span>
+              </SidebarMenuButton>
+              <SidebarMenuItem></SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

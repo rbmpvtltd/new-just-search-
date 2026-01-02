@@ -35,7 +35,7 @@ export const guestProcedure = publicProcedure.use(async (opts) => {
   logger.info("GUEST  started");
   const { ctx } = opts;
 
-  if (!ctx.token) {
+  if (!ctx || !ctx.token) {
     return opts.next({
       ctx: {
         userId: null,

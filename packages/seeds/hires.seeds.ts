@@ -51,6 +51,34 @@ export const addHire = async () => {
   if (!fakeUser) {
     throw new Error("Failed to generate a fake user!");
   }
+  const educationMap: Record<string, number | null> = {
+    "2": null,
+
+    "b.e / b.tech": 1,
+    "b.tech ll.b.": 11,
+    "b.a ll.b": 69,
+
+    bsw: null,
+
+    "b.a": 19,
+    "m.a": 21,
+    master: 21,
+
+    "b.com": 32,
+    "m.com": 33,
+
+    bca: 57,
+    "ca / cpa": 36,
+
+    "b.lib.sc.": 31,
+
+    "5th pass": 79,
+    "8th pass": 80,
+    "10th pass": 81,
+    "10+2 pass": 82,
+
+    uneducated: 78,
+  };
 
   for (const row of rows) {
     // const row = rows[0];
@@ -141,6 +169,12 @@ export const addHire = async () => {
       if (!createUser) {
         console.log("User not found" + row.id);
       }
+      const qualificationKey =
+        typeof row.highest_qualification === "string"
+          ? row.highest_qualification.toLowerCase().trim()
+          : "";
+
+      const highestQualification = educationMap[qualificationKey] ?? null;
       await db.insert(hireListing).values({
         id: row.id,
         salesmanId: row.salesman_id ?? 1,
@@ -189,7 +223,7 @@ export const addHire = async () => {
         twitter: row.twitter,
         linkedin: row.linkedin,
         views: 0,
-        highestQualification: row.highest_qualification,
+        highestQualification: highestQualification ?? 12,
         employmentStatus: row.employment_status,
         workExperienceYear: row.work_experience_year,
         workExperienceMonth: row.work_experience_month,

@@ -18,11 +18,11 @@ export type HireListing = {
   jobType: string[];
   languages: string[];
   subcategories: string[];
-  buildingName? : string;
+  buildingName?: string;
   workExp: number;
   workShift: string[];
   area?: string;
-  phoneNumber? : string 
+  phoneNumber?: string;
   city?: string;
   latitude?: number;
   longitude?: number;
@@ -41,7 +41,7 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/hire/${item.objectID}`,
+                  pathname: `/hire/hireDetail/${item.objectID}`,
                 }}
               >
                 <Image
