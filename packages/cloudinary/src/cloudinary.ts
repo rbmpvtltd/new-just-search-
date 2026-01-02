@@ -14,6 +14,20 @@ export default cloudinary;
 
 // import fs, { unlinkSync } from "fs";
 
+const multiUploadOnCloudinary = async (files: string[], folderName = "") => {
+  const uploadPromises = [];
+  for (const file of files) {
+    uploadPromises.push(
+      cloudinary.uploader.upload(file, {
+        resource_type: "auto",
+        folder: folderName,
+      }),
+    );
+  }
+  const results = await Promise.all(uploadPromises);
+
+  return results.map((result) => result.public_id);
+};
 const uploadOnCloudinary = async (
   localFilePath: string,
   folderName = "",
@@ -62,4 +76,4 @@ const deleteOnCloudinary = async (cloudinary_url: string) => {
   }
 };
 
-export { uploadOnCloudinary, deleteOnCloudinary };
+export { uploadOnCloudinary, deleteOnCloudinary, multiUploadOnCloudinary };

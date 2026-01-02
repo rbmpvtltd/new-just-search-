@@ -23,8 +23,8 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  await addBusiness();
-  // await seedFavourites();
+  // await addBusiness();
+  await seedFavourites();
   // await businessesCategories();
   // await businessesSubcategory();
   // await BusinessReviews();
@@ -40,16 +40,16 @@ export const clearAllTablesBusiness = async () => {
     `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
   );
   await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
-  );
+  // await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
+  // );
   console.log(" All tables cleared successfully!");
 };
 
 const addBusiness = async () => {
   const [rows]: any[] = await sql.execute(
-    "SELECT * FROM listings WHERE type = 1",
+    "SELECT *, REPLACE(longitude , ',', '') as clear_longitude, REPLACE(latitude , ',', '') as clear_latitude FROM listings WHERE type = 1",
   );
 
   const fakeUser = await getFakeBusinessUser();
@@ -149,7 +149,6 @@ const addBusiness = async () => {
     }
     // console.log("==========row is ===========",createUser)
     try {
-      // {"Mon":{"opens_at":"11 AM","closes_at":"9 PM"},"Tue":{"opens_at":"11 AM","closes_at":"9 PM"},"Wed":{"opens_at":"11 AM","closes_at":"9 PM"},"Thu":{"opens_at":"11 AM","closes_at":"9 PM"},"Fri":{"opens_at":"11 AM","closes_at":"9 PM"},"Sat":{"opens_at":"11 AM","closes_at":"9 PM"},"Sun":{"closed":true}}
       const saleman = await db
         .select()
         .from(salesmen)
@@ -162,6 +161,8 @@ const addBusiness = async () => {
       type BusinessData = InferInsertModel<typeof businessListings>;
       const { days, fromHour, toHour } = scheduleExtracter(row.schedules);
       //TODO: fixed schedure;
+
+      const { latitude, longitude } = getRightLocation(row);
       const businessData: BusinessData = {
         id: row.id,
         salesmanId: saleman[0]?.id ?? 1,
@@ -177,8 +178,8 @@ const addBusiness = async () => {
         specialities: row.specialities,
         description: row.description,
         homeDelivery: row.home_delivery,
-        latitude: row.latitude,
-        longitude: row.longitude,
+        latitude,
+        longitude,
         buildingName: row.building_name,
         streetName: row.street_name,
         area: row.area,
@@ -196,46 +197,9 @@ const addBusiness = async () => {
         linkedin: row.linkedin,
         listingVideo: row.listing_video,
         isFeature: !!row.is_feature,
-        // createdAt: row.created_at,
-        // updatedAt: row.updated_at,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
       };
-      //       const businessData: BusinessData = {
-      //   id: 42,
-      //   salesmanId: 1,
-      //   userId: 202,
-      //   name: "Shree Jodhpur Handloom",
-      //   days: [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
-      //   fromHour: "11 AM",
-      //   toHour: "9 PM",
-      //   contactPerson: "Shree Handloom",
-      //   ownerNumber: "8401705173",
-      //   slug: "shree-jodhpur-handloom",
-      //   photo: "82291101735900048.jpg",
-      //   specialities: "Best rental store in jodhpur",
-      //   description: "Year of Establishment 2014",
-      //   homeDelivery: "no",
-      //   latitude: "26.21410926949991",
-      //   longitude: "73.03151209814672",
-      //   buildingName: "Shop No 4x12",
-      //   streetName: "Kudi Bhagtasni Housing Board",
-      //   area: "Kudi",
-      //   landmark: "Near Central Academy",
-      //   pincode: "342005",
-      //   state: 19,
-      //   city: 449,
-      //   status: "Approved",
-      //   email: null,
-      //   phoneNumber: "8401705173",
-      //   whatsappNo: null,
-      //   alternativeMobileNumber: null,
-      //   facebook: null,
-      //   twitter: null,
-      //   linkedin: null,
-      //   listingVideo: null,
-      //   isFeature: !!0,
-      //   createdAt: new Date("2025-01-03T04:57:28.000Z"),
-      //   updatedAt: new Date("2025-05-12T00:18:48.000Z"),
-      // }
       const [newbusinessListing] = await db
         .insert(businessListings)
         .values(businessData)
@@ -272,12 +236,12 @@ const addBusiness = async () => {
 
   console.log(" Business migration completed!");
 };
-
 // favourite
-
 const seedFavourites = async () => {
   const [favourite]: any[] = await sql.execute("SELECT * FROM wishlists");
 
+  type FavouriteData = InferInsertModel<typeof favourites>;
+  const allData: FavouriteData[] = [];
   for (const row of favourite) {
     const [user] = await db
       .select()
@@ -290,22 +254,23 @@ const seedFavourites = async () => {
       .where(eq(businessListings.id, row.listing_id));
 
     if (!user) {
-      console.log("user not found", row.id);
       continue;
     }
 
     if (!businessListing) {
-      console.log("business not found", row.id);
       continue;
     }
 
-    await db.insert(favourites).values({
+    const favouriteData: FavouriteData = {
       businessId: businessListing.id,
       userId: user.id,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    });
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+
+    allData.push(favouriteData);
   }
+  await db.insert(favourites).values(allData);
 };
 
 // businessesSubcategory
@@ -459,20 +424,15 @@ export const seedRecentViewsBusiness = async () => {
 };
 
 type DayKey = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
-
 interface OpenDay {
   opens_at: string;
   closes_at: string;
 }
-
 interface ClosedDay {
   closed: true;
 }
-
 type ScheduleDay = OpenDay | ClosedDay;
-
 type Schedule = Record<DayKey, ScheduleDay>;
-
 interface ScheduleResult {
   days: string[] | null;
   fromHour: string | null;
@@ -524,4 +484,84 @@ const scheduleExtracter = (
     fromHour,
     toHour,
   };
+};
+
+const getRightLocation = (
+  row: any,
+): { latitude: number; longitude: number } => {
+  const id = row.id;
+  const { clear_longitude, clear_latitude } = row;
+  if (
+    ![
+      292, 433, 806, 1813, 1952, 2026, 2028, 2030, 2032, 2035, 2050, 2086, 2088,
+      2091, 2092, 2094, 2126, 2136, 2200, 2215, 2398,
+    ].includes(id)
+  ) {
+    return { latitude: clear_longitude, longitude: clear_latitude };
+  }
+
+  if (id === 292) {
+    return { latitude: 26.222869, longitude: 72.999919 };
+  }
+  if (id === 433) {
+    return { latitude: 19.20175, longitude: 72.859194 };
+  }
+  if (id === 806) {
+    return { latitude: 26.265225145989614, longitude: 73.01835466997551 };
+  }
+  if (id === 1813) {
+    return { latitude: 26.27380557693804, longitude: 73.033499996705 };
+  }
+  if (id === 1952) {
+    return { latitude: 26.28228070625321, longitude: 73.00706863377452 };
+  }
+  if (id === 2026) {
+    return { latitude: 26.280298193900585, longitude: 73.0199678101972 };
+  }
+  if (id === 2028) {
+    return { latitude: 26.280298193900585, longitude: 73.0199678101972 };
+  }
+  if (id === 2030) {
+    return { latitude: 26.265225145989614, longitude: 73.01835466997551 };
+  }
+  if (id === 2032) {
+    return { latitude: 26.28352566953517, longitude: 73.98338694088521 };
+  }
+  if (id === 2035) {
+    return { latitude: 26.273762509760203, longitude: 73.00002145437699 };
+  }
+  if (id === 2050) {
+    return { latitude: 26.280263515224608, longitude: 73.02797853903316 };
+  }
+  if (id === 2086) {
+    return { latitude: 26.229073211487673, longitude: 73.04013562368779 };
+  }
+  if (id === 2088) {
+    return { latitude: 26.229073211487673, longitude: 73.04013562368779 };
+  }
+  if (id === 2091) {
+    return { latitude: 26.229073211487673, longitude: 73.04013562368779 };
+  }
+  if (id === 2092) {
+    return { latitude: 26.229073211487673, longitude: 73.04013562368779 };
+  }
+  if (id === 2094) {
+    return { latitude: 26.213271100657817, longitude: 73.02359999670337 };
+  }
+  if (id === 2126) {
+    return { latitude: 26.2887, longitude: 73.0239 };
+  }
+  if (id === 2136) {
+    return { latitude: 26.297463, longitude: 73.037453 };
+  }
+  if (id === 2200) {
+    return { latitude: 26.309798173651373, longitude: 73.0434993261525 };
+  }
+  if (id === 2215) {
+    return { latitude: 26.265225145989614, longitude: 73.01835466997551 };
+  }
+  if (id === 2398) {
+    return { latitude: 26.2746863, longitude: 73.0212532 };
+  }
+  return { latitude: clear_latitude, longitude: clear_longitude };
 };
