@@ -197,17 +197,10 @@ export default function PersonalDetailsForm({
       placeholder: "Select Languages",
       component: "multiselect",
       section: "profile",
-      options: [
-        { label: "Hindi", value: "Hindi" },
-        { label: "English", value: "English" },
-        { label: "Punjabi", value: "Punjabi" },
-        { label: "Gujarati", value: "Gujarati" },
-        { label: "Bengali", value: "Bengali" },
-        { label: "Malayalam", value: "Malayalam" },
-        { label: "Kannada", value: "Kannada" },
-        { label: "Tamil", value: "Tamil" },
-        { label: "Other", value: "Other" },
-      ],
+      options: hireListing?.getLanguages.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       error: errors.languages?.message,
     },
     {

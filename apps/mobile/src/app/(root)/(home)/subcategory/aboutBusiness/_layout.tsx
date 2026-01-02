@@ -47,8 +47,12 @@ export default function TabLayout() {
           title: "About Business ",
           headerShown: true,
           headerLeft: () => (
-            <Pressable className="ml-2" onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} />
+            <Pressable className="ml-6 " onPress={() => router.back()}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                className="p-2 mr-4 self-center"
+              />
             </Pressable>
           ),
           tabBarLabel: "Business",

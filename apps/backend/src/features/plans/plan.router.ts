@@ -51,20 +51,20 @@ export const planRouter = router({
       .groupBy(plans.id);
 
     const freePlan = allPlan.filter((item) => item.role === "all")[0];
-    logger.info("freePlan", { freePlan: freePlan });
-    if (!freePlan) {
-      throw new Error("Free plan not found");
-    }
+
     if (!ctx.userId) {
-      console.log("retuen");
       return {
         plans: allPlan,
         activePlan: {
-          planid: freePlan.id,
+          planid: freePlan?.id || 0,
           isactive: false,
         },
       };
     }
+    if (!freePlan) {
+      throw new Error("Free plan not found");
+    }
+
     const isActivePlanExist = (
       await db
         .select()

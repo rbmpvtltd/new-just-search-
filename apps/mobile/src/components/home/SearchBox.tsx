@@ -27,7 +27,7 @@ export function SearchBox(props: SearchBoxProps) {
   }
 
   return (
-    <View className="bg-base-300 w-full ">
+    <View className="bg-base-300 w-full p-2 ">
       <TextInput
         placeholder={props.placeholder ?? "Search Anything"}
         placeholderTextColor={

@@ -1,11 +1,30 @@
-import { Stack } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack } from "expo-router";
+import { Pressable } from "react-native";
 
 export default function HomeLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: true }}>
       <Stack.Screen
         name="singleOffers"
         options={{ headerShown: true, title: "Offers" }}
+      />
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Offers",
+          headerShown: true,
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Pressable className="ml-2" onPress={() => router.back()}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                className="p-2 mr-4 self-center"
+              />
+            </Pressable>
+          ),
+        }}
       />
     </Stack>
   );

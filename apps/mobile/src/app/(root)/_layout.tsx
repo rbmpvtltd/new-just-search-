@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Notifications from "expo-notifications";
-import { Tabs, usePathname } from "expo-router";
-import { useColorScheme } from "react-native";
+import { router, Tabs, usePathname } from "expo-router";
+import { Pressable, useColorScheme } from "react-native";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import Colors from "@/constants/Colors";
@@ -169,8 +169,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(offer)/allOffers"
         options={{
-          title: "Offers",
-          headerShown: false,
+          title: "All Offers",
+          headerShown: true,
           tabBarIcon: ({ color }) => (
             <Ionicons name="pricetag-outline" size={24} color={color} />
           ),

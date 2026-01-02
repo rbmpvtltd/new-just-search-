@@ -3,6 +3,7 @@
 import crypto from "node:crypto";
 import { on } from "node:events";
 import { db } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   banners,
   bannerUpdateSchema,
@@ -23,6 +24,7 @@ import {
 } from "@/lib/cloudinary";
 import { razorpayInstance } from "@/lib/razorpay";
 import { adminProcedure, protectedProcedure, router } from "@/utils/trpc";
+import { changeRoleInSession } from "../auth/lib/session";
 export const subscriptionRouter = router({
   verifyPayment: protectedProcedure
     .input(
@@ -36,9 +38,19 @@ export const subscriptionRouter = router({
       });
 
       if (currentPlan?.planId === input.planId) {
-        return true;
+        const plan = await db.query.plans.findFirst({
+          where: eq(plans.id, input.planId),
+        });
+        await changeRoleInSession(ctx.sessionId, plan?.role || "visiter");
+
+        return {
+          success: true,
+          role: plan?.role || "visiter",
+        };
       }
-      return false;
+      return {
+        success: false,
+      };
     }),
   create: protectedProcedure
     .input(z.object({ identifier: z.string() }))
@@ -141,123 +153,15 @@ export const subscriptionRouter = router({
           })
           .where(eq(planUserActive.userId, ctx.userId));
       }
-
-      return { success: true, message: "Subscription verified successfully" };
-    }),
-  revanuePaymentVerification: protectedProcedure
-    .input(
-      z.object({
-        revanue_id: z.string(),
-        transaction: z.string(),
-        // plan_id: z.number(),
-        product_identifier: z.string(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      // await db
-      //   .update(planUserSubscriptions)
-      //   .set({
-      //     status: true,
-      //     transactionNumber: razorpay_payment_id,
-      //   })
-      //   .where(
-      //     eq(
-      //       planUserSubscriptions.subscriptionNumber,
-      //       input.razorpay_subscription_id,
-      //     ),
-      //   );
-      //
-      // await db.insert(planUserActive).values({
-      //   userId: ctx.userId,
-      //   planId: subscription.plansId,
-      //   features: subscription.features,
-      // });
-      //
-      return { success: true, message: "Subscription verified successfully" };
-    }),
-
-  edit: adminProcedure
-    .input(
-      z.object({
-        id: z.number(),
-      }),
-    )
-    .query(async ({ input }) => {
-      const data = await db
-        .select()
-        .from(banners)
-        .where(eq(banners.id, input.id));
-      return data[0];
-    }),
-  update: adminProcedure
-    .input(bannerUpdateSchema)
-    .mutation(async ({ input }) => {
-      const { id, ...updateData } = input;
-      logger.info("getting in backend");
-      if (!id)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Please pass id field",
-        });
-      const olddata = (
-        await db.select().from(banners).where(eq(banners.id, id))
-      )[0];
-      if (olddata?.photo && olddata?.photo !== updateData.photo) {
-        await cloudinaryDeleteImageByPublicId(olddata.photo);
-      }
-      await db.update(banners).set(updateData).where(eq(banners.id, id));
-      return { success: true };
-    }),
-  multidelete: adminProcedure
-    .input(
-      z.object({
-        ids: z.array(z.number()),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const allSeletedPhoto = await db
-        .select({
-          photo: banners.photo,
-        })
-        .from(banners)
-        .where(inArray(banners.id, input.ids));
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => item.photo),
-      );
-      await db.delete(banners).where(inArray(banners.id, input.ids));
-      return { success: true };
-    }),
-  multiactive: adminProcedure
-    .input(
-      z.array(
-        z.object({
-          id: z.number(),
-          isActive: z.boolean(),
-        }),
-      ),
-    )
-    .mutation(async ({ input }) => {
+      const plan = await db.query.plans.findFirst({
+        where: eq(plans.id, subscription.plansId),
+      });
       await db
-        .update(banners)
-        .set({
-          isActive: sql`CASE ${banners.id} 
-            ${sql.join(
-              input.map(
-                (item) =>
-                  sql`WHEN ${item.id} THEN ${item.isActive ? sql`true` : sql`false`}`,
-              ),
-              sql` `,
-            )} 
-                ELSE ${banners.isActive} 
-                END`,
-        })
-        .where(
-          inArray(
-            banners.id,
-            input.map((item) => item.id),
-          ),
-        );
+        .update(users)
+        .set({ role: plan?.role })
+        .where(eq(users.id, ctx.userId));
 
-      return { success: true };
+      await changeRoleInSession(ctx.sessionId, plan?.role || "visiter");
+      return { success: true, message: "Subscription verified successfully" };
     }),
 });

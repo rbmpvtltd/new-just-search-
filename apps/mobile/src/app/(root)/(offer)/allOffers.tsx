@@ -1,15 +1,16 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import OfferSearchForm from "@/features/offer/show/offerSearchForm";
-import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
-import OffersList from "@/features/offer/show/OffersList";
+import { Stack } from "expo-router";
 import type { Hit as AlgoliaHit } from "instantsearch.js";
-import { View } from "react-native";
-import { Configure, InstantSearch } from "react-instantsearch-core";
-import { searchClient } from "@/lib/algoliaClient";
-import { SearchBox } from "@/components/home/SearchBox";
-import { InfiniteHits } from "@/components/home/InfiniteHits";
-import { OfferProductFilters } from "@/features/offer/show/OfferFilter";
 import { useState } from "react";
+import { Configure, InstantSearch } from "react-instantsearch-core";
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { InfiniteHits } from "@/components/home/InfiniteHits";
+import { SearchBox } from "@/components/home/SearchBox";
+import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
+import { OfferProductFilters } from "@/features/offer/show/OfferFilter";
+import OffersList from "@/features/offer/show/OffersList";
+import OfferSearchForm from "@/features/offer/show/offerSearchForm";
+import { searchClient } from "@/lib/algoliaClient";
 
 export interface OfferProductHitType extends AlgoliaHit {
   objectID: string;
@@ -27,26 +28,34 @@ export interface OfferProductHitType extends AlgoliaHit {
 function AllOffers() {
   const [isModalOpen, setModalOpen] = useState(false);
   return (
-    <SafeAreaView className="flex-1">
-      <View className="-mb-14 flex-1">
-        <InstantSearch
-          searchClient={searchClient}
-          indexName="product_offer_listing"
-        >
-          <Configure hitsPerPage={10} />
-          <SearchBox />
-          <OfferProductFilters
-            isDrawerOpen={isModalOpen}
-            onToggleDrawer={() => setModalOpen((isOpen) => !isOpen)}
-            // onChange={scrollToTop}
-          />
-          <InfiniteHits<OfferProductHitType>
-            showOnlyOnSearch={false}
-            hitComponent={OfferProductHitCard}
-          />
-        </InstantSearch>
-      </View>
-    </SafeAreaView>
+    <>
+      {/* <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="allOffers"
+          options={{ title: "All Hires", headerShown: true }}
+        />
+      </Stack> */}
+      <SafeAreaView className="flex-1">
+        <View className="-mb-14 flex-1">
+          <InstantSearch
+            searchClient={searchClient}
+            indexName="product_offer_listing"
+          >
+            <Configure hitsPerPage={10} />
+            <SearchBox />
+            <OfferProductFilters
+              isDrawerOpen={isModalOpen}
+              onToggleDrawer={() => setModalOpen((isOpen) => !isOpen)}
+              // onChange={scrollToTop}
+            />
+            <InfiniteHits<OfferProductHitType>
+              showOnlyOnSearch={false}
+              hitComponent={OfferProductHitCard}
+            />
+          </InstantSearch>
+        </View>
+      </SafeAreaView>
+    </>
   );
 }
 

@@ -1,16 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
 import Purchases from "react-native-purchases";
 import { useAuthStore } from "@/features/auth/authStore";
 import { queryClient, trpc } from "@/lib/trpc";
+import { deviceId, platform } from "@/utils/getDeviceId";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../../../components/inputs/Input";
 import { type LoginFormData, loginSchema } from "../schema/loginSchema";
-import { deviceId, platform } from "@/utils/getDeviceId";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginFrom() {
   const setAuthStoreToken = useAuthStore((state) => state.setToken);

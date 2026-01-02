@@ -16,7 +16,7 @@ import {
   productSubCategories,
   products,
 } from "../db/src/schema/product.schema";
-import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
+// import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 
@@ -26,7 +26,7 @@ export const productSeed = async () => {
   await addProduct();
   // await addProductReviews();
   // await addRecentViewProduct();
-  await addProductSubCategroy();
+  // await addProductSubCategroy();
 };
 
 export const clearAllTablesBusiness = async () => {
@@ -108,114 +108,114 @@ export const addProduct = async () => {
 };
 
 // 2. products_reviews
-const addProductReviews = async () => {
-  const [review]: any[] = await sql.execute("SELECT  * FROM products_reviews");
-  const fakeUser = await fakeUserSeed();
-  const fakeBusiness = await fakeBusinessSeed();
+// const addProductReviews = async () => {
+//   const [review]: any[] = await sql.execute("SELECT  * FROM products_reviews");
+//   const fakeUser = await fakeUserSeed();
+//   const fakeBusiness = await fakeBusinessSeed();
 
-  for (const row of review) {
-    let [user] = await db.select().from(users).where(eq(users.id, row.user_id));
+//   for (const row of review) {
+//     let [user] = await db.select().from(users).where(eq(users.id, row.user_id));
 
-    if (!user) {
-      console.log(`user not found ${row.id} using faKe user`);
-      user = fakeUser;
-    }
+//     if (!user) {
+//       console.log(`user not found ${row.id} using faKe user`);
+//       user = fakeUser;
+//     }
 
-    let [business] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
-    console.log(fakeBusiness);
+//     let [business] = await db
+//       .select()
+//       .from(businessListings)
+//       .where(eq(businessListings.id, row.listing_id));
+//     console.log(fakeBusiness);
 
-    if (!business) {
-      console.log(`business not found ${row.id} using faKe business`);
-      business = fakeBusiness as any;
-      continue;
-    }
+//     if (!business) {
+//       console.log(`business not found ${row.id} using faKe business`);
+//       business = fakeBusiness as any;
+//       continue;
+//     }
 
-    const [Product] = await db
-      .select()
-      .from(products)
-      .where(eq(products.id, row.product_id));
-    if (!Product) {
-      console.log("Product not found", row.id);
-      continue;
-    }
-    console.log("conflicts is here", business);
-    await db.insert(productReviews).values({
-      id: row.id,
-      userId: user!.id,
-      businessId: business!.id,
-      productId: Product.id,
-      name: row.name,
-      email: row.email,
-      message: row.message,
-      rate: row.rate,
-      view: row.view,
-      status: true,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-  }
-  // console.log('successfully seed of productReviews')
-};
+//     const [Product] = await db
+//       .select()
+//       .from(products)
+//       .where(eq(products.id, row.product_id));
+//     if (!Product) {
+//       console.log("Product not found", row.id);
+//       continue;
+//     }
+//     console.log("conflicts is here", business);
+//     await db.insert(productReviews).values({
+//       id: row.id,
+//       userId: user!.id,
+//       businessId: business!.id,
+//       productId: Product.id,
+//       name: row.name,
+//       email: row.email,
+//       message: row.message,
+//       rate: row.rate,
+//       view: row.view,
+//       status: true,
+//       createdAt: row.created_at,
+//       updatedAt: row.updated_at,
+//     });
+//   }
+//   // console.log('successfully seed of productReviews')
+// };
 
-// 4.ProductSubcCategroy
-const addProductSubCategroy = async () => {
-  const [subCategory]: any[] = await sql.execute(
-    "SELECT * FROM product_subcategory",
-  );
-  for (const row of subCategory) {
-    const [Product] = await db
-      .select()
-      .from(products)
-      .where(eq(products.id, row.product_id));
-    if (!Product) {
-      console.log("Product not found", row.id);
-      continue;
-    }
+// // 4.ProductSubcCategroy
+// const addProductSubCategroy = async () => {
+//   const [subCategory]: any[] = await sql.execute(
+//     "SELECT * FROM product_subcategory",
+//   );
+//   for (const row of subCategory) {
+//     const [Product] = await db
+//       .select()
+//       .from(products)
+//       .where(eq(products.id, row.product_id));
+//     if (!Product) {
+//       console.log("Product not found", row.id);
+//       continue;
+//     }
 
-    const [subCategory] = await db
-      .select()
-      .from(subcategories)
-      .where(eq(subcategories.id, row.subcategory_id));
-    if (!subCategory) {
-      console.log("subCategory not found", row.id);
-      continue;
-    }
+//     const [subCategory] = await db
+//       .select()
+//       .from(subcategories)
+//       .where(eq(subcategories.id, row.subcategory_id));
+//     if (!subCategory) {
+//       console.log("subCategory not found", row.id);
+//       continue;
+//     }
 
-    await db.insert(productSubCategories).values({
-      productId: Product.id,
-      subcategoryId: subCategory.id,
-    });
-  }
-  console.log("succcessfully seed of product_subcategory");
-};
+//     await db.insert(productSubCategories).values({
+//       productId: Product.id,
+//       subcategoryId: subCategory.id,
+//     });
+//   }
+//   console.log("succcessfully seed of product_subcategory");
+// };
 
-// NOTE: recent_views_listings TABLE NOT FOUND
-// 5. recent_views_product
-const addRecentViewProduct = async () => {
-  const [recentViews]: any[] = await sql.execute(
-    "SELECT * FROM recent_views_listings",
-  );
-  for (const row of recentViews) {
-    const [Product] = await db
-      .select()
-      .from(products)
-      .where(eq(products.id, row.listing_id));
-    if (!Product) {
-      console.log("Product not found", row.id);
-      continue;
-    }
+// // NOTE: recent_views_listings TABLE NOT FOUND
+// // 5. recent_views_product
+// const addRecentViewProduct = async () => {
+//   const [recentViews]: any[] = await sql.execute(
+//     "SELECT * FROM recent_views_listings",
+//   );
+//   for (const row of recentViews) {
+//     const [Product] = await db
+//       .select()
+//       .from(products)
+//       .where(eq(products.id, row.listing_id));
+//     if (!Product) {
+//       console.log("Product not found", row.id);
+//       continue;
+//     }
 
-    await db.insert(recentViewProducts).values({
-      productId: Product.id,
-      device: row.device,
-      browser: row.browser,
-      operatingSystem: row.operating_system,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-  }
-  console.log("succcessfully seed of recent_views_listings");
-};
+//     await db.insert(recentViewProducts).values({
+//       productId: Product.id,
+//       device: row.device,
+//       browser: row.browser,
+//       operatingSystem: row.operating_system,
+//       createdAt: row.created_at,
+//       updatedAt: row.updated_at,
+//     });
+//   }
+//   console.log("succcessfully seed of recent_views_listings");
+// };

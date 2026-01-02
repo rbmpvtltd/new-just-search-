@@ -7,8 +7,8 @@ import { Platform, Pressable, Text, useColorScheme, View } from "react-native";
 import Colors from "@/constants/Colors";
 
 type Props = {
-  value: string; // store ISO string
-  onChange: (val: string) => void;
+  value: string; // ISO string OR "20:30"
+  onChange: (val: string) => void; // store ISO string
   onBlur?: () => void;
   minimumDate?: Date;
   maximumDate?: Date;
@@ -28,24 +28,34 @@ const DatePickerComponent: React.FC<Props> = ({
   const colorScheme = useColorScheme();
   const [showPicker, setShowPicker] = React.useState(false);
 
-  const parsedDate = value ? new Date(value) : new Date();
+  const parsedDate = React.useMemo(() => {
+    if (!value) return new Date();
+    return mode === "time" ? timeStringToDate(value) : new Date(value);
+  }, [value, mode]);
 
   const handleChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowPicker(false);
+
     if (event.type === "set" && selectedDate) {
-      onChange(selectedDate.toISOString());
+      if (mode === "time") {
+        onChange(dateTo24HourString(selectedDate)); // ✅ STORE "HH:mm"
+      } else {
+        onChange(format(selectedDate, "yyyy-MM-dd")); // optional for date
+      }
     }
+
     onBlur?.();
   };
 
-  // 👉 Format value dynamically based on mode
   const formattedValue = React.useMemo(() => {
     if (!value) return mode === "time" ? "Select Time" : "Select Date";
+
     if (mode === "time") {
-      return format(parsedDate, "hh:mm a"); // e.g. "03:45 PM"
+      return to12HourFormat(value);
     }
-    return format(parsedDate, "dd MMM yyyy"); // e.g. "03 Nov 2025"
-  }, [value, mode, parsedDate]);
+
+    return format(new Date(value), "dd MMM yyyy");
+  }, [value, mode]);
 
   return (
     <View
@@ -69,11 +79,50 @@ const DatePickerComponent: React.FC<Props> = ({
           display={Platform.OS === "ios" ? "inline" : "default"}
           minimumDate={minimumDate}
           maximumDate={maximumDate}
-          is24Hour={false} // ✅ show AM/PM for time
+          is24Hour={false}
         />
       )}
     </View>
   );
 };
+
+/**
+ * Converts ISO string OR "20:30" → Date
+ */
+function timeStringToDate(value: string) {
+  // ISO string
+  if (value.includes("T")) {
+    return new Date(value);
+  }
+
+  // "20:30"
+  const [h, m] = value.split(":").map(Number);
+  const date = new Date();
+  date.setHours(h, m, 0, 0);
+  return date;
+}
+
+/**
+ * Converts ISO string OR "20:30" → "08:30 pm"
+ */
+function to12HourFormat(value: string) {
+  let date: Date;
+
+  if (value.includes("T")) {
+    date = new Date(value);
+  } else {
+    const [h, m] = value.split(":").map(Number);
+    date = new Date();
+    date.setHours(h, m, 0, 0);
+  }
+
+  return format(date, "hh:mm a");
+}
+
+function dateTo24HourString(date: Date) {
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
 
 export default DatePickerComponent;

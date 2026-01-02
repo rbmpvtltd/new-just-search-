@@ -40,6 +40,8 @@ export default function MyOffer() {
     return <Spinner />;
   }
 
+  console.log("Offer data", offersData);
+
   return (
     <div className="p-2">
       <div className="grid grid-cols-6 bg-gray-100 px-4 py-3 font-semibold rounded-t-lg text-sm">
@@ -53,7 +55,7 @@ export default function MyOffer() {
 
       {offersData ? (
         offersData.map((offer, index) => (
-          <OfferCard key={offer.offer.id} offer={offer} index={index} />
+          <OfferCard key={offer.id} offer={offer} index={index} />
         ))
       ) : (
         <p className="text-center text-gray-500">No offers found</p>
@@ -87,27 +89,27 @@ type OfferType = NonNullable<
 >["offersData"][number];
 function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
   const today = new Date();
-  const end = new Date(offer.offer.offerEndDate);
+  const end = new Date(offer.offerEndDate);
 
   const status = today <= end ? "Active" : "Expired";
-  console.log("OFFERS Data", offer);
+  console.log("OFFERS Data ----------------------------", offer);
 
   return (
     <div className="">
       <div
-        key={offer.offer.id}
+        key={offer.id}
         className="grid grid-cols-6 items-center px-4 py-3 border-b text-sm hover:bg-gray-50 transition"
       >
         <div>{index + 1}</div>
 
         <div>
-          {offer?.offer?.mainImage ? (
+          {offer?.mainImage ? (
             <CldImage
               width="100"
               height="100"
               className="border rounded"
-              src={offer.offer.mainImage}
-              alt={offer.offer.offerName}
+              src={offer.mainImage}
+              alt={offer.offerName}
             />
           ) : (
             <div className="flex items-center justify-center h-40 w-40 border rounded text-gray-400">
@@ -116,7 +118,7 @@ function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
           )}
         </div>
 
-        <div className="font-medium">{offer.offer.offerName}</div>
+        <div className="font-medium">{offer.offerName}</div>
 
         <div>
           <span
@@ -131,13 +133,13 @@ function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
         </div>
 
         <div>
-          {offer.offer.offerEndDate
-            ? new Date(offer.offer.offerEndDate).toLocaleDateString()
+          {offer.offerEndDate
+            ? new Date(offer.offerEndDate).toLocaleDateString()
             : "—"}
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href={`/profile/offer/edit/${offer.offer.id}`}>
+          <Link href={`/profile/offer/edit/${offer.id}`}>
             <Button size="icon" variant="secondary" className="cursor-pointer">
               <Pencil className="w-4 h-4" />
             </Button>

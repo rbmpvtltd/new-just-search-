@@ -30,6 +30,7 @@ export default function BusinessDetail({
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
@@ -250,6 +251,19 @@ export default function BusinessDetail({
               </>
             ) : (
               "CONTINUE"
+            )}
+          </Button>
+          <Button
+            type="submit"
+            onClick={() => console.log(getValues())}
+            className="bg-orange-500 hover:bg-orange-700 font-bold"
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              "Get Value"
             )}
           </Button>
         </div>

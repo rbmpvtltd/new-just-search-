@@ -84,6 +84,8 @@ function ProductCard({ product }: { product: ProductType }) {
     trpc.productrouter.deleteProduct.mutationOptions(),
   );
 
+  
+
   return (
     <div className="bg-gray-100 rounded-2xl shadow-lg overflow-hidden flex sm:flex-row flex-col gap-4 p-4">
       <div className="flex justify-center sm:w-48">

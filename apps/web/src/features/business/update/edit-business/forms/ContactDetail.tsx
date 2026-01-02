@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { UserBusinessListingType } from "..";
@@ -124,30 +125,21 @@ export default function ContactDetail({
     mutate(
       { ...formValue, pincode: formValue.pincode },
       {
-        onSuccess: async (data) => {
+        onSuccess: (data) => {
           if (data.success) {
-            await Swal.fire({
-              title: data.message,
-              icon: "success",
-              draggable: true,
-            });
+            sweetAlertSuccess(data.message);
             const queryClient = getQueryClient();
             queryClient.invalidateQueries({
               queryKey: trpc.businessrouter.show.queryKey(),
             });
             // clearPage();
-            router.push("/");
+            router.push("/profile/business");
           }
           console.log("Success", data);
         },
         onError: (error) => {
           if (isTRPCClientError(error)) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong!",
-              // footer: '<a href="#">Why do I have this issue?</a>',
-            });
+            sweetAlertError(error.message);
             console.error("Error", error.message);
           }
         },
