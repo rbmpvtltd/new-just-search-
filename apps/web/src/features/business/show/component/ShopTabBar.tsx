@@ -45,8 +45,8 @@ type SingleShopType = OutputTrpcType["businessrouter"]["singleShop"] | null;
 
 export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
   const trpc = useTRPC();
-  const latitude = Number(singleShop?.latitude?.split(",").shift());
-  const longitude = Number(singleShop?.longitude?.split(",").pop());
+  const latitude = singleShop?.latitude;
+  const longitude = singleShop?.longitude;
   const { data } = useQuery(trpc.auth.verifyauth.queryOptions());
   const { data: submmited } = useQuery(
     trpc.businessrouter.ReviewSubmitted.queryOptions({
@@ -194,8 +194,8 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
         <TabsContent value="location" className="mt-10 sm:mt-0">
           <div className="p-4 flex flex-wrap justify-between gap-4">
             <GoMap
-              latitude={singleShop?.latitude}
-              longitude={singleShop?.longitude}
+              latitude={String(singleShop?.latitude)}
+              longitude={String(singleShop?.longitude)}
               title={singleShop?.name}
             />
             {/* <div className="md:w-[80%] w-full mx-auto">
