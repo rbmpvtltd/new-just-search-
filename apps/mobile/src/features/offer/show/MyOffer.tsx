@@ -104,12 +104,12 @@ function OfferCard({ item }: { item: OfferType }) {
             { id: item?.id },
             {
               onSuccess: async (data) => {
-                console.log("data is", data);
                 if (!data?.success) {
                   console.warn(
                     "Delete product mutation returned no data:",
                     data,
                   );
+                  Alert.alert("Offer deleted successfully");
                   return;
                 }
               },
@@ -141,10 +141,10 @@ function OfferCard({ item }: { item: OfferType }) {
             </Text>
 
             <Text className="text-secondary font-bold text-lg">
-              ₹{item.finalPrice}{" "}
-              {item.discountPercent && (
+              ₹{item?.finalPrice}{" "}
+              {item?.discountPercent && (
                 <Text className="text-error text-sm ml-1">
-                  🔖 {item.discountPercent}% OFF
+                  🔖 {item?.discountPercent}% OFF
                 </Text>
               )}
             </Text>

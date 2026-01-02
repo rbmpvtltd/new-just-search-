@@ -1,11 +1,11 @@
+import Image from "next/image";
+import { CldImage } from "next-cloudinary";
+import { FaPhoneAlt, FaWhatsappSquare } from "react-icons/fa";
+import { IoMail } from "react-icons/io5";
+import { MdLocationPin } from "react-icons/md";
+import { Badge } from "@/components/ui/badge";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
-import Image from "next/image";
-import { MdLocationPin } from "react-icons/md";
-import { FaPhoneAlt } from "react-icons/fa";
-import { FaWhatsappSquare } from "react-icons/fa";
-import { IoMail } from "react-icons/io5";
-import { Badge } from "@/components/ui/badge";
 
 async function page({
   params,
@@ -39,11 +39,16 @@ async function page({
     <div className="px-4 w-[90%] mx-auto">
       <div className="flex gap-6 flex-col md:flex-row items-center">
         <div className="md:mx-0 mx-auto">
-          <Image
-            src="https://www.justsearch.net.in/assets/images/215013691738759602.jpg" // TODO : set dynamic image when upload on cloudinary
-            width={400}
-            height={600}
+          {/* <Image
+            src="https://www.justsearch.net.in/assets/images/215013691738759602.jpg"
             alt="hire img"
+          /> */}
+          <CldImage
+            width="400"
+            height="600"
+            className="w-full h-full object-cover"
+            src={data?.data?.photo ?? ""}
+            alt="Business image"
           />
         </div>
         <div className="p-4 flex flex-col gap-3">
@@ -55,8 +60,10 @@ async function page({
           </div>
           <div className="flex gap-2 flex-wrap">
             <Badge variant="default">{data?.data?.category}</Badge>
-            {data?.data?.subcategories?.map((item,i)=>(
-              <Badge key={i.toString()} variant="destructive">{item}</Badge>
+            {data?.data?.subcategories?.map((item, i) => (
+              <Badge key={i.toString()} variant="destructive">
+                {item}
+              </Badge>
             ))}
           </div>
           <div className="flex items-center">
@@ -85,8 +92,14 @@ async function page({
             <p>{data?.data?.email}</p>
           </div>
           <div className="flex gap-2 items-center">
-            <span className="font-bold line-clamp-1">Highest Qualification :</span>
-            <p className="line-clamp-1">{Number(data?.data?.qualification) === 2 ? "Graduation" : data?.data?.qualification}</p>
+            <span className="font-bold line-clamp-1">
+              Highest Qualification :
+            </span>
+            <p className="line-clamp-1">
+              {Number(data?.data?.qualification) === 2
+                ? "Graduation"
+                : data?.data?.qualification}
+            </p>
           </div>
           <div className="flex gap-2 items-center">
             <span className="font-bold">Experience :</span>
@@ -111,9 +124,7 @@ async function page({
                 ))}
               </div>
             )}
-            {!data?.data?.languages?.length && (
-              <p>N/A</p>
-            )}
+            {!data?.data?.languages?.length && <p>N/A</p>}
           </div>
           <div className="flex gap-2 items-center">
             <span className="font-bold">Work Shift :</span>

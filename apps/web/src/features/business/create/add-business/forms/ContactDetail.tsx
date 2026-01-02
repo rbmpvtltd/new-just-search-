@@ -111,11 +111,11 @@ export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
     mutate(
       { ...finalData, pincode: formValue.pincode },
       {
-        onSuccess: async (data) => {
+        onSuccess: (data) => {
           if (data.success) {
             setRole("business");
             clearPage();
-            await Swal.fire({
+            Swal.fire({
               title: data.message,
               icon: "success",
               draggable: true,

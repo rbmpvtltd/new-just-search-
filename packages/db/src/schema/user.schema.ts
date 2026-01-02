@@ -35,7 +35,7 @@ export const profiles = pgTable("profiles", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   profileImage: varchar("profileImage", { length: 255 }),
-  salutation: varchar("salutation", { length: 100 }),
+  salutation: integer("salutation"),
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   dob: date("dob"),
@@ -44,9 +44,7 @@ export const profiles = pgTable("profiles", {
   address: varchar("address", { length: 255 }),
   pincode: varchar("pincode", { length: 10 }),
   state: integer("state").notNull(),
-  city: integer("city")
-    .notNull()
-    .references(() => cities.id),
+  city: integer("city").references(() => cities.id),
   // website: varchar("website", { length: 255 }), TODO: Ask About this Akki sir
   createdAt: timestamp("created_at").default(sql`NOW()`),
   updatedAt: timestamp("updated_at").default(sql`NOW()`),

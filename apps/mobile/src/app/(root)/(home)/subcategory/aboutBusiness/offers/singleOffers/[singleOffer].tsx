@@ -9,12 +9,15 @@ import {
 } from "expo-router";
 import { useCallback, useState } from "react";
 import {
+  Alert,
   BackHandler,
   Dimensions,
   Image,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   Text,
   useColorScheme,
   View,
@@ -96,6 +99,39 @@ export default function TabOneScreen() {
   const { mutate, isPending } = useMutation(
     trpc.chat.sendMessage.mutationOptions(),
   );
+
+  const onShare = async () => {
+    try {
+      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutBusiness/products/singleProduct/${offer?.id}`;
+
+      const result = await Share.share(
+        {
+          title: offer?.name ?? "Check this Product",
+          message:
+            Platform.OS === "android"
+              ? `${offer?.name ?? "Amazing Product"}\n\n${shareUrl}`
+              : (offer?.name ?? "Amazing Product"),
+          url: shareUrl, // iOS uses this
+        },
+        {
+          dialogTitle: "Share Offer",
+        },
+      );
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // iOS specific (AirDrop, WhatsApp, etc.)
+          console.log("Shared via:", result.activityType);
+        } else {
+          console.log("Shared successfully");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share dismissed");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error?.message ?? "Unable to share");
+    }
+  };
   return (
     <>
       <Stack.Screen
@@ -134,6 +170,13 @@ export default function TabOneScreen() {
               <Text className="text-secondary text-lg mb-2">
                 {offer?.shopName}
               </Text>
+              <Pressable
+                hitSlop={10}
+                // onPress={onShare}
+                className="absolute right-0 top-1/2 -translate-y-1/2"
+              >
+                <Ionicons name="share-social" size={22} color="black" />
+              </Pressable>
               <Text className="text-secondary text-[24px] font-semibold mb-2">
                 {offer?.name}
               </Text>

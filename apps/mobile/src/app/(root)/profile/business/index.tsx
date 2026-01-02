@@ -19,6 +19,8 @@ function MyBusiness() {
     trpc.businessrouter.show.queryOptions(),
   );
 
+  console.log("DATA BUSINESS", data);
+
   if (isError) {
     if (error.shape?.data.httpStatus === 401) {
       return <CreateBusinessListing />;

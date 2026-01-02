@@ -6,7 +6,7 @@ import { isTRPCClientError } from "@trpc/client";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import Swal from "sweetalert2";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -20,7 +20,10 @@ import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 import type { SetOpen } from "../add.form";
 
-type AddOfferSchema = z.infer<typeof offersInsertSchema>;
+export const adminOfferSchema = offersInsertSchema.extend({
+  businessId: z.number(),
+});
+type AddOfferSchema = z.infer<typeof adminOfferSchema>;
 type AddAdminOfferType = OutputTrpcType["adminOfferRouter"]["add"];
 export default function AddOffer({
   setOpen,
@@ -41,7 +44,7 @@ export default function AddOffer({
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<AddOfferSchema>({
-    resolver: zodResolver(offersInsertSchema),
+    resolver: zodResolver(adminOfferSchema),
     defaultValues: {
       businessId: NaN,
       offerName: "",

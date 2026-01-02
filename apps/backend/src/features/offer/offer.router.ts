@@ -1,12 +1,14 @@
 import { db, schemas } from "@repo/db";
+import { businessListings } from "@repo/db/dist/schema/business.schema";
 import {
   insertOfferReviewSchema,
+  offerPhotos,
   offers,
   offersInsertSchema,
   offersUpdateSchema,
 } from "@repo/db/dist/schema/offer.schema";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, gt, gte, sql } from "drizzle-orm";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
@@ -71,6 +73,8 @@ export const offerrouter = router({
   addOffer: businessProcedure
     .input(offersInsertSchema)
     .mutation(async ({ ctx, input }) => {
+      const now = new Date();
+      const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.userId, ctx.userId),
@@ -81,13 +85,75 @@ export const offerrouter = router({
           message: "Business not found",
         });
       }
+
+      console.log("HIII");
+
+      const activeplan = await db.query.planUserActive.findFirst({
+        where: (planUserActive, { eq }) =>
+          eq(planUserActive.userId, ctx.userId),
+      });
+
+      if (!activeplan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Plan not found",
+        });
+      }
+      console.log("Hiii 2");
+
+      const offerDuration = activeplan.features.offerDuration;
+      const expireAt = new Date(
+        now.getTime() + offerDuration * 24 * 60 * 60 * 1000,
+      );
+
+      console.log("Hiii 3");
+
+      const maxOfferPerDay = (
+        await db
+          .select({
+            count: sql<number>`count(*)`,
+          })
+          .from(offers)
+          .innerJoin(businessListings, eq(offers.businessId, business.id))
+          .where(
+            and(
+              eq(businessListings.userId, ctx.userId),
+              gte(offers.createdAt, last24Hours),
+            ),
+          )
+      )[0]?.count;
+
+      console.log("Hii4 ");
+
+      if (activeplan.features.maxOfferPerDay <= (maxOfferPerDay ?? 0)) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Today offer limit exceeded",
+        });
+      }
+
+      const totalOffer = (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${offers.id})::int`,
+          })
+          .from(offers)
+          .where(eq(offers.businessId, business.id))
+      )[0]?.count;
+
+      if (activeplan.features.offerLimit <= (totalOffer ?? 0)) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Offer limit exceeded",
+        });
+      }
       const slugifyName = slugify(input.offerName);
 
       const startDate = new Date();
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + 5);
       const [offer] = await db
-        .insert(schemas.offer.offers)
+        .insert(offers)
         .values({
           businessId: business.id,
           offerName: input.offerName,
@@ -100,6 +166,7 @@ export const offerrouter = router({
           offerDescription: input.offerDescription,
           offerStartDate: startDate,
           offerEndDate: endDate,
+          expires_at: expireAt,
         })
         .returning({
           id: offers.id,
@@ -170,27 +237,49 @@ export const offerrouter = router({
         });
       }
 
-      const offers = await db.query.offers.findMany({
-        where: (offers, { and, gt, eq }) =>
+      // const offers = await db.query.offers.findMany({
+      //   where: (offers, { and, gt, eq }) =>
+      //     and(
+      //       eq(offers.businessId, business.id),
+
+      //       cursor ? gt(offers.id, cursor) : undefined,
+      //     ),
+      //   orderBy: (offers, { asc }) => [asc(offers.id)],
+      //   limit,
+      //   with: {
+      //     offerPhotos: true,
+      //   },
+      // });
+
+      const offersData = await db
+        .select({
+          offer: offers,
+          photos: offerPhotos,
+          isExpired: sql<boolean>`(${offers.expires_at} < now())`.as(
+            "isExpired",
+          ),
+        })
+        .from(offers)
+        .leftJoin(offerPhotos, eq(offerPhotos.offerId, offers.id))
+        .where(
           and(
             eq(offers.businessId, business.id),
             cursor ? gt(offers.id, cursor) : undefined,
           ),
-        orderBy: (offers, { asc }) => [asc(offers.id)],
-        limit,
-        with: {
-          offerPhotos: true,
-        },
-      });
+        )
+        .orderBy(asc(offers.id))
+        .limit(limit);
 
       // if (!offers) {
       //   return { message: "Offers not found" };
       // }
 
       const nextCursor =
-        offers.length > 0 ? offers[offers.length - 1]?.id : null;
+        offersData.length > 0
+          ? offersData[offersData.length - 1]?.offer.id
+          : null;
 
-      return { offers, nextCursor };
+      return { offersData, nextCursor };
     }),
 
   edit: businessProcedure

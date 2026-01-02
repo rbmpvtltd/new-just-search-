@@ -7,9 +7,7 @@ import { getRole } from "@/utils/session";
 
 export default async function page() {
   const role = await getRole();
-  return (
-    <div>{role?.value === "hire" ? <MyHireList /> : <CreateHireListing />}</div>
-  );
+  return <div>{role === "hire" ? <MyHireList /> : <CreateHireListing />}</div>;
 }
 
 async function MyHireList() {

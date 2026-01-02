@@ -61,7 +61,8 @@ export default function PersonalDetailsForm({
   });
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  const { data: subCategories } = useQuery(
+  
+  const { data: subCategories, isLoading: subCategoriesLoading } = useQuery(
     trpc.hirerouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
     }),
@@ -177,6 +178,7 @@ export default function PersonalDetailsForm({
           value: item.id,
         })),
       ],
+      isLoading: subCategoriesLoading,
       component: "multiselectdropdown",
       dropdownPosition: "auto",
       placeholder: "Select Sub Category",
@@ -335,6 +337,7 @@ export default function PersonalDetailsForm({
           value: city.id,
         })),
       ],
+      isLoading: isLoading,
       dropdownPosition: "top",
       error: errors.city?.message,
     },

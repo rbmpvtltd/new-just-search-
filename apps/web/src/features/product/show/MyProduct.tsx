@@ -87,12 +87,12 @@ function ProductCard({ product }: { product: ProductType }) {
   return (
     <div className="bg-gray-100 rounded-2xl shadow-lg overflow-hidden flex sm:flex-row flex-col gap-4 p-4">
       <div className="flex justify-center sm:w-48">
-        {product?.productPhotos?.[0]?.photo ? (
+        {product?.mainImage ? (
           <CldImage
             width="200"
             height="200"
             className="border rounded"
-            src={product.productPhotos[0].photo}
+            src={product.mainImage}
             alt={product.productName}
           />
         ) : (
@@ -112,7 +112,7 @@ function ProductCard({ product }: { product: ProductType }) {
 
         <div className="mt-4 flex gap-2">
           <Link
-            href={`/profile/product/edit/${product.productSlug}`}
+            href={`/profile/product/edit/${product.id}`}
             className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center gap-2"
           >
             <Pencil className="w-4 h-4" />

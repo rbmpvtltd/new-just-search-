@@ -1,8 +1,14 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
-import { db, schemas } from "@repo/db";
+import { db } from "@repo/db";
 import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import {
+  franchises,
+  profiles,
+  salesmen,
+} from "@repo/db/dist/schema/user.schema";
 import dotenv from "dotenv";
-import { sql as dbsql, eq, type InferInsertModel } from "drizzle-orm";
+import { sql as dbsql, type InferInsertModel } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake, dummyImageUrl } from "./seeds";
 
@@ -52,11 +58,6 @@ export const userSeed = async () => {
   await seedOfSalesman();
 };
 
-const users = schemas.auth.users;
-const profiles = schemas.user.profiles;
-const franchises = schemas.user.franchises;
-const salesmen = schemas.user.salesmen;
-
 export const clearAllTablesUser = async () => {
   // await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE profiles RESTART IDENTITY CASCADE;`);
@@ -76,9 +77,33 @@ export const seedUsers = async () => {
       continue;
     }
 
+    // plan id
+    // ad_limit
+    // products_limit
+    // offers_limit
+    // plan_end_date
+    // payment_date
+    // area,
+
+    // await db.insert(profiles).values({
+    //   userId: Number(insertedUser.id),
+    //   salutation: salutation,
+    //   firstName: firstName,
+    //   lastName: lastName,
+    //   city: cityId,
+    //   profileImage: profilePhotoUrl,
+    //   address: row.address ?? "null",
+    //   dob: row.dob ?? null,
+    //   maritalStatus: row.marital_status ?? null,
+    //   occupation: occupationId,
+    //   state: row.state ?? 19,
+    //   pincode: row.zip ?? "000000",
+    //   createdAt: row.created_at,
+    //   updatedAt: row.updated_at,
+    // });
     const user: DbUser = {
       id: row.id,
-      displayName: row.username,
+      displayName: row.name,
       phoneNumber: row.phone,
       email: row.email,
       status: true,
@@ -86,26 +111,16 @@ export const seedUsers = async () => {
       role: row.phone ? UserRole.visiter : UserRole.guest,
       googleId: row.google_id,
       appleId: row.apple_id,
-      revanueCatId: row.revanue_cat_id,
+      revanueCatId: row.revanue_id ?? undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
 
-    let [insertedUser] = await db
-      .insert(users)
-      .values(user)
-      .onConflictDoNothing()
-      .returning();
+    //TODO: add current user plan
+    const [insertedUser] = await db.insert(users).values(user).returning();
 
     if (!insertedUser) {
-      // fallback: fetch existing user by unique key (email is usually safe)
-      insertedUser = await db.query.users.findFirst({
-        where: (u, { eq }) => eq(u.email, user.email),
-      });
-    }
-
-    if (!insertedUser) {
-      throw new Error(`User could not be inserted or found: ${user.email}`);
+      throw new Error(`User could not be inserted or found:`);
     }
 
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
@@ -118,14 +133,20 @@ export const seedUsers = async () => {
       )) ?? dummyImageUrl;
 
     // resolve city id
-    let cityId: number;
+    let cityId: number | null = null;
     if (row.city) {
-      const cityRecord = await db.query.cities.findFirst({
-        where: (c, { eq }) => eq(c.city, row.city),
-      });
-      cityId = cityRecord?.id ?? 1; // 👈 fallback to "Unknown" city id
-    } else {
-      cityId = 1; // 👈 fallback
+      const cityIdOrName = Number(row.city);
+      let cityRecord = null;
+      if (Number.isNaN(cityIdOrName)) {
+        cityRecord = await db.query.cities.findFirst({
+          where: (c, { eq }) => eq(c.city, row.city),
+        });
+      } else {
+        cityRecord = await db.query.cities.findFirst({
+          where: (c, { eq }) => eq(c.id, Number(row.city)),
+        });
+      }
+      cityId = cityRecord?.id ?? null; // 👈 fallback to "Unknown" city id
     }
 
     if (row.marital_status === "married") {
@@ -161,12 +182,12 @@ export const seedUsers = async () => {
 
     await db.insert(profiles).values({
       userId: Number(insertedUser.id),
-      salutation: salutation,
+      salutation: salutation === "Mr." ? 1 : salutation === "Ms." ? 2 : 3,
       firstName: firstName,
       lastName: lastName,
       city: cityId,
       profileImage: profilePhotoUrl,
-      address: row.address ?? "null",
+      address: row.area ?? row.address,
       dob: row.dob ?? null,
       maritalStatus: row.marital_status ?? null,
       occupation: occupationId,

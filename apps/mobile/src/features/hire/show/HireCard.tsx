@@ -180,15 +180,19 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Alert,
   Dimensions,
   Image,
+  Platform,
   Pressable,
+  Share,
   Text,
   TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { HireListingHitType } from "@/app/(root)/(hire)/hire";
 import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
@@ -207,6 +211,39 @@ export default function HireCard({
   title?: any;
 }) {
   const colorScheme = useColorScheme();
+
+  const onShare = async () => {
+    try {
+      const shareUrl = `https://web-test.justsearch.net.in//hireDetail/${item?.objectID}`;
+
+      const result = await Share.share(
+        {
+          title: item?.name ?? "",
+          message:
+            Platform.OS === "android"
+              ? `${item?.name ?? ""}\n\n${shareUrl}`
+              : (item?.name ?? ""),
+          url: shareUrl, // iOS uses this
+        },
+        {
+          dialogTitle: "Share Offer",
+        },
+      );
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // iOS specific (AirDrop, WhatsApp, etc.)
+          console.log("Shared via:", result.activityType);
+        } else {
+          console.log("Shared successfully");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share dismissed");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error?.message ?? "Unable to share");
+    }
+  };
 
   return (
     <Pressable
@@ -240,10 +277,23 @@ export default function HireCard({
             )} */}
           </View>
         </View>
-        <View className="w-full items-center mt-8 mb-2">
-          <Text className="text-secondary text-2xl font-semibold text-center">
+        <View className="w-full mt-8 mb-2 px-4 relative items-center">
+          {/* Centered title */}
+          <Text
+            className="text-secondary text-2xl font-semibold text-center"
+            numberOfLines={2}
+          >
             {item?.name}
           </Text>
+
+          {/* Share button at end */}
+          <Pressable
+            hitSlop={10}
+            className="absolute right-4 top-1/2 -translate-y-1/2"
+            onPress={onShare}
+          >
+            <Ionicons name="share-social" size={22} color="black" />
+          </Pressable>
         </View>
 
         <View className="flex-row flex-wrap gap-2 ml-4">

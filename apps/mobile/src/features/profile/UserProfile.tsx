@@ -37,7 +37,7 @@ export default function UserProfile() {
       firstName: data?.profile?.firstName ?? "",
       dob: data?.profile?.dob ?? "",
       lastName: data?.profile?.lastName ?? "",
-      salutation: data?.profile?.salutation ?? "",
+      salutation: data?.profile?.salutation ?? NaN,
       occupation: data?.profile?.occupation ?? NaN,
       maritalStatus: data?.profile?.maritalStatus ?? "Married",
       address: data?.profile?.address ?? "",
@@ -98,11 +98,10 @@ export default function UserProfile() {
       name: "salutation",
       label: "Title",
       component: "dropdown",
-      data: [
-        { label: "Mr", value: "Mr" },
-        { label: "Ms", value: "Ms" },
-        { label: "Mrs", value: "Mrs" },
-      ],
+      data: data.getSlutation.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       required: false,
       placeholder: "Select Title",
       error: errors.salutation?.message,
@@ -196,6 +195,7 @@ export default function UserProfile() {
         states?.map((state) => ({ label: state.label, value: state.value })) ??
         [],
       required: false,
+      dropdownPosition: "top",
       error: errors.state?.message,
     },
     {
@@ -205,6 +205,7 @@ export default function UserProfile() {
       placeholder: "City",
       component: "dropdown",
       required: false,
+      dropdownPosition: "top",
       data: cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
       error: errors.city?.message,
     },

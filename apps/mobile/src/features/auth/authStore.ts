@@ -12,7 +12,7 @@ type AuthState = {
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
-  role: "visiter",
+  role: "guest",
   authenticated: false,
   setToken: (token, role) => {
     queryClient.invalidateQueries();
@@ -20,6 +20,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     return set({ token, authenticated, role });
   },
   clearToken: () => {
-    set({ token: null, authenticated: false });
+    set({ token: null, authenticated: false, role: "guest" });
   },
 }));

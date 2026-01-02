@@ -35,8 +35,8 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
       streetName: formValue?.streetName ?? "",
       area: formValue?.area ?? "",
       landmark: formValue?.landmark ?? "",
-      latitude: formValue?.latitude ?? "",
-      longitude: formValue?.longitude ?? "",
+      latitude: formValue?.latitude ?? NaN,
+      longitude: formValue?.longitude ?? NaN,
       pincode: formValue?.pincode ?? "",
       state: formValue.state ?? 0,
       city: formValue?.city ?? 0,
@@ -141,6 +141,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
       name: "latitude",
       label: "Latitude",
       placeholder: "e.g. 26.9124",
+      type: "number",
       component: "input",
       keyboardType: "numeric",
       className: "w-[90%] bg-base-200",
@@ -149,6 +150,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
     {
       control,
       name: "longitude",
+      type: "number",
       label: "Longitude",
       placeholder: "e.g. 75.7878",
       component: "input",
@@ -220,8 +222,8 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
 
               setDetectedCityName(cityName);
 
-              setValue("latitude", String(lat));
-              setValue("longitude", String(lng));
+              setValue("latitude", Number(lat));
+              setValue("longitude", Number(lng));
               setValue("pincode", pincode);
               setValue("state", matchedState?.value ?? 0);
               setValue("area", area);

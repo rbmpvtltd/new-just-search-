@@ -34,6 +34,7 @@ export default async function Page() {
 
   return (
     <div className="mx-auto">
+      
       <FirstCaraousel bannerFirst={bannerFirst} />
       <Category category={category} allCategory={allCategory} />
       <PremiumShop />

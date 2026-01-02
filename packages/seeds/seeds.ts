@@ -4,7 +4,7 @@ import { businessSeed } from "./business.seed";
 import { fakeSeed } from "./fake.seed";
 import { feedbackseed } from "./feedback.seed";
 import { hireSeed } from "./hires.seeds";
-// import { sql } from "./mysqldb.seed";
+import { sql } from "./mysqldb.seed";
 import { notRelated } from "./notrelated.seed";
 import { offerSeed } from "./offer.seed";
 import { planSeed } from "./plan.seed";
@@ -14,6 +14,8 @@ import { userSeed } from "./user.seed";
 
 export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
+export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
+
 (async () => {
   try {
     // Postgres seeding

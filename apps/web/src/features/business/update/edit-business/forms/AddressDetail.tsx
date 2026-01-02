@@ -44,8 +44,8 @@ export default function AddressDetail({
       streetName: businessListing?.business?.streetName ?? "",
       area: businessListing?.business?.area ?? "",
       landmark: businessListing?.business?.landmark ?? "",
-      latitude: businessListing?.business?.latitude ?? "",
-      longitude: businessListing?.business?.longitude ?? "",
+      latitude: Number(businessListing?.business?.latitude),
+      longitude: Number(businessListing?.business?.longitude),
       pincode: businessListing?.business?.pincode,
       state: businessListing?.business?.state,
       city: businessListing?.business?.city,
@@ -118,6 +118,7 @@ export default function AddressDetail({
     },
     {
       control,
+      type: "number",
       label: "Latitude",
       name: "latitude",
       placeholder: "Latitude",
@@ -126,7 +127,7 @@ export default function AddressDetail({
     },
     {
       control,
-
+      type: "number",
       label: "Longitude",
       name: "longitude",
       placeholder: "Longitude",
@@ -170,8 +171,8 @@ export default function AddressDetail({
     setFormValue("streetName", data.streetName ?? "");
     setFormValue("area", data.area ?? "");
     setFormValue("landmark", data.landmark ?? "");
-    setFormValue("latitude", data.latitude ?? "");
-    setFormValue("longitude", data.longitude ?? "");
+    setFormValue("latitude", String(data.latitude) ?? "");
+    setFormValue("longitude", String(data.longitude) ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", Number(data.state) ?? "");
     setFormValue("city", Number(data.city) ?? "");
@@ -220,8 +221,8 @@ export default function AddressDetail({
                   setValue("streetName", street_name ?? "");
                   setValue("area", area ?? "");
                   setValue("landmark", landmark ?? "");
-                  setValue("latitude", String(lat));
-                  setValue("longitude", String(long));
+                  setValue("latitude", Number(lat));
+                  setValue("longitude", Number(long));
                   setValue("pincode", pincode ?? "");
                   setValue("state", matchedState?.value ?? 0);
                 }}

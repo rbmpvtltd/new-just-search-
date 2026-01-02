@@ -6,7 +6,7 @@ import {
 } from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
@@ -61,22 +61,11 @@ export const productrouter = router({
       columns: { id: true, name: true },
     });
 
-    logger.info("Subcategory Record", subcategoryRecord);
     return {
       categoryRecord,
       subcategoryRecord,
     };
   }),
-
-  getSubCategories: visitorProcedure
-    .input(z.object({ categoryId: z.number() }))
-    .query(async ({ ctx, input }) => {
-      const businessSubCategories = await db.query.subcategories.findMany({
-        where: (subcategories, { eq }) =>
-          eq(subcategories.categoryId, input.categoryId),
-      });
-      return businessSubCategories;
-    }),
 
   addProduct: businessProcedure
     .input(productInsertSchema)
@@ -91,10 +80,37 @@ export const productrouter = router({
           message: "Business not found",
         });
       }
+
+      const activeplan = await db.query.planUserActive.findFirst({
+        where: (planUserActive, { eq }) =>
+          eq(planUserActive.userId, ctx.userId),
+      });
+      if (!activeplan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Plan not found",
+        });
+      }
+
+      const totalProduct = (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${products.id})::int`,
+          })
+          .from(products)
+          .where(eq(products.businessId, business.id))
+      )[0]?.count;
+      console.log("totalProduct", totalProduct);
+      if (activeplan.features.productLimit <= (totalProduct ?? 0)) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product limit exceeded",
+        });
+      }
       const slugifyName = slugify(input.productName);
 
       const [product] = await db
-        .insert(schemas.product.products)
+        .insert(products)
         .values({
           mainImage: input.mainImage,
           businessId: business.id,
@@ -238,6 +254,8 @@ export const productrouter = router({
         where: (businessListings, { eq }) =>
           eq(businessListings.userId, ctx.userId),
       });
+      console.log("Product Update 1", input);
+
       if (!business) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -248,6 +266,8 @@ export const productrouter = router({
       const isProductExists = await db.query.products.findFirst({
         where: (products, { eq }) => eq(products.id, Number(input.id)),
       });
+
+      console.log("Product Update 2");
 
       if (!isProductExists) {
         throw new TRPCError({
@@ -261,7 +281,6 @@ export const productrouter = router({
         .set({
           productName: input.productName,
           mainImage: input.mainImage,
-          categoryId: input.categoryId,
           rate: input.rate,
           productDescription: input.productDescription,
         })

@@ -12,6 +12,8 @@ export const MyProfile = () => {
     trpc.userRouter.getUserProfile.queryOptions(),
   );
 
+  console.log("User data", userData);
+
   return (
     <View className=" bg-base-300 py-8 mt-4 w-[90%] rounded-lg">
       <View className="flex-row items-center relative justify-around w-[100%] gap-4 px-8">
@@ -22,7 +24,7 @@ export const MyProfile = () => {
               className="w-[100%] h-[100%] rounded-full border-2 border-secondary"
             />
           </View>
-           {/* <AdvancedImage
+          {/* <AdvancedImage
               cldImg={cld.image(userData?.profileImage || "")}
               className="w-[100%] h-[100%] rounded-full border-2 border-secondary"
             />

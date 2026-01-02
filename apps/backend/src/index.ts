@@ -9,10 +9,10 @@ import cors from "cors";
 import { eq } from "drizzle-orm";
 import express from "express";
 import jwt from "jsonwebtoken";
+import { createSession } from "./features/auth/lib/session";
 import { appRouter, openRouter } from "./route";
 import { createContext } from "./utils/context";
 import { limiter } from "./utils/limiter";
-import { createSession } from "./features/auth/lib/session";
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use(
     createContext, // TODO: add rate limiter
     middleware: cors({ origin: "*" }),
     onError: (opts) => {
-      logger.error(opts.error.code);
+      logger.error(opts.error.code, { message: opts.error.message });
     },
   }),
 );

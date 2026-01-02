@@ -1,6 +1,8 @@
 "use server";
+import type { UserRole } from "@repo/db";
 import { cookies } from "next/headers";
 
+const EXPIRY_TIME = 3 * 24 * 60 * 60 * 1000;
 export async function setToken(token: string) {
   const cookieStore = await cookies();
   const persist = process.env.NODE_ENV === "production";
@@ -11,7 +13,7 @@ export async function setToken(token: string) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      expires: new Date(Date.now() + EXPIRY_TIME),
     });
   } else {
     cookieStore.set("token", token, {
@@ -21,6 +23,14 @@ export async function setToken(token: string) {
       path: "/",
     });
   }
+
+  cookieStore.set("authenticated", "true", {
+    httpOnly: false,
+    secure: false,
+    sameSite: "lax",
+    path: "/",
+    expires: new Date(Date.now() + EXPIRY_TIME),
+  });
 
   return true;
 }
@@ -58,7 +68,8 @@ export async function setRole(role: string, persist = false) {
   return true;
 }
 
-export async function getRole() {
+export async function getRole(): Promise<UserRole> {
   const cookieStore = await cookies();
-  return cookieStore.get("role");
+  if (!cookieStore.get("role")) return "guest";
+  return cookieStore.get("role")?.value as UserRole;
 }

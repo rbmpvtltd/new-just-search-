@@ -377,6 +377,7 @@ CREATE TABLE "offers" (
 	"offer_end_date" timestamp NOT NULL,
 	"reupload_count" integer DEFAULT 0 NOT NULL,
 	"status" boolean DEFAULT true NOT NULL,
+	"expires_at" timestamp NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -547,7 +548,7 @@ CREATE TABLE "profiles" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"profileImage" varchar(255),
-	"salutation" varchar(100),
+	"salutation" integer,
 	"first_name" varchar(100),
 	"last_name" varchar(100),
 	"dob" date,
@@ -556,7 +557,7 @@ CREATE TABLE "profiles" (
 	"address" varchar(255),
 	"pincode" varchar(10),
 	"state" integer NOT NULL,
-	"city" integer NOT NULL,
+	"city" integer,
 	"created_at" timestamp DEFAULT NOW(),
 	"updated_at" timestamp DEFAULT NOW()
 );

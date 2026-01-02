@@ -1,33 +1,28 @@
-import { Ionicons } from "@expo/vector-icons";
-import {
-  type DrawerContentComponentProps,
-  DrawerContentScrollView,
-  DrawerItem,
-  DrawerToggleButton,
-} from "@react-navigation/drawer";
-import type { HeaderBackButtonProps } from "@react-navigation/elements";
-import { useQuery } from "@tanstack/react-query";
-import { type Href, router, useSegments } from "expo-router";
-import { Drawer } from "expo-router/drawer";
-import {
-  Alert,
-  Image,
-  Pressable,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
-import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
-import { trpc } from "@/lib/trpc";
-import { useNotificationCount } from "@/query/notification/notication";
-import { showLoginAlert } from "@/utils/alert";
-import { Loading } from "../ui/Loading";
-import { SomethingWrong } from "../ui/SomethingWrong";
+import { Ionicons } from "@expo/vector-icons";
+import type { HeaderBackButtonProps } from "@react-navigation/elements";
+import { UserRole } from "@repo/db";
+import { type Href, router, useSegments } from "expo-router";
+import { Pressable, Text, View } from "react-native";
+import { fi } from "zod/v4/locales";
+
+import { create } from "zustand";
+
+type DrawerStore = {
+  open: boolean;
+  toggleOpen: () => void;
+  setOpen: (open: boolean) => void;
+};
+
+export const useDrawerStore = create<DrawerStore>((set) => ({
+  open: false,
+  toggleOpen: () => set((state) => ({ open: !state.open })),
+  setOpen: (open: boolean) => set({ open }),
+}));
 
 const drawerFields: DrawerField[] = [
   {
-    name: "home",
+    name: "Home",
     route: "/(root)/(home)/home",
     title: "hi",
     headerLeft: () => {
@@ -37,58 +32,87 @@ const drawerFields: DrawerField[] = [
         </View>
       );
     },
+    icon: "home-outline",
+    role: "all",
   },
   {
     name: "Profile",
     route: "/(root)/profile",
+    icon: "person-circle-outline",
+    role: "all",
   },
   {
-    name: "Hire Listings",
+    name: "Hire Listing",
     route: "/(root)/profile/hire",
+    icon: "briefcase-outline",
+    role: ["hire", "visitor", "guest"],
   },
   {
-    name: "Business Listings",
+    name: "Business Listing",
     route: "/(root)/profile/business",
+    icon: "business-outline",
+    role: ["business", "visitor", "guest"],
   },
   {
     name: "My Offers",
     route: "/(root)/profile/offer",
+    icon: "gift-outline",
+    role: "business",
   },
   {
     name: "Add Offer",
     route: "/(root)/profile/offer/add",
+    icon: "add-circle-outline",
+    role: "business",
   },
   {
     name: "Add Product",
     route: "/(root)/profile/product/add",
+    icon: "add-circle-outline",
+    role: "business",
   },
   {
     name: "My Products",
     route: "/(root)/profile/product",
+    icon: "cube-outline",
+    role: "business",
   },
   {
     name: "Pricing Plans",
     route: "/(root)/profile/plans",
+    icon: "cash-outline",
+    role: "all",
   },
   {
     name: "Request to Delete Account",
     route: "/(root)/profile/account-delete-request",
+    icon: "trash-outline",
+    role: "all",
   },
   {
     name: "Feedback",
     route: "/(root)/profile/feedback",
+    icon: "chatbox-ellipses-outline",
+    role: "all",
   },
   {
     name: "Help and Support",
     route: "/(root)/profile/help-and-support",
+    icon: "help-circle-outline",
+    role: "all",
   },
   {
     name: "Terms & Conditions",
     route: "/(root)/profile/terms-and-conditions",
+    icon: "document-text-outline",
+    role: "all",
   },
   {
     name: "Logout",
     route: "/(root)/profile/logout",
+    icon: "log-out-outline",
+    role: "all",
+    authenticated: true,
   },
 ];
 
@@ -112,188 +136,104 @@ interface DrawerField {
     | undefined;
 
   route: Href;
+  icon?: keyof typeof Ionicons.glyphMap;
+  role?: string[] | string;
+  authenticated?: boolean;
 }
 
-function CustomDrawerContent(props: DrawerContentComponentProps) {
+export function CustomDrawerContent() {
   const segment = useSegments();
   const currentRoute = segment.join("/");
+  const toggleOpen = useDrawerStore((state) => state.toggleOpen);
+  let role = useAuthStore((s) => s.role);
+  const authenticated = useAuthStore((s) => s.authenticated);
+
+  if (!role) {
+    role = "all";
+  }
+
+  const items = drawerFields.filter(
+    (item) =>
+      (item?.role?.includes(role) || item?.role === "all") &&
+      (!item?.authenticated || authenticated),
+  );
   return (
-    <DrawerContentScrollView {...props}>
-      {drawerFields.map((field) => {
+    // <View>
+    //   {drawerFields.map((field) => {
+    //     const isFocused = `/${currentRoute}` === field.route;
+    //     return (
+    //       <Pressable
+    //         key={field.key ?? field.name}
+    //         className={`${isFocused ? "bg-primary" : ""}`}
+    //         onPress={() => router.navigate(field.route)}
+    //       >
+    //         <Text>{field.name}</Text>
+    //       </Pressable>
+    //     );
+    //   })}
+    // </View>
+    <View className="flex-1 bg-background px-3 pt-6">
+      {items.map((field) => {
         const isFocused = `/${currentRoute}` === field.route;
         return (
-          <DrawerItem
+          <Pressable
             key={field.key ?? field.name}
-            label={field.name}
-            activeTintColor="#ff2"
-            focused={isFocused}
             onPress={() => {
+              toggleOpen();
               router.navigate(field.route);
             }}
-          />
+            className={`flex-row items-center gap-3 rounded-xl px-4 py-3 mb-2
+              ${isFocused ? "bg-primary-content" : "active:bg-gray-100"}
+            `}
+          >
+            {isFocused && (
+              <View className="absolute left-0 h-6 w-1 rounded-r-full bg-primary" />
+            )}
+
+            {field.icon && (
+              <Ionicons
+                name={field.icon}
+                size={20}
+                color={isFocused ? "#2563eb" : "#6b7280"}
+              />
+            )}
+
+            <Text
+              className={`text-base font-medium
+                ${isFocused ? "bg-primary-content" : "text-gray-700"}
+              `}
+            >
+              {field.name === "Profile" && !authenticated
+                ? field.name === "Profile" && "Log In"
+                : field.name}
+            </Text>
+          </Pressable>
         );
       })}
-    </DrawerContentScrollView>
+    </View>
   );
 }
 
-export default function DrawerLayout() {
-  const {
-    data: notificationCount,
-    isLoading,
-    isError,
-  } = useNotificationCount();
-  const segment = useSegments();
-  const currentRoute = segment.join("/");
-  const isAuthenticated = useQuery(trpc.auth.verifyauth.queryOptions());
-  const clearToken = useAuthStore((state) => state.clearToken);
-  const colorScheme = useColorScheme();
-  if (isLoading) {
-    return <Loading position="center" />;
-  }
+// key={field.key ?? field.name}
+// label={field.name}
+// activeTintColor="#ff2"
+// focused={isFocused}
+// onPress={() => {
+//   router.navigate(field.route);
+// }}
+//  />
 
-  if (isError) {
-    return <SomethingWrong />;
-  }
+export function DrawerMenu() {
+  const toggleOpen = useDrawerStore((state) => state.toggleOpen);
   return (
-    <Drawer
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: Colors[colorScheme ?? "light"]["base-100"],
-          // dark slate color
-        },
-        headerRight: () => (
-          <View className="flex-row gap-4 mr-4">
-            <Pressable
-              onPress={() => {
-                if (!isAuthenticated.isSuccess) {
-                  showLoginAlert({
-                    message: "Need to login to access your chat sessions",
-                    onConfirm: () => {
-                      clearToken();
-                      router.navigate("/(root)/profile");
-                    },
-                  });
-                } else {
-                  router.push("/(root)/(home)/chat");
-                }
-              }}
-            >
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={20}
-                color={Colors[colorScheme ?? "light"].secondary}
-              />
-            </Pressable>
-
-            <Pressable
-              onPress={() => {
-                if (!isAuthenticated.isSuccess) {
-                  Alert.alert(
-                    "Login Required",
-                    "You need to login to use favorites feature",
-                    [
-                      { text: "Cancel", style: "cancel" },
-                      {
-                        text: "Login",
-                        onPress: () => {
-                          clearToken();
-                          router.navigate("/(root)/profile");
-                        },
-                      },
-                    ],
-                  );
-                } else {
-                  router.push("/home"); // TODO: add real favorites redirect
-                }
-              }}
-            >
-              <Ionicons
-                name="heart-outline"
-                size={20}
-                color={Colors[colorScheme ?? "light"].secondary}
-              />
-            </Pressable>
-
-            <Pressable
-              onPress={() => {
-                if (!isAuthenticated.isSuccess) {
-                  Alert.alert(
-                    "Login Required",
-                    "Need to login to view notifications",
-                    [
-                      { text: "Cancel", style: "cancel" },
-                      {
-                        text: "Login",
-                        onPress: () => {
-                          clearToken();
-                          router.replace("/(root)/profile");
-                        },
-                      },
-                    ],
-                  );
-                } else {
-                  router.push("/(root)/profile/notification");
-                }
-              }}
-            >
-              <View className="flex-row items-center">
-                <Ionicons
-                  name="notifications-outline"
-                  size={20}
-                  color={Colors[colorScheme ?? "light"].secondary}
-                />
-                {!!notificationCount?.unread_count && (
-                  <Text className="text-white bg-red-500 px-1 text-xs rounded-full ml-1">
-                    {notificationCount.unread_count.toString()}
-                  </Text>
-                )}
-              </View>
-            </Pressable>
-          </View>
-        ),
-        headerLeft: () => (
-          <>
-            <DrawerToggleButton
-              tintColor={Colors[colorScheme ?? "light"].secondary}
-            />
-            {colorScheme === "dark" ? (
-              <Image
-                source={require("@/assets/images/Just_Search_Logo_Full_Dark.png")}
-                className="w-32 h-20"
-              />
-            ) : (
-              <Image
-                source={require("@/assets/images/Just_Search_Logo_Full_Light.png")}
-                className="w-[100px] h-[50px]"
-              />
-            )}
-          </>
-        ),
-        headerTitle: "",
-        headerTitleStyle: {
-          fontWeight: "bold",
-          fontSize: 20,
-          color: Colors[colorScheme ?? "light"].secondary,
-        },
-      }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
-    >
-      {drawerFields
-        .filter((field) => {
-          return `/${currentRoute}` === field.route;
-        })
-        .map((field) => {
-          return (
-            <Drawer.Screen
-              name={field.name}
-              key={field.key ?? field.name}
-              options={{
-                headerShown: true,
-              }}
-            />
-          );
-        })}
-    </Drawer>
+    <Pressable onPress={() => toggleOpen()}>
+      <Ionicons
+        name="menu"
+        size={24}
+        color="black"
+        onPress={() => toggleOpen()}
+      />
+    </Pressable>
   );
+  // <Button  onPress={() => toggleOpen()} title={`Menu`} />;
 }

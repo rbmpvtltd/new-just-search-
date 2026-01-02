@@ -1,9 +1,28 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function ProfileLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>  {/* Optional: Show header for nested screens */}
-      <Stack.Screen name='subcategory/[subcategory]' options={{ headerShown : false }} />
+    <Stack screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="[subcategory]" options={{ title: "All Business " }} />
+      <Stack.Screen name="aboutBusiness" options={{ headerShown: false }} />
     </Stack>
+
+    // <Stack screenOptions={{ headerShown: true }}>
+    //   <Stack.Screen name="index" options={{ title: "Profile" }} />
+    //   <Stack.Screen
+    //     name="subcategory/[subcategory]"
+    //     options={{
+    //       // headerLeft: () => <DrawerMenu />,
+    //       title: "Hire Listing",
+    //     }}
+    //   />
+    //   <Stack.Screen
+    //     name="hire/edit/[id]"
+    //     options={{
+    //       // headerLeft: () => <DrawerMenu />,
+    //       title: "Edit Hire Listing",
+    //     }}
+    //   />
+    // </Stack>
   );
 }
