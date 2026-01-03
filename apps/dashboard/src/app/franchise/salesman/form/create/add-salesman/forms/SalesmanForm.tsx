@@ -17,7 +17,7 @@ import type { SetOpen } from "../../../add.form";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 import type { AddAdminSalesmanType } from "./ProfileForm";
 
-const franchiseSalesmenInsertSchema = salesmenInsertSchema.omit({
+export const franchiseSalesmenInsertSchema = salesmenInsertSchema.omit({
   userId: true,
   franchiseId: true,
 });

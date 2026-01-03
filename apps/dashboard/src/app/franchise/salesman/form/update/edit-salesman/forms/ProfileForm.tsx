@@ -82,7 +82,7 @@ export default function ProfileForm({
       name: "salutation",
       label: "Title",
       component: "select",
-      options: data.getOccupation?.map((item) => ({
+      options: data.getSalutation?.map((item) => ({
         label: item.name,
         value: item.id,
       })),

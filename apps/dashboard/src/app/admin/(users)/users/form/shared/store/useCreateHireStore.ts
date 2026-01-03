@@ -34,7 +34,6 @@ const initialFormValue: CombinedForm = {
   profileImage: "",
   maritalStatus: "Married",
   dob: null,
-  area: "",
   pincode: "",
   state: 0,
   city: 0,
@@ -42,7 +41,7 @@ const initialFormValue: CombinedForm = {
   address: "",
   lastName: "",
   occupation: null,
-  salutation: "",
+  salutation: NaN,
 };
 
 export const useUserFormStore = create<UserFormProps>((set) => ({

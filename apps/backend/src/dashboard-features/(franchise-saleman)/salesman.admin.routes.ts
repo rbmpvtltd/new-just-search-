@@ -100,8 +100,9 @@ export const adminSalemanRouter = router({
       },
       where: (user, { eq }) => eq(user.role, "franchises"),
     });
+    const salutation = await db.query.salutation.findMany();
 
-    return { states, occupation, franchise };
+    return { states, occupation, franchise, salutation };
   }),
   getReferCode: adminProcedure
     .input(z.object({ franchiseId: z.number() }))
@@ -206,6 +207,7 @@ export const adminSalemanRouter = router({
       const getFranchise = await db.query.users.findMany({
         where: (user, { eq }) => eq(user.role, "franchises"),
       });
+      const getSalutation = await db.query.salutation.findMany();
       const franchiseData = await db.query.franchises.findFirst({
         where: (franchise, { eq }) => eq(franchise.id, Number(input?.id)),
       });
@@ -223,12 +225,13 @@ export const adminSalemanRouter = router({
       });
       return {
         userData,
-        profileData,
         getStates,
-        getOccupation,
+        profileData,
         salesmanData,
-        franchiseData,
         getFranchise,
+        getSalutation,
+        franchiseData,
+        getOccupation,
       };
     }),
   update: adminProcedure

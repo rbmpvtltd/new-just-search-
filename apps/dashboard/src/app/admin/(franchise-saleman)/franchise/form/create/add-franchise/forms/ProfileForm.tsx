@@ -78,7 +78,7 @@ export default function ProfileForm() {
       name: "salutation",
       label: "Title",
       component: "select",
-      options: data.occupation.map((item) => ({
+      options: data.salutation.map((item) => ({
         label: item.name,
         value: item.id,
       })),
@@ -126,6 +126,7 @@ export default function ProfileForm() {
         label: item.name,
         value: item.id,
       })),
+      error: errors.occupation?.message,
     },
     {
       control,

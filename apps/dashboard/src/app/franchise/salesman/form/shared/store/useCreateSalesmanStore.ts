@@ -2,11 +2,12 @@ import type { salesmenInsertSchema } from "@repo/db/dist/schema/user.schema";
 import type z from "zod";
 import { create } from "zustand";
 import type { franchiseAddProfileInsertSchema } from "../../create/add-salesman/forms/ProfileForm";
+import type { franchiseSalesmenInsertSchema } from "../../create/add-salesman/forms/SalesmanForm";
 import type { franchiseAddUserInsertSchema } from "../../create/add-salesman/forms/UserForm";
 
 type UserInsertSchema = z.infer<typeof franchiseAddUserInsertSchema>;
 type ProfileSchema = z.infer<typeof franchiseAddProfileInsertSchema>;
-type SalesmanSchema = z.infer<typeof salesmenInsertSchema>;
+type SalesmanSchema = z.infer<typeof franchiseSalesmenInsertSchema>;
 export type CombinedForm = ProfileSchema & UserInsertSchema & SalesmanSchema;
 
 type SalesmanFormProps = {
@@ -43,11 +44,9 @@ const initialFormValue: CombinedForm = {
   address: "",
   lastName: "",
   occupation: null,
-  salutation: "",
+  salutation: NaN,
   //salesman
-  franchiseId: NaN,
   referCode: "",
-  
 };
 
 export const useSalesmanFormStore = create<SalesmanFormProps>((set) => ({

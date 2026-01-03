@@ -20,7 +20,7 @@ import type { SetOpen } from "../../../add.form";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 import type { AddAdminSalesmanType } from "./ProfileForm";
 
-const adminSalesmenInsertSchema = salesmenInsertSchema.omit({
+export const adminSalesmenInsertSchema = salesmenInsertSchema.omit({
   userId: true,
 });
 type SalesmanInsertSchema = z.infer<typeof adminSalesmenInsertSchema>;

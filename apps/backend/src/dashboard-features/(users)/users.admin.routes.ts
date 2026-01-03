@@ -81,7 +81,8 @@ export const adminUsersRouter = router({
   add: adminProcedure.query(async () => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();
-    return { states, occupation };
+    const salutation = await db.query.salutation.findMany();
+    return { states, occupation, salutation };
   }),
   create: adminProcedure
     .input(
@@ -136,6 +137,7 @@ export const adminUsersRouter = router({
     .query(async ({ input }) => {
       const getStates = await db.query.states.findMany();
       const getOccupation = await db.query.occupation.findMany();
+      const getSalutation = await db.query.salutation.findMany();
       const userData = await db.query.users.findFirst({
         where: (user, { eq }) => eq(user.id, input.id),
       });
@@ -144,7 +146,7 @@ export const adminUsersRouter = router({
         where: (profile, { eq }) => eq(profile.userId, Number(userData?.id)),
       });
 
-      return { userData, profileData, getStates, getOccupation };
+      return { userData, profileData, getStates, getOccupation, getSalutation };
     }),
   update: adminProcedure
     .input(usersUpdateSchema.extend(profileUpdateSchema.shape))

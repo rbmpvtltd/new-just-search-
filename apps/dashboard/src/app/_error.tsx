@@ -1,6 +1,6 @@
 "use client";
 
-export default function Error({
+export default function ErrorComponent({
   error,
   reset,
 }: {
@@ -8,7 +8,7 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <html>
+    <html lang="en">
       <body>
         <div>
           <h2>Something went wrong!</h2>
