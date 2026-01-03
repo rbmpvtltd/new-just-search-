@@ -13,6 +13,7 @@ import {
   type FormFieldProps,
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
+import LocationAutoDetect from "@/components/ui/LocationAutoDetect";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { trpc } from "@/lib/trpc";
 import type { UserHireListingType } from "..";
@@ -24,6 +25,8 @@ export default function PersonalDetailsForm({
 }: {
   data: UserHireListingType;
 }) {
+  console.log("Hire listing data", data);
+
   const setFormValue = useHireFormStore((s) => s.setFormValue);
   const nextPage = useHireFormStore((s) => s.nextPage);
   const [detectedCityName, setDetectedCityName] = useState<null | string>(null);
@@ -346,7 +349,7 @@ export default function PersonalDetailsForm({
           {formFields.map((field, idx) => (
             <React.Fragment key={idx.toString()}>
               <FormField {...field} />
-              {/* {field.name === "alternativeMobileNumber" && (
+              {field.name === "alternativeMobileNumber" && (
                 <LocationAutoDetect
                   onResult={(locationData) => {
                     const formatted = locationData.formattedAddress ?? "";
@@ -364,7 +367,7 @@ export default function PersonalDetailsForm({
                       ? parts[0]
                       : "";
 
-                    const matchedState = formReferenceData?.getStates?.find(
+                    const matchedState = data?.getStates?.find(
                       (item) => item?.name === stateName.toLocaleUpperCase(),
                     );
 
@@ -380,7 +383,7 @@ export default function PersonalDetailsForm({
                     );
                   }}
                 />
-              )} */}
+              )}
             </React.Fragment>
           ))}
         </View>

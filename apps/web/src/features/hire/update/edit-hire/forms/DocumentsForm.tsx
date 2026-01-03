@@ -15,6 +15,7 @@ import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { UserHireListingType } from "..";
@@ -38,6 +39,7 @@ export default function DocumentsForm({
   const { mutate } = useMutation(trpc.hirerouter.update.mutationOptions());
   const prevPage = useHireFormStore((state) => state.prevPage);
   const formValue = useHireFormStore((state) => state.formValue);
+  const clearPage = useHireFormStore((s) => s.clearPage);
   const {
     control,
     handleSubmit,
@@ -74,24 +76,19 @@ export default function DocumentsForm({
     }));
     mutate(finalData, {
       onSuccess: (data) => {
-        Swal.fire({
-          title: data.message,
-          icon: "success",
-          draggable: true,
-        });
-        const queryClient = getQueryClient();
-        queryClient.invalidateQueries({
-          queryKey: trpc.hirerouter.show.queryKey(),
-        });
-        router.push("/");
+        if (data.success) {
+          sweetAlertSuccess(data.message);
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.hirerouter.show.queryKey(),
+          });
+          clearPage();
+          router.push("/profile/hire");
+        }
       },
       onError: (error) => {
         if (isTRPCClientError(error)) {
-          Swal.fire({
-            title: error.message,
-            icon: "error",
-            draggable: true,
-          });
+          sweetAlertError(error.message);
           console.error("error,", error.message);
         }
       },
@@ -149,10 +146,11 @@ export default function DocumentsForm({
     },
     {
       control,
-      label: "Refer Code",
+      label: "Salesman Refer Code",
       name: "referCode",
       placeholder: "Refer Code",
       component: "input",
+      disabled: true,
       error: errors.referCode?.message,
     },
   ];

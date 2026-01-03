@@ -2,10 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   JobDuration,
   JobType,
-  jobDurationEnum,
-  jobTypeEnum,
   WorkShift,
-  workShiftEnum,
 } from "@repo/db/dist/enum/allEnum.enum";
 import { preferredPositionSchema } from "@repo/db/dist/schema/hire.schema";
 import { useForm } from "react-hook-form";

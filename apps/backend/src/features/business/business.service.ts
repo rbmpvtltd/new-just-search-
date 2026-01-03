@@ -1,13 +1,26 @@
 import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
-import { businessReviews } from "@repo/db/dist/schema/business.schema";
+import {
+  businessCategories,
+  businessListings,
+  businessReviews,
+  businessSubcategories,
+} from "@repo/db/dist/schema/business.schema";
+import {
+  categories,
+  subcategories,
+} from "@repo/db/dist/schema/not-related.schema";
 import { TRPCError } from "@trpc/server";
+import { algoliasearch } from "algoliasearch";
 import { and, eq, sql } from "drizzle-orm";
 import { boolean } from "zod";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
-
+const algoliaClient = algoliasearch(
+  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+  process.env.ALGOLIA_ADMIN_API_KEY!,
+);
 async function singleShop(shopId: number) {
   const singleShopData = await db
     .select({
@@ -184,8 +197,9 @@ async function createReview(
         message,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }).returning();
-    console.log("review created successfully",data);
+      })
+      .returning();
+    console.log("review created successfully", data);
     return data;
   } catch (err: any) {
     throw new TRPCError({
@@ -195,4 +209,83 @@ async function createReview(
   }
 }
 
-export { singleShop, reviewExist, createReview };
+async function businessApproved(businessId: number) {
+  const business = (
+    await db
+      .select({
+        id: businessListings.id,
+        name: businessListings.name,
+        photo: businessListings.photo,
+        area: businessListings.area,
+        streetName: businessListings.streetName,
+        buildingName: businessListings.buildingName,
+        longitude: businessListings.longitude,
+        latitude: businessListings.latitude,
+        phoneNumber: businessListings.phoneNumber,
+        categoryId: businessCategories.categoryId,
+        category: categories.title,
+        subcategories: sql`  COALESCE(
+        array_agg(DISTINCT ${subcategories.name})
+        FILTER (WHERE ${subcategories.name} IS NOT NULL),
+        '{}'
+      )`.as("subcategories"),
+        rating: businessReviews.rate,
+      })
+      .from(businessListings)
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(categories, eq(businessCategories.categoryId, categories.id))
+      .leftJoin(
+        businessSubcategories,
+        eq(businessListings.id, businessSubcategories.businessId),
+      )
+      .leftJoin(
+        subcategories,
+        eq(businessSubcategories.subcategoryId, subcategories.id),
+      )
+      .leftJoin(
+        businessReviews,
+        eq(businessListings.id, businessReviews.businessId),
+      )
+      .groupBy(
+        businessListings.id,
+        businessReviews.rate,
+        categories.title,
+        businessCategories.categoryId,
+      )
+      .where(eq(businessListings.id, businessId))
+  )[0];
+
+  await algoliaClient.saveObjects({
+    indexName: "business_listings",
+    objects: [
+      {
+        objectID: businessId,
+        name: business?.name,
+        photo: business?.photo,
+        area: business?.area,
+        longitude: business?.longitude,
+        latitude: business?.latitude,
+        phoneNumber: business?.phoneNumber,
+        subcategories: business?.subcategories,
+        streetName: business?.streetName,
+        category: business?.category,
+        categoryId: business?.categoryId,
+        rating: Math.ceil(Number(business?.rating)),
+        _geoloc: {
+          lat: Number(business?.latitude),
+          lng: Number(business?.longitude),
+        },
+      },
+    ],
+  });
+
+  await db
+    .update(businessListing)
+    .set({ status: "Approved" })
+    .where(eq(businessListing.id, businessId));
+}
+
+export { singleShop, reviewExist, createReview, businessApproved };

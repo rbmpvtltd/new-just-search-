@@ -227,6 +227,8 @@ export const adminBusinessRouter = router({
         .insert(businessListings)
         .values({
           ...input,
+          latitude: String(input.latitude),
+          longitude: String(input.longitude),
           status: "Approved",
           slug: slugifyName,
         })

@@ -1,5 +1,6 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
 import { Eye, Pencil, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +9,7 @@ import { CldImage } from "next-cloudinary";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
@@ -18,24 +20,24 @@ export default function MyHire({ data }: { data: MyHireType }) {
   const router = useRouter();
   const { mutate, isPending } = useMutation(
     trpc.hirerouter.delete.mutationOptions({
-      onSuccess: async (data) => {
+      onSuccess: (data) => {
         if (data.success) {
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
             queryKey: trpc.hirerouter.show.queryKey(),
           });
 
-          await Swal.fire({
-            title: "Deleted!",
-            icon: "success",
-            draggable: true,
-          });
+          sweetAlertSuccess(
+            data.message || "Hire listing deleted successfully",
+          );
+          router.push("/");
         }
-        router.push("/");
         console.log("deleted");
       },
       onError: (err) => {
-        console.error(err);
+        if (isTRPCClientError(err)) {
+          sweetAlertError(err.message);
+        }
       },
     }),
   );
@@ -81,7 +83,7 @@ export default function MyHire({ data }: { data: MyHireType }) {
 
             <div className="mt-6 flex gap-2">
               <Link
-                href={`/profile/hire/edit/${data.slug}`}
+                href={`/profile/hire/edit/${data.id}`}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center justify-center gap-2"
               >
                 <Pencil className="w-4 h-4" />

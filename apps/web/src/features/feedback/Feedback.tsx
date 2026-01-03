@@ -9,6 +9,7 @@ import type z from "zod";
 import { FormField } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 
 type FeedbackSchema = z.infer<typeof feedbackInsertSchema>;
@@ -44,19 +45,11 @@ export default function Feedback() {
     mutate(data, {
       onSuccess: (data) => {
         if (data.success) {
-          Swal.fire({
-            title: data?.message,
-            icon: "success",
-            draggable: true,
-          });
+          sweetAlertSuccess(data.message);
         }
       },
       onError: (error) => {
-        Swal.fire({
-          title: error?.message,
-          icon: "error",
-          draggable: true,
-        });
+        sweetAlertError(error.message);
       },
     });
   };

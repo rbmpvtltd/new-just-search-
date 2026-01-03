@@ -197,7 +197,7 @@ export const productrouter = router({
             eq(products.businessId, business.id),
             cursor ? gt(products.id, cursor) : undefined,
           ),
-        orderBy: (products, { asc }) => [asc(products.id)],
+        orderBy: (products, { desc }) => [desc(products.id)],
         limit,
         with: {
           productPhotos: true,

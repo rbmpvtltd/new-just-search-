@@ -9,7 +9,6 @@ export default function ProfileLayout({
   return (
     <SidebarProvider minHeight={true}>
       <AppSidebar />
-
       <main className="w-full">
         <SidebarTrigger />
         {children}

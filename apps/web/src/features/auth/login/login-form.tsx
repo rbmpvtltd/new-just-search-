@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,8 +22,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { setRole, setToken } from "@/utils/session";
-import GoogleLoginBtn from "./google-login";
 import AppleLoginBtn from "./apple-login";
+import GoogleLoginBtn from "./google-login";
 
 const formSchema = z.object({
   username: z.string(),
@@ -35,6 +36,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const id = useId();
   const trpc = useTRPC();
@@ -57,7 +59,7 @@ export function LoginForm({
     mutate(data, {
       onSuccess: async (data) => {
         await setToken(data?.session || "");
-        setRole(data?.role || "");
+        await setRole(data?.role || "");
         router.push("/");
       },
     });
@@ -110,14 +112,30 @@ export function LoginForm({
                         </Link>
                       </div>
                       <FormControl>
-                        <Input
-                          {...field}
-                          id={`password-${id}`}
-                          min={6}
-                          type="password"
-                          required
-                        />
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            id={`password-${id}`}
+                            min={6}
+                            type={showPassword ? "text" : "password"}
+                            required
+                          />
+                          {showPassword ? (
+                            <Eye
+                              className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                              onClick={() => {
+                                setShowPassword(!showPassword);
+                              }}
+                            />
+                          ) : (
+                            <EyeOff
+                              className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          )}
+                        </div>
                       </FormControl>
+
                       <FormMessage />
                     </FormItem>
                   )}

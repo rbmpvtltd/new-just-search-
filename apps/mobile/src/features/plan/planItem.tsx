@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, Text, useColorScheme, View } from "react-native";
+import { Alert, Pressable, Text, useColorScheme, View } from "react-native";
 import type { PurchasesPackage } from "react-native-purchases";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
@@ -22,6 +22,8 @@ export default function PricingCard({
   pkg: PurchasesPackage | null | undefined;
 }) {
   const colorScheme = useColorScheme();
+  const authenticated = useAuthStore((state) => state.authenticated);
+
   const storePlan = usePlanStore((state) => state.activePlan);
   const setNewStore = usePlanStore((state) => state.setNew);
   const currentRole = useAuthStore((state) => state.role);
@@ -104,7 +106,12 @@ export default function PricingCard({
             }}
             className={`rounded-full py-3 items-center justify-center bg-base-300`}
             disabled={buttonDisable}
-            onPress={() => setNewStore(plan.id, true)}
+            onPress={() => {
+              if (!authenticated) {
+                return Alert.alert("Please login to continue");
+              }
+              setNewStore(plan.id, true);
+            }}
           >
             <Text className={`font-semibold text-lg text-secondary `}>
               {plan.id === activePlan.planid

@@ -16,6 +16,7 @@ import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
@@ -33,8 +34,6 @@ export default function EditProduct({
   myProduct: MyProductType;
   formReferenceData: FormReferenceDataType;
 }) {
-  console.log("MY Product", myProduct);
-
   const trpc = useTRPC();
   const router = useRouter();
   const { mutate } = useMutation(trpc.productrouter.update.mutationOptions());
@@ -51,10 +50,10 @@ export default function EditProduct({
       rate: myProduct?.product.rate,
       productDescription: myProduct?.product.productDescription,
       mainImage: myProduct?.product.mainImage ?? "",
-      image2: myProduct?.product.productPhotos[1]?.photo ?? "",
-      image3: myProduct?.product.productPhotos[2]?.photo ?? "",
-      image4: myProduct?.product.productPhotos[3]?.photo ?? "",
-      image5: myProduct?.product.productPhotos[4]?.photo ?? "",
+      image2: myProduct?.product.productPhotos[0]?.photo ?? "",
+      image3: myProduct?.product.productPhotos[1]?.photo ?? "",
+      image4: myProduct?.product.productPhotos[2]?.photo ?? "",
+      image5: myProduct?.product.productPhotos[3]?.photo ?? "",
       categoryId: myProduct?.product.categoryId,
       subcategoryId: myProduct?.product.productSubCategories.map(
         (item) => item.subcategoryId,
@@ -173,25 +172,17 @@ export default function EditProduct({
         onSuccess: (data) => {
           console.log("success", data);
           if (data.success) {
-            Swal.fire({
-              title: data.message,
-              icon: "success",
-              draggable: true,
-            });
+            sweetAlertSuccess(data.message);
             const queryClient = getQueryClient();
             queryClient.invalidateQueries({
               queryKey: trpc.productrouter.showProduct.queryKey(),
             });
-            router.push("/");
+            router.push("/profile/product");
           }
         },
         onError: (error) => {
           if (isTRPCClientError(error)) {
-            Swal.fire({
-              title: error.message,
-              icon: "error",
-              draggable: true,
-            });
+            sweetAlertError(error.message);
           }
         },
       },

@@ -15,6 +15,7 @@ import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
@@ -47,11 +48,11 @@ export default function EditOffer({
       discountPercent: myOffer?.offer?.discountPercent,
       finalPrice: myOffer?.offer?.finalPrice,
       offerDescription: myOffer?.offer?.offerDescription,
-      mainImage: myOffer?.offer.offerPhotos[0]?.photo || "",
-      image2: myOffer?.offer.offerPhotos[1]?.photo || "",
-      image3: myOffer?.offer.offerPhotos[2]?.photo || "",
-      image4: myOffer?.offer.offerPhotos[3]?.photo || "",
-      image5: myOffer?.offer.offerPhotos[4]?.photo || "",
+      mainImage: myOffer?.offer?.mainImage || "",
+      image2: myOffer?.offer?.offerPhotos[0]?.photo || "",
+      image3: myOffer?.offer?.offerPhotos[1]?.photo || "",
+      image4: myOffer?.offer?.offerPhotos[2]?.photo || "",
+      image5: myOffer?.offer?.offerPhotos[3]?.photo || "",
       categoryId: myOffer?.offer.categoryId,
       subcategoryId: myOffer?.offer.offerSubcategory.map(
         (item) => item.subcategoryId,
@@ -188,25 +189,17 @@ export default function EditOffer({
       {
         onSuccess: (data) => {
           if (data.success) {
-            Swal.fire({
-              title: data.message,
-              icon: "success",
-              draggable: true,
-            });
+            sweetAlertSuccess(data.message);
             const queryClient = getQueryClient();
             queryClient.invalidateQueries({
               queryKey: trpc.offerrouter.showOffer.queryKey(),
             });
-            router.push("/");
+            router.push("/profile/offer");
           }
         },
         onError: (error) => {
           if (isTRPCClientError(error)) {
-            Swal.fire({
-              title: error.message,
-              icon: "error",
-              draggable: true,
-            });
+            sweetAlertError(error.message);
           }
         },
       },

@@ -214,7 +214,7 @@ export default function PersonalDetailsForm({
       section: "profile",
       options: data.getLanguages.map((item) => ({
         label: item.name,
-        value: item.name,
+        value: item.id,
       })),
       error: errors.languages?.message,
     },
@@ -345,10 +345,7 @@ export default function PersonalDetailsForm({
 
   return (
     <div className="">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="max-w-6xl"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl">
         <div className="p-8 space-y-8">
           <div className="p-6 bg-gray-50 rounded-xl shadow">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -376,6 +373,8 @@ export default function PersonalDetailsForm({
                 <div className="flex items-end justify-between mb-4 ">
                   <LocationAutoDetect
                     onResult={(data) => {
+                      console.log("Location data", data);
+
                       const formatted = data.formattedAddress ?? "";
                       const parts = formatted
                         .split(",")

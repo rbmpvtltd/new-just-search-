@@ -84,7 +84,7 @@ export default function AddProduct() {
             queryClient.invalidateQueries({
               queryKey: trpc.productrouter.showProduct.queryKey(),
             });
-            router.replace("/(root)/profile");
+            router.replace("/(root)/profile/product");
           }
         },
         onError: (error) => {

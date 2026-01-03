@@ -10,8 +10,6 @@ type MyHireType = OutputTrpcType["hirerouter"]["show"];
 export default function MyHireCard({ data }: { data: MyHireType }) {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  console.log("data", data);
-
   return (
     <View className="w-full h-full bg-base-100">
       <View className="bg-base-200 rounded-xl shadow-md mx-4 my-6 p-4">

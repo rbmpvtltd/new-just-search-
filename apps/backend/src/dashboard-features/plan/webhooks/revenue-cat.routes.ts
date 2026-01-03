@@ -1,5 +1,6 @@
 import EventEmitter from "node:events";
 import { db } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   planUserActive,
   planUserSubscriptions,
@@ -7,6 +8,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { eq, type InferInsertModel } from "drizzle-orm";
 import type { NextFunction, Request, RequestHandler, Response } from "express";
+import { changeRoleInSession } from "@/features/auth/lib/session";
 import env from "@/utils/envaild";
 import type { RevenueCatWebhookEvent } from "./types";
 
@@ -94,6 +96,12 @@ export const revenueCatRouter = asyncHandler(
         //   "subscription created successfully",
         // );
         console.log("event subitted successfully");
+        await db
+          .update(users)
+          .set({ role: plan?.role })
+          .where(eq(users.id, user.id));
+
+        await changeRoleInSession(user.id, plan?.role || "visiter");
         break;
       }
       case "EXPIRATION":

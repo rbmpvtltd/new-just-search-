@@ -7,6 +7,7 @@ import {
   offersInsertSchema,
   offersUpdateSchema,
 } from "@repo/db/dist/schema/offer.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { and, asc, eq, gt, gte, sql } from "drizzle-orm";
 import z from "zod";
@@ -237,47 +238,45 @@ export const offerrouter = router({
         });
       }
 
-      // const offers = await db.query.offers.findMany({
-      //   where: (offers, { and, gt, eq }) =>
-      //     and(
-      //       eq(offers.businessId, business.id),
-
-      //       cursor ? gt(offers.id, cursor) : undefined,
-      //     ),
-      //   orderBy: (offers, { asc }) => [asc(offers.id)],
-      //   limit,
-      //   with: {
-      //     offerPhotos: true,
-      //   },
-      // });
-
-      const offersData = await db
-        .select({
-          offer: offers,
-          photos: offerPhotos,
-          isExpired: sql<boolean>`(${offers.expires_at} < now())`.as(
-            "isExpired",
-          ),
-        })
-        .from(offers)
-        .leftJoin(offerPhotos, eq(offerPhotos.offerId, offers.id))
-        .where(
+      const offersData = await db.query.offers.findMany({
+        where: (offers, { and, gt, eq }) =>
           and(
             eq(offers.businessId, business.id),
             cursor ? gt(offers.id, cursor) : undefined,
           ),
-        )
-        .orderBy(asc(offers.id))
-        .limit(limit);
+        orderBy: (offers, { asc }) => [asc(offers.id)],
+        limit,
+        with: {
+          offerPhotos: true,
+        },
+      });
 
+      // const offersData = await db
+      //   .select({
+      //     offer: offers,
+      //     // photos: offerPhotos,
+      //     // isExpired: sql<boolean>`(${offers.expires_at} < now())`.as(
+      //     //   "isExpired",
+      //     // ),
+      //   })
+      //   .from(offers)
+      //   .leftJoin(offerPhotos, eq(offerPhotos.offerId, offers.id))
+      //   .where(
+      //     and(
+      //       eq(offers.businessId, business.id),
+      //       cursor ? gt(offers.id, cursor) : undefined,
+      //     ),
+      //   )
+      //   .orderBy(asc(offers.id))
+      //   .limit(limit);
+
+      logger.info("Offers Data: ", { offersData });
       // if (!offers) {
       //   return { message: "Offers not found" };
       // }
 
       const nextCursor =
-        offersData.length > 0
-          ? offersData[offersData.length - 1]?.offer.id
-          : null;
+        offersData.length > 0 ? offersData[offersData.length - 1]?.id : null;
 
       return { offersData, nextCursor };
     }),
@@ -360,7 +359,6 @@ export const offerrouter = router({
         .update(schemas.offer.offers)
         .set({
           offerName: input.offerName,
-          categoryId: input.categoryId,
           rate: input.rate,
           discountPercent: input.discountPercent,
           finalPrice: input.finalPrice,

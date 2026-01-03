@@ -1,9 +1,17 @@
+import { redirect } from "next/navigation";
+import { trpcServer } from "@/trpc/trpc-server";
+import { asyncHandler } from "@/utils/error/asyncHandler";
 import { RegisterForm } from "../../../features/auth/register/register-form";
 
-export default function Register() {
-  return (
-    <div>
-      <RegisterForm />
-    </div>
-  );
+export default async function Register() {
+  const session = await asyncHandler(trpcServer.auth.verifyauth.query());
+
+  if (!session?.data?.success) {
+    return (
+      <div>
+        <RegisterForm />
+      </div>
+    );
+  }
+  redirect("/");
 }

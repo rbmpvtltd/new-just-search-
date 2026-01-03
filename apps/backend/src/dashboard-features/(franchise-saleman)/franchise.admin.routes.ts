@@ -196,7 +196,7 @@ export const adminFranchiseRouter = router({
       const franchiseData = franchiseUpdateSchema
         .omit({ userId: true })
         .parse(input);
-      ("input is", { userData: userData });
+      // ("input is", { userData: userData });
       const isEmailOrPhoneNumberExist = await db.query.users.findFirst({
         where: (user, { and, eq, or, ne }) =>
           and(

@@ -100,6 +100,7 @@ function RootLayoutNav() {
           }}
           onClose={() => setOpen(false)}
           // swipeEnabled={isAuthenticated}
+          
           renderDrawerContent={() => <CustomDrawerContent />}
         >
           <BoundaryWrapper>

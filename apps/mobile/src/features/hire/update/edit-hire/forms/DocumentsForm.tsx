@@ -135,7 +135,7 @@ export default function DocumentsForm({ data }: { data: UserHireListingType }) {
       name: "referCode",
       label: "Refer Code",
       component: "input",
-      disable: true,
+      editable: false,
       placeholder: "Select Salesman",
       error: errors.referCode?.message,
     },

@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { setRole, setToken } from "@/utils/session";
+import { Eye, EyeOff } from "lucide-react";
 
 const formSchema = z.object({
   username: z.string(),
@@ -35,6 +36,8 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [showPassword, setShowPassword] = useState(false);
+
   const id = useId();
   const trpc = useTRPC();
   const { mutate, isError, error } = useMutation(
@@ -114,13 +117,28 @@ export function LoginForm({
                         </Link>
                       </div>
                       <FormControl>
-                        <Input
-                          {...field}
-                          id={`password-${id}`}
-                          min={6}
-                          type="password"
-                          required
-                        />
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            id={`password-${id}`}
+                            min={6}
+                            type={showPassword ? "text" : "password"}
+                            required
+                          />
+                          {showPassword ? (
+                            <Eye
+                              className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                              onClick={() => {
+                                setShowPassword(!showPassword);
+                              }}
+                            />
+                          ) : (
+                            <EyeOff
+                              className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

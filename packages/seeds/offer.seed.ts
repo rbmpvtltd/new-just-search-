@@ -12,7 +12,7 @@ import {
   offerSubcategory,
   offers,
 } from "../db/src/schema/offer.schema";
-import { fakeSeed, fakeUserSeed } from "./fake.seed";
+// import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 
@@ -21,8 +21,8 @@ dotenv.config();
 export const offerSeed = async () => {
   await clearOfferSeed();
   await addOffer();
-  await addOfferReviews();
-  await addOfferSubcategories();
+  // await addOfferReviews();
+  // await addOfferSubcategories();
 };
 
 const clearOfferSeed = async () => {
@@ -107,76 +107,76 @@ export const addOffer = async () => {
   console.log("successfully seed of offer and offer photo");
 };
 // 2. offer_reviews
-export const addOfferReviews = async () => {
-  const [reviews]: any[] = await sql.execute("SELECT * FROM offer_reviews");
-  const fakeUser = (await fakeUserSeed()) || (await fakeSeed())?.user;
+// export const addOfferReviews = async () => {
+//   const [reviews]: any[] = await sql.execute("SELECT * FROM offer_reviews");
+//   const fakeUser = (await fakeUserSeed()) || (await fakeSeed())?.user;
 
-  for (const row of reviews) {
-    let [user] = await db.select().from(users).where(eq(users.id, row.user_id));
+//   for (const row of reviews) {
+//     let [user] = await db.select().from(users).where(eq(users.id, row.user_id));
 
-    if (!user) {
-      // console.log("user not found", row.id);
-      user = fakeUser;
-    }
+//     if (!user) {
+//       // console.log("user not found", row.id);
+//       user = fakeUser;
+//     }
 
-    const [offer] = await db
-      .select()
-      .from(offers)
-      .where(eq(offers.id, row.offer_id));
+//     const [offer] = await db
+//       .select()
+//       .from(offers)
+//       .where(eq(offers.id, row.offer_id));
 
-    if (!offer) {
-      console.log("offer not found", row.id);
-      continue;
-    }
+//     if (!offer) {
+//       console.log("offer not found", row.id);
+//       continue;
+//     }
 
-    await db.insert(offerReviews).values({
-      userId: user!.id,
-      offerId: offer.id,
-      name: row.name,
-      email: row.email,
-      message: row.message,
-      rate: row.rate,
-      view: row.view,
-      status: row.status,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-  }
-  console.log("successfully seed of offerReviews");
-};
+//     await db.insert(offerReviews).values({
+//       userId: user!.id,
+//       offerId: offer.id,
+//       name: row.name,
+//       email: row.email,
+//       message: row.message,
+//       rate: row.rate,
+//       view: row.view,
+//       status: row.status,
+//       createdAt: row.created_at,
+//       updatedAt: row.updated_at,
+//     });
+//   }
+//   console.log("successfully seed of offerReviews");
+// };
 
-// 3. OfferSubcategory
-export const addOfferSubcategories = async () => {
-  const [rows]: any[] = await sql.execute("SELECT * FROM offer_subcategory");
+// // 3. OfferSubcategory
+// export const addOfferSubcategories = async () => {
+//   const [rows]: any[] = await sql.execute("SELECT * FROM offer_subcategory");
 
-  for (const row of rows) {
-    const [offer] = await db
-      .select()
-      .from(offers)
-      .where(eq(offers.id, row.offer_id));
+//   for (const row of rows) {
+//     const [offer] = await db
+//       .select()
+//       .from(offers)
+//       .where(eq(offers.id, row.offer_id));
 
-    if (!offer) {
-      console.log("offerId not found", row.id);
-      continue;
-    }
+//     if (!offer) {
+//       console.log("offerId not found", row.id);
+//       continue;
+//     }
 
-    const [subcategory] = await db
-      .select()
-      .from(subcategories)
-      .where(eq(subcategories.id, row.subcategory_id));
+//     const [subcategory] = await db
+//       .select()
+//       .from(subcategories)
+//       .where(eq(subcategories.id, row.subcategory_id));
 
-    if (!subcategory) {
-      console.log("subCategory not found", row.id);
-      continue;
-    }
+//     if (!subcategory) {
+//       console.log("subCategory not found", row.id);
+//       continue;
+//     }
 
-    await db.insert(offerSubcategory).values({
-      offerId: offer.id,
-      subcategoryId: subcategory.id,
-    });
-  }
-  console.log("successfully seed of OfferSubcategories");
-};
+//     await db.insert(offerSubcategory).values({
+//       offerId: offer.id,
+//       subcategoryId: subcategory.id,
+//     });
+//   }
+//   console.log("successfully seed of OfferSubcategories");
+// };
 
 // TODO
 // 4. RecentViewsOffer

@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -51,6 +52,7 @@ const otpSchema = z.object({
 export function RegisterForm({ className }: React.ComponentProps<"div">) {
   const trpc = useTRPC();
   const [step, setStep] = useState<"register" | "verify">("register");
+  const [showPassword, setShowPassword] = useState(false);
   const [otp, setOTP] = useState<string>("");
   const [tempFormData, setTempFormData] = useState<any>(null);
   const router = useRouter();
@@ -371,12 +373,27 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                       Password <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
+                      {/* <div className="relative"> */}
                       <Input
                         {...field}
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         className="rounded-xl"
                       />
+                      {/* {showPassword ? (
+                          <Eye
+                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                            onClick={() => {
+                              setShowPassword(!showPassword);
+                            }}
+                          />
+                        ) : (
+                          <EyeOff
+                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        )}
+                      </div> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -392,12 +409,27 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                       Confirm Password <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        type="password"
-                        placeholder="••••••••"
-                        className="rounded-xl"
-                      />
+                      <div className="relative">
+                        <Input
+                          {...field}
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          className="rounded-xl"
+                        />
+                        {showPassword ? (
+                          <Eye
+                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                            onClick={() => {
+                              setShowPassword(!showPassword);
+                            }}
+                          />
+                        ) : (
+                          <EyeOff
+                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

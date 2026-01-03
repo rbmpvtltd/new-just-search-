@@ -2,12 +2,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { chatTokenSessionInsertSchema } from "@repo/db/src/schema/help-and-support.schema";
 import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
 import { FormField } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 
 type HelpAndSupportSchema = z.infer<typeof chatTokenSessionInsertSchema>;
@@ -32,26 +34,14 @@ export default function HelpAndSupport() {
     mutate(data, {
       onSuccess: (data) => {
         if (data.success) {
-          Swal.fire({
-            title: data.message,
-            icon: "success",
-            draggable: true,
-          });
-        } else {
-          Swal.fire({
-            title: data.message,
-            icon: "error",
-            draggable: true,
-          });
+          sweetAlertSuccess(data.message);
         }
       },
       onError: (error) => {
         console.log("Error", error);
-        Swal.fire({
-          title: error?.message,
-          icon: "error",
-          draggable: true,
-        });
+        if (isTRPCClientError(error)) {
+          sweetAlertError(error.message);
+        }
       },
     });
   };

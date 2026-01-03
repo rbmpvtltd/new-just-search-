@@ -50,10 +50,10 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       finalPrice: myOffer?.offer?.finalPrice,
       offerDescription: myOffer?.offer?.offerDescription,
       mainImage: myOffer?.offer?.mainImage ?? "",
-      image2: myOffer?.offer.offerPhotos[1]?.photo ?? "",
-      image3: myOffer?.offer.offerPhotos[2]?.photo ?? "",
-      image4: myOffer?.offer.offerPhotos[3]?.photo ?? "",
-      image5: myOffer?.offer.offerPhotos[4]?.photo ?? "",
+      image2: myOffer?.offer.offerPhotos[0]?.photo ?? "",
+      image3: myOffer?.offer.offerPhotos[1]?.photo ?? "",
+      image4: myOffer?.offer.offerPhotos[2]?.photo ?? "",
+      image5: myOffer?.offer.offerPhotos[3]?.photo ?? "",
       categoryId: myOffer?.offer.categoryId,
       subcategoryId: myOffer?.offer.offerSubcategory.map(
         (item) => item.subcategoryId,
@@ -92,7 +92,7 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
             queryClient.invalidateQueries({
               queryKey: trpc.offerrouter.showOffer.queryKey(),
             });
-            router.replace("/(root)/profile");
+            router.replace("/(root)/profile/offer");
           }
         },
         onError: (error) => {

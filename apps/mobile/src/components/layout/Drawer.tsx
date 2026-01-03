@@ -1,12 +1,11 @@
-import { useAuthStore } from "@/features/auth/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import type { HeaderBackButtonProps } from "@react-navigation/elements";
-import { UserRole } from "@repo/db";
+import type { UserRole } from "@repo/db";
 import { type Href, router, useSegments } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { fi } from "zod/v4/locales";
-
 import { create } from "zustand";
+import { useAuthStore } from "@/features/auth/authStore";
 
 type DrawerStore = {
   open: boolean;
@@ -25,7 +24,7 @@ const drawerFields: DrawerField[] = [
     name: "Home",
     route: "/(root)/(home)/home",
     title: "hi",
-    headerLeft: () => {
+    headerRight: () => {
       return (
         <View className="p-4 bg-primary">
           <Text className="text-secondary"> hi</Text>
@@ -34,6 +33,7 @@ const drawerFields: DrawerField[] = [
     },
     icon: "home-outline",
     role: "all",
+   
   },
   {
     name: "Profile",
@@ -45,13 +45,13 @@ const drawerFields: DrawerField[] = [
     name: "Hire Listing",
     route: "/(root)/profile/hire",
     icon: "briefcase-outline",
-    role: ["hire", "visitor", "guest"],
+    role: ["hire", "visiter", "guest"],
   },
   {
     name: "Business Listing",
     route: "/(root)/profile/business",
     icon: "business-outline",
-    role: ["business", "visitor", "guest"],
+    role: ["business", "visiter", "guest"],
   },
   {
     name: "My Offers",
@@ -87,7 +87,7 @@ const drawerFields: DrawerField[] = [
     name: "Request to Delete Account",
     route: "/(root)/profile/account-delete-request",
     icon: "trash-outline",
-    role: "all",
+    role: ["visiter", "guest", "hire", "business"],
   },
   {
     name: "Feedback",
@@ -137,7 +137,7 @@ interface DrawerField {
 
   route: Href;
   icon?: keyof typeof Ionicons.glyphMap;
-  role?: string[] | string;
+  role?: UserRole[] | UserRole;
   authenticated?: boolean;
 }
 
