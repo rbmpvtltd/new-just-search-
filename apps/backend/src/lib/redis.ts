@@ -7,3 +7,11 @@ export const redis = new Redis({
   username: env.REDIS_USERNAME,
   password: env.REDIS_PASSWORD,
 });
+
+export const getSessionByUserId = async (userId: number) => {
+  const session = await redis.get(`usersessionid:${userId}`);
+  if (!session) {
+    return null;
+  }
+  return session.split("session:")[1];
+};

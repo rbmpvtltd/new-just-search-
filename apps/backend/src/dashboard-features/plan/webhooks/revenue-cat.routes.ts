@@ -9,6 +9,7 @@ import { TRPCError } from "@trpc/server";
 import { eq, type InferInsertModel } from "drizzle-orm";
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { changeRoleInSession } from "@/features/auth/lib/session";
+import { getSessionByUserId } from "@/lib/redis";
 import env from "@/utils/envaild";
 import type { RevenueCatWebhookEvent } from "./types";
 
@@ -101,7 +102,10 @@ export const revenueCatRouter = asyncHandler(
           .set({ role: plan?.role })
           .where(eq(users.id, user.id));
 
-        await changeRoleInSession(user.id, plan?.role || "visiter");
+        const sessionId = await getSessionByUserId(user.id);
+        if (sessionId) {
+          await changeRoleInSession(sessionId, plan?.role || "visiter");
+        }
         break;
       }
       case "EXPIRATION":
