@@ -36,10 +36,9 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
       firstName: data.profileData?.firstName ?? "",
       dob: data.profileData?.dob ?? null,
       lastName: data.profileData?.lastName ?? "",
-      salutation: data.profileData?.salutation ?? "",
+      salutation: data.profileData?.salutation ?? NaN,
       occupation: data.profileData?.occupation ?? null,
       maritalStatus: data.profileData?.maritalStatus ?? "Married",
-      area: data.profileData?.area ?? "",
       pincode: data.profileData?.pincode ?? "",
       city: data.profileData?.city ?? NaN,
       state: data.profileData?.state ?? NaN,
@@ -72,17 +71,18 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
       component: "image",
       required: false,
       className: "mx-auto w-[90%]",
+      error: errors.profileImage?.message,
     },
     {
       control,
       name: "salutation",
       label: "Title",
       component: "select",
-      options: [
-        { label: "Mr", value: "Mr" },
-        { label: "Ms", value: "Ms" },
-        { label: "Mrs", value: "Mrs" },
-      ],
+      options: data.getSalutation?.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
+      required: false,
       placeholder: "Select Title",
       error: errors.salutation?.message,
     },
@@ -127,6 +127,7 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
         label: item.name,
         value: item.id,
       })),
+      error: errors.occupation?.message,
     },
     {
       control,
@@ -141,15 +142,16 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
           value: item,
         };
       }),
+      error: errors.maritalStatus?.message,
     },
     {
       control,
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Address",
+      name: "address",
+      placeholder: "Address",
       required: false,
       component: "input",
-      error: "",
+      error: errors.address?.message,
     },
     {
       control,
@@ -158,7 +160,7 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
       placeholder: "Pincode",
       required: false,
       component: "input",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
@@ -172,7 +174,7 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
           label: state.name,
           value: state.id,
         })) ?? [],
-      error: "",
+      error: errors.state?.message,
     },
     {
       control,
@@ -184,7 +186,7 @@ export default function ProfileForm({ data }: { data: EditAdminSalesmanType }) {
       loading: isLoading,
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: "",
+      error: errors.city?.message,
     },
   ];
   return (

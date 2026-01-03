@@ -91,7 +91,8 @@ export const adminFranchiseRouter = router({
   add: adminProcedure.query(async () => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();
-    return { states, occupation };
+    const salutation = await db.query.salutation.findMany();
+    return { states, occupation, salutation };
   }),
   create: adminProcedure
     .input(
@@ -169,6 +170,7 @@ export const adminFranchiseRouter = router({
     .query(async ({ input }) => {
       const getStates = await db.query.states.findMany();
       const getOccupation = await db.query.occupation.findMany();
+      const getSalutation = await db.query.salutation.findMany();
       const userData = await db.query.users.findFirst({
         where: (user, { eq }) => eq(user.id, input.id),
       });
@@ -179,7 +181,14 @@ export const adminFranchiseRouter = router({
         where: (franchise, { eq }) =>
           eq(franchise.userId, Number(userData?.id)),
       });
-      return { userData, profileData, getStates, getOccupation, franchiseData };
+      return {
+        userData,
+        getStates,
+        profileData,
+        getOccupation,
+        getSalutation,
+        franchiseData,
+      };
     }),
   update: adminProcedure
     .input(

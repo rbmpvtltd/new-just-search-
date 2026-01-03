@@ -39,15 +39,14 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
   } = useForm<ProfileSchema>({
     resolver: zodResolver(adminAddProfileInsertSchema),
     defaultValues: {
-      address: "",
       profileImage: "",
       firstName: "",
       dob: null,
       lastName: "",
-      salutation: "",
+      salutation: NaN,
       occupation: null,
       maritalStatus: "Married",
-      area: "",
+      address: "",
       pincode: "",
       city: NaN,
       state: NaN,
@@ -103,17 +102,17 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
       component: "image",
       required: false,
       className: "mx-auto w-[90%]",
+      error: errors.profileImage?.message,
     },
     {
       control,
       name: "salutation",
       label: "Title",
       component: "select",
-      options: [
-        { label: "Mr", value: "Mr" },
-        { label: "Ms", value: "Ms" },
-        { label: "Mrs", value: "Mrs" },
-      ],
+      options: data.salutation.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       placeholder: "Select Title",
       error: errors.salutation?.message,
     },
@@ -145,7 +144,7 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
       placeholder: "Date of Birth",
       required: false,
       component: "calendar",
-      error: "",
+      error: errors.dob?.message,
     },
     {
       control,
@@ -158,6 +157,7 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
         label: item.name,
         value: item.id,
       })),
+      error: errors.occupation?.message,
     },
     {
       control,
@@ -172,15 +172,16 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
           value: item,
         };
       }),
+      error: errors.maritalStatus?.message,
     },
     {
       control,
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Address",
+      name: "address",
+      placeholder: "Address",
       required: false,
       component: "input",
-      error: "",
+      error: errors.address?.message,
     },
     {
       control,
@@ -189,7 +190,7 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
       placeholder: "Pincode",
       required: false,
       component: "input",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
@@ -201,7 +202,7 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
       options:
         data.states.map((state) => ({ label: state.name, value: state.id })) ??
         [],
-      error: "",
+      error: errors.state?.message,
     },
     {
       control,
@@ -213,7 +214,7 @@ export default function ProfileForm({ setOpen }: { setOpen: SetOpen }) {
       loading: isLoading,
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: "",
+      error: errors.city?.message,
     },
   ];
   return (

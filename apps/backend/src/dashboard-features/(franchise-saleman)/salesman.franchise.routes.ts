@@ -124,8 +124,8 @@ export const franchiseSalemanRouter = router({
         lastAssignCode: true,
       },
     });
-
-    return { states, occupation, franchise };
+    const salutation = await db.query.salutation.findMany();
+    return { states, occupation, franchise, salutation };
   }),
   getReferCode: franchisesProcedure
     .input(z.object({ franchiseId: z.number() }))
@@ -227,7 +227,7 @@ export const franchiseSalemanRouter = router({
     .query(async ({ input }) => {
       const getStates = await db.query.states.findMany();
       const getOccupation = await db.query.occupation.findMany();
-
+      const getSalutation = await db.query.salutation.findMany();
       const salesmanData = await db.query.salesmen.findFirst({
         where: (salesman, { eq }) => eq(salesman.id, Number(input?.id)),
       });
@@ -246,6 +246,7 @@ export const franchiseSalemanRouter = router({
         profileData,
         salesmanData,
         getOccupation,
+        getSalutation,
       };
     }),
   update: franchisesProcedure

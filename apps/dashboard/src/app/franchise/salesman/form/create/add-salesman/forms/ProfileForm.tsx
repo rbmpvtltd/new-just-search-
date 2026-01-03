@@ -81,7 +81,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       name: "salutation",
       label: "Title",
       component: "select",
-      options: data.occupation.map((item) => ({
+      options: data.salutation.map((item) => ({
         label: item.name,
         value: item.id,
       })),

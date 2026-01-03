@@ -24,11 +24,11 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
     // await fakeSeed();
     // await businessSeed();
     // await hireSeed();
-    await productSeed();
-    await offerSeed();
+    // await productSeed();
+    // await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();
-    // await planSeed();
+    await planSeed();
     // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
