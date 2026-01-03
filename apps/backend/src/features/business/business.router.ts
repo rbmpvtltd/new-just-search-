@@ -26,8 +26,9 @@ import {
 } from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
+import { algoliasearch } from "algoliasearch";
 import { and, eq, sql } from "drizzle-orm";
-import z from "zod";
+import z, { object } from "zod";
 import {
   cloudinaryDeleteImageByPublicId,
   cloudinaryDeleteImagesByPublicIds,
@@ -41,11 +42,19 @@ import {
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
-import { createReview, reviewExist } from "./business.service";
+import {
+  businessApproved,
+  createReview,
+  reviewExist,
+} from "./business.service";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
 
+const algoliaClient = algoliasearch(
+  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+  process.env.ALGOLIA_ADMIN_API_KEY!,
+);
 export const businessrouter = router({
   test: protectedProcedure.input(z.object({})).mutation(async ({ ctx }) => {
     const role = await changeRoleInSession(ctx.sessionId, "business");
@@ -238,6 +247,21 @@ export const businessrouter = router({
         .where(eq(users.id, ctx.userId));
 
       await changeRoleInSession(ctx.sessionId, "business");
+      const myPlan = await db.query.planUserActive.findFirst({
+        where: (planUserActive, { eq }) =>
+          eq(planUserActive.userId, ctx.userId),
+      });
+
+      if (myPlan) {
+        const plan = await db.query.plans.findFirst({
+          where: (plans, { eq }) => eq(plans.id, myPlan.planId),
+        });
+
+        if (plan?.role === "business") {
+          await businessApproved(createBusiness.id);
+        }
+      }
+
       return { success: true, message: "Business created successfully" };
     }),
 

@@ -29,7 +29,7 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
     // await feedbackseed();
     // await seedRequestAccounts();
     // await planSeed();
-    // await algoliaSeed();
+    await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
 
