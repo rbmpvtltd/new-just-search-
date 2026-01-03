@@ -136,20 +136,20 @@
 //   );
 // }
 
-import {
-  InstantSearch,
-  SearchBox,
-  Hits,
-  Configure,
-  RangeInput,
-  ClearRefinements,
-  Pagination,
-  RefinementList,
-} from "react-instantsearch";
 import { algoliaClient } from "@repo/algolia";
-import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import {
+  ClearRefinements,
+  Configure,
+  Hits,
+  InstantSearch,
+  Pagination,
+  RangeInput,
+  RefinementList,
+  SearchBox,
+} from "react-instantsearch";
 
 function Hit({ hit }: { hit: any }) {
   return (
@@ -164,6 +164,7 @@ function Hit({ hit }: { hit: any }) {
       >
         <div className="relative w-full mx-auto flex justify-center">
           <div className="relative">
+            {/* TODO: why we are using this image */}
             <Image
               width={200}
               height={400}

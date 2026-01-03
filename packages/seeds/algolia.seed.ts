@@ -22,9 +22,9 @@ const algoliaClient = algoliasearch(
 );
 
 export async function algoliaSeed() {
-  // await algoliaHireSeed()
-  // await algoliaBusinessSeed();
-  // await algoliaProductOfferSeed();
+  await algoliaHireSeed();
+  await algoliaBusinessSeed();
+  await algoliaProductOfferSeed();
   // await algoliaCategorySeed();
   // await algoliaSubCategorySeed();
   await algoliaAllListingSeed();
@@ -75,7 +75,7 @@ async function algoliaHireSeed() {
         id: hireListing.id,
         name: hireListing.name,
         photo: hireListing.photo,
-        area: hireListing.area,
+        address: hireListing.address,
         gender: hireListing.gender,
         languages: hireListing.languages,
         workExp: hireListing.workExperienceYear,
@@ -141,7 +141,7 @@ async function algoliaHireSeed() {
         objectID: item.id,
         name: item.name,
         photo: item.photo,
-        area: item.area,
+        address: item.address,
         gender: item.gender,
         languages: item.languages,
         workExp: item.workExp,
@@ -190,7 +190,7 @@ async function algoliaBusinessSeed() {
         id: businessListings.id,
         name: businessListings.name,
         photo: businessListings.photo,
-        area: businessListings.area,
+        address: businessListings.address,
         streetName: businessListings.streetName,
         buildingName: businessListings.buildingName,
         longitude: businessListings.longitude,
@@ -480,7 +480,7 @@ async function algoliaAllListingSeed() {
         id: businessListings.id,
         name: businessListings.name,
         photo: businessListings.photo,
-        area: businessListings.area,
+        address: businessListings.address,
         streetName: businessListings.streetName,
         buildingName: businessListings.buildingName,
         longitude: businessListings.longitude,
@@ -539,7 +539,7 @@ async function algoliaAllListingSeed() {
         id: hireListing.id,
         name: hireListing.name,
         photo: hireListing.photo,
-        area: hireListing.area,
+        address: hireListing.address,
         gender: hireListing.gender,
         languages: hireListing.languages,
         workExp: hireListing.workExperienceYear,
@@ -608,7 +608,7 @@ async function algoliaAllListingSeed() {
         name: item.name,
         listingType: "business",
         photo: item.photo,
-        area: item.area,
+        address: item.address,
         gender: null,
         languages: null,
         workExp: null,
@@ -649,7 +649,7 @@ async function algoliaAllListingSeed() {
         name: item.name,
         listingType: "hire",
         photo: item.photo,
-        area: item.area,
+        address: item.address,
         gender: item.gender,
         languages: item.languages,
         workExp: item.workExp,

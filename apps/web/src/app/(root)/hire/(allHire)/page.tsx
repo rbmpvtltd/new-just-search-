@@ -1,17 +1,17 @@
 "use client";
 
-import {
-  InstantSearch,
-  SearchBox,
-  Hits,
-  RefinementList,
-  Configure,
-  RangeInput,
-  ClearRefinements,
-  Pagination,
-} from "react-instantsearch";
 import { algoliaClient } from "@repo/algolia";
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  ClearRefinements,
+  Configure,
+  Hits,
+  InstantSearch,
+  Pagination,
+  RangeInput,
+  RefinementList,
+  SearchBox,
+} from "react-instantsearch";
 import { HireListingCard } from "@/features/hire/show/component/HireListingCard";
 
 function Hit({ hit }: { hit: any }) {
@@ -33,7 +33,7 @@ export default function Page() {
       },
       () => {
         console.log("Location permission denied");
-      }
+      },
     );
   }, []);
 
@@ -84,7 +84,8 @@ export default function Page() {
               <h3 className="font-bold text-xl lg:text-2xl">Filters</h3>
               <ClearRefinements
                 classNames={{
-                  button: "text-xs lg:text-sm px-2 py-1 border rounded bg-primary text-white",
+                  button:
+                    "text-xs lg:text-sm px-2 py-1 border rounded bg-primary text-white",
                 }}
               />
             </div>
@@ -97,22 +98,28 @@ export default function Page() {
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
                 }}
               />
             </div>
 
             <div className="mb-6">
-              <h4 className="font-bold mb-2 text-sm lg:text-base">Languages Known</h4>
+              <h4 className="font-bold mb-2 text-sm lg:text-base">
+                Languages Known
+              </h4>
               <RefinementList
                 attribute="languages"
                 classNames={{
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
                 }}
               />
             </div>
@@ -129,15 +136,20 @@ export default function Page() {
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
-                  searchBox: "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
                 }}
               />
             </div>
 
             <div className="mb-6">
-              <h4 className="font-bold mb-2 text-sm lg:text-base">Subcategories</h4>
+              <h4 className="font-bold mb-2 text-sm lg:text-base">
+                Subcategories
+              </h4>
               <RefinementList
                 attribute="subcategories"
                 limit={2}
@@ -148,16 +160,18 @@ export default function Page() {
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
-                  searchBox: "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
                 }}
               />
             </div>
 
             <div className="mb-6">
               <h4 className="font-bold mb-2 text-sm lg:text-base">Distance</h4>
-             
 
               <input
                 type="text"
@@ -171,13 +185,17 @@ export default function Page() {
             </div>
 
             <div className="mb-6">
-              <h4 className="font-bold mb-2 text-sm lg:text-base">Salary Range</h4>
+              <h4 className="font-bold mb-2 text-sm lg:text-base">
+                Salary Range
+              </h4>
               <RangeInput
                 attribute="expectedSalary"
                 classNames={{
                   root: "flex flex-col gap-2",
-                  input: "border border-gray-300 px-2 py-1.5 rounded w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
-                  submit: "px-3 py-1 bg-primary text-white rounded text-sm mt-2",
+                  input:
+                    "border border-gray-300 px-2 py-1.5 rounded w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  submit:
+                    "px-3 py-1 bg-primary text-white rounded text-sm mt-2",
                 }}
               />
             </div>
@@ -194,15 +212,20 @@ export default function Page() {
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
-                  searchBox: "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
                 }}
               />
             </div>
 
             <div className="mb-6">
-              <h4 className="font-bold mb-2 text-sm lg:text-base">Work Shift</h4>
+              <h4 className="font-bold mb-2 text-sm lg:text-base">
+                Work Shift
+              </h4>
               <RefinementList
                 attribute="workShift"
                 limit={2}
@@ -213,21 +236,28 @@ export default function Page() {
                   item: "flex items-center gap-2 mb-1",
                   label: "flex items-center gap-2 text-sm cursor-pointer",
                   checkbox: "cursor-pointer",
-                  count: "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
-                  showMore: "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
-                  searchBox: "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  count:
+                    "ml-auto text-xs bg-secondary text-white rounded-md px-2 py-0.5",
+                  showMore:
+                    "text-blue-600 text-sm mt-2 cursor-pointer hover:underline",
+                  searchBox:
+                    "w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
                 }}
               />
             </div>
 
             <div className="mb-6">
-              <h4 className="font-bold mb-2 text-sm lg:text-base">Work Experience</h4>
+              <h4 className="font-bold mb-2 text-sm lg:text-base">
+                Work Experience
+              </h4>
               <RangeInput
                 attribute="workExp"
                 classNames={{
                   root: "flex flex-col gap-2",
-                  input: "border border-gray-300 px-2 py-1.5 rounded w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
-                  submit: "px-3 py-1 bg-primary text-white rounded text-sm mt-2",
+                  input:
+                    "border border-gray-300 px-2 py-1.5 rounded w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  submit:
+                    "px-3 py-1 bg-primary text-white rounded text-sm mt-2",
                 }}
               />
             </div>
