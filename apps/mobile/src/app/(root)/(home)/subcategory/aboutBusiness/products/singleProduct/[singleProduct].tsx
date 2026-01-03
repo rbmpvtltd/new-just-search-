@@ -105,8 +105,8 @@ export default function TabOneScreen() {
     return <Loading position="center" size={"large"} />;
   }
 
-  const latitude = Number(product?.latitude?.split(",").shift());
-  const longitude = Number(product?.longitude?.split(",").pop());
+  const latitude = Number(product?.latitude);
+  const longitude = Number(product?.longitude);
 
   const onShare = async () => {
     try {

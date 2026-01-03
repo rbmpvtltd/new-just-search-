@@ -41,8 +41,8 @@ export default function AddressDetail({
       streetName: data?.business?.streetName ?? "",
       area: data?.business?.area ?? "",
       landmark: data?.business?.landmark ?? "",
-      latitude: data?.business?.latitude ?? "",
-      longitude: data?.business?.longitude ?? "",
+      latitude: data?.business?.latitude ?? null,
+      longitude: data?.business?.longitude ?? null,
       pincode: data?.business?.pincode,
       state: data?.business?.state,
       city: data?.business?.city,
@@ -214,8 +214,8 @@ export default function AddressDetail({
                   setValue("streetName", street_name ?? "");
                   setValue("area", area ?? "");
                   setValue("landmark", landmark ?? "");
-                  setValue("latitude", String(lat));
-                  setValue("longitude", String(long));
+                  setValue("latitude", Number(lat));
+                  setValue("longitude", Number(long));
                   setValue("pincode", pincode ?? "");
                   setValue("state", matchedState?.value ?? 0);
                 }}

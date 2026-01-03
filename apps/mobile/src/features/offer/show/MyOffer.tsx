@@ -38,7 +38,7 @@ export default function MyOffersList() {
 
   if (isError) return <SomethingWrong />;
 
-  if (!data?.pages[0].offers || data.pages[0].offers.length === 0)
+  if (!data?.pages[0].offersData || data.pages[0].offersData.length === 0)
     return (
       <View className="px-4 mt-4">
         <Pressable
@@ -52,7 +52,7 @@ export default function MyOffersList() {
         </Pressable>
       </View>
     );
-  const offersData = data?.pages.flatMap((page) => page.offers || []) ?? [];
+  const offersData = data?.pages.flatMap((page) => page.offersData || []) ?? [];
 
   return (
     <View className="flex-1 bg-base-100">
@@ -71,7 +71,7 @@ export default function MyOffersList() {
 
 type OfferType = NonNullable<
   OutputTrpcType["offerrouter"]["showOffer"]
->["offers"][number];
+>["offersData"][number];
 function OfferCard({ item }: { item: OfferType }) {
   const router = useRouter();
   const { mutate: deleteOffer, isPending } = useMutation(

@@ -178,11 +178,8 @@
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
 import {
   Alert,
-  Dimensions,
-  Image,
   Platform,
   Pressable,
   Share,
@@ -191,17 +188,9 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import type { HireListingHitType } from "@/app/(root)/(hire)/hire";
 import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
-import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/features/auth/authStore";
-import { OutputTrpcType } from "@/lib/trpc";
-import { useStartChat } from "@/query/startChat";
-import { showLoginAlert } from "@/utils/alert";
-import { dialPhone } from "@/utils/getContact";
-import { HireListingHitType } from "@/app/(root)/(hire)/hire";
 
 export default function HireCard({
   item,

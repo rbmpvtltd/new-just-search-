@@ -15,7 +15,6 @@ import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/features/auth/authStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useToggleWishlist } from "@/query/favorite";
-import { useStartChat } from "@/query/startChat";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
@@ -26,9 +25,8 @@ type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] | undefined;
 
 const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
   const router = useRouter();
-  const { mutate: startChat } = useStartChat();
-  const latitude = Number(shop?.latitude?.split(",").shift());
-  const longitude = Number(shop?.longitude?.split(",").pop());
+  const latitude = Number(shop?.latitude);
+  const longitude = Number(shop?.longitude);
   const { data } = useQuery(trpc.auth.verifyauth.queryOptions());
 
   const clearToken = useAuthStore((state) => state.clearToken);

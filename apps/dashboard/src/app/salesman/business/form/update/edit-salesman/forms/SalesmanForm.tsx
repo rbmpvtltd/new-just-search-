@@ -20,6 +20,9 @@ import type { SetOpen } from "../../../edit.form";
 import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanStore";
 import type { EditAdminSalesmanType } from "..";
 
+export const adminAddSalesmenInsertSchema = salesmenInsertSchema.omit({
+  userId: true,
+});
 type SalesmanInsertSchema = z.infer<typeof salesmenInsertSchema>;
 
 export default function SalesmanForm({

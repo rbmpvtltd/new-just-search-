@@ -41,10 +41,9 @@ export default function ProfileForm({
       firstName: data.profileData?.firstName ?? "",
       dob: data.profileData?.dob ?? null,
       lastName: data.profileData?.lastName ?? "",
-      salutation: data.profileData?.salutation ?? "",
+      salutation: data.profileData?.salutation ?? NaN,
       occupation: data.profileData?.occupation ?? null,
       maritalStatus: data.profileData?.maritalStatus ?? "Married",
-      area: data.profileData?.area ?? "",
       pincode: data.profileData?.pincode ?? "",
       city: data.profileData?.city ?? NaN,
       state: data.profileData?.state ?? NaN,
@@ -83,11 +82,11 @@ export default function ProfileForm({
       name: "salutation",
       label: "Title",
       component: "select",
-      options: [
-        { label: "Mr", value: "Mr" },
-        { label: "Ms", value: "Ms" },
-        { label: "Mrs", value: "Mrs" },
-      ],
+      options: data.getOccupation.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
+      required: false,
       placeholder: "Select Title",
       error: errors.salutation?.message,
     },
@@ -119,7 +118,7 @@ export default function ProfileForm({
       placeholder: "Date of Birth",
       required: false,
       component: "calendar",
-      error: "",
+      error: errors.dob?.message,
     },
     {
       control,
@@ -132,6 +131,7 @@ export default function ProfileForm({
         label: item.name,
         value: item.id,
       })),
+      error: errors.occupation?.message,
     },
     {
       control,
@@ -146,15 +146,16 @@ export default function ProfileForm({
           value: item,
         };
       }),
+      error: errors.maritalStatus?.message,
     },
     {
       control,
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Address",
+      name: "address",
+      placeholder: "Address",
       required: false,
       component: "input",
-      error: "",
+      error: errors.address?.message,
     },
     {
       control,
@@ -163,7 +164,7 @@ export default function ProfileForm({
       placeholder: "Pincode",
       required: false,
       component: "input",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
@@ -177,7 +178,7 @@ export default function ProfileForm({
           label: state.name,
           value: state.id,
         })) ?? [],
-      error: "",
+      error: errors.state?.message,
     },
     {
       control,
@@ -189,7 +190,7 @@ export default function ProfileForm({
       loading: isLoading,
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: "",
+      error: errors.city?.message,
     },
   ];
   return (

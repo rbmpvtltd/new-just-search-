@@ -7,9 +7,6 @@ import MyToken from "@/features/help-and-support/show/MyToken";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 
 type MyTokenType = OutputTrpcType["helpAndSupportRouter"]["show"][number];
-type OfferType = NonNullable<
-  OutputTrpcType["offerrouter"]["showOffer"]
->["offers"][number];
 export default function index() {
   const { data: myTokens } = useQuery(
     trpc.helpAndSupportRouter.show.queryOptions(),

@@ -52,8 +52,8 @@ export default function PersonalDetailsForm({
       languages: data?.hire?.languages ?? [],
       mobileNumber: data?.hire?.mobileNumber ?? "",
       alternativeMobileNumber: data?.hire?.alternativeMobileNumber ?? "",
-      latitude: data?.hire?.latitude ?? "",
-      longitude: data?.hire?.longitude ?? "",
+      latitude: data?.hire?.latitude ?? null,
+      longitude: data?.hire?.longitude ?? null,
       area: data?.hire?.area ?? "",
       pincode: data?.hire?.pincode ?? "",
       state: data?.hire?.state ?? 0,
@@ -373,8 +373,8 @@ export default function PersonalDetailsForm({
 
                     setDetectedCityName(cityName);
 
-                    setValue("latitude", String(lat));
-                    setValue("longitude", String(lng));
+                    setValue("latitude", Number(lat));
+                    setValue("longitude", Number(lng));
                     setValue("pincode", pincode);
                     setValue("state", matchedState?.id ?? 0);
                     setValue(

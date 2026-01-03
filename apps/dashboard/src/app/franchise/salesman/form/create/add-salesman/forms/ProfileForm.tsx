@@ -42,7 +42,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       firstName: formValue.firstName ?? "",
       dob: formValue.dob ?? null,
       lastName: formValue.lastName ?? "",
-      salutation: formValue.salutation ?? "",
+      salutation: formValue.salutation ?? NaN,
       occupation: formValue.occupation ?? null,
       maritalStatus: formValue.maritalStatus ?? "Married",
       pincode: formValue.pincode ?? "",
@@ -53,15 +53,11 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
 
   const selectedState = useWatch({ control, name: "state" });
 
-  const {
-    data: cities,
-    isLoading,
-  } = useQuery(
+  const { data: cities, isLoading } = useQuery(
     trpc.adminUtilsRouter.getCities.queryOptions({
       state: selectedState,
     }),
   );
-
 
   const onSubmit = async (data: ProfileSchema) => {
     const file = await uploadToCloudinary([data.profileImage], "profile");
@@ -85,11 +81,10 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       name: "salutation",
       label: "Title",
       component: "select",
-      options: [
-        { label: "Mr", value: "Mr" },
-        { label: "Ms", value: "Ms" },
-        { label: "Mrs", value: "Mrs" },
-      ],
+      options: data.occupation.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })),
       placeholder: "Select Title",
       error: errors.salutation?.message,
     },
@@ -121,7 +116,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       placeholder: "Date of Birth",
       required: false,
       component: "calendar",
-      error: "",
+      error: errors.dob?.message,
     },
     {
       control,
@@ -134,6 +129,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
         label: item.name,
         value: item.id,
       })),
+      error: errors.occupation?.message,
     },
     {
       control,
@@ -148,6 +144,16 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
           value: item,
         };
       }),
+      error: errors.maritalStatus?.message,
+    },
+    {
+      control,
+      label: "Address",
+      name: "address",
+      placeholder: "Address",
+      required: false,
+      component: "input",
+      error: errors.address?.message,
     },
 
     {
@@ -157,7 +163,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       placeholder: "Pincode",
       required: false,
       component: "input",
-      error: "",
+      error: errors.pincode?.message,
     },
     {
       control,
@@ -169,7 +175,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       options:
         data.states.map((state) => ({ label: state.name, value: state.id })) ??
         [],
-      error: "",
+      error: errors.state?.message,
     },
     {
       control,
@@ -181,7 +187,7 @@ export default function ProfileForm({ data }: { data: AddAdminSalesmanType }) {
       loading: isLoading,
       options:
         cities?.map((city) => ({ label: city.city, value: city.id })) ?? [],
-      error: "",
+      error: errors.city?.message,
     },
   ];
   return (

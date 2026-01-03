@@ -13,6 +13,7 @@ import { useSalesmanFormStore } from "../../../shared/store/useCreateSalesmanSto
 
 export const adminAddUserInsertSchema = usersInsertSchema.omit({
   role: true,
+
 });
 type UserInsertSchema = z.infer<typeof adminAddUserInsertSchema>;
 

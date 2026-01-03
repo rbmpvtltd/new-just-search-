@@ -1,6 +1,7 @@
 import {
   boolean,
   date,
+  doublePrecision,
   integer,
   pgTable,
   serial,
@@ -48,8 +49,8 @@ export const hireListing = pgTable("hire_listing", {
   slug: varchar("slug", { length: 255 }),
   specialities: text("specialities"),
   description: text("description"),
-  latitude: integer("latitude"),
-  longitude: integer("longitude"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
   buildingName: varchar("building_name", { length: 255 }),
   streetName: varchar("street_name", { length: 255 }),
   area: varchar("area", { length: 255 }),

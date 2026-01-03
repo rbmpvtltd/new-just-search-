@@ -53,8 +53,8 @@ export default function PersonalDetailsForm({
       mobileNumber: hireListing?.hire?.mobileNumber ?? "",
       alternativeMobileNumber: hireListing?.hire?.alternativeMobileNumber ?? "",
       email: hireListing?.hire?.email ?? "",
-      latitude: hireListing?.hire?.latitude ?? "",
-      longitude: hireListing?.hire?.longitude ?? "",
+      latitude: hireListing?.hire?.latitude ?? null,
+      longitude: hireListing?.hire?.longitude ?? null,
       area: hireListing?.hire?.area ?? "",
       pincode: hireListing?.hire?.pincode ?? "",
       state: hireListing?.hire?.state ?? undefined,
@@ -375,8 +375,8 @@ export default function PersonalDetailsForm({
                       );
                       setDetectedCityName(cityName);
 
-                      setValue("latitude", String(lat));
-                      setValue("longitude", String(long));
+                      setValue("latitude", Number(lat));
+                      setValue("longitude", Number(long));
                       setValue("area", area);
                       setValue("pincode", pincode);
                       setValue("state", matchedState?.value ?? 0);

@@ -38,8 +38,8 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
       streetName: formValue.streetName ?? "",
       area: formValue.area ?? "",
       landmark: formValue.landmark ?? "",
-      latitude: formValue.latitude ?? "",
-      longitude: formValue.longitude ?? "",
+      latitude: formValue.latitude ?? null,
+      longitude: formValue.longitude ?? null,
       pincode: formValue.pincode ?? "",
       state: formValue.state ?? "",
       city: formValue.city ?? "",
@@ -222,8 +222,8 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
                   setValue("streetName", street_name ?? "");
                   setValue("area", area ?? "");
                   setValue("landmark", landmark ?? "");
-                  setValue("latitude", String(lat));
-                  setValue("longitude", String(long));
+                  setValue("latitude", Number(lat));
+                  setValue("longitude", Number(long));
                   setValue("pincode", pincode ?? "");
                   setValue("state", matchedState?.value ?? 0);
                 }}
