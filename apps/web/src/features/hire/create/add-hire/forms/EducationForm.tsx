@@ -48,7 +48,7 @@ export default function EducationForm({ data }: { data: AddHirePageType }) {
       component: "select",
       options: data.getHighestQualification.map((item) => ({
         label: item.name,
-        value: item.name,
+        value: item.id,
       })),
       error: errors.highestQualification?.message,
     },

@@ -102,15 +102,15 @@ export default function TabOneScreen() {
 
   const onShare = async () => {
     try {
-      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutBusiness/products/singleProduct/${offer?.id}`;
+      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutBusiness/offers/singleOffers/${offer?.id}`;
 
       const result = await Share.share(
         {
-          title: offer?.name ?? "Check this Product",
+          title: offer?.name ?? "Check this Offer",
           message:
             Platform.OS === "android"
-              ? `${offer?.name ?? "Amazing Product"}\n\n${shareUrl}`
-              : (offer?.name ?? "Amazing Product"),
+              ? `${offer?.name ?? "Amazing Offer"}\n\n${shareUrl}`
+              : (offer?.name ?? "Amazing Offer"),
           url: shareUrl, // iOS uses this
         },
         {
@@ -137,6 +137,18 @@ export default function TabOneScreen() {
       <Stack.Screen
         options={{
           title: offer?.name,
+          headerLeft: () => (
+            <Pressable
+              className="ml-2"
+              onPress={() => router.replace("/(root)/(offer)/allOffers")}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                className="p-2 mr-4 self-center"
+              />
+            </Pressable>
+          ),
         }}
       />
       <ScrollView className="flex-1">
@@ -166,29 +178,30 @@ export default function TabOneScreen() {
             )}
           />
           <View className="p-8 bg-base-200 ">
-            <View>
-              <Text className="text-secondary text-lg mb-2">
-                {offer?.shopName}
-              </Text>
-              <Pressable
-                hitSlop={10}
-                // onPress={onShare}
-                className="absolute right-0 top-1/2 -translate-y-1/2"
-              >
-                <Ionicons name="share-social" size={22} color="black" />
-              </Pressable>
-              <Text className="text-secondary text-[24px] font-semibold mb-2">
+            <View className="mb-3">
+              <View className="flex-row items-center justify-between">
+                <Text
+                  className="text-secondary text-lg flex-1 pr-3"
+                  numberOfLines={2}
+                >
+                  {offer?.shopName}
+                </Text>
+                <Pressable hitSlop={10} onPress={onShare}>
+                  <Ionicons name="share-social" size={22} color="black" />
+                </Pressable>
+              </View>
+              <Text className="text-secondary text-[24px] font-semibold mt-2 mb-2">
                 {offer?.name}
               </Text>
               <RenderHTML
                 contentWidth={width}
                 source={{ html: offer?.description || "" }}
                 tagsStyles={{
-                  body: { color: "#ff6600" }, // Orange text everywhere
+                  body: { color: "#ff6600" },
                 }}
               />
-              <View className="flex-row items-center gap-4">
-                <Text className="text-primary text-lg ">
+              <View className="flex-row items-center gap-4 mt-2">
+                <Text className="text-primary text-lg font-semibold">
                   ₹{offer?.finalPrice}
                 </Text>
                 <Text className="text-secondary line-through">
@@ -196,6 +209,7 @@ export default function TabOneScreen() {
                 </Text>
               </View>
             </View>
+
             <View className="w-full items-center gap-4 my-4">
               <View className="w-[100%] bg-error-content rounded-lg py-2 px-4">
                 <Pressable

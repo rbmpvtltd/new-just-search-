@@ -15,6 +15,7 @@ import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import { setRole } from "@/utils/session";
@@ -61,26 +62,20 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
     }));
     mutate(finalData, {
       onSuccess: (data) => {
-        setRole("hire");
-        clearPage();
-        Swal.fire({
-          title: data.message,
-          icon: "success",
-          draggable: true,
-        });
-        const queryClient = getQueryClient();
-        queryClient.invalidateQueries({
-          queryKey: trpc.hirerouter.show.queryKey(),
-        });
-        router.push("/");
+        if (data.success) {
+          setRole("hire");
+          sweetAlertSuccess(data.message);
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.hirerouter.show.queryKey(),
+          });
+          clearPage();
+          router.push("/profile/hire");
+        }
       },
       onError: (error) => {
         if (isTRPCClientError(error)) {
-          Swal.fire({
-            title: error.message,
-            icon: "error",
-            draggable: true,
-          });
+          sweetAlertError(error.message);
           console.error("error,", error.message);
         }
       },
@@ -96,7 +91,7 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
       component: "select",
       options: data.getDocuments.map((item) => ({
         label: item.name,
-        value: item.name,
+        value: item.id,
       })),
       error: errors.idProof?.message,
     },
@@ -138,7 +133,7 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
     },
     {
       control,
-      label: "",
+      label: "Salesman Refer Code",
       name: "salesmanId",
       placeholder: "",
       component: "select",

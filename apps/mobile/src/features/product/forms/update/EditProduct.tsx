@@ -49,10 +49,10 @@ export default function EditProduct({
       rate: myProduct?.product?.rate,
       productDescription: myProduct?.product?.productDescription,
       mainImage: myProduct?.product.mainImage || "",
-      image2: myProduct?.product.productPhotos[1]?.photo || "",
-      image3: myProduct?.product.productPhotos[2]?.photo || "",
-      image4: myProduct?.product.productPhotos[3]?.photo || "",
-      image5: myProduct?.product.productPhotos[4]?.photo || "",
+      image2: myProduct?.product.productPhotos[0]?.photo || "",
+      image3: myProduct?.product.productPhotos[1]?.photo || "",
+      image4: myProduct?.product.productPhotos[2]?.photo || "",
+      image5: myProduct?.product.productPhotos[3]?.photo || "",
       categoryId: myProduct?.product.categoryId,
       subcategoryId: myProduct?.product.productSubCategories.map(
         (item) => item.subcategoryId,
@@ -92,7 +92,7 @@ export default function EditProduct({
             queryClient.invalidateQueries({
               queryKey: trpc.productrouter.showProduct.queryKey(),
             });
-            router.replace("/(root)/profile");
+            router.replace("/(root)/profile/product");
           }
         },
         onError: (error) => {

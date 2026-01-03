@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productInsertSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
@@ -14,6 +15,7 @@ import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
@@ -166,25 +168,18 @@ export default function AddProduct({
         onSuccess: (data) => {
           console.log("success", data);
           if (data.success) {
-            Swal.fire({
-              title: data.message,
-              icon: "success",
-              draggable: true,
-            });
+            sweetAlertSuccess(data.message);
             const queryClient = getQueryClient();
             queryClient.invalidateQueries({
               queryKey: trpc.productrouter.showProduct.queryKey(),
             });
-            router.push("/");
+            router.push("/profile/product");
           }
         },
         onError: (error) => {
-          Swal.fire({
-            title: error.message,
-            icon: "error",
-            color: "red",
-            draggable: true,
-          });
+          if (isTRPCClientError(error)) {
+            sweetAlertError(error.message);
+          }
         },
       },
     );

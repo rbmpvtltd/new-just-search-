@@ -4,6 +4,7 @@ import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
+import { id } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
@@ -16,6 +17,7 @@ import { uploadToCloudinary } from "@/components/image/cloudinary";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import type { OutputTrpcType } from "@/trpc/type";
 
@@ -54,21 +56,14 @@ export default function UserProfile({ user }: { user: UserProfile }) {
     };
     mutate(finalData, {
       onSuccess: (data) => {
-        console.log("success", data);
-        Swal.fire({
-          title: data.message,
-          icon: "success",
-          draggable: true,
-        });
-        router.push("/");
+        if (data.success) {
+          sweetAlertSuccess(data.message);
+          router.push("/");
+        }
       },
       onError: (error) => {
         if (isTRPCClientError(error)) {
-          Swal.fire({
-            title: error.message,
-            icon: "error",
-            draggable: true,
-          });
+          sweetAlertError(error.message);
           console.error("error,", error.message);
         }
       },

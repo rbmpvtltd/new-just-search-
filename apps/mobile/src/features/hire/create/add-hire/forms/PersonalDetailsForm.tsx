@@ -61,7 +61,7 @@ export default function PersonalDetailsForm({
   });
 
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
-  
+
   const { data: subCategories, isLoading: subCategoriesLoading } = useQuery(
     trpc.hirerouter.getSubCategories.queryOptions({
       categoryId: selectedCategoryId,
@@ -358,8 +358,6 @@ export default function PersonalDetailsForm({
               {field.name === "alternativeMobileNumber" && (
                 <LocationAutoDetect
                   onResult={(locationData) => {
-                    console.log("data", locationData);
-
                     const formatted = locationData.formattedAddress ?? "";
                     const parts = formatted.split(",").map((p) => p.trim());
 
@@ -368,7 +366,8 @@ export default function PersonalDetailsForm({
                     const pincode = locationData.postalCode || "";
                     const cityName = locationData.city || "";
                     const stateName = locationData.region || "";
-                    const area = parts.length > 1 ? parts[2] : "";
+                    const area =
+                      parts.length > 1 ? `${parts[2]} ${parts[3]}` : "";
                     const street_name = parts.length > 1 ? parts[1] : "";
                     const landmark = locationData.street || "";
                     const building_name = parts[0].match(/[A-Za-z]/)
@@ -387,7 +386,7 @@ export default function PersonalDetailsForm({
                     setValue("state", matchedState?.id ?? 0);
                     setValue(
                       "area",
-                      building_name || area || street_name || landmark,
+                      area || building_name || street_name || landmark,
                     );
                   }}
                 />

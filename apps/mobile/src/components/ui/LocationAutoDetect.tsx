@@ -33,14 +33,19 @@ export default function LocationAutoDetect({
   iconOnly,
   className,
 }: Props) {
-  const { data, isLoading, isError, error, refetch } = useDetectLocation(false);
+  const {
+    data: detected,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useDetectLocation(false);
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "light"];
 
   const handleDetect = async () => {
     try {
-      const result = await refetch();
-
+      const result = detected ? { data: detected } : await refetch();
       if (result.data) {
         const { coords, address, success } = result.data;
 

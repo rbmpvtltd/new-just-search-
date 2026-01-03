@@ -85,7 +85,7 @@ export default function AddOffer() {
             queryClient.invalidateQueries({
               queryKey: trpc.offerrouter.showOffer.queryKey(),
             });
-            router.replace("/(root)/profile");
+            router.replace("/(root)/profile/offer");
           }
           // router.push("/");
         },

@@ -83,16 +83,16 @@ export const hirerouter = router({
         });
       }
 
-      const existingBusiness = await db.query.businessListings.findFirst({
-        where: (businessListings, { eq }) =>
-          eq(businessListings.userId, ctx.userId),
-      });
-      if (existingBusiness) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "User already have business listing",
-        });
-      }
+      // const existingBusiness = await db.query.businessListings.findFirst({
+      //   where: (businessListings, { eq }) =>
+      //     eq(businessListings.userId, ctx.userId),
+      // });
+      // if (existingBusiness) {
+      //   throw new TRPCError({
+      //     code: "CONFLICT",
+      //     message: "User already have business listing",
+      //   });
+      // }
 
       const existingHire = await db.query.hireListing.findFirst({
         where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
@@ -331,7 +331,6 @@ export const hirerouter = router({
           state: input.state,
           city: input.city,
           email: input.email,
-          mobileNumber: input.mobileNumber,
           alternativeMobileNumber: input.alternativeMobileNumber,
           highestQualification: input.highestQualification,
           workExperienceYear: input.workExperienceYear,
@@ -362,6 +361,7 @@ export const hirerouter = router({
           coverLetter: input.coverLetter,
           resumePhoto: input.resumePhoto,
           aboutYourself: input.aboutYourself,
+          
         })
         .where(eq(schemas.hire.hireListing.userId, isHireExists.userId));
 

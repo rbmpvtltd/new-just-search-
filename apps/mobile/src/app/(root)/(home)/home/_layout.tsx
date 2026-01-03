@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import { DrawerMenu } from "@/components/layout/Drawer";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useLoadToken } from "@/hooks/useLoadToken";
+import { Text } from "react-native";
 
 export default function HomeLayout() {
   const { data, isLoading } = useLoadToken();
@@ -35,6 +36,7 @@ export default function HomeLayout() {
         options={{
           headerShown: true,
           headerLeft: () => <DrawerMenu />,
+          headerRight: () => <Text className="text-secondary">hi</Text>,
           title: "",
         }}
       />
