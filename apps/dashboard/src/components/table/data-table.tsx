@@ -119,13 +119,6 @@ export function DataTable<TData, TValue>({
       globalFilter,
       columnFilters,
     },
-    // TODO: remove this comment --
-    // initialState: {
-    //   pagination: {
-    //     pageIndex: 0,
-    //     pageSize: 10,
-    //   },
-    // },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -136,7 +129,6 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    // getSortedRowModel: getSortedRowModel(), // TODO: remove this
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     manualPagination,

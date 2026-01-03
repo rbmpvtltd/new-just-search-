@@ -14,7 +14,8 @@ import {
   cities,
   subcategories,
 } from "../db/src/schema/not-related.schema";
-import { fakeSeed, fakeUserSeed } from "./fake.seed";
+import { getRightLocation } from "./business.seed";
+import { fakeSeed, getFakeHireUser } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { safeArray } from "./utils";
@@ -36,17 +37,12 @@ const cleardataofhire = async () => {
   console.log("all tables clear successfully");
 };
 
-export const addHire = async () => {
+const addHire = async () => {
   const [rows]: any[] = await sql.execute(
     "SELECT * FROM listings WHERE type = 2",
   );
 
-  let fakeUser = await fakeUserSeed();
-
-  if (!fakeUser) {
-    const seed = await fakeSeed();
-    fakeUser = seed?.user;
-  }
+  const fakeUser = await getFakeHireUser();
 
   if (!fakeUser) {
     throw new Error("Failed to generate a fake user!");
@@ -83,14 +79,12 @@ export const addHire = async () => {
   for (const row of rows) {
     // const row = rows[0];
 
-    console.log("row-------", row);
     // return;
     let [createUser] = await db
       .select()
       .from(users)
       .where(eq(users.id, Number(row.user_id)));
 
-    console.log("createUser", createUser);
     if (!createUser) {
       const [user]: any[] = await sql.execute(
         `SELECT * FROM users WHERE id = ${row.user_id}`,
@@ -98,7 +92,6 @@ export const addHire = async () => {
 
       if (user[0]) {
         const mySqlUser = user[0];
-        console.log("mySqlUser", mySqlUser);
         // return
         try {
           [createUser] = await db
@@ -114,8 +107,11 @@ export const addHire = async () => {
             })
             .returning();
           console.log(createUser);
+          // TODO: user profile is not added yet
         } catch (e) {
-          console.error("error is ", e.message);
+          if (e instanceof Error) {
+            console.error("error is ", e.message);
+          }
         }
       } else {
         createUser = fakeUser;
@@ -156,7 +152,7 @@ export const addHire = async () => {
     if (row.photo) {
       hireListingPhoto = await uploadOnCloudinary(
         liveHireImageUrl,
-        "Banner",
+        "Hire",
         clouadinaryFake,
       );
     }
@@ -175,6 +171,7 @@ export const addHire = async () => {
           : "";
 
       const highestQualification = educationMap[qualificationKey] ?? null;
+      const { latitude, longitude } = getRightLocation(row);
       await db.insert(hireListing).values({
         id: row.id,
         salesmanId: row.salesman_id ?? 1,
@@ -201,16 +198,16 @@ export const addHire = async () => {
         languages: safeArray(row.languages),
         specialities: row.specialities,
         description: row.description,
-        latitude: row.latitude,
-        longitude: row.longitude,
+        latitude,
+        longitude,
         buildingName: row.building_name,
         streetName: row.street_name,
-        area: row.area || "dadasd",
+        address: row.real_address ?? row.area,
         landmark: row.landmark,
         pincode: row.pincode,
         state: row.state,
         // city: city!.id,
-        schedules: JSON.stringify(row.schedules),
+
         photo: hireListingPhoto ?? "",
         isFeature: row.is_feature === 1,
         status: "Approved",
@@ -222,7 +219,6 @@ export const addHire = async () => {
         facebook: row.facebook,
         twitter: row.twitter,
         linkedin: row.linkedin,
-        views: 0,
         highestQualification: highestQualification ?? 12,
         employmentStatus: row.employment_status,
         workExperienceYear: row.work_experience_year,

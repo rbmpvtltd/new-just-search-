@@ -90,6 +90,7 @@ const addBusiness = async () => {
               phoneNumber: mySqlUser.phone,
             })
             .returning();
+          // TODO: userprofile is not added yet
           console.log(createUser);
         } catch (e) {
           console.error("error is ", e);
@@ -183,7 +184,7 @@ const addBusiness = async () => {
         longitude,
         buildingName: row.building_name,
         streetName: row.street_name,
-        area: row.area,
+        address: row.real_address ?? row.area,
         landmark: row.landmark,
         pincode: String(row.pincode),
         state: city.stateId,
@@ -487,7 +488,7 @@ const scheduleExtracter = (
   };
 };
 
-const getRightLocation = (
+export const getRightLocation = (
   row: any,
 ): { latitude: number; longitude: number } => {
   const id = row.id;

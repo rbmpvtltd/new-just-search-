@@ -24,9 +24,9 @@ dotenv.config();
 export const productSeed = async () => {
   await clearAllTablesBusiness();
   await addProduct();
-  // await addProductReviews();
+  await addProductReviews();
+  await addProductSubCategroy();
   // await addRecentViewProduct();
-  // await addProductSubCategroy();
 };
 
 export const clearAllTablesBusiness = async () => {
@@ -62,11 +62,18 @@ export const addProduct = async () => {
       continue;
     }
 
+    const liveProductsImageUrl = `https://justsearch.net.in/assets/images/image1`;
+    const uploaded = await uploadOnCloudinary(
+      liveProductsImageUrl,
+      "Products",
+      clouadinaryFake,
+    );
+
     const [productCreated] = await db
       .insert(products)
       .values({
         id: row.id,
-        mainImage: "Banner/cbycmehjeetyxbuxc6ie", // TODO: change this Static placeholder image
+        mainImage: uploaded,
         status: true,
         businessId: business.id,
         categoryId: category.id,
@@ -81,8 +88,13 @@ export const addProduct = async () => {
       })
       .returning();
 
+    if (!productCreated) {
+      console.log("product not found", row.id);
+      throw new Error("product not found");
+    }
+
     // Product Photos
-    const images = ["image1", "image2", "image3", "image4", "image5"];
+    const images = ["image2", "image3", "image4", "image5"];
     for (const image of images) {
       if (row[image]) {
         const liveProductsImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
@@ -95,7 +107,7 @@ export const addProduct = async () => {
 
         if (photoUrl) {
           await db.insert(productPhotos).values({
-            productId: productCreated!.id,
+            productId: productCreated.id,
             photo: photoUrl,
             createdAt: row.created_at,
             updatedAt: row.updated_at,
@@ -108,92 +120,89 @@ export const addProduct = async () => {
 };
 
 // 2. products_reviews
-// const addProductReviews = async () => {
-//   const [review]: any[] = await sql.execute("SELECT  * FROM products_reviews");
-//   const fakeUser = await fakeUserSeed();
-//   const fakeBusiness = await fakeBusinessSeed();
+const addProductReviews = async () => {
+  const [review]: any[] = await sql.execute("SELECT  * FROM products_reviews");
 
-//   for (const row of review) {
-//     let [user] = await db.select().from(users).where(eq(users.id, row.user_id));
+  for (const row of review) {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, row.user_id));
 
-//     if (!user) {
-//       console.log(`user not found ${row.id} using faKe user`);
-//       user = fakeUser;
-//     }
+    if (!user) {
+      console.log(`user not found ${row.id} using faKe user`);
+      continue;
+    }
 
-//     let [business] = await db
-//       .select()
-//       .from(businessListings)
-//       .where(eq(businessListings.id, row.listing_id));
-//     console.log(fakeBusiness);
+    const [business] = await db
+      .select()
+      .from(businessListings)
+      .where(eq(businessListings.id, row.listing_id));
 
-//     if (!business) {
-//       console.log(`business not found ${row.id} using faKe business`);
-//       business = fakeBusiness as any;
-//       continue;
-//     }
+    if (!business) {
+      console.log(`business not found ${row.id} using faKe business`);
+      continue;
+    }
 
-//     const [Product] = await db
-//       .select()
-//       .from(products)
-//       .where(eq(products.id, row.product_id));
-//     if (!Product) {
-//       console.log("Product not found", row.id);
-//       continue;
-//     }
-//     console.log("conflicts is here", business);
-//     await db.insert(productReviews).values({
-//       id: row.id,
-//       userId: user!.id,
-//       businessId: business!.id,
-//       productId: Product.id,
-//       name: row.name,
-//       email: row.email,
-//       message: row.message,
-//       rate: row.rate,
-//       view: row.view,
-//       status: true,
-//       createdAt: row.created_at,
-//       updatedAt: row.updated_at,
-//     });
-//   }
-//   // console.log('successfully seed of productReviews')
-// };
+    const [product] = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, row.product_id));
+    if (!product) {
+      console.log("Product not found", row.id);
+      continue;
+    }
+    await db.insert(productReviews).values({
+      id: row.id,
+      userId: user.id,
+      businessId: business.id,
+      productId: product.id,
+      name: row.name,
+      email: row.email,
+      message: row.message,
+      rate: row.rate,
+      status: true,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    });
+  }
+  // console.log('successfully seed of productReviews')
+};
 
-// // 4.ProductSubcCategroy
-// const addProductSubCategroy = async () => {
-//   const [subCategory]: any[] = await sql.execute(
-//     "SELECT * FROM product_subcategory",
-//   );
-//   for (const row of subCategory) {
-//     const [Product] = await db
-//       .select()
-//       .from(products)
-//       .where(eq(products.id, row.product_id));
-//     if (!Product) {
-//       console.log("Product not found", row.id);
-//       continue;
-//     }
+// 4.ProductSubcCategroy
+const addProductSubCategroy = async () => {
+  const [subCategory]: any[] = await sql.execute(
+    "SELECT * FROM product_subcategory",
+  );
+  for (const row of subCategory) {
+    const [Product] = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, row.product_id));
+    if (!Product) {
+      console.log("Product not found", row.id);
+      continue;
+    }
 
-//     const [subCategory] = await db
-//       .select()
-//       .from(subcategories)
-//       .where(eq(subcategories.id, row.subcategory_id));
-//     if (!subCategory) {
-//       console.log("subCategory not found", row.id);
-//       continue;
-//     }
+    const [subCategory] = await db
+      .select()
+      .from(subcategories)
+      .where(eq(subcategories.id, row.subcategory_id));
+    if (!subCategory) {
+      console.log("subCategory not found", row.id);
+      continue;
+    }
 
-//     await db.insert(productSubCategories).values({
-//       productId: Product.id,
-//       subcategoryId: subCategory.id,
-//     });
-//   }
-//   console.log("succcessfully seed of product_subcategory");
-// };
+    await db.insert(productSubCategories).values({
+      productId: Product.id,
+      subcategoryId: subCategory.id,
+    });
+  }
+  console.log("succcessfully seed of product_subcategory");
+};
 
-// // NOTE: recent_views_listings TABLE NOT FOUND
-// // 5. recent_views_product
+// NOTE: recent_views_listings TABLE NOT FOUND
+// 5. recent_views_product
 // const addRecentViewProduct = async () => {
 //   const [recentViews]: any[] = await sql.execute(
 //     "SELECT * FROM recent_views_listings",
@@ -207,7 +216,7 @@ export const addProduct = async () => {
 //       console.log("Product not found", row.id);
 //       continue;
 //     }
-
+//
 //     await db.insert(recentViewProducts).values({
 //       productId: Product.id,
 //       device: row.device,

@@ -39,7 +39,7 @@ export const businessListings = pgTable("business_listings", {
   longitude: doublePrecision("longitude"),
   buildingName: varchar("building_name", { length: 255 }),
   streetName: varchar("street_name", { length: 255 }),
-  area: varchar("area", { length: 255 }),
+  address: varchar("address", { length: 255 }),
   landmark: varchar("landmark", { length: 255 }),
   pincode: varchar("pincode"),
   state: integer("state").notNull(),
@@ -73,7 +73,8 @@ export const businessInsertSchema = createInsertSchema(businessListings, {
     z.string().min(3, "Building name should be minimum 3 characters long"),
   streetName: () =>
     z.string().min(3, "Street name should be minimum 3 characters long"),
-  area: () => z.string().min(3, "Area should be minimum 3 characters long"),
+  address: () =>
+    z.string().min(3, "address should be minimum 3 characters long"),
   latitude: () =>
     z.number().refine(
       (val) => {
@@ -137,7 +138,7 @@ export const businessDetailSchema = businessInsertSchema.pick({
 export const addressDetailSchema = businessInsertSchema.pick({
   buildingName: true,
   streetName: true,
-  area: true,
+  address: true,
   landmark: true,
   latitude: true,
   longitude: true,
