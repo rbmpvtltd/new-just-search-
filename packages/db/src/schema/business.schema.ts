@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  doublePrecision,
   integer,
   pgTable,
   serial,
@@ -34,8 +35,8 @@ export const businessListings = pgTable("business_listings", {
   specialities: text("specialities"),
   description: text("description"),
   homeDelivery: varchar("home_delivery", { length: 255 }),
-  latitude: integer("latitude"),
-  longitude: integer("longitude"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
   buildingName: varchar("building_name", { length: 255 }),
   streetName: varchar("street_name", { length: 255 }),
   area: varchar("area", { length: 255 }),

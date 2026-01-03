@@ -23,27 +23,27 @@ import { clouadinaryFake } from "./seeds";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
-  // await addBusiness();
-  await seedFavourites();
-  // await businessesCategories();
-  // await businessesSubcategory();
+  await addBusiness();
+  // await seedFavourites();
+  await businessesCategories();
+  await businessesSubcategory();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
 export const clearAllTablesBusiness = async () => {
-  await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE  TABLE favourites RESTART IDENTITY CASCADE;`);
   await db.execute(
     `TRUNCATE TABLE business_categories RESTART IDENTITY CASCADE;`,
   );
   await db.execute(
     `TRUNCATE TABLE business_subcategories RESTART IDENTITY CASCADE;`,
   );
-  await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
-  // );
+  // await db.execute(`TRUNCATE TABLE business_reviews RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE business_photos RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE TABLE business_listings RESTART IDENTITY CASCADE;`,
+  );
   console.log(" All tables cleared successfully!");
 };
 
@@ -72,7 +72,7 @@ const addBusiness = async () => {
 
       if (user[0]) {
         const mySqlUser = user[0];
-        console.log("mySqlUser", mySqlUser);
+        // console.log("mySqlUser", mySqlUser);
         // return
         try {
           [createUser] = await db
@@ -163,6 +163,7 @@ const addBusiness = async () => {
       //TODO: fixed schedure;
 
       const { latitude, longitude } = getRightLocation(row);
+      console.log("latitude", latitude, "longitude", longitude);
       const businessData: BusinessData = {
         id: row.id,
         salesmanId: saleman[0]?.id ?? 1,
@@ -200,12 +201,12 @@ const addBusiness = async () => {
         createdAt: row.created_at,
         updatedAt: row.updated_at,
       };
+      console.log("businessData", businessData);
       const [newbusinessListing] = await db
         .insert(businessListings)
         .values(businessData)
         .returning();
 
-      // images handle
       if (newbusinessListing) {
         const images = ["image1", "image2", "image3", "image4", "image5"];
         for (const image of images) {
@@ -228,9 +229,9 @@ const addBusiness = async () => {
           }
         }
       }
-    } catch (_) {
+    } catch (error: any) {
       console.error("row id is ", row.id, "user id", row.user_id);
-      throw new Error("error in business migration");
+      throw new Error("error in business", error);
     }
   }
 
@@ -497,7 +498,10 @@ const getRightLocation = (
       2091, 2092, 2094, 2126, 2136, 2200, 2215, 2398,
     ].includes(id)
   ) {
-    return { latitude: clear_longitude, longitude: clear_latitude };
+    return {
+      latitude: Number(clear_longitude),
+      longitude: Number(clear_latitude),
+    };
   }
 
   if (id === 292) {
@@ -563,5 +567,8 @@ const getRightLocation = (
   if (id === 2398) {
     return { latitude: 26.2746863, longitude: 73.0212532 };
   }
-  return { latitude: clear_latitude, longitude: clear_longitude };
+  return {
+    latitude: Number(clear_latitude),
+    longitude: Number(clear_longitude),
+  };
 };

@@ -127,15 +127,15 @@ async function algoliaHireSeed() {
       .groupBy(hireListing.id, cities.city, states.name);
 
     const finalData = data.map((item) => {
-      let longitude = item.longitude?.replaceAll(",", "");
-      let latitude = item.latitude?.replaceAll(",", "");
+      const longitude = item.longitude;
+      const latitude = item.latitude;
       console.log("longi and lati", longitude, latitude);
-      if (isNaN(Number(longitude))) {
-        longitude = "73.0363583";
-      }
-      if (isNaN(Number(latitude))) {
-        latitude = "26.292058";
-      }
+      // if (isNaN(Number(longitude))) {
+      //   longitude = "73.0363583";
+      // }
+      // if (isNaN(Number(latitude))) {
+      //   latitude = "26.292058";
+      // }
 
       return {
         objectID: item.id,
@@ -244,15 +244,15 @@ async function algoliaBusinessSeed() {
       .groupBy(businessListings.id, businessCategories.id);
 
     const finalData = data.map((item) => {
-      let longitude = item.longitude?.replaceAll(",", "");
-      let latitude = item.latitude?.replaceAll(",", "");
+      const longitude = item.longitude;
+      const latitude = item.latitude;
       console.log("longi and lati", longitude, latitude);
-      if (isNaN(Number(longitude))) {
-        longitude = "73.0363583";
-      }
-      if (isNaN(Number(latitude))) {
-        latitude = "26.292058";
-      }
+      // if (isNaN(Number(longitude))) {
+      //   longitude = 73.0363583;
+      // }
+      // if (isNaN(Number(latitude))) {
+      //   latitude = 26.292058;
+      // }
 
       return {
         objectID: item.id,
@@ -593,15 +593,15 @@ async function algoliaAllListingSeed() {
       .groupBy(hireListing.id, cities.city, states.name, hireCategories.id);
 
     const bdata = businessData.map((item) => {
-      let longitude = item.longitude?.replaceAll(",", "");
-      let latitude = item.latitude?.replaceAll(",", "");
+      const longitude = item.longitude;
+      const latitude = item.latitude;
       console.log("longi and lati", longitude, latitude);
-      if (isNaN(Number(longitude))) {
-        longitude = "73.0363583";
-      }
-      if (isNaN(Number(latitude))) {
-        latitude = "26.292058";
-      }
+      // if (isNaN(Number(longitude))) {
+      //   longitude = "73.0363583";
+      // }
+      // if (isNaN(Number(latitude))) {
+      //   latitude = "26.292058";
+      // }
 
       return {
         objectID: item.id,
@@ -634,15 +634,15 @@ async function algoliaAllListingSeed() {
     });
 
     const hdata = hireData.map((item) => {
-      let longitude = item.longitude?.replaceAll(",", "");
-      let latitude = item.latitude?.replaceAll(",", "");
+      const longitude = item.longitude;
+      const latitude = item.latitude;
       console.log("longi and lati", longitude, latitude);
-      if (isNaN(Number(longitude))) {
-        longitude = "73.0363583";
-      }
-      if (isNaN(Number(latitude))) {
-        latitude = "26.292058";
-      }
+      // if (isNaN(Number(longitude))) {
+      //   longitude = "73.0363583";
+      // }
+      // if (isNaN(Number(latitude))) {
+      //   latitude = "26.292058";
+      // }
 
       return {
         objectID: item.id,

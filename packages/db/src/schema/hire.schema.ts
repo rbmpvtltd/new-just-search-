@@ -48,8 +48,8 @@ export const hireListing = pgTable("hire_listing", {
   slug: varchar("slug", { length: 255 }),
   specialities: text("specialities"),
   description: text("description"),
-  latitude: varchar("latitude", { length: 100 }),
-  longitude: varchar("longitude", { length: 100 }),
+  latitude: integer("latitude"),
+  longitude: integer("longitude"),
   buildingName: varchar("building_name", { length: 255 }),
   streetName: varchar("street_name", { length: 255 }),
   area: varchar("area", { length: 255 }),
@@ -117,18 +117,16 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
 
   languages: () => z.array(z.number()).min(1, "Select at least one language"),
   latitude: () =>
-    z.string().refine(
+    z.number().refine(
       (val) => {
-        const num = parseFloat(val);
-        return !Number.isNaN(num) && num >= -90 && num <= 90;
+        return !Number.isNaN(val) && val >= -90 && val <= 90;
       },
       { message: "Latitude must be a number between -90 and 90" },
     ),
   longitude: () =>
-    z.string().refine(
+    z.number().refine(
       (val) => {
-        const num = parseFloat(val);
-        return !Number.isNaN(num) && num >= -180 && num <= 180;
+        return !Number.isNaN(val) && val >= -180 && val <= 180;
       },
       { message: "Longitude must be a number between -180 and 180" },
     ),
