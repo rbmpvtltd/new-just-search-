@@ -170,12 +170,12 @@ function AddBusinessPage() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <KeyboardAwareScrollView
           enableOnAndroid
-          extraScrollHeight={60}
+          extraScrollHeight={50}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             flexGrow: 1,
-            paddingHorizontal: 12,
+            paddingHorizontal: 6,
             paddingVertical: 0,
           }}
         >

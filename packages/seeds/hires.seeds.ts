@@ -17,7 +17,7 @@ import { getRightLocation } from "./business.seed";
 import { getFakeHireUser } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
-import { safeArray } from "./utils";
+import { insertUser, safeArray } from "./utils";
 
 export const hireSeed = async () => {
   await cleardataofhire();
@@ -41,14 +41,13 @@ const addHire = async () => {
     "SELECT * FROM listings WHERE type = 2",
   );
 
-  const fakeUser = await getFakeHireUser();
+  // const fakeUser = await getFakeHireUser();
 
-  if (!fakeUser) {
-    throw new Error("Failed to generate a fake user!");
-  }
+  // if (!fakeUser) {
+  //   throw new Error("Failed to generate a fake user!");
+  // }
   const educationMap: Record<string, number | null> = {
     "2": null,
-
     "b.e / b.tech": 1,
     "b.tech ll.b.": 11,
     "b.a ll.b": 69,
@@ -79,48 +78,50 @@ const addHire = async () => {
     // const row = rows[0];
 
     // return;
-    let [createUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, Number(row.user_id)));
+    // let [createUser] = await db
+    //   .select()
+    //   .from(users)
+    //   .where(eq(users.id, Number(row.user_id)));
 
-    if (!createUser) {
-      const [user]: any[] = await sql.execute(
-        `SELECT * FROM users WHERE id = ${row.user_id}`,
-      );
+    // if (!createUser) {
+    //   const [user]: any[] = await sql.execute(
+    //     `SELECT * FROM users WHERE id = ${row.user_id}`,
+    //   );
 
-      if (user[0]) {
-        const mySqlUser = user[0];
-        // return
-        try {
-          [createUser] = await db
-            .insert(users)
-            .values({
-              id: mySqlUser.id,
-              displayName: row.name ?? mySqlUser.name,
-              email: mySqlUser.email,
-              googleId: mySqlUser.google_id,
-              password: mySqlUser.password,
-              role: UserRole.hire,
-              phoneNumber: mySqlUser.phone,
-            })
-            .returning();
-          console.log(createUser);
-          // TODO: user profile is not added yet
-        } catch (e) {
-          if (e instanceof Error) {
-            console.error("error is ", e.message);
-          }
-        }
-      } else {
-        createUser = fakeUser;
-      }
-    }
+    //   if (user[0]) {
+    //     const mySqlUser = user[0];
+    //     // return
+    //     try {
+    //       [createUser] = await db
+    //         .insert(users)
+    //         .values({
+    //           id: mySqlUser.id,
+    //           displayName: row.name ?? mySqlUser.name,
+    //           email: mySqlUser.email,
+    //           googleId: mySqlUser.google_id,
+    //           password: mySqlUser.password,
+    //           role: UserRole.hire,
+    //           phoneNumber: mySqlUser.phone,
+    //         })
+    //         .returning();
+    //       console.log(createUser);
+    //       // TODO: user profile is not added yet
+    //     } catch (e) {
+    //       if (e instanceof Error) {
+    //         console.error("error is ", e.message);
+    //       }
+    //     }
+    //   } else {
+    //     createUser = fakeUser;
+    //   }
+    // }
 
-    // return
-    if (!createUser) {
-      console.log("User not found" + row.id);
-    }
+    // // return
+    // if (!createUser) {
+    //   console.log("User not found" + row.id);
+    // }
+
+    const userId = await insertUser(row.user_id, "hire");
 
     let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
 
@@ -157,13 +158,13 @@ const addHire = async () => {
     }
 
     // console.log("=====");
-    console.log("createUser-------------------", createUser);
+    // console.log("createUser-------------------", createUser);
     // return;
 
     try {
-      if (!createUser) {
-        console.log("User not found" + row.id);
-      }
+      // if (!createUser) {
+      //   console.log("User not found" + row.id);
+      // }
       const qualificationKey =
         typeof row.highest_qualification === "string"
           ? row.highest_qualification.toLowerCase().trim()
@@ -176,7 +177,7 @@ const addHire = async () => {
         salesmanId: row.salesman_id ?? 1,
         fromHour: "",
         toHour: "",
-        userId: createUser?.id ?? 588,
+        userId,
         city: city!.id,
         name: row.name,
         slug: row.slug,

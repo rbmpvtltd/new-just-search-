@@ -114,6 +114,19 @@ export const franchiseSalemanRouter = router({
         pageCount: totalPages,
       };
     }),
+
+  totalUsers: franchisesProcedure.query(async ({ ctx }) => {
+    const allSalesman =
+      (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${salesmen.id})::int`,
+          })
+          .from(salesmen)
+          .where(eq(salesmen.franchiseId, ctx.userId))
+      )[0]?.count ?? 0;
+    return allSalesman;
+  }),
   add: franchisesProcedure.query(async ({ ctx }) => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();

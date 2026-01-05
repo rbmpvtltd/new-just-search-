@@ -1,20 +1,13 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { SectionCards } from "@/components/dashboard/section-cards";
-import { SectionCards2 } from "@/components/dashboard/section-cards_2";
+import { SectionCards } from "./salesman/components/section-cards";
 
-export default function Page() {
+export default async function Page() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div>project {process.env.TEST_DASHBOARD}</div>
         <div>repo root {process.env.TEST}</div>
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <SectionCards2 />
-          <SectionCards />
-          <div className="px-4 lg:px-6">
-            <ChartAreaInteractive />
-          </div>
-          {/* <DataTable data={data} /> */}
+          <SectionCards data={0} />
         </div>
       </div>
     </div>

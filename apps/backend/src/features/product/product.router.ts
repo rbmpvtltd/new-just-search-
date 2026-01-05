@@ -356,16 +356,8 @@ export const productrouter = router({
   createProductReview: protectedProcedure
     .input(insertProductReviewSchema)
     .mutation(async ({ input, ctx }) => {
-      const {
-        email,
-        message,
-        name,
-        productId,
-        businessId,
-        rate,
-        status,
-        view,
-      } = input;
+      const { email, message, name, productId, businessId, rate, status } =
+        input;
       const { userId } = ctx;
       const reviewExist = await productReviewExist(
         userId,
@@ -387,7 +379,6 @@ export const productrouter = router({
         name ?? "",
         email ?? "",
         status,
-        view,
       );
       return { success: true, data: data };
     }),

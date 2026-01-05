@@ -219,42 +219,48 @@ export default function BusinessDetail({
 
   return (
     // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAwareScrollView
-        enableOnAndroid
-        extraScrollHeight={80}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, paddingVertical: 16 }}
-      >
-        <View className="mx-auto w-[90%]">
-          {formFields.map((field) => (
-            <FormField key={field.name} {...field} />
-          ))}
-        </View>
-        <View className="flex-row items-center ml-8 w-[90%]">
-          <LableText title="Shop Images" className="" />
-          <Text style={{ color: "red" }} className="ml-1 mt-2">
-            *
-          </Text>
-        </View>
-        <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
-          {formFields2.map((field) => (
-            <FormField key={field.name} {...field} />
-          ))}
-        </View>
+    // <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    //   <KeyboardAwareScrollView
+    //     enableOnAndroid
+    //     extraScrollHeight={60}
+    //     keyboardShouldPersistTaps="handled"
+    //     showsVerticalScrollIndicator={false}
+    //     contentContainerStyle={{
+    //       flexGrow: 1,
+    //       paddingHorizontal: 12,
+    //       paddingVertical: 0,
+    //     }}
+    //   >
+    <>
+      <View className="mx-auto w-[90%]">
+        {formFields.map((field) => (
+          <FormField key={field.name} {...field} />
+        ))}
+      </View>
+      <View className="flex-row items-center ml-8 w-[90%]">
+        <LableText title="Shop Images" className="" />
+        <Text style={{ color: "red" }} className="ml-1 mt-2">
+          *
+        </Text>
+      </View>
+      <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
+        {formFields2.map((field) => (
+          <FormField key={field.name} {...field} />
+        ))}
+      </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-24">
-          <View className="w-[45%] mx-auto">
-            <PrimaryButton
-              title="Next"
-              isLoading={isSubmitting}
-              onPress={handleSubmit(onSubmit)}
-            />
-          </View>
+      <View className="flex-row justify-between w-[90%] self-center mt-6 mb-16">
+        <View className="w-[45%] mx-auto">
+          <PrimaryButton
+            title="Next"
+            isLoading={isSubmitting}
+            onPress={handleSubmit(onSubmit)}
+          />
         </View>
-      </KeyboardAwareScrollView>
-    </TouchableWithoutFeedback>
+      </View>
+    </>
+    //   </KeyboardAwareScrollView>
+    // </TouchableWithoutFeedback>
     // </SafeAreaView>
   );
 }

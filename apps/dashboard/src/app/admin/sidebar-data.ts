@@ -118,5 +118,10 @@ export const adminSidebarData: SidebarData = {
       url: "/delete-request",
       icon: IconFileWord,
     },
+    {
+      name: "Mobile Version Update",
+      url: "/update",
+      icon: IconFileWord,
+    },
   ],
 };
