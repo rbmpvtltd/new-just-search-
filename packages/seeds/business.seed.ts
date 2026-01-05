@@ -106,7 +106,6 @@ const addBusiness = async () => {
     if (skipSlug.includes(row.slug)) {
       slug = `${row.slug}-${row.id}`;
     }
-    // console.log("==========row is ===========",createUser)
     try {
       const saleman = await db
         .select()
