@@ -191,13 +191,13 @@ export const productrouter = router({
         });
       }
 
-      const products = await db.query.products.findMany({
+      const productData = await db.query.products.findMany({
         where: (products, { and, gt, eq }) =>
           and(
             eq(products.businessId, business.id),
             cursor ? gt(products.id, cursor) : undefined,
           ),
-        orderBy: (products, { desc }) => [desc(products.id)],
+        orderBy: (products, { asc }) => [asc(products.id)],
         limit,
         with: {
           productPhotos: true,
@@ -209,9 +209,9 @@ export const productrouter = router({
       // }
 
       const nextCursor =
-        products.length > 0 ? products[products.length - 1]?.id : null;
+        productData.length > 0 ? productData[productData.length - 1]?.id : null;
 
-      return { products, nextCursor };
+      return { productData, nextCursor };
     }),
 
   edit: businessProcedure

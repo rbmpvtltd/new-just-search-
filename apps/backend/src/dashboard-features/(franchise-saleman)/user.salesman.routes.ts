@@ -173,7 +173,6 @@ export const salesmanUserRouter = router({
           .where(eq(hireListing.salesmanId, ctx.userId))
       )[0]?.count ?? 0;
 
-    const totalUser = allBusiness + allhire;
-    return totalUser;
+    return { allBusiness, allhire };
   }),
 });

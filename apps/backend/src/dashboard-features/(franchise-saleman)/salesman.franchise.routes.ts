@@ -4,6 +4,8 @@ import {
   usersInsertSchema,
   usersUpdateSchema,
 } from "@repo/db/dist/schema/auth.schema";
+import { businessListings } from "@repo/db/dist/schema/business.schema";
+import { hireListing } from "@repo/db/dist/schema/hire.schema";
 import {
   categories,
   categoryUpdateSchema,
@@ -115,7 +117,7 @@ export const franchiseSalemanRouter = router({
       };
     }),
 
-  totalUsers: franchisesProcedure.query(async ({ ctx }) => {
+  totalSalesman: franchisesProcedure.query(async ({ ctx }) => {
     const allSalesman =
       (
         await db
@@ -125,6 +127,15 @@ export const franchiseSalemanRouter = router({
           .from(salesmen)
           .where(eq(salesmen.franchiseId, ctx.userId))
       )[0]?.count ?? 0;
+
+    const totalUsers = await db
+      .select({
+        count: sql<number>`count(distinct ${salesmen.id})::int`,
+      })
+      .from(salesmen)
+      .leftJoin(businessListings, eq(salesmen.id, businessListings.salesmanId))
+      .leftJoin(hireListing, eq(salesmen.id, hireListing.salesmanId))
+      .where(eq(salesmen.franchiseId, ctx.userId));
     return allSalesman;
   }),
   add: franchisesProcedure.query(async ({ ctx }) => {

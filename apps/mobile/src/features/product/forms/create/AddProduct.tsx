@@ -201,12 +201,12 @@ export default function AddProduct() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAwareScrollView
         enableOnAndroid
-        extraScrollHeight={60}
+        // extraScrollHeight={50}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
-          paddingHorizontal: 12,
+          // paddingHorizontal: 12,
           paddingVertical: 0,
         }}
       >
@@ -216,17 +216,17 @@ export default function AddProduct() {
           ))}
         </View>
         <View className="flex-row items-center ml-8 w-[90%]">
-          <LableText title="Product Images" className="" />
+          <LableText title="Offer Images" className="" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>
         </View>
-        <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
+        <View className="flex-row flex-wrap items-center gap-2 justify-center ">
           {formFields2.map((field) => (
-            <FormField key={field.name} {...field} />
+            <FormField labelHidden key={field.name} {...field} />
           ))}
         </View>
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-2">
+        <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2 mb-4">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
               title="Next"

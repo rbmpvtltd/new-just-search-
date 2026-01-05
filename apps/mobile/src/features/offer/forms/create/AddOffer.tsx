@@ -212,17 +212,14 @@ export default function AddOffer() {
     {
       control,
       name: "image2",
-      label: "",
       placeholder: "Select Image 2",
       component: "image",
       required: false,
-      className: "",
       error: errors.image2?.message,
     },
     {
       control,
       name: "image3",
-      label: "",
       placeholder: "Select Image 3",
       component: "image",
       required: false,
@@ -231,7 +228,6 @@ export default function AddOffer() {
     {
       control,
       name: "image4",
-      label: "",
       placeholder: "Select Image 4",
       component: "image",
       required: false,
@@ -240,7 +236,6 @@ export default function AddOffer() {
     {
       control,
       name: "image5",
-      label: "",
       placeholder: "Select Image 5",
       component: "image",
       required: false,
@@ -256,7 +251,7 @@ export default function AddOffer() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
-          paddingHorizontal: 12,
+          // paddingHorizontal: 12,
           paddingVertical: 0,
         }}
       >
@@ -271,12 +266,12 @@ export default function AddOffer() {
             *
           </Text>
         </View>
-        <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
+        <View className="mt-2 flex-row flex-wrap items-center gap-2 justify-center ">
           {formFields2.map((field) => (
-            <FormField key={field.name} {...field} />
+            <FormField labelHidden key={field.name} {...field} />
           ))}
         </View>
-        <View className="flex-row justify-between w-[90%] self-center mt-6 mb-2">
+        <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[100%] gap-2">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
               title="Next"

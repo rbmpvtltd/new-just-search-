@@ -238,7 +238,7 @@ export default function BusinessDetail({
           *
         </Text>
       </View>
-      <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2     ">
+      <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[100%] gap-2">
         {formFields2.map((field) => (
           <FormField key={field.name} {...field} />
         ))}

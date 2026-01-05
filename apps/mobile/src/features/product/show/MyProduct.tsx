@@ -35,9 +35,10 @@ export default function MyProductsList() {
   );
   const router = useRouter();
   if (isLoading) return <ActivityIndicator />;
+  console.log("Data", data);
 
   if (isError) return <SomethingWrong />;
-  if (!data?.pages[0].products || data.pages[0].products.length === 0)
+  if (!data?.pages[0].productData || data.pages[0].productData.length === 0)
     return (
       <View className="px-4 mt-4">
         <Pressable
@@ -51,7 +52,8 @@ export default function MyProductsList() {
         </Pressable>
       </View>
     );
-  const productsData = data?.pages.flatMap((page) => page.products || []) ?? [];
+  const productsData =
+    data?.pages.flatMap((page) => page.productData || []) ?? [];
 
   return (
     <View className="flex-1 bg-base-100">
@@ -70,7 +72,7 @@ export default function MyProductsList() {
 
 type ProductType = NonNullable<
   OutputTrpcType["productrouter"]["showProduct"]
->["products"][number];
+>["productData"][number];
 function ProductCard({ item }: { item: ProductType }) {
   const router = useRouter();
   const { mutate: deleteProduct, isPending } = useMutation(
