@@ -194,7 +194,6 @@ import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 
 export default function HireCard({
   item,
-  title,
 }: {
   item: HireListingHitType | SubcategoryHitType;
   title?: any;
