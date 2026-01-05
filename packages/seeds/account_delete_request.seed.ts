@@ -1,8 +1,7 @@
 import { db } from "@repo/db";
-import { account_delete_request } from "@repo/db/dist/schema/user.schema.js";
 import { users } from "@repo/db/dist/schema/auth.schema.js";
+import { account_delete_request } from "@repo/db/dist/schema/user.schema.js";
 import { eq } from "drizzle-orm";
-import { fakeUserSeed } from "./fake.seed.js";
 import { sql } from "./mysqldb.seed.js";
 
 export const seedRequestAccounts = async () => {
@@ -17,20 +16,17 @@ const seedrequestAccounts = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM request_accounts");
 
   for (const row of rows) {
-    let user_id = row.user_id;
-    const fakeUser = await fakeUserSeed();
+    const user_id = row.user_id;
     try {
       const [findUser] = await db
         .select()
         .from(users)
         .where(eq(users.id, row.user_id));
       if (!findUser) {
-        user_id = fakeUser?.id;
-        console.log("failed to find user", row.user_id);
+        continue;
       }
     } catch (error) {
-      user_id = fakeUser?.id;
-      console.log("error is", error.message);
+      continue;
     }
 
     await db.insert(account_delete_request).values({

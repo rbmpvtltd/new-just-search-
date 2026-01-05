@@ -22,12 +22,12 @@ const algoliaClient = algoliasearch(
 );
 
 export async function algoliaSeed() {
-  await algoliaHireSeed();
+  // await algoliaHireSeed();
   await algoliaBusinessSeed();
-  await algoliaProductOfferSeed();
+  // await algoliaProductOfferSeed();
   // await algoliaCategorySeed();
   // await algoliaSubCategorySeed();
-  await algoliaAllListingSeed();
+  // await algoliaAllListingSeed();
 }
 
 async function algoliaCategorySeed() {
@@ -157,8 +157,8 @@ async function algoliaHireSeed() {
         subcategories: item.subcategories,
         category: item.category,
         _geoloc: {
-          lat: Number(latitude),
-          lng: Number(longitude),
+          lat: latitude,
+          lng: longitude,
         },
       };
     });
@@ -269,8 +269,8 @@ async function algoliaBusinessSeed() {
         categoryId: item.categoryId,
         rating: Math.ceil(Number(item.rating)),
         _geoloc: {
-          lat: Number(latitude),
-          lng: Number(longitude),
+          lat: latitude,
+          lng: longitude,
         },
       };
     });

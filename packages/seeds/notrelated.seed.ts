@@ -103,7 +103,7 @@ export const bannerSeed = async () => {
   for (const row of rows) {
     const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
 
-    let bannerPhotoPublicId: string | null = null;
+    let bannerPhotoPublicId: string = "";
     if (row.photo) {
       bannerPhotoPublicId = await uploadOnCloudinary(
         liveProfileImageUrl,
@@ -115,7 +115,7 @@ export const bannerSeed = async () => {
     dbBannerValue.push({
       // id: row.id,
       route: row.route ?? null,
-      photo: "Banner/cbycmehjeetyxbuxc6ie", //TODO: change the photo with original when upload on cloudinary
+      photo: bannerPhotoPublicId,
       isActive: typeof row.status === "number" ? Boolean(row.status) : false,
       type: row.type,
       createdAt: row.created_at,

@@ -494,8 +494,8 @@ export const getRightLocation = (
   const { clear_longitude, clear_latitude } = row;
   if (
     ![
-      292, 433, 806, 1813, 1952, 2026, 2028, 2030, 2032, 2035, 2050, 2086, 2088,
-      2091, 2092, 2094, 2126, 2136, 2200, 2215, 2398,
+      292, 226, 433, 806, 1813, 1952, 2026, 2028, 2030, 2032, 2035, 2050, 2086,
+      2088, 2091, 2092, 2094, 2126, 2136, 2200, 2215, 2398,
     ].includes(id)
   ) {
     return {
@@ -506,6 +506,9 @@ export const getRightLocation = (
 
   if (id === 292) {
     return { latitude: 26.222869, longitude: 72.999919 };
+  }
+  if (id === 226) {
+    return { latitude: 26.190672086239275, longitude: 73.00460935509179 };
   }
   if (id === 433) {
     return { latitude: 19.20175, longitude: 72.859194 };

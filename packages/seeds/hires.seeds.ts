@@ -23,8 +23,8 @@ export const hireSeed = async () => {
   await cleardataofhire();
   await addHire();
   // await seedRecentViewsHire();
-  await seedHireCategories();
-  await seedHireSubcategories();
+  // await seedHireCategories();
+  // await seedHireSubcategories();
 };
 
 const cleardataofhire = async () => {
@@ -38,7 +38,7 @@ const cleardataofhire = async () => {
 
 const addHire = async () => {
   const [rows]: any[] = await sql.execute(
-    "SELECT * FROM listings WHERE type = 2",
+    "SELECT *, REPLACE(longitude , ',', '') as clear_longitude, REPLACE(latitude , ',', '') as clear_latitude FROM listings WHERE type = 2",
   );
 
   const fakeUser = await getFakeHireUser();
