@@ -258,7 +258,7 @@ async function algoliaBusinessSeed() {
         objectID: item.id,
         name: item.name,
         photo: item.photo,
-        area: item.area,
+        address: item.address,
         longitude,
         latitude,
         buildingName: item.buildingName,

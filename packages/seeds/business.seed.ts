@@ -10,7 +10,6 @@ import {
   businessReviews,
   businessSubcategories,
   favourites,
-  recentViewBusiness,
 } from "../db/src/schema/business.schema";
 import {
   categories,
@@ -24,10 +23,10 @@ import { clouadinaryFake } from "./seeds";
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
   await addBusiness();
-  // await seedFavourites();
+  await seedFavourites();
   await businessesCategories();
   await businessesSubcategory();
-  // await BusinessReviews();
+  await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -380,50 +379,50 @@ const BusinessReviews = async () => {
 };
 
 // recent_views_business
-export const seedRecentViewsBusiness = async () => {
-  const [rows]: any[] = await sql.execute(
-    "SELECT * FROM recent_views_listings",
-  );
-
-  for (const row of rows) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
-
-    const [businessListing] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
-
-    if (!user) {
-      console.warn(`User not found, using fake user`);
-      continue;
-    }
-
-    if (!businessListing) {
-      console.warn(`Business not found, using fake business`);
-      throw new Error(`Business not found ${row.listing_id}`);
-    }
-    try {
-      await db.insert(recentViewBusiness).values({
-        id: row.id,
-        userId: user.id,
-        businessId: businessListing.id,
-        device: row.device,
-        browser: row?.browser ?? "fake device",
-        operatingSystem: row?.operating_system ?? "fake os",
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-      });
-    } catch (e: any) {
-      console.log("successfully seed of recent views business");
-
-      console.error(e.message);
-    }
-  }
-  console.log("successfully recent views business");
-};
+// const seedRecentViewsBusiness = async () => {
+//   const [rows]: any[] = await sql.execute(
+//     "SELECT * FROM recent_views_listings",
+//   );
+//
+//   for (const row of rows) {
+//     const [user] = await db
+//       .select()
+//       .from(users)
+//       .where(eq(users.id, row.user_id));
+//
+//     const [businessListing] = await db
+//       .select()
+//       .from(businessListings)
+//       .where(eq(businessListings.id, row.listing_id));
+//
+//     if (!user) {
+//       console.warn(`User not found, using fake user`);
+//       continue;
+//     }
+//
+//     if (!businessListing) {
+//       console.warn(`Business not found, using fake business`);
+//       throw new Error(`Business not found ${row.listing_id}`);
+//     }
+//     try {
+//       await db.insert(recentViewBusiness).values({
+//         id: row.id,
+//         userId: user.id,
+//         businessId: businessListing.id,
+//         device: row.device,
+//         browser: row?.browser ?? "fake device",
+//         operatingSystem: row?.operating_system ?? "fake os",
+//         createdAt: row.created_at,
+//         updatedAt: row.updated_at,
+//       });
+//     } catch (e: any) {
+//       console.log("successfully seed of recent views business");
+//
+//       console.error(e.message);
+//     }
+//   }
+//   console.log("successfully recent views business");
+// };
 
 type DayKey = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 interface OpenDay {

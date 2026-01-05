@@ -250,22 +250,22 @@ export const insertBusinessReviewSchema = createInsertSchema(businessReviews, {
 // });
 
 // 8. recent_views_business
-export const recentViewBusiness = pgTable("recent_view_business", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id),
-
-  businessId: integer("business_id")
-    .notNull()
-    .references(() => businessListings.id),
-
-  device: varchar("device", { length: 255 }),
-  browser: varchar("browser", { length: 255 }),
-  operatingSystem: varchar("operating_system", { length: 255 }),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+// export const recentViewBusiness = pgTable("recent_view_business", {
+//   id: serial("id").primaryKey(),
+//   userId: integer("user_id")
+//     .notNull()
+//     .references(() => users.id),
+//
+//   businessId: integer("business_id")
+//     .notNull()
+//     .references(() => businessListings.id),
+//
+//   device: varchar("device", { length: 255 }),
+//   browser: varchar("browser", { length: 255 }),
+//   operatingSystem: varchar("operating_system", { length: 255 }),
+//   createdAt: timestamp("created_at").defaultNow(),
+//   updatedAt: timestamp("updated_at").defaultNow(),
+// });
 
 // // 9  business_refer
 // export const businessRefer = pgTable("business_refer", {

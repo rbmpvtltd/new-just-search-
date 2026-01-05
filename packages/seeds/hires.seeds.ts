@@ -7,7 +7,6 @@ import {
   hireCategories,
   hireListing,
   hireSubcategories,
-  recentViewHire,
 } from "../db/src/schema/hire.schema";
 import {
   categories,
@@ -15,7 +14,7 @@ import {
   subcategories,
 } from "../db/src/schema/not-related.schema";
 import { getRightLocation } from "./business.seed";
-import { fakeSeed, getFakeHireUser } from "./fake.seed";
+import { getFakeHireUser } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { safeArray } from "./utils";
@@ -254,41 +253,41 @@ const addHire = async () => {
 };
 
 // seedRecentViewsHire
-const seedRecentViewsHire = async () => {
-  const [recentViews]: any[] = await sql.execute(
-    "SELECT * FROM recent_views_listings",
-  );
-
-  for (const row of recentViews) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
-    if (!user) {
-      console.log("user not found");
-      continue;
-    }
-
-    const [hire] = await db
-      .select()
-      .from(hireListing)
-      .where(eq(hireListing.id, row.listing_id));
-
-    if (!hire) {
-      console.log("hire not found");
-      continue;
-    }
-
-    await db.insert(recentViewHire).values({
-      userId: user.id,
-      hireId: hire.id,
-      device: row.device,
-      browser: row.browser,
-      operatingSystem: row.operating_system,
-    });
-  }
-  console.log("successfully ");
-};
+// const seedRecentViewsHire = async () => {
+//   const [recentViews]: any[] = await sql.execute(
+//     "SELECT * FROM recent_views_listings",
+//   );
+//
+//   for (const row of recentViews) {
+//     const [user] = await db
+//       .select()
+//       .from(users)
+//       .where(eq(users.id, row.user_id));
+//     if (!user) {
+//       console.log("user not found");
+//       continue;
+//     }
+//
+//     const [hire] = await db
+//       .select()
+//       .from(hireListing)
+//       .where(eq(hireListing.id, row.listing_id));
+//
+//     if (!hire) {
+//       console.log("hire not found");
+//       continue;
+//     }
+//
+//     await db.insert(recentViewHire).values({
+//       userId: user.id,
+//       hireId: hire.id,
+//       device: row.device,
+//       browser: row.browser,
+//       operatingSystem: row.operating_system,
+//     });
+//   }
+//   console.log("successfully ");
+// };
 
 // seedHireSubcategories
 export const seedHireSubcategories = async () => {

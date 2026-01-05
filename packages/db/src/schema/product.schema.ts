@@ -106,7 +106,6 @@ export const insertProductReviewSchema = createInsertSchema(productReviews, {
   rate: () =>
     z.number().min(1).max(5, "Rating must be between 1 and 5").optional(),
   email: () => z.email().min(8, "Email Must Be Contain 8 Characters").max(500),
-  view: () => z.boolean(),
   status: () => z.boolean(),
 }).omit({
   userId: true,
