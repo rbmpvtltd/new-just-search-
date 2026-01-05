@@ -11,7 +11,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = false;
+export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
 
@@ -20,11 +20,11 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
     // Postgres seeding
     // await notRelated();
     // await userSeed();
-    await fakeSeed();
+    // await fakeSeed();
     // await businessSeed();
-    // await hireSeed();
     // await productSeed();
     // await offerSeed();
+    await hireSeed();
     // await feedbackseed();
     // await seedRequestAccounts();
     // await planSeed();

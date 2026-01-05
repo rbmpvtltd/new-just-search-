@@ -45,7 +45,7 @@ export const hireListing = pgTable("hire_listing", {
   dob: date("dob"),
   gender: genderEnum("gender").notNull(),
   maritalStatus: maritalStatusEnum("marital_status").notNull(),
-  languages: integer("language").array().notNull(),
+  languages: integer("languages").array().notNull(),
   slug: varchar("slug", { length: 255 }),
   specialities: text("specialities"),
   description: text("description"),

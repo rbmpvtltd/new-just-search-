@@ -1,7 +1,9 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
-import { eq } from "drizzle-orm";
+import { JobType, UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { languages } from "@repo/db/dist/schema/not-related.schema";
+import { salesmen } from "@repo/db/dist/schema/user.schema";
+import { eq, type InferInsertModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
   hireCategories,
@@ -141,6 +143,7 @@ const addHire = async () => {
       "9027662451740469698.jpg",
       "3709273371738146929.jpeg",
       "6924536251755946456.jpeg",
+      "19940945571746603611.jpg",
     ];
 
     if (invalidPhotos.includes(row.photo)) {
@@ -150,11 +153,15 @@ const addHire = async () => {
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     let hireListingPhoto: string | null = null;
     if (row.photo) {
-      hireListingPhoto = await uploadOnCloudinary(
-        liveHireImageUrl,
-        "Hire",
-        clouadinaryFake,
-      );
+      try {
+        hireListingPhoto = await uploadOnCloudinary(
+          liveHireImageUrl,
+          "Hire",
+          clouadinaryFake,
+        );
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
     }
 
     // console.log("=====");
@@ -170,19 +177,175 @@ const addHire = async () => {
           ? row.highest_qualification.toLowerCase().trim()
           : "";
 
+      const saleman = await db
+        .select()
+        .from(salesmen)
+        .where(
+          eq(
+            salesmen.referCode,
+            row.refer_code ? row.refer_code.toUpperCase() : null,
+          ),
+        );
+
       const highestQualification = educationMap[qualificationKey] ?? null;
       const { latitude, longitude } = getRightLocation(row);
+
+      const languagesIds = await Promise.all(
+        safeArray(row.languages).map(async (language: string) => {
+          const [languageDB] = await db
+            .select()
+            .from(languages)
+            .where(eq(languages.name, language));
+          return languageDB?.id;
+        }),
+      );
+      type HireData = InferInsertModel<typeof hireListing>;
+      const jobType = safeArray(row.job_type).map((jobType: string) => {
+        if (jobType === "Full Time") return JobType.FullTime;
+        return jobType;
+      });
+      // const hireData: HireData = {
+      //   id: row.id,
+      //   salesmanId: saleman[0]?.id ?? 1,
+      //   fromHour: "",
+      //   toHour: "",
+      //   userId,
+      //   city: city?.id ?? 449,
+      //   name: row.name,
+      //   slug: row.slug,
+      //   fatherName: row.father_name,
+      //   dob: String(row.dob),
+      //   gender:
+      //     row.gender === 1 ? "Male" : row.gender === 2 ? "Female" : "Others",
+      //   maritalStatus:
+      //     row.marital_status === 1
+      //       ? "Married"
+      //       : row.marital_status === 2
+      //         ? "Unmarried"
+      //         : row.marital_status === 3
+      //           ? "Widowed"
+      //           : row.marital_status === 4
+      //             ? "Divorced"
+      //             : "Others",
+      //   languages: languagesIds,
+      //   specialities: row.specialities,
+      //   description: row.description,
+      //   latitude,
+      //   longitude,
+      //   buildingName: row.building_name,
+      //   streetName: row.street_name,
+      //   address: row.real_address ?? row.area,
+      //   landmark: row.landmark,
+      //   pincode: String(row.pincode),
+      //   state: row.state,
+      //   // city: city!.id,
+
+      //   photo: hireListingPhoto ?? "",
+      //   isFeature: row.is_feature === 1,
+      //   status: "Approved",
+      //   website: row.website,
+      //   email: row.email,
+      //   mobileNumber: row.mobile_number,
+      //   whatsappNo: row.whatsapp_no,
+      //   alternativeMobileNumber: row.alternative_mobile_number,
+      //   facebook: row.facebook,
+      //   twitter: row.twitter,
+      //   linkedin: row.linkedin,
+      //   highestQualification: highestQualification ?? 12,
+      //   employmentStatus: row.employment_status,
+      //   workExperienceYear: row.work_experience_year,
+      //   workExperienceMonth: row.work_experience_month,
+      //   jobRole: row.job_role,
+      //   previousJobRole: row.previous_job_role,
+      //   expertise: row.expertise,
+      //   skillset: row.skillset,
+      //   abilities: row.abilities,
+      //   jobType,
+      //   locationPreferred: row.location_preferred,
+      //   certificates: row.certificates,
+      //   workShift: safeArray(row.work_shift),
+      //   expectedSalaryFrom: row.expected_salary_from,
+      //   expectedSalaryTo: row.expected_salary_to,
+      //   jobDuration: safeArray(row.job_duration),
+      //   relocate: row.relocate === 1 ? "Yes" : "No",
+      //   availability: row.availability,
+      //   idProof: row.id_proof,
+      //   idProofPhoto: hireListingPhoto,
+      //   coverLetter: row.cover_letter,
+      //   resumePhoto: hireListingPhoto,
+      //   aboutYourself: row.about_yourself,
+      // };
+      // const hireData: HireData = {
+      //   id: 419,
+      //   salesmanId: 1,
+      //   fromHour: "",
+      //   toHour: "",
+      //   userId: 588,
+      //   city: 449,
+      //   name: "Ruchika Mewara",
+      //   slug: "ruchika-mewara",
+      //   fatherName: "Amarjeet Singh",
+      //   dob: "Thu Jun 08 2000 00:00:00 GMT+0530 (India Standard Time)",
+      //   gender: "Female",
+      //   maritalStatus: "Others",
+      //   languages: [2, 1],
+      //   specialities: null,
+      //   description: null,
+      //   latitude: 73.02745391487893,
+      //   longitude: 26.214785486607322,
+      //   buildingName: null,
+      //   streetName: null,
+      //   address: "sector 2",
+      //   landmark: null,
+      //   pincode: "342005",
+      //   state: 19,
+      //   photo: "Banner/cbycmehjeetyxbuxc6ie",
+      //   isFeature: false,
+      //   status: "Approved",
+      //   website: null,
+      //   email: "sc@gmail.com",
+      //   mobileNumber: "8695310446",
+      //   whatsappNo: null,
+      //   alternativeMobileNumber: "8695310446",
+      //   facebook: null,
+      //   twitter: null,
+      //   linkedin: null,
+      //   highestQualification: 12,
+      //   employmentStatus: "no",
+      //   workExperienceYear: 3,
+      //   workExperienceMonth: 6,
+      //   jobRole: "Pre primary",
+      //   previousJobRole: null,
+      //   expertise: "All Subjects",
+      //   skillset: null,
+      //   abilities: null,
+      //   jobType: ["FullTime"],
+      //   locationPreferred: null,
+      //   certificates: null,
+      //   workShift: ["Morning"],
+      //   expectedSalaryFrom: null,
+      //   expectedSalaryTo: null,
+      //   jobDuration: ["Year"],
+      //   relocate: "No",
+      //   availability: "Now",
+      //   idProof: 1,
+      //   idProofPhoto: "Banner/cbycmehjeetyxbuxc6ie",
+      //   coverLetter: undefined,
+      //   resumePhoto: "Banner/cbycmehjeetyxbuxc6ie",
+      //   aboutYourself: null,
+      // };
+      // console.log("hireData", hireData);
       await db.insert(hireListing).values({
         id: row.id,
-        salesmanId: row.salesman_id ?? 1,
+        salesmanId: saleman[0]?.id ?? 1,
         fromHour: "",
         toHour: "",
         userId,
-        city: city!.id,
+        city: city?.id ?? 449,
         name: row.name,
         slug: row.slug,
         fatherName: row.father_name,
-        dob: row.dob,
+        dob: "2000-06-08",
         gender:
           row.gender === 1 ? "Male" : row.gender === 2 ? "Female" : "Others",
         maritalStatus:
@@ -195,16 +358,16 @@ const addHire = async () => {
                 : row.marital_status === 4
                   ? "Divorced"
                   : "Others",
-        languages: safeArray(row.languages),
+        languages: [1],
         specialities: row.specialities,
         description: row.description,
-        latitude,
-        longitude,
-        buildingName: row.building_name,
+        latitude : 21,
+        longitude: 13,
+        buildingName: "row.building_name",
         streetName: row.street_name,
         address: row.real_address ?? row.area,
         landmark: row.landmark,
-        pincode: row.pincode,
+        pincode: "21212",
         state: row.state,
         // city: city!.id,
 
@@ -235,18 +398,19 @@ const addHire = async () => {
         expectedSalaryFrom: row.expected_salary_from,
         expectedSalaryTo: row.expected_salary_to,
         jobDuration: safeArray(row.job_duration),
-        relocate: row.relocate,
+        relocate: row.relocate === 1 ? "yes" : "no",
         availability: row.availability,
         idProof: row.id_proof,
         idProofPhoto: hireListingPhoto,
         coverLetter: row.cover_letter,
         resumePhoto: hireListingPhoto,
         aboutYourself: row.about_yourself,
+        // schedules: "",
       });
 
       // console.log("hire", hire);
     } catch (error) {
-      console.log("error", error);
+      throw new Error(`Error creating hire: ${error}`);
     }
 
     console.log("successsfully hire listings seed");
