@@ -43,6 +43,8 @@ export async function delToken() {
 
 export async function getToken() {
   const cookieStore = await cookies();
+  cookieStore.delete("authenticated");
+  cookieStore.delete("role");
   return cookieStore.get("token");
 }
 
