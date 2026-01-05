@@ -1,54 +1,11 @@
-import { uploadOnCloudinary } from "@repo/cloudinary";
-import { db } from "@repo/db";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { db, type UserRole } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
-import {
-  franchises,
-  profiles,
-  salesmen,
-} from "@repo/db/dist/schema/user.schema";
+import { franchises, salesmen } from "@repo/db/dist/schema/user.schema";
 import dotenv from "dotenv";
-import { sql as dbsql, type InferInsertModel } from "drizzle-orm";
+import { sql as dbsql } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
-import { clouadinaryFake, dummyImageUrl } from "./seeds";
+import { insertUser } from "./utils";
 
-interface NameParts {
-  salutation: string | null;
-  firstName: string;
-  lastName: string | null;
-}
-
-function parseName(name: string | null): NameParts {
-  if (!name) {
-    return {
-      salutation: "",
-      firstName: "",
-      lastName: "",
-    };
-  }
-  const salutationRegex = /^(Mr\.|Mrs\.|Ms\.|Dr\.)\s+/; // regex to match common salutations
-  const match = name.match(salutationRegex);
-
-  // Extract salutation, if present
-  const salutation = match ? match[0].trim() : null;
-
-  // Remove the salutation from the name if it exists
-  const nameWithoutSalutation = salutation
-    ? name.replace(salutationRegex, "")
-    : name;
-
-  // Split the remaining name into parts
-  const nameParts = nameWithoutSalutation.trim().split(" ");
-
-  const firstName = nameParts[0] || "";
-  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : null;
-
-  return {
-    salutation: salutation,
-    firstName: firstName,
-    lastName: lastName,
-  };
-}
 
 dotenv.config();
 export const userSeed = async () => {
@@ -71,142 +28,16 @@ export const clearAllTablesUser = async () => {
 export const seedUsers = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM users");
 
-  type DbUser = InferInsertModel<typeof users>;
   for (const row of rows) {
     if (row.status !== 1) {
       continue;
     }
-
-    // plan id
-    // ad_limit
-    // products_limit
-    // offers_limit
-    // plan_end_date
-    // payment_date
-    // area,
-
-    // await db.insert(profiles).values({
-    //   userId: Number(insertedUser.id),
-    //   salutation: salutation,
-    //   firstName: firstName,
-    //   lastName: lastName,
-    //   city: cityId,
-    //   profileImage: profilePhotoUrl,
-    //   address: row.address ?? "null",
-    //   dob: row.dob ?? null,
-    //   maritalStatus: row.marital_status ?? null,
-    //   occupation: occupationId,
-    //   state: row.state ?? 19,
-    //   pincode: row.zip ?? "000000",
-    //   createdAt: row.created_at,
-    //   updatedAt: row.updated_at,
-    // });
-    const user: DbUser = {
-      id: row.id,
-      displayName: row.name,
-      phoneNumber: row.phone,
-      email: row.email,
-      status: true,
-      password: row.password ?? null,
-      role: row.phone ? UserRole.visiter : UserRole.guest,
-      googleId: row.google_id,
-      appleId: row.apple_id,
-      revanueCatId: row.revanue_id ?? undefined,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    };
-
-    //TODO: add current user plan
-    const [insertedUser] = await db.insert(users).values(user).returning();
-
-    if (!insertedUser) {
-      throw new Error(`User could not be inserted or found:`);
+    let role: UserRole = "guest";
+    if (row.phone) {
+      role = "visiter";
     }
-
-    let profilePhotoUrl = dummyImageUrl;
-
-    try {
-      const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
-
-      const uploadedUrl = await uploadOnCloudinary(
-        liveProfileImageUrl,
-        "Profile",
-        clouadinaryFake,
-      );
-
-      if (uploadedUrl) {
-        profilePhotoUrl = uploadedUrl;
-      }
-    } catch (err) {
-      console.log(`Image skipped for user ${row.id}`, err);
-    }
-    // resolve city id
-    let cityId: number | null = null;
-    if (row.city) {
-      const cityIdOrName = Number(row.city);
-      let cityRecord = null;
-      if (Number.isNaN(cityIdOrName)) {
-        cityRecord = await db.query.cities.findFirst({
-          where: (c, { eq }) => eq(c.city, row.city),
-        });
-      } else {
-        cityRecord = await db.query.cities.findFirst({
-          where: (c, { eq }) => eq(c.id, Number(row.city)),
-        });
-      }
-      cityId = cityRecord?.id ?? null; // 👈 fallback to "Unknown" city id
-    }
-
-    if (row.marital_status === "married") {
-      row.marital_status = "Married";
-    }
-    if (row.marital_status === "unmarried") {
-      row.marital_status = "Unmarried";
-    }
-    if (row.marital_status === "widowed") {
-      row.marital_status = "Widowed";
-    }
-    if (row.marital_status === "divorced") {
-      row.marital_status = "Divorced";
-    }
-    if (row.marital_status === "others") {
-      row.marital_status = "Others";
-    }
-
-    let occupationId = null;
-    if (row.occupation) {
-      const occupationRow = row.occupation as string;
-      const occupationData = await db.query.occupation.findFirst({
-        where: (occupation, { eq, or, ilike }) =>
-          or(
-            eq(occupation.name, occupationRow.toLowerCase()),
-            ilike(occupation.name, `%${occupationRow.toLowerCase()}%`),
-          ),
-      });
-      occupationId = occupationData?.id;
-    }
-
-    const { salutation, firstName, lastName } = parseName(row.name);
-
-    await db.insert(profiles).values({
-      userId: Number(insertedUser.id),
-      salutation: salutation === "Mr." ? 1 : salutation === "Ms." ? 2 : 3,
-      firstName: firstName,
-      lastName: lastName,
-      city: cityId,
-      profileImage: profilePhotoUrl,
-      address: row.area ?? row.address,
-      dob: row.dob ?? null,
-      maritalStatus: row.marital_status ?? null,
-      occupation: occupationId,
-      state: row.state ?? 19,
-      pincode: row.zip ?? "000000",
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
+    await insertUser(row.id, role);
   }
-
-  console.log("users and Profiles seeding complete");
 };
 
 const seedfranchises = async () => {
@@ -250,7 +81,6 @@ const seedfranchises = async () => {
     .values({
       id: 1,
       userId: rbmUser?.id,
-
       referPrifixed: "RBMHORJ",
       employeeLimit: 50,
       gstNo: "08AANCR4677E1ZX",
@@ -311,8 +141,8 @@ export const seedOfSalesman = async () => {
     const [user] = await db
       .insert(users)
       .values({
-        displayName: row.display_name,
-        role: UserRole.salesman,
+        displayName: row.name,
+        role: "salesman",
         email: row.email,
         phoneNumber: row.mobile_no,
         password: row.password,

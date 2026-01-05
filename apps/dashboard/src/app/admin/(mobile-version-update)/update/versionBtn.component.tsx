@@ -1,5 +1,4 @@
 "use client";
-
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -22,9 +21,21 @@ export const VersionBtnComponent = ({
     }),
   );
   return (
-    <>
-      <Input value={value} onChange={(e) => setValue(e.target.value)} />
-      <Button onClick={() => mutate(value)}>VersionBtnComponent</Button>
-    </>
+    <div className="flex gap-2 max-w-sm ml-4">
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Enter version name"
+        className="h-11 flex-1"
+      />
+
+      <Button
+        onClick={() => mutate(value)}
+        disabled={!value.trim()}
+        className="h-11 px-5"
+      >
+        Update Version
+      </Button>
+    </div>
   );
 };

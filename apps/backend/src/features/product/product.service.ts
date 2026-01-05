@@ -20,7 +20,7 @@ async function singleShop(shopId: number) {
       homeDelivery: businessListing.homeDelivery,
       // schedule: businessListing.schedules,
       status: businessListing.status,
-      area: businessListing.area,
+      address: businessListing.address,
       streetName: businessListing.streetName,
       buildingName: businessListing.buildingName,
       createdAt: businessListing.createdAt,
@@ -166,46 +166,48 @@ async function productReviewExist(
     .select()
     .from(productReviews)
     .where(
-      and(eq(productReviews.userId, userId), eq(productReviews.productId,productId)),
+      and(
+        eq(productReviews.userId, userId),
+        eq(productReviews.productId, productId),
+      ),
     );
 
   return data.length > 0;
 }
 
-
 async function createProductReview(
   userId: number,
   productId: number,
-  businessId:number,
+  businessId: number,
   rating: number,
   message: string,
   name: string,
   email: string,
   status: boolean,
-  view: boolean,
 ) {
   try {
-    const data = db.insert(productReviews).values({
-      userId: userId,
-      productId : productId,
-      businessId:businessId,
-      name: name,
-      rate: rating,
-      email: email,
-      message: message,
-      view: view,
-      status: status,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }).returning();
-    return data
+    const data = db
+      .insert(productReviews)
+      .values({
+        userId: userId,
+        productId: productId,
+        businessId: businessId,
+        name: name,
+        rate: rating,
+        email: email,
+        message: message,
+        status: status,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return data;
   } catch (err) {
     throw new TRPCError({
-      code : "INTERNAL_SERVER_ERROR",
-      message : "Could Not Create Review",
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Could Not Create Review",
     });
   }
 }
 
-
-export { singleShop,productReviewExist,createProductReview };
+export { singleShop, productReviewExist, createProductReview };

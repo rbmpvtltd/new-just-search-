@@ -1,9 +1,9 @@
 import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
-import { and, eq, sql } from "drizzle-orm";
-import { reviewExist } from "../business/business.service";
 import { offerReviews } from "@repo/db/dist/schema/offer.schema";
 import { TRPCError } from "@trpc/server";
+import { and, eq, sql } from "drizzle-orm";
+import { reviewExist } from "../business/business.service";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
@@ -21,7 +21,7 @@ async function singleShop(shopId: number) {
       homeDelivery: businessListing.homeDelivery,
       // schedule: businessListing.schedules,
       status: businessListing.status,
-      area: businessListing.area,
+      address: businessListing.address,
       streetName: businessListing.streetName,
       buildingName: businessListing.buildingName,
       createdAt: businessListing.createdAt,
@@ -184,25 +184,28 @@ async function createOfferReview(
   view: boolean,
 ) {
   try {
-    const data = db.insert(offerReviews).values({
-      userId: userId,
-      offerId: offerId,
-      name: name,
-      rate: rating,
-      email: email,
-      message: message,
-      view: view,
-      status: status,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }).returning();
-    return data
+    const data = db
+      .insert(offerReviews)
+      .values({
+        userId: userId,
+        offerId: offerId,
+        name: name,
+        rate: rating,
+        email: email,
+        message: message,
+        view: view,
+        status: status,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return data;
   } catch (err) {
     throw new TRPCError({
-      code : "INTERNAL_SERVER_ERROR",
-      message : "Could Not Create Review",
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Could Not Create Review",
     });
   }
 }
 
-export { singleShop, offerReviewExist,createOfferReview };
+export { singleShop, offerReviewExist, createOfferReview };

@@ -20,11 +20,11 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
     // Postgres seeding
     // await notRelated();
     // await userSeed();
-    // await fakeSeed();
-    await businessSeed();
-    await productSeed();
-    await offerSeed();
+    await fakeSeed();
+    // await businessSeed();
     // await hireSeed();
+    // await productSeed();
+    // await offerSeed();
     // await feedbackseed();
     // await seedRequestAccounts();
     // await planSeed();
