@@ -2,8 +2,14 @@ import UpdateDisplayNameForm from "@/features/auth/login/display-update";
 import UserProfile from "@/features/profile/UserProfile";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { getToken } from "@/utils/session";
+import { redirect } from "next/navigation";
 
 export default async function page() {
+  const data = await getToken();
+  if (!data) {
+    redirect("/login");
+  }
   const { data: userData } = await asyncHandler(
     trpcServer.userRouter.getUserDetail.query(),
   );

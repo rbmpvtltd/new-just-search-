@@ -1,12 +1,23 @@
-import { redirect } from "next/navigation";
-
 import UpdateDisplayNameForm from "@/features/auth/login/display-update";
 import { LoginForm } from "@/features/auth/login/login-form";
+import { redirect } from "next/navigation";
+
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { getToken } from "@/utils/session";
 
 export default async function Login() {
+  const { data: userData, error } = await asyncHandler(
+    trpcServer.userRouter.getUserDetail.query(),
+  );
+  const data = await getToken();
+
+  // try {
   const session = await asyncHandler(trpcServer.auth.verifyauth.query());
+  console.log("Hii dasdasda", userData);
+  if (data) {
+    redirect("/");
+  }
 
   // Not logged in → show login
   if (!session?.data?.success) {
@@ -20,9 +31,6 @@ export default async function Login() {
   }
 
   // User is logged in fetch user data
-  const { data: userData } = await asyncHandler(
-    trpcServer.userRouter.getUserDetail.query(),
-  );
 
   // Force display name update
   if (!userData?.displayName || userData.displayName === "null") {
@@ -32,7 +40,4 @@ export default async function Login() {
       </div>
     );
   }
-
-  // Already logged in
-  redirect("/");
 }

@@ -123,15 +123,23 @@ export const seedUsers = async () => {
       throw new Error(`User could not be inserted or found:`);
     }
 
-    const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
+    let profilePhotoUrl = dummyImageUrl;
 
-    const profilePhotoUrl =
-      (await uploadOnCloudinary(
+    try {
+      const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
+
+      const uploadedUrl = await uploadOnCloudinary(
         liveProfileImageUrl,
         "Profile",
         clouadinaryFake,
-      )) ?? dummyImageUrl;
+      );
 
+      if (uploadedUrl) {
+        profilePhotoUrl = uploadedUrl;
+      }
+    } catch (err) {
+      console.log(`Image skipped for user ${row.id}`, err);
+    }
     // resolve city id
     let cityId: number | null = null;
     if (row.city) {

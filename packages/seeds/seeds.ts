@@ -12,7 +12,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = true;
+export const clouadinaryFake = false;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
 
