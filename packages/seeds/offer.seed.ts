@@ -63,11 +63,18 @@ export const addOffer = async () => {
       continue;
     }
 
+    const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row.image1}`;
+    const mainImage = await uploadOnCloudinary(
+      liveOfferImageUrl,
+      "offer",
+      clouadinaryFake,
+    );
+
     const [offerCreate] = await db
       .insert(offers)
       .values({
         businessId: business.id,
-        mainImage: "Banner/cbycmehjeetyxbuxc6ie", // TODO: change this image upload on cloudinary
+        mainImage,
         categoryId: category.id,
         offerName: row.product_name,
         offerSlug: row.product_slug,
@@ -84,19 +91,22 @@ export const addOffer = async () => {
       })
       .returning({ id: offers.id });
 
-    const images = ["image1", "image2", "image3", "image4", "image5"];
+    if (!offerCreate) {
+      console.log("offer not created", row.id);
+      throw new Error("offer not created");
+    }
+    const images = ["image2", "image3", "image4", "image5"];
     for (const image of images) {
       if (row[image]) {
         const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-        const uploaded = await uploadOnCloudinary(
+        const offerPhotoUrl = await uploadOnCloudinary(
           liveOfferImageUrl,
           "offer",
           clouadinaryFake,
         );
-        const offerPhotoUrl = uploaded;
 
         await db.insert(offerPhotos).values({
-          offerId: offerCreate!.id,
+          offerId: offerCreate.id,
           photo: offerPhotoUrl,
           createdAt: row.created_at,
           updatedAt: row.updated_at,

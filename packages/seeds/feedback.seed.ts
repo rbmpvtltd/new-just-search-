@@ -9,21 +9,21 @@ export const feedbackseed = async () => {
 
 // Helper function to ensure array values for feedbackType
 const ensureArray = (value: any): string[] => {
-  if (value === null || value === undefined || value === '') {
+  if (value === null || value === undefined || value === "") {
     return ["No type"]; // Default value as array
   }
   if (Array.isArray(value)) {
     return value.map(String); // Ensure all elements are strings
   }
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     // Check if it's a JSON string
     try {
       const parsed = JSON.parse(value);
       return Array.isArray(parsed) ? parsed.map(String) : [value];
     } catch {
       // If parsing fails, check if it's comma-separated
-      if (value.includes(',')) {
-        return value.split(',').map(s => s.trim());
+      if (value.includes(",")) {
+        return value.split(",").map((s) => s.trim());
       }
       // Otherwise wrap in array
       return [value];
@@ -36,10 +36,10 @@ const ensureArray = (value: any): string[] => {
 // feedback
 const seedFeedbacks = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM feedback");
-  
+
   let successCount = 0;
   let errorCount = 0;
-  
+
   for (const row of rows) {
     const [userResult]: any[] = await sql.execute(
       "SELECT * FROM users WHERE id = ?",
@@ -76,7 +76,7 @@ const seedFeedbacks = async () => {
       console.log(`  Converted to:`, ensureArray(row.feedback_type));
     }
   }
-  
+
   console.log("\n=== Feedback Seeding Summary ===");
   console.log(`Total processed: ${rows.length}`);
   console.log(`Successful: ${successCount}`);
