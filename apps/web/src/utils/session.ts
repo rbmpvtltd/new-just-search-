@@ -36,6 +36,7 @@ export async function setToken(token: string) {
 }
 
 export async function delToken() {
+  console.log("Deleting token...");
   const cookieStore = await cookies();
   return cookieStore.delete("token");
 }
