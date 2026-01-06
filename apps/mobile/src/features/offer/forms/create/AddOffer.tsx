@@ -274,7 +274,7 @@ export default function AddOffer() {
         <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[100%] gap-2">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
-              title="Next"
+              title="Submit"
               isLoading={isSubmitting}
               onPress={handleSubmit(onSubmit)}
             />
