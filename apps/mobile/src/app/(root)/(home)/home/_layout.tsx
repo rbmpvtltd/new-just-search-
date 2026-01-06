@@ -69,7 +69,7 @@ export default function HomeLayout() {
             </>
           ),
           headerRight: () => (
-            <View className="flex-row gap-4 mr-4">
+            <View className="flex-row gap-4 mr-4 bi">
               <Pressable
                 onPress={() => {
                   if (!isAuthenticated.isSuccess) {

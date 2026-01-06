@@ -33,7 +33,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
     defaultValues: {
       buildingName: formValue?.buildingName ?? "",
       streetName: formValue?.streetName ?? "",
-      area: formValue?.area ?? "",
+      address: formValue?.address ?? "",
       landmark: formValue?.landmark ?? "",
       latitude: formValue?.latitude ?? NaN,
       longitude: formValue?.longitude ?? NaN,
@@ -87,7 +87,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
   const onSubmit = (data: AddressDetailSchema) => {
     setFormValue("buildingName", data.buildingName ?? "");
     setFormValue("streetName", data.streetName ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("landmark", data.landmark ?? "");
     setFormValue("latitude", data.latitude ?? "");
     setFormValue("longitude", data.longitude ?? "");
@@ -119,12 +119,12 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
 
     {
       control,
-      name: "area",
-      label: "Area",
-      placeholder: "Enter your Area",
+      name: "address",
+      label: "Address",
+      placeholder: "Enter your address",
       component: "input",
       className: "w-[90%] bg-base-200",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -211,7 +211,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
               const pincode = data.postalCode || "";
               const cityName = data.city || "";
               const stateName = data.region || "";
-              const area = parts.length > 1 ? parts[2] : "";
+              const address = parts.length > 1 ? parts[2] : "";
               const street_name = parts.length > 1 ? parts[1] : "";
               const landmark = data.street || "";
               const building_name = parts[0].match(/[A-Za-z]/) ? parts[0] : "";
@@ -226,7 +226,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPAgeType }) {
               setValue("longitude", Number(lng));
               setValue("pincode", pincode);
               setValue("state", matchedState?.value ?? 0);
-              setValue("area", area);
+              setValue("address", address);
               setValue(
                 "buildingName",
                 building_name ? building_name : street_name,
