@@ -146,6 +146,9 @@ export default function TabOneScreen() {
   }
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
+        <Pressable className="bg-primary" onPress={() => router.push("/(root)/profile/notification")}>
+          <Text>Go To Notification</Text>
+        </Pressable>
       <View className="flex items-center r rounded-4xl">
         <UpdateModel latestVersion={latestVersion ?? "1.0.0"} />
         <CustomCarousel />

@@ -21,38 +21,18 @@ import {
 // import { useStartChat } from "@/query/startChat";
 // import { isoStringToTime } from "@/utils/dateAndTime";
 import { trpc } from "@/lib/trpc";
+import { useAuthStore } from "@/features/auth/authStore";
+import { router } from "expo-router";
 
 export default function Notification() {
   // const colorScheme = useColorScheme();
-  // const queryClient = useQueryClient();
-  // const isAuthenticated = useAuthStore((state) => state.authenticated);
-  // const { mutate: startChat, isPending: loading } = useStartChat();
-  // const { mutate: mutateMaskAsRead } = useMaskAsRead();
-  // if (loading) <Loading position="center" />;
-
-  // const { mutate: clearNotifications, isPending } = useClearNotification();
-
-  // const handleClear = () => {
-  //   clearNotifications(undefined, {
-  //     onSuccess: () => {
-  //       queryClient.invalidateQueries({
-  //         queryKey: ["notifications"],
-  //       });
-  //     },
-  //     onError: (error) => {
-  //       console.error("Clear failed:", error);
-  //     },
-  //   });
-  // };
-
-  // if (!isAuthenticated) {
-  //   router.replace("/(root)/profile");
-  // }
-
-  // const { data } = useSuspenceData(NOTIFICATION_URL.url, NOTIFICATION_URL.key);
-  // if (data?.data?.length === 0) {
-  //   return <DataNotFound />;
-  // }
+  const isAuthenticated = useAuthStore((state) => state.authenticated);
+  console.log("Is Authenticated", isAuthenticated);
+  if(!isAuthenticated){
+    router.push("/")
+  }
+  const {data} = useQuery(trpc.notificationRouter.getNotifications.queryOptions())
+  console.log("Notification Data", data);
 
   return (
     <>

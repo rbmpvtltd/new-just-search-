@@ -1,12 +1,37 @@
 import { protectedProcedure, publicProcedure, router } from "@/utils/trpc";
 import { db } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
+import { businessCategories, businessListings, businessSubcategories } from "@repo/db/dist/schema/business.schema";
 import {
   pushTokenInsertSchema,
   pushTokens,
 } from "@repo/db/dist/schema/notification.schema";
+import { notification } from "@repo/db/dist/schema/user.schema";
 import { TRPCError } from "@trpc/server";
+import {and, eq, or} from "drizzle-orm"
 
 export const notificationRouter = router({
+  getNotifications : protectedProcedure.query(async({ctx})=>{
+    if(ctx.role === "business"){
+      const data = await db.select({
+        title: notification.title,
+        description: notification.description,
+        id : notification.id,
+        categoryId : businessCategories.categoryId,
+        subcategory : businessSubcategories.subcategoryId
+      })
+      .from(notification)
+      .leftJoin(
+        businessListings,eq(businessListings.userId,ctx.userId)
+      )
+      .leftJoin(businessCategories,eq(businessCategories.businessId,businessListings.id))
+      .leftJoin(businessSubcategories,eq(businessSubcategories.businessId,businessListings.id))
+      .where(or(eq(notification.categoryId,businessCategories.categoryId),eq(notification.subCategoryId,businessSubcategories.subcategoryId)))
+      .groupBy(businessCategories.id,notification.id,businessSubcategories.id)
+  
+      return { success : true,data : data,ctx}
+    }
+  }),
   createPushToken: protectedProcedure
     .input(pushTokenInsertSchema)
     .mutation(async ({ input, ctx }) => {
@@ -63,4 +88,5 @@ export const notificationRouter = router({
         });
       }
     }),
+
 });
