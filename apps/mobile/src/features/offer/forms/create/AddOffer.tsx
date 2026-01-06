@@ -251,7 +251,7 @@ export default function AddOffer() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
-          // paddingHorizontal: 12,
+          paddingHorizontal: 10,
           paddingVertical: 0,
         }}
       >

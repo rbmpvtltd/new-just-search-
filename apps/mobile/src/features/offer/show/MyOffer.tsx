@@ -56,6 +56,17 @@ export default function MyOffersList() {
 
   return (
     <View className="flex-1 bg-base-100">
+      <View className="px-4 mt-4">
+        <Pressable
+          className="bg-primary py-3 rounded-xl w-[50%] flex-row self-center justify-center shadow-sm"
+          onPress={() => router.push("/(root)/profile/offer/add")}
+        >
+          <Ionicons name="add-circle-outline" size={20} color="#fff" />
+          <Text className="text-secondary ml-2 font-semibold">
+            Add New Offer
+          </Text>
+        </Pressable>
+      </View>
       <FlatList
         data={offersData}
         renderItem={({ item }) => <OfferCard item={item} />}
