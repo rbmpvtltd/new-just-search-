@@ -75,6 +75,7 @@ export function parseName(name: string | null): NameParts {
   };
 }
 export const insertUser = async (userId: string, role: DbUserRole) => {
+  if (Number(userId) < 168) console.error("user id less than 168", userId);
   // Implementation for inserting a user
   const isUserExist = await db.query.users.findFirst({
     where: eq(users.id, Number(userId)),

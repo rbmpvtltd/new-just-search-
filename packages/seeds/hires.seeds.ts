@@ -25,8 +25,8 @@ export const hireSeed = async () => {
   await cleardataofhire();
   // await testhire();
   await addHire();
-  // await seedHireCategories();
-  // await seedHireSubcategories();
+  await seedHireCategories();
+  await seedHireSubcategories();
 };
 
 const testhire = async () => {
@@ -466,7 +466,7 @@ export const seedHireSubcategories = async () => {
       .where(eq(hireListing.id, row.listing_id));
 
     if (!hire) {
-      console.log("hire not found");
+      console.log("hire not found", hire);
       continue;
     }
 
@@ -498,7 +498,6 @@ export const seedHireCategories = async () => {
       .where(eq(hireListing.id, row.listing_id));
 
     if (!hire) {
-      console.log("hire not found", hire);
       continue;
     }
 
@@ -508,7 +507,6 @@ export const seedHireCategories = async () => {
       .where(eq(categories.id, row.category_id));
 
     if (!category) {
-      console.log("category not found");
       continue;
     }
 

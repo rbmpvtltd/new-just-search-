@@ -6,7 +6,6 @@ import { sql as dbsql } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
 import { insertUser } from "./utils";
 
-
 dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
@@ -26,12 +25,11 @@ export const clearAllTablesUser = async () => {
 };
 
 export const seedUsers = async () => {
-  const [rows]: any[] = await sql.execute("SELECT * FROM users");
+  const [rows]: any[] = await sql.execute(
+    `SELECT u.* FROM mydb.users u left join listings l on u.id = l.user_id where l.user_id is null`,
+  );
 
   for (const row of rows) {
-    if (row.status !== 1) {
-      continue;
-    }
     let role: UserRole = "guest";
     if (row.phone) {
       role = "visiter";

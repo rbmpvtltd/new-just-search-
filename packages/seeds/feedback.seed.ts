@@ -35,7 +35,10 @@ const ensureArray = (value: any): string[] => {
 
 // feedback
 const seedFeedbacks = async () => {
-  const [rows]: any[] = await sql.execute("SELECT * FROM feedback");
+  const [rows]: any[] = await sql.execute(
+    "SELECT * FROM feedback",
+    // " where id = 10",
+  );
 
   let successCount = 0;
   let errorCount = 0;
@@ -52,11 +55,8 @@ const seedFeedbacks = async () => {
       continue;
     }
 
-    const feedbackType = row.feedback_type
-      .split(",")
-      .filter((item: string) => item.length > 0);
     try {
-      await db.insert(feedbacks).values({
+      const feedbackData = {
         id: row.id,
         userId: row.user_id,
         // feedbackType MUST be an array (as per schema)
@@ -65,7 +65,9 @@ const seedFeedbacks = async () => {
         additionalFeedback: row.additional_feedback ?? null,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
-      });
+      };
+      console.log("feedbackData", feedbackData);
+      await db.insert(feedbacks).values(feedbackData);
       successCount++;
       console.log(`✓ Seeded feedback ${row.id}`);
     } catch (e: any) {

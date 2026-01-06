@@ -24,10 +24,10 @@ import { insertUser } from "./utils";
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
   await addBusiness();
-  await seedFavourites();
-  await businessesCategories();
-  await businessesSubcategory();
-  await BusinessReviews();
+  // await seedFavourites();
+  // await businessesCategories();
+  // await businessesSubcategory();
+  // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -121,7 +121,7 @@ const addBusiness = async () => {
       //TODO: fixed schedure;
 
       const { latitude, longitude } = getRightLocation(row);
-      console.log("latitude", latitude, "longitude", longitude);
+      // console.log("latitude", latitude, "longitude", longitude);
       const businessData: BusinessData = {
         id: row.id,
         salesmanId: saleman[0]?.id ?? 1,
@@ -159,7 +159,7 @@ const addBusiness = async () => {
         createdAt: row.created_at,
         updatedAt: row.updated_at,
       };
-      console.log("businessData", businessData);
+      // console.log("businessData", businessData);
       const [newbusinessListing] = await db
         .insert(businessListings)
         .values(businessData)
