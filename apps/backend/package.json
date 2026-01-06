@@ -21,6 +21,7 @@
   "peerDependencies": {},
   "dependencies": {
     "@orpc/openapi": "^1.8.7",
+    "drizzle-orm": "^0.44.4",
     "@orpc/trpc": "^1.8.7",
     "@orpc/zod": "^1.9.4",
     "@oslojs/crypto": "^1.0.1",

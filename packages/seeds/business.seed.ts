@@ -271,7 +271,6 @@ const businessesCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_category");
 
   for (const row of rows) {
-    console.log(row.listing_id);
     const [business] = await db
       .select()
       .from(businessListings)

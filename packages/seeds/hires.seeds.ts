@@ -23,10 +23,77 @@ import { insertUser, safeArray } from "./utils";
 
 export const hireSeed = async () => {
   await cleardataofhire();
+  // await testhire();
   await addHire();
-  // await seedRecentViewsHire();
   // await seedHireCategories();
   // await seedHireSubcategories();
+};
+
+const testhire = async () => {
+  const userId = await insertUser("588", "hire");
+  console.log("userId", userId);
+  type HireData = InferInsertModel<typeof hireListing>;
+  const hireData: HireData = {
+    id: 1851,
+    salesmanId: 5,
+    fromHour: "",
+    toHour: "",
+    userId: 2365,
+    city: 449,
+    name: "Jasraj Singh Rajpurohit",
+    slug: "jasraj-singh",
+    fatherName: "Devi Singh Raajpurohit",
+    dob: "1987-12-31",
+    gender: "Male",
+    maritalStatus: "Married",
+    languages: [2, 1],
+    specialities: null,
+    description: null,
+    latitude: 73.0449461,
+    longitude: 26.2284545,
+    buildingName: null,
+    streetName: null,
+    address: "Chamber no. 32 third floor new campus Jhalamand",
+    landmark: null,
+    pincode: "342013",
+    state: 19,
+    photo: "Banner/cbycmehjeetyxbuxc6ie",
+    isFeature: false,
+    status: "Approved",
+    website: null,
+    email: "Jasrajdoli@gmail.com",
+    mobileNumber: undefined,
+    whatsappNo: null,
+    alternativeMobileNumber: "9602188881",
+    facebook: null,
+    twitter: null,
+    linkedin: null,
+    highestQualification: 11,
+    employmentStatus: "yes",
+    workExperienceYear: 7,
+    workExperienceMonth: 1,
+    jobRole: "Advocate",
+    previousJobRole: "High court",
+    expertise: null,
+    skillset: "Advocate",
+    abilities: null,
+    jobType: ["Full time"],
+    locationPreferred: "Rajasthan",
+    certificates: "6083319081743437506.jpg",
+    workShift: ["Morning_shift", "Evening_shift"],
+    expectedSalaryFrom: "In Cases",
+    expectedSalaryTo: "In Cases",
+    jobDuration: [],
+    relocate: "Yes",
+    availability: "All Legal cases attend",
+    idProof: 1,
+    idProofPhoto: "Banner/cbycmehjeetyxbuxc6ie",
+    coverLetter: undefined,
+    resumePhoto: "Banner/cbycmehjeetyxbuxc6ie",
+    aboutYourself: null,
+  };
+  console.log("hireData", hireData);
+  await db.insert(hireListing).values(hireData);
 };
 
 const cleardataofhire = async () => {
@@ -201,141 +268,14 @@ const addHire = async () => {
       );
       type HireData = InferInsertModel<typeof hireListing>;
       const jobType = safeArray(row.job_type).map((jobType: string) => {
-        if (jobType === "Full Time") return JobType.FullTime;
+        if (jobType.toLocaleLowerCase() === "full time")
+          return JobType.FullTime;
         return jobType;
       });
-      // const hireData: HireData = {
-      //   id: row.id,
-      //   salesmanId: saleman[0]?.id ?? 1,
-      //   fromHour: "",
-      //   toHour: "",
-      //   userId,
-      //   city: city?.id ?? 449,
-      //   name: row.name,
-      //   slug: row.slug,
-      //   fatherName: row.father_name,
-      //   dob: String(row.dob),
-      //   gender:
-      //     row.gender === 1 ? "Male" : row.gender === 2 ? "Female" : "Others",
-      //   maritalStatus:
-      //     row.marital_status === 1
-      //       ? "Married"
-      //       : row.marital_status === 2
-      //         ? "Unmarried"
-      //         : row.marital_status === 3
-      //           ? "Widowed"
-      //           : row.marital_status === 4
-      //             ? "Divorced"
-      //             : "Others",
-      //   languages: languagesIds,
-      //   specialities: row.specialities,
-      //   description: row.description,
-      //   latitude,
-      //   longitude,
-      //   buildingName: row.building_name,
-      //   streetName: row.street_name,
-      //   address: row.real_address ?? row.area,
-      //   landmark: row.landmark,
-      //   pincode: String(row.pincode),
-      //   state: row.state,
-      //   // city: city!.id,
-
-      //   photo: hireListingPhoto ?? "",
-      //   isFeature: row.is_feature === 1,
-      //   status: "Approved",
-      //   website: row.website,
-      //   email: row.email,
-      //   mobileNumber: row.mobile_number,
-      //   whatsappNo: row.whatsapp_no,
-      //   alternativeMobileNumber: row.alternative_mobile_number,
-      //   facebook: row.facebook,
-      //   twitter: row.twitter,
-      //   linkedin: row.linkedin,
-      //   highestQualification: highestQualification ?? 12,
-      //   employmentStatus: row.employment_status,
-      //   workExperienceYear: row.work_experience_year,
-      //   workExperienceMonth: row.work_experience_month,
-      //   jobRole: row.job_role,
-      //   previousJobRole: row.previous_job_role,
-      //   expertise: row.expertise,
-      //   skillset: row.skillset,
-      //   abilities: row.abilities,
-      //   jobType,
-      //   locationPreferred: row.location_preferred,
-      //   certificates: row.certificates,
-      //   workShift: safeArray(row.work_shift),
-      //   expectedSalaryFrom: row.expected_salary_from,
-      //   expectedSalaryTo: row.expected_salary_to,
-      //   jobDuration: safeArray(row.job_duration),
-      //   relocate: row.relocate === 1 ? "Yes" : "No",
-      //   availability: row.availability,
-      //   idProof: row.id_proof,
-      //   idProofPhoto: hireListingPhoto,
-      //   coverLetter: row.cover_letter,
-      //   resumePhoto: hireListingPhoto,
-      //   aboutYourself: row.about_yourself,
-      // };
-      // const hireData: HireData = {
-      //   id: 419,
-      //   salesmanId: 1,
-      //   fromHour: "",
-      //   toHour: "",
-      //   userId: 588,
-      //   city: 449,
-      //   name: "Ruchika Mewara",
-      //   slug: "ruchika-mewara",
-      //   fatherName: "Amarjeet Singh",
-      //   dob: "Thu Jun 08 2000 00:00:00 GMT+0530 (India Standard Time)",
-      //   gender: "Female",
-      //   maritalStatus: "Others",
-      //   languages: [2, 1],
-      //   specialities: null,
-      //   description: null,
-      //   latitude: 73.02745391487893,
-      //   longitude: 26.214785486607322,
-      //   buildingName: null,
-      //   streetName: null,
-      //   address: "sector 2",
-      //   landmark: null,
-      //   pincode: "342005",
-      //   state: 19,
-      //   photo: "Banner/cbycmehjeetyxbuxc6ie",
-      //   isFeature: false,
-      //   status: "Approved",
-      //   website: null,
-      //   email: "sc@gmail.com",
-      //   mobileNumber: "8695310446",
-      //   whatsappNo: null,
-      //   alternativeMobileNumber: "8695310446",
-      //   facebook: null,
-      //   twitter: null,
-      //   linkedin: null,
-      //   highestQualification: 12,
-      //   employmentStatus: "no",
-      //   workExperienceYear: 3,
-      //   workExperienceMonth: 6,
-      //   jobRole: "Pre primary",
-      //   previousJobRole: null,
-      //   expertise: "All Subjects",
-      //   skillset: null,
-      //   abilities: null,
-      //   jobType: ["FullTime"],
-      //   locationPreferred: null,
-      //   certificates: null,
-      //   workShift: ["Morning"],
-      //   expectedSalaryFrom: null,
-      //   expectedSalaryTo: null,
-      //   jobDuration: ["Year"],
-      //   relocate: "No",
-      //   availability: "Now",
-      //   idProof: 1,
-      //   idProofPhoto: "Banner/cbycmehjeetyxbuxc6ie",
-      //   coverLetter: undefined,
-      //   resumePhoto: "Banner/cbycmehjeetyxbuxc6ie",
-      //   aboutYourself: null,
-      // };
-      // console.log("hireData", hireData);
-      await db.insert(hireListing).values({
+      const workShift = safeArray(row.work_shift).map((workType: string) => {
+        return workType.split("_")[0];
+      });
+      const hireData: HireData = {
         id: row.id,
         salesmanId: saleman[0]?.id ?? 1,
         fromHour: "",
@@ -345,7 +285,7 @@ const addHire = async () => {
         name: row.name,
         slug: row.slug,
         fatherName: row.father_name,
-        dob: "2000-06-08",
+        dob: new Date(row.dob).toISOString().split("T")[0],
         gender:
           row.gender === 1 ? "Male" : row.gender === 2 ? "Female" : "Others",
         maritalStatus:
@@ -358,16 +298,16 @@ const addHire = async () => {
                 : row.marital_status === 4
                   ? "Divorced"
                   : "Others",
-        languages: [1],
+        languages: languagesIds,
         specialities: row.specialities,
         description: row.description,
-        latitude : 21,
-        longitude: 13,
-        buildingName: "row.building_name",
+        latitude,
+        longitude,
+        buildingName: row.building_name,
         streetName: row.street_name,
         address: row.real_address ?? row.area,
         landmark: row.landmark,
-        pincode: "21212",
+        pincode: String(row.pincode),
         state: row.state,
         // city: city!.id,
 
@@ -391,22 +331,82 @@ const addHire = async () => {
         expertise: row.expertise,
         skillset: row.skillset,
         abilities: row.abilities,
-        jobType: safeArray(row.job_type),
+        jobType,
         locationPreferred: row.location_preferred,
         certificates: row.certificates,
-        workShift: safeArray(row.work_shift),
+        workShift,
         expectedSalaryFrom: row.expected_salary_from,
         expectedSalaryTo: row.expected_salary_to,
         jobDuration: safeArray(row.job_duration),
-        relocate: row.relocate === 1 ? "yes" : "no",
+        relocate: row.relocate === 1 ? "Yes" : "No",
         availability: row.availability,
         idProof: row.id_proof,
         idProofPhoto: hireListingPhoto,
         coverLetter: row.cover_letter,
         resumePhoto: hireListingPhoto,
         aboutYourself: row.about_yourself,
-        // schedules: "",
-      });
+      };
+      // const hireData: HireData = {
+      //   id: 419,
+      //   salesmanId: 1,
+      //   fromHour: "",
+      //   toHour: "",
+      //   userId: 588,
+      //   city: 449,
+      //   name: "Ruchika Mewara",
+      //   slug: "ruchika-mewara",
+      //   fatherName: "Amarjeet Singh",
+      //   dob: "Thu Jun 08 2000 00:00:00 GMT+0530 (India Standard Time)",
+      //   gender: "Female",
+      //   maritalStatus: "Others",
+      //   languages: [2, 1],
+      //   specialities: "alsdkfj",
+      //   description: "aslkdfjalsdkj",
+      //   latitude: 73.02745391487893,
+      //   longitude: 26.214785486607322,
+      //   buildingName: "kalsjdflsak",
+      //   streetName: "alksdjf",
+      //   address: "sector 2",
+      //   landmark: "asldkfj",
+      //   pincode: "342005",
+      //   state: 19,
+      //   photo: "Banner/cbycmehjeetyxbuxc6ie",
+      //   isFeature: false,
+      //   status: "Approved",
+      //   website: "alsdfkjalskdj",
+      //   email: "sc@gmail.com",
+      //   mobileNumber: "8695310446",
+      //   whatsappNo: "95225654654",
+      //   alternativeMobileNumber: "8695310446",
+      //   facebook: "alksdjf",
+      //   twitter: "alskdjf",
+      //   linkedin: null,
+      //   highestQualification: 12,
+      //   employmentStatus: "no",
+      //   workExperienceYear: 3,
+      //   workExperienceMonth: 6,
+      //   jobRole: "Pre primary",
+      //   previousJobRole: null,
+      //   expertise: "All Subjects",
+      //   skillset: "js is",
+      //   abilities: "afe",
+      //   jobType: ["FullTime"],
+      //   locationPreferred: "asdf",
+      //   certificates: "safd",
+      //   workShift: ["Morning"],
+      //   expectedSalaryFrom: "asdf",
+      //   expectedSalaryTo: "asdfk",
+      //   jobDuration: ["Day"],
+      //   relocate: "No",
+      //   availability: "Now",
+      //   idProof: 1,
+      //   idProofPhoto: "Banner/cbycmehjeetyxbuxc6ie",
+      //   coverLetter: "asdklfj",
+      //   resumePhoto: "Banner/cbycmehjeetyxbuxc6ie",
+      //   aboutYourself: "asdlfkjads",
+      // };
+      console.log("hireData", hireData);
+      await db.insert(hireListing).values(hireData);
 
       // console.log("hire", hire);
     } catch (error) {

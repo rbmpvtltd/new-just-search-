@@ -96,7 +96,7 @@ export const adminPlanRouter = router({
       const dbData = dbPlansInsertSchema
         .omit({
           features: true,
-          identifier: true,
+          razorPayIdentifier: true,
         })
         .parse(input);
 

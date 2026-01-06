@@ -51,7 +51,7 @@ export const dbPlansInsertSchema = createInsertSchema(plans).extend({
 });
 export const plansInsertSchema = dbPlansInsertSchema
   .omit({
-    identifier: true,
+    razorPayIdentifier: true,
     features: true,
   })
   .extend({
