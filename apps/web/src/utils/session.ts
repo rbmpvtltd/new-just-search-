@@ -38,13 +38,13 @@ export async function setToken(token: string) {
 export async function delToken() {
   console.log("Deleting token...");
   const cookieStore = await cookies();
+  cookieStore.delete("authenticated");
+  cookieStore.delete("role");
   return cookieStore.delete("token");
 }
 
 export async function getToken() {
   const cookieStore = await cookies();
-  cookieStore.delete("authenticated");
-  cookieStore.delete("role");
   return cookieStore.get("token");
 }
 
