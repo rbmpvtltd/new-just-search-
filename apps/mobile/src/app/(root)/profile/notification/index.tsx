@@ -2,76 +2,58 @@
 import { useQuery } from "@tanstack/react-query";
 // import { router } from "expo-router";
 import {
-  // FlatList,
-  // Image,
-  // Pressable,
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
   Text,
-  // useColorScheme,
+  useColorScheme,
   View,
 } from "react-native";
-// import { SafeAreaView } from "react-native-safe-area-context";
-// import DataNotFound from "@/components/ui/DataNotFound";
-// import { Loading } from "@/components/ui/Loading";
-// import { NOTIFICATION_URL } from "@/constants/apis";
-// import Colors from "@/constants/Colors";
-// import { useAuthStore } from "@/features/auth/authStore";
-// import { useClearNotification } from "@/query/clearNotifications";
-// import { useSuspenceData } from "@/query/getAllSuspense";
-// import { useMaskAsRead } from "@/query/notification/notication";
-// import { useStartChat } from "@/query/startChat";
-// import { isoStringToTime } from "@/utils/dateAndTime";
+import { SafeAreaView } from "react-native-safe-area-context";
+import DataNotFound from "@/components/ui/DataNotFound";
+import { Loading } from "@/components/ui/Loading";
+import { NOTIFICATION_URL } from "@/constants/apis";
+import Colors from "@/constants/Colors";
+import { useClearNotification } from "@/query/clearNotifications";
+import { useSuspenceData } from "@/query/getAllSuspense";
+import { useMaskAsRead } from "@/query/notification/notication";
+import { useStartChat } from "@/query/startChat";
+import { isoStringToTime } from "@/utils/dateAndTime";
 import { trpc } from "@/lib/trpc";
 import { useAuthStore } from "@/features/auth/authStore";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+
+
 
 export default function Notification() {
-  // const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();
+  const [showModal, setShowModal] = useState(false);
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   console.log("Is Authenticated", isAuthenticated);
-  if(!isAuthenticated){
+  if (!isAuthenticated) {
     router.push("/")
   }
-  const {data} = useQuery(trpc.notificationRouter.getNotifications.queryOptions())
+  const { data } = useQuery(trpc.notificationRouter.getNotifications.queryOptions())
   console.log("Notification Data", data);
+    const [selectedNotification, setSelectedNotification] = useState<any>(null);
 
   return (
-    <>
-      {/* <FlatList
+    <View>
+
+      <FlatList
         className="bg-base-200 mb-10"
-        data={data.data}
+        data={data?.data}
         renderItem={({ item, index }) => {
           return (
             <Pressable
-              onPress={() => {
-                mutateMaskAsRead(item.id, {
-                  onSuccess: () => {
-                    if (item.chat_session_id) {
-                      startChat(item.chat_session_id, {
-                        onSuccess: (res) => {
-                          router.navigate({
-                            pathname: "/(root)/chats", // TODO: add real chats redirect
-                            params: {
-                              chat: res?.chat_session_id.toString(),
-                            },
-                          });
-                        },
-                        onError: (err) => {
-                          console.error("Failed to start chat:", err);
-                        },
-                      });
-                    }
-                    queryClient.invalidateQueries({
-                      queryKey: [NOTIFICATION_URL.key],
-                    });
-                    queryClient.invalidateQueries({
-                      queryKey: ["getNotificationCount"],
-                    });
-                  },
-                  onError: (err) => {
-                    console.error("failed mask as read", err);
-                  },
-                });
+                          onPress={() => {
+                setShowModal(true);
+                setSelectedNotification(item);
               }}
+
             >
               <View
                 className={`${index % 2 === 0 ? "bg-base-200" : "bg-base-100"} px-4 py-3 flex-row gap-6 items-center w-[100%]`}
@@ -81,44 +63,20 @@ export default function Notification() {
                     source={require("@/assets/images/app-icon.png")}
                     className="w-[50px] h-[50px] rounded-full"
                   />
-                  {item.is_read === 0 && (
-                    <Ionicons
-                      name="ellipse"
-                      size={15}
-                      color="#00a884"
-                      className="absolute -left-1"
-                    />
-                  )}
                 </View>
                 <View className="w-[80%]">
                   <View className="flex-row justify-between items-center">
                     <Text className={`text-secondary text-2xl font-semibold`}>
-                      {item?.name ? item.name : "Just Search"}
+                      Just Search
                     </Text>
                     <Text className="text-secondary">
-                      {isoStringToTime(item.created_at)}
+                      {String(item.createdAt).split(" ").slice(0, 3).join(" ")}
                     </Text>
                   </View>
                   <View className="flex-row justify-between items-center">
                     <Text className="text-secondary text-[12px]">
-                      {item.message}
+                      {item.title}
                     </Text>
-                    {item.is_read === 1 && (
-                      <Ionicons
-                        name="checkmark-done-circle-outline"
-                        size={18}
-                        color="#00a884"
-                        className=""
-                      />
-                    )}
-                    {item.isSended === 0 && (
-                      <Ionicons
-                        name="checkmark-done-circle-outline"
-                        size={18}
-                        color="#71889b"
-                        className=""
-                      />
-                    )}
                   </View>
                 </View>
               </View>
@@ -126,21 +84,45 @@ export default function Notification() {
           );
         }}
       />
-      <SafeAreaView className="absolute bottom-[10px] right-[15px]">
-        <View className="p-4 rounded-full bg-primary">
-          <Pressable onPress={handleClear} disabled={isPending}>
-            <Ionicons
-              name="trash-outline"
-              size={30}
-              color={Colors[colorScheme ?? "light"].secondary}
-              className=""
-            />
-          </Pressable>
+      <Modal
+        visible={showModal}
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+        transparent
+      >
+        <View
+          className="flex-1 justify-center items-center bg-black/50"
+          style={{
+            backgroundColor:
+              colorScheme === "dark" ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            className="w-[85%] p-5 rounded-2xl shadow-lg"
+            style={{
+              backgroundColor: Colors[colorScheme ?? "light"]["base-100"],
+            }}
+          >
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-xl font-bold text-secondary">
+                {selectedNotification?.title || "Just Search"}
+              </Text>
+              <Pressable onPress={() => setShowModal(false)}>
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={Colors[colorScheme ?? "light"].secondary}
+                />
+              </Pressable>
+            </View>
+
+            <Text className="text-secondary text-lg">
+              {selectedNotification?.description}
+            </Text>
+          </View>
         </View>
-      </SafeAreaView> */}
-      <View className="flex-1 justify-center items-center">
-        <Text className="text-secondary">Notitication page</Text>
-      </View>
-    </>
+      </Modal>
+
+    </View>
   );
 }
