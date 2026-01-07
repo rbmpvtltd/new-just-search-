@@ -45,7 +45,7 @@ const initialFormValue: CombinedBusinessForm = {
 
   buildingName: "",
   streetName: "",
-  area: "",
+  address: "",
   landmark: "",
   latitude: 0,
   longitude: 0,
@@ -62,7 +62,7 @@ const initialFormValue: CombinedBusinessForm = {
   ownerNumber: "",
   email: "",
   whatsappNo: "",
-  salesmanId: NaN,
+  salesmanId: 0,
   // slug: "",
 };
 export const useBusinessFormStore = create<BusinessFormProps>((set) => ({

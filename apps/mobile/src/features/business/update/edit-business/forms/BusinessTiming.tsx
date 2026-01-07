@@ -16,8 +16,10 @@ export default function BusinessTiming({
   data: UserBusinessListingType;
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
+  const formValue = useBusinessFormStore((s) => s.formValue);
   const nextPage = useBusinessFormStore((s) => s.nextPage);
   const prevPage = useBusinessFormStore((s) => s.prevPage);
+
   const {
     control,
     handleSubmit,
@@ -25,17 +27,27 @@ export default function BusinessTiming({
   } = useForm<BusinessTimingSchema>({
     resolver: zodResolver(businessTimingSchema),
     defaultValues: {
-      days: data?.business?.days ?? [],
-      fromHour: data?.business?.fromHour ?? "",
-      toHour: data?.business?.toHour ?? "",
+      days: data?.business?.days ?? formValue.days ?? [],
+      fromHour:
+        formValue.fromHour === ""
+          ? data?.business?.fromHour
+          : (formValue.fromHour ?? ""),
+      toHour:
+        formValue.toHour === ""
+          ? data?.business?.toHour
+          : (formValue.toHour ?? ""),
     },
   });
 
   const onSubmit = (data: BusinessTimingSchema) => {
+    console.log("Data", data.fromHour);
+
     const formatFromHour = toISOStringTime(data?.fromHour ?? "");
+    console.log("Formated", formatFromHour);
+
     const formatToHour = toISOStringTime(data?.toHour ?? "");
     setFormValue("days", data.days ?? []);
-    setFormValue("fromHour", formatFromHour ?? "");
+    setFormValue("fromHour", data.fromHour ?? "");
     setFormValue("toHour", formatToHour ?? "");
     nextPage();
   };

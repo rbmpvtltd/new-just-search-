@@ -97,11 +97,11 @@ export const FormField = <T extends FieldValues>({
   const colorScheme = useColorScheme();
   const [_, setPlainText] = useState("");
   return (
-    <>
-      <View className="flex-row items-center ml-3">
+    <View>
+      <View className="flex-row items-center">
         {!labelHidden && <LableText title={label} />}
         {required && (
-          <Text style={{ color: "red" }} className="ml-1 mt-2">
+          <Text style={{ color: "red" }} className="mt-2 ">
             *
           </Text>
         )}
@@ -154,7 +154,6 @@ export const FormField = <T extends FieldValues>({
                   onChange={onChange}
                   onBlur={onBlur}
                   mode={mode || "date"}
-                  
                 />
               );
             }
@@ -175,7 +174,7 @@ export const FormField = <T extends FieldValues>({
               }
 
               return (
-                <View className={`items-center w-30 h-30   ${className}`}>
+                <View className={`items-center w-30 h-30  ${className}`}>
                   <Pressable
                     onPress={async () => {
                       Alert.alert("Pick File From", "  ", [
@@ -390,6 +389,6 @@ export const FormField = <T extends FieldValues>({
         }}
       />
       {component !== "timepicker" && error && <ErrorText title={error} />}
-    </>
+    </View>
   );
 };

@@ -14,8 +14,10 @@ import {
   type FormFieldProps,
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useHireFormStore } from "@/features/hire/shared/store/useCreateHireStore";
 import { queryClient, trpc } from "@/lib/trpc";
+import { setTokenRole } from "@/utils/secureStore";
 import type { AddHirePageType } from "..";
 
 type DocumentSchema = z.infer<typeof documentSchema>;
@@ -23,6 +25,8 @@ type DocumentSchema = z.infer<typeof documentSchema>;
 export default function DocumentsForm({ data }: { data: AddHirePageType }) {
   const prevPage = useHireFormStore((s) => s.prevPage);
   const formValue = useHireFormStore((s) => s.formValue);
+  const token = useAuthStore((s) => s.token);
+  const setToken = useAuthStore((s) => s.setToken);
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
   const {
     control,
@@ -57,6 +61,8 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
     mutate(finalData, {
       onSuccess: async (data) => {
         if (data?.success) {
+          setToken(token, "business");
+          await setTokenRole(token ?? "", "business");
           Alert.alert("listing added successfully");
           queryClient.invalidateQueries({
             queryKey: trpc.hirerouter.show.queryKey(),
@@ -134,6 +140,7 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
         label: salesman?.referCode,
         value: salesman?.id,
       })),
+      dropdownPosition: "top",
       placeholder: "Select Salesman",
       error: errors.salesmanId?.message,
     },

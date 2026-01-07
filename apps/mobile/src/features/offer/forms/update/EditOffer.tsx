@@ -120,6 +120,7 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       name: "rate",
       label: "Offer Price",
       component: "input",
+      type: "number",
       keyboardType: "numeric",
       placeholder: "Offer Price",
       error: errors.rate?.message,
@@ -132,6 +133,7 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       control,
       name: "discountPercent",
       label: " Discount",
+      type: "number",
       component: "input",
       keyboardType: "numeric",
       placeholder: "e.g 10",
@@ -150,6 +152,7 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
       name: "finalPrice",
       label: " Final Price",
       component: "input",
+      type: "number",
       keyboardType: "numeric",
       placeholder: "Final Price",
       error: errors.finalPrice?.message,
@@ -257,7 +260,7 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
             *
           </Text>
         </View>
-        <View className="mt-2 flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
+        <View className="flex-row flex-wrap items-center mx-auto w-[90%] gap-2">
           {formFields2.map((field) => (
             <FormField key={field.name} {...field} />
           ))}
@@ -265,7 +268,7 @@ export default function EditOffer({ myOffer }: { myOffer: EditOfferType }) {
         <View className="flex-row justify-between w-[90%] self-center mt-6 mb-2">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
-              title="Next"
+              title="Submit"
               isLoading={isSubmitting}
               onPress={handleSubmit(onSubmit)}
             />

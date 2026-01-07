@@ -375,7 +375,7 @@ export const adminBusinessRouter = router({
           longitude: input.longitude,
           buildingName: input.buildingName,
           streetName: input.streetName,
-          area: input.area,
+          address: input.address,
           landmark: input.landmark,
           pincode: input.pincode,
           state: input.state,

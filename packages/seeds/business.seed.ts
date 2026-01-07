@@ -19,6 +19,7 @@ import {
 import { getFakeBusinessUser } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
+import { insertUser } from "./utils";
 
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
@@ -51,58 +52,16 @@ const addBusiness = async () => {
     "SELECT *, REPLACE(longitude , ',', '') as clear_longitude, REPLACE(latitude , ',', '') as clear_latitude FROM listings WHERE type = 1",
   );
 
-  const fakeUser = await getFakeBusinessUser();
+  // const fakeUser = await getFakeBusinessUser();
 
-  if (!fakeUser) {
-    throw new Error("Failed to generate a fake user!");
-  }
+  // if (!fakeUser) {
+  //   throw new Error("Failed to generate a fake user!");
+  // }
 
   for (const row of rows) {
     // const row = rows[0];
-    let [createUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, Number(row.user_id)));
 
-    if (!createUser) {
-      const [user]: any[] = await sql.execute(
-        `SELECT * FROM users WHERE id = ${row.user_id}`,
-      );
-
-      if (user[0]) {
-        const mySqlUser = user[0];
-        // console.log("mySqlUser", mySqlUser);
-        // return
-        try {
-          [createUser] = await db
-            .insert(users)
-            .values({
-              id: mySqlUser.id,
-              displayName: row.name ?? mySqlUser.name,
-              email: mySqlUser.email,
-              googleId: mySqlUser.google_id,
-              password: mySqlUser.password,
-              appleId: mySqlUser.apple_id,
-              revanueCatId: mySqlUser.revanue_cat_id ?? undefined,
-              status: true,
-              role: "business",
-              phoneNumber: mySqlUser.phone,
-            })
-            .returning();
-          // TODO: userprofile is not added yet
-          console.log(createUser);
-        } catch (e) {
-          console.error("error is ", e);
-        }
-      } else {
-        createUser = fakeUser;
-      }
-    }
-
-    if (!createUser) {
-      console.log(`User not found ${row.id}`);
-      throw new Error("User not found");
-    }
+    const userId = await insertUser(row.user_id, "business");
 
     let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
 
@@ -167,7 +126,7 @@ const addBusiness = async () => {
       const businessData: BusinessData = {
         id: row.id,
         salesmanId: saleman[0]?.id ?? 1,
-        userId: createUser.id,
+        userId,
         name: row.name,
         days,
         fromHour,

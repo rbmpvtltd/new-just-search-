@@ -42,11 +42,12 @@ export default function ContactDetail({
   } = useForm<ContactDetailSchema>({
     resolver: zodResolver(contactDetailInsertSchema),
     defaultValues: {
-      contactPerson: data?.business?.contactPerson ?? "",
-      phoneNumber: data?.business?.phoneNumber ?? "",
-      ownerNumber: data?.business?.ownerNumber ?? "",
-      whatsappNo: data?.business?.whatsappNo ?? "",
-      email: data?.business?.email ?? "",
+      contactPerson:
+        data?.business?.contactPerson ?? formValue.contactPerson ?? "",
+      phoneNumber: data?.business?.phoneNumber ?? formValue.phoneNumber ?? "",
+      ownerNumber: data?.business?.ownerNumber ?? formValue.ownerNumber ?? "",
+      whatsappNo: data?.business?.whatsappNo ?? formValue.whatsappNo ?? "",
+      email: data?.business?.email ?? formValue.email ?? "",
       referCode: data?.referCode?.referCode ?? "",
     },
   });
@@ -161,11 +162,7 @@ export default function ContactDetail({
 
         <View className="flex-row justify-between w-[90%] self-center mt-6">
           <View className="w-[45%]">
-            <PrimaryButton
-              title="Previous"
-              variant="outline"
-              onPress={prevPage}
-            />
+            <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
           </View>
           <View className="w-[45%]">
             <PrimaryButton

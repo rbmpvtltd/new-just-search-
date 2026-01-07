@@ -2,7 +2,12 @@ import { db, schemas } from "@repo/db";
 import { favourites } from "@repo/db/dist/schema/business.schema";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
-import { guestProcedure, publicProcedure, router, visitorProcedure } from "@/utils/trpc";
+import {
+  guestProcedure,
+  publicProcedure,
+  router,
+  visitorProcedure,
+} from "@/utils/trpc";
 import { getBannerData } from "./banners.service";
 
 const business = schemas.business.businessListings;
@@ -22,7 +27,7 @@ export const bannerRouter = router({
         photo: business.photo,
         id: business.id,
         name: business.name,
-        area: business.area,
+        address: business.address,
         streetName: business.streetName,
         buildingName: business.buildingName,
         rating: sql<string[]>`COALESCE(AVG(${business_reviews.rate}),0)`,

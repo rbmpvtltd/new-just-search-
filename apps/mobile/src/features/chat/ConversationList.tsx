@@ -1,9 +1,9 @@
-import { cld } from "@/lib/cloudinary";
-import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, Text, View } from "react-native";
+import { cld } from "@/lib/cloudinary";
+import { type OutputTrpcType, trpc } from "@/lib/trpc";
 
 type ConversationListType = OutputTrpcType["chat"]["conversationList"] | null;
 export default function ConversationList() {
@@ -11,6 +11,14 @@ export default function ConversationList() {
   const { data: conversationList } = useSuspenseQuery(
     trpc.chat.conversationList.queryOptions(),
   );
+
+  if (!conversationList || conversationList.length === 0) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-gray-500 text-base">No conversations found.</Text>
+      </View>
+    );
+  }
   return (
     <FlatList
       className="bg-base-100"

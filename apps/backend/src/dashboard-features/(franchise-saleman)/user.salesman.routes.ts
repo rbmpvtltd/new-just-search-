@@ -151,4 +151,28 @@ export const salesmanUserRouter = router({
         pageCount: totalPages,
       };
     }),
+
+  totalUsers: salesmanProcedure.query(async ({ ctx }) => {
+    const allBusiness =
+      (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${businessListings.id})::int`,
+          })
+          .from(businessListings)
+          .where(eq(businessListings.salesmanId, ctx.userId))
+      )[0]?.count ?? 0;
+
+    const allhire =
+      (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${hireListing.id})::int`,
+          })
+          .from(hireListing)
+          .where(eq(hireListing.salesmanId, ctx.userId))
+      )[0]?.count ?? 0;
+
+    return { allBusiness, allhire };
+  }),
 });

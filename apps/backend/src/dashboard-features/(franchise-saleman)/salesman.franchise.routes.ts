@@ -4,6 +4,8 @@ import {
   usersInsertSchema,
   usersUpdateSchema,
 } from "@repo/db/dist/schema/auth.schema";
+import { businessListings } from "@repo/db/dist/schema/business.schema";
+import { hireListing } from "@repo/db/dist/schema/hire.schema";
 import {
   categories,
   categoryUpdateSchema,
@@ -21,7 +23,7 @@ import {
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import z from "zod";
 import {
@@ -114,6 +116,47 @@ export const franchiseSalemanRouter = router({
         pageCount: totalPages,
       };
     }),
+
+  totalSalesman: franchisesProcedure.query(async ({ ctx }) => {
+    const franchiseUser = await db.query.franchises.findFirst({
+      where: (franchise, { eq }) => eq(franchise.userId, ctx.userId),
+      columns: {
+        id: true,
+      },
+    });
+    if (!franchiseUser) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Franchise not found",
+      });
+    }
+    const businessSq = await db
+      .select({ count: count() })
+      .from(businessListings)
+      .innerJoin(salesmen, eq(salesmen.id, businessListings.salesmanId))
+      .where(eq(salesmen.franchiseId, franchiseUser.id));
+
+    const hireSq = await db
+      .select({ count: count() })
+      .from(hireListing)
+      .innerJoin(salesmen, eq(salesmen.id, hireListing.salesmanId))
+      .where(eq(salesmen.franchiseId, franchiseUser.id));
+
+    const totalUsers =
+      Number(businessSq[0]?.count ?? 0) + Number(hireSq[0]?.count ?? 0);
+
+    const allSalesman =
+      (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${salesmen.id})::int`,
+          })
+          .from(salesmen)
+          .where(eq(salesmen.franchiseId, franchiseUser.id))
+      )[0]?.count ?? 0;
+
+    return { allSalesman, totalUsers, businessSq, hireSq };
+  }),
   add: franchisesProcedure.query(async ({ ctx }) => {
     const states = await db.query.states.findMany();
     const occupation = await db.query.occupation.findMany();

@@ -60,7 +60,7 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
 
   return (
     <>
-      <div className="h-50 relative w-50 border rounded overflow-hidden border-2 border-gray-600 ">
+      <div className="h-50 relative w-50 rounded overflow-hidden border-2 border-gray-600 ">
         <input
           className="absolute opacity-0 inset-0 cursor-pointer z-10"
           type="file"
@@ -73,7 +73,7 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
             <CldImage
               width="100"
               height="100"
-              className="w-full h-full object-cover p-4"
+              className="w-full h-full object-contain p-4"
               src={value}
               alt="Cloudinary image"
               onError={(e) =>
