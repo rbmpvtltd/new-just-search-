@@ -40,6 +40,12 @@ export default function Notification() {
   console.log("Notification Data", data);
     const [selectedNotification, setSelectedNotification] = useState<any>(null);
 
+  if(data?.data.length === 0){
+    return <View className="flex-1 justify-center items-center">
+      <Text className="text-secondary text-2xl">No Notifications To Show</Text>
+    </View>
+  }
+
   return (
     <View>
 

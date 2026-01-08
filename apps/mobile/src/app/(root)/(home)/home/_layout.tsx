@@ -38,7 +38,7 @@ export default function HomeLayout() {
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
   const segment = useSegments();
   const currentRoute = segment.join("/");
-  const isAuthenticated = useQuery(trpc.auth.verifyauth.queryOptions());
+  const isAuthenticated = useAuthStore((state) => state.authenticated);
   const clearToken = useAuthStore((state) => state.clearToken);
   useEffect(() => {
     if (data?.token && data.role) {
@@ -69,10 +69,10 @@ export default function HomeLayout() {
             </>
           ),
           headerRight: () => (
-            <View className="flex-row gap-4 mr-4 bi">
+            <View className="flex-row gap-4 bi">
               <Pressable
                 onPress={() => {
-                  if (!isAuthenticated.isSuccess) {
+                  if (!isAuthenticated) {
                     showLoginAlert({
                       message: "Need to login to access your chat sessions",
                       onConfirm: () => {
@@ -94,7 +94,7 @@ export default function HomeLayout() {
 
               <Pressable
                 onPress={() => {
-                  if (!isAuthenticated.isSuccess) {
+                  if (!isAuthenticated) {
                     Alert.alert(
                       "Login Required",
                       "You need to login to use favorites feature",
@@ -110,7 +110,7 @@ export default function HomeLayout() {
                       ],
                     );
                   } else {
-                    router.push("/home");
+                    router.push("/(root)/(home)/favourites");
                   }
                 }}
               >
@@ -123,7 +123,7 @@ export default function HomeLayout() {
 
               <Pressable
                 onPress={() => {
-                  if (!isAuthenticated.isSuccess) {
+                  if (!isAuthenticated) {
                     Alert.alert(
                       "Login Required",
                       "Need to login to view notifications",
@@ -139,7 +139,7 @@ export default function HomeLayout() {
                       ],
                     );
                   } else {
-                    router.push("/(root)/profile/notification");
+                    router.push("/(root)/(home)/notification");
                   }
                 }}
               >

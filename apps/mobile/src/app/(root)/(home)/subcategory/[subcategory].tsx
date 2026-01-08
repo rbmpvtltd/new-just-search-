@@ -169,7 +169,7 @@ export default function SubCategory() {
           <View className="flex-1">
             <InstantSearch
               searchClient={searchClient}
-              indexName="all_listing" // Change to your Algolia index name
+              indexName="all_listing"
             >
               <Configure hitsPerPage={10} filters={filters} />
               <SearchBox placeholder={`Search Anything In ${title}`} />

@@ -4,7 +4,7 @@ import { Menu, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { IoMdChatboxes } from "react-icons/io";
+import { IoIosNotifications, IoMdChatboxes } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
@@ -105,6 +105,16 @@ export const HeroHeader = () => {
                     >
                       <Link href="/profile">
                         <User size={18} />
+                      </Link>
+                    </Button>
+                     <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="text-primary flex items-center justify-center border-2 border-primary"
+                    >
+                      <Link href="/notification">
+                        <IoIosNotifications />
                       </Link>
                     </Button>
                   </div>

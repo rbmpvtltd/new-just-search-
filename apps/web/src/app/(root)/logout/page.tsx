@@ -12,9 +12,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 function Logout() {
   const trpc = useTRPC();
+  const router = useRouter()
   const { mutate } = useMutation(
     trpc.auth.logout.mutationOptions({
       onSuccess: async () => {
@@ -25,9 +27,10 @@ function Logout() {
       },
     }),
   );
-
+  
   const handleLogout = () => {
     mutate();
+    router.push("/")
   };
 
   return (
