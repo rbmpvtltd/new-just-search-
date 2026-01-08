@@ -182,15 +182,17 @@ export default function AddOffer({
       error: errors.image5?.message,
     },
   ];
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: AddOfferSchema) => {
     const file = await uploadToCloudinary(
       [data.mainImage, data.image2, data.image3, data.image4, data.image5],
       "offers",
     );
+    console.log("Ofer data value", data);
+
     mutate(
       {
         ...data,
-        mainImage: file[0],
+        mainImage: file[0] ?? "",
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",

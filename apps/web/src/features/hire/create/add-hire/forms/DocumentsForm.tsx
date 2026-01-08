@@ -97,7 +97,6 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
     },
     {
       control,
-      type: "",
       label: "Id Proof Photo",
       name: "idProofPhoto",
       placeholder: "Upload your photo",

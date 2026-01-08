@@ -28,6 +28,7 @@ export default function PersonalDetailsForm({
   const trpc = useTRPC();
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const nextPage = useHireFormStore((state) => state.nextPage);
+  const formValue = useHireFormStore((state) => state.formValue);
   const [detectedCityName, setDetectedCityName] = React.useState<null | string>(
     null,
   );
@@ -40,25 +41,70 @@ export default function PersonalDetailsForm({
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
-      photo: hireListing?.hire?.photo ?? "",
-      name: hireListing?.hire?.name ?? "",
-      categoryId: hireListing?.category?.categoryId,
+      photo:
+        formValue?.photo === ""
+          ? hireListing?.hire?.photo
+          : (formValue?.photo ?? ""),
+      name:
+        formValue?.name === ""
+          ? hireListing?.hire?.name
+          : (formValue?.name ?? ""),
+      categoryId:
+        formValue?.categoryId === 0
+          ? hireListing?.category?.categoryId
+          : (formValue?.categoryId ?? 0),
       subcategoryId:
-        hireListing?.subcategory.map((item) => item.subcategoryId) ?? [],
+        formValue?.subcategoryId.length === 0
+          ? hireListing?.subcategory.map((item) => item.subcategoryId)
+          : (formValue?.subcategoryId ?? []),
       gender: hireListing?.hire?.gender ?? undefined,
       maritalStatus: hireListing?.hire?.maritalStatus ?? undefined,
-      fatherName: hireListing?.hire?.fatherName ?? "",
-      dob: hireListing?.hire?.dob ?? "",
-      languages: hireListing?.hire?.languages ?? [],
-      mobileNumber: hireListing?.hire?.mobileNumber ?? "",
-      alternativeMobileNumber: hireListing?.hire?.alternativeMobileNumber ?? "",
-      email: hireListing?.hire?.email ?? "",
-      latitude: hireListing?.hire?.latitude ?? null,
-      longitude: hireListing?.hire?.longitude ?? null,
-      area: hireListing?.hire?.area ?? "",
-      pincode: hireListing?.hire?.pincode ?? "",
-      state: hireListing?.hire?.state ?? undefined,
-      city: hireListing?.hire?.city ?? undefined,
+      fatherName:
+        formValue?.fatherName === ""
+          ? hireListing?.hire?.fatherName
+          : (formValue?.fatherName ?? ""),
+      dob:
+        formValue?.dob === "" ? hireListing?.hire?.dob : (formValue?.dob ?? ""),
+      languages:
+        formValue?.languages.length === 0
+          ? hireListing?.hire?.languages
+          : (formValue?.languages ?? []),
+      mobileNumber:
+        formValue?.mobileNumber === ""
+          ? hireListing?.hire?.mobileNumber
+          : (formValue?.mobileNumber ?? ""),
+      alternativeMobileNumber:
+        formValue?.alternativeMobileNumber === ""
+          ? hireListing?.hire?.alternativeMobileNumber
+          : (formValue?.alternativeMobileNumber ?? ""),
+      email:
+        formValue?.email === ""
+          ? hireListing?.hire?.email
+          : (formValue?.email ?? ""),
+      latitude:
+        formValue?.latitude === 0
+          ? hireListing?.hire?.latitude
+          : (formValue?.latitude ?? 0),
+      longitude:
+        formValue?.longitude === 0
+          ? hireListing?.hire?.longitude
+          : (formValue?.longitude ?? 0),
+      address:
+        formValue?.address === ""
+          ? hireListing?.hire?.address
+          : (formValue?.address ?? ""),
+      pincode:
+        formValue?.pincode === ""
+          ? hireListing?.hire?.pincode
+          : (formValue?.pincode ?? ""),
+      state:
+        formValue?.state === 0
+          ? hireListing?.hire?.state
+          : (formValue?.state ?? 0),
+      city:
+        formValue?.city === 0
+          ? hireListing?.hire?.city
+          : (formValue?.city ?? 0),
     },
   });
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
@@ -83,13 +129,17 @@ export default function PersonalDetailsForm({
       state: Number(selectedStateId),
     }),
   );
+  if (cities && cities.length > 0 && detectedCityName) {
+    const matchedCity = cities?.find(
+      (city) => city.city.toLowerCase() === detectedCityName?.toLowerCase(),
+    );
+    if (matchedCity && matchedCity?.id !== control._formValues.city) {
+      setValue("city", matchedCity?.id, {
+        shouldValidate: true,
+      });
+    }
+  }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (cityLoading) {
-    return <div>Loading...</div>;
-  }
   const formFields: FormFieldProps<PersonalDetailsSchema>[] = [
     {
       control,
@@ -237,7 +287,7 @@ export default function PersonalDetailsForm({
     },
     {
       control,
-      type: "text",
+      type: "number",
       label: "Latitude",
       name: "latitude",
       placeholder: "Latitude",
@@ -247,7 +297,7 @@ export default function PersonalDetailsForm({
     },
     {
       control,
-      type: "text",
+      type: "number",
       label: "Longitude",
       name: "longitude",
       placeholder: "Longitude",
@@ -258,12 +308,12 @@ export default function PersonalDetailsForm({
     {
       control,
       type: "text",
-      label: "Area",
-      name: "area",
+      label: "Address",
+      name: "address",
       placeholder: "Area",
       component: "input",
       section: "loction",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -321,7 +371,7 @@ export default function PersonalDetailsForm({
     setFormValue("email", data.email ?? "");
     setFormValue("latitude", data.latitude ?? "");
     setFormValue("longitude", data.longitude ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state ?? "");
     setFormValue("city", data.city ?? "");
@@ -366,7 +416,7 @@ export default function PersonalDetailsForm({
                       const pincode = data.postalCode || "";
                       const cityName = data.city || "";
                       const stateName = data.region || "";
-                      const area = parts[0]?.match(/[A-Za-z]/)
+                      const address = parts[0]?.match(/[A-Za-z]/)
                         ? parts[0]
                         : formatted;
                       const matchedState = states?.find(
@@ -377,7 +427,7 @@ export default function PersonalDetailsForm({
 
                       setValue("latitude", Number(lat));
                       setValue("longitude", Number(long));
-                      setValue("area", area);
+                      setValue("address", address);
                       setValue("pincode", pincode);
                       setValue("state", matchedState?.value ?? 0);
                     }}
@@ -392,7 +442,7 @@ export default function PersonalDetailsForm({
                     <div
                       key={field.name}
                       className={
-                        field.name === "area"
+                        field.name === "address"
                           ? "md:col-span-2 lg:col-span-3"
                           : ""
                       }

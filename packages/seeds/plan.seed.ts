@@ -1,5 +1,5 @@
 import { db } from "@repo/db";
-import { plans } from "@repo/db/dist/schema/plan.schema";
+import { planAttributes, plans } from "@repo/db/dist/schema/plan.schema";
 import dotenv from "dotenv";
 import { eq, type InferInsertModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
@@ -10,6 +10,7 @@ dotenv.config();
 export const planSeed = async () => {
   await clearAllTablesBusiness();
   await addplans();
+  await planAttribute();
   // await addtransactions();
   // await addUserSubscriptions();
 };
@@ -27,6 +28,28 @@ const addplans = async () => {
   type PlanData = InferInsertModel<typeof plans>;
   const plansData: PlanData[] = [
     {
+      id: 1,
+      name: "FREE",
+      razorPayIdentifier: "",
+      period: "yearly" as const,
+      interval: 1,
+      role: "all",
+      amount: 0,
+      currency: "INR",
+      planColor: "#ff3131",
+      features: {
+        verifyBag: true,
+        offerLimit: 0,
+        productLimit: 0,
+        offerDuration: 0,
+        maxOfferPerDay: 0,
+      },
+      status: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 2,
       name: "PRO",
       razorPayIdentifier: "plan_Rrrr2lJOWGFSLn",
       period: "yearly",
@@ -47,20 +70,42 @@ const addplans = async () => {
       updatedAt: new Date(),
     },
     {
-      name: "FREE",
-      razorPayIdentifier: "",
-      period: "yearly" as const,
+      id: 3,
+      name: "ULTRA",
+      razorPayIdentifier: "ultra_plan_Rrrr2lJOWGFSLn",
+      period: "yearly",
       interval: 1,
-      role: "all",
-      amount: 0,
+      role: "business",
+      amount: 2999,
       currency: "INR",
-      planColor: "#ff3131",
+      planColor: "#ffbd59",
       features: {
         verifyBag: true,
-        offerLimit: 0,
-        productLimit: 0,
-        offerDuration: 0,
-        maxOfferPerDay: 0,
+        offerLimit: 50,
+        productLimit: 20,
+        offerDuration: 10,
+        maxOfferPerDay: 7,
+      },
+      status: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 4,
+      name: "HIRE",
+      razorPayIdentifier: "hire_plan_Rrrr2lJOWGFSLn",
+      period: "yearly",
+      interval: 1,
+      role: "hire",
+      amount: 399,
+      currency: "INR",
+      planColor: "#ffbd59",
+      features: {
+        verifyBag: true,
+        offerLimit: 50,
+        productLimit: 20,
+        offerDuration: 10,
+        maxOfferPerDay: 7,
       },
       status: true,
       createdAt: new Date(),
@@ -69,6 +114,117 @@ const addplans = async () => {
   ];
 
   await db.insert(plans).values(plansData);
+};
+const planAttribute = async () => {
+  type PlanAttributesData = InferInsertModel<typeof planAttributes>;
+  const planAttributesData: PlanAttributesData[] = [
+    {
+      planId: 1,
+      name: "BUSINESS LISTING",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 1,
+      name: "HIRE PROFILE",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 1,
+      name: "PRODUCT LISTING",
+      isAvailable: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 1,
+      name: "OFFER LISTING",
+      isAvailable: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 1,
+      name: "VERIFICATION BADGE",
+      isAvailable: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 2,
+      name: "BUSINESS LISTING",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 2,
+      name: "VERIFICATION BADGE",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 2,
+      name: "30 PRODUCTS LISTING",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 2,
+      name: "15 OFFERS LISTING/MONTH(EACH OFFER VALID FOR 3 DAYS)",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 3,
+      name: "BUSINESS LISTING",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 3,
+      name: "VERIFICATION BADGE",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 3,
+      name: "80 PRODUCTS LISTING",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 3,
+      name: "40 OFFERS LISTING/MONTH(EACH OFFER VALID FOR 5 DAYS)",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 4,
+      name: "HIRE PROFILE",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      planId: 4,
+      name: "VERIFICATION BADGE",
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
+  await db.insert(planAttributes).values(planAttributesData);
 };
 
 // 3. transactions

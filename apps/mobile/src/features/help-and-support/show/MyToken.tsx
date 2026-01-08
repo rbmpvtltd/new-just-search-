@@ -60,13 +60,13 @@ const MyToken = memo(({ myTokens }: { myTokens: MyTokenType }) => {
           className="rounded-full px-3 py-1"
           style={{
             backgroundColor:
-              myTokens?.status === 0
+              myTokens?.status === 1
                 ? Colors[colorScheme ?? "light"].success
                 : Colors[colorScheme ?? "light"].error,
           }}
         >
           <Text className="text-secondary font-semibold">
-            {myTokens?.status === 0 ? "Open" : "Close"}
+            {myTokens?.status === 1 ? "Open" : "Close"}
           </Text>
         </View>
       </View>
@@ -85,7 +85,7 @@ const MyToken = memo(({ myTokens }: { myTokens: MyTokenType }) => {
           }
         >
           <Ionicons name="eye-outline" size={20} color="#fff" />
-          <Text className="text-secondary font-medium ml-1.5">View</Text>
+          <Text className="text-base-100 font-medium ml-1.5">View</Text>
         </Pressable>
       </View>
     </View>

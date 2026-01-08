@@ -158,7 +158,7 @@ function SendMessage({ conversationId }: { conversationId: number }) {
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="flex-row p-[10px] bg-base-100 border-t border-gray-200"
+      className="flex-row p-[10px] bg-base-100 border-t border-gray-200 "
       style={{ paddingBottom: insets.bottom }}
     >
       <TextInput

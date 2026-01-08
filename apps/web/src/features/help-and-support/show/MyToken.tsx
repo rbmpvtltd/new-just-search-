@@ -51,7 +51,7 @@ export default function MyToken() {
                     {format(parseDate(token.createdAt), "en_US")}
                   </div>
                   <div className="font-medium line-clamp-1">
-                    {token.status ? "Expired" : "Active"}
+                    {token.status ? "Active" : "Expired"}
                   </div>
 
                   <div className="flex items-center -ml-5">

@@ -45,5 +45,5 @@ export const chatTokenSessionInsertSchema = createInsertSchema(
     userId: true,
   })
   .extend({
-    message: z.string().min(1, "Subject is required"),
+    message: z.string().min(1, "Message is required"),
   });

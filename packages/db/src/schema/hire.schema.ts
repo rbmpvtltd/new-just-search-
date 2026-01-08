@@ -142,7 +142,7 @@ export const hireInsertSchema = createInsertSchema(hireListing, {
   certificates: () => z.string().optional(),
 
   workExperienceYear: () =>
-    z.number().min(1, "Work experience year is required"),
+    z.number("Work experience is required in number").optional(),
   jobRole: () => z.string().min(1, "Job role is required"),
 
   idProof: () => z.number().min(1, "ID proof is required"),

@@ -20,6 +20,7 @@ export default function BusinessTiming({
   businessListing: UserBusinessListingType;
 }) {
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
+  const formValue = useBusinessFormStore((state) => state.formValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
   const prevPage = useBusinessFormStore((state) => state.prevPage);
   const {
@@ -29,9 +30,18 @@ export default function BusinessTiming({
   } = useForm<BusinessTimingSchema>({
     resolver: zodResolver(businessTimingSchema),
     defaultValues: {
-      days: businessListing?.business?.days ?? [],
-      fromHour: businessListing?.business?.fromHour ?? "",
-      toHour: businessListing?.business?.toHour ?? "",
+      days:
+        formValue.days?.length === 0
+          ? businessListing?.business?.days
+          : (formValue.days ?? []),
+      fromHour:
+        formValue.fromHour === ""
+          ? businessListing?.business?.fromHour
+          : (formValue.fromHour ?? ""),
+      toHour:
+        formValue.toHour === ""
+          ? businessListing?.business?.toHour
+          : (formValue.toHour ?? ""),
     },
   });
 

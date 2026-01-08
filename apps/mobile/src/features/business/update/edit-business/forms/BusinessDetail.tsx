@@ -33,23 +33,52 @@ export default function BusinessDetail({
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
     defaultValues: {
-      name: data?.business?.name ?? formValue.name ?? "",
-      photo: data?.business?.photo ?? formValue.photo ?? "",
-      categoryId: data?.category?.categoryId ?? formValue.categoryId ?? 0,
+      name:
+        formValue?.name === "" ? data?.business?.name : (formValue.name ?? ""),
+      photo:
+        formValue?.photo === ""
+          ? data?.business?.photo
+          : (formValue.photo ?? ""),
+      categoryId:
+        formValue?.categoryId === 0
+          ? data?.category?.categoryId
+          : (formValue.categoryId ?? 0),
       subcategoryId:
-        data?.subcategories?.map((s) => s.subcategoryId) ??
-        formValue.subcategoryId ??
-        [],
+        formValue?.subcategoryId.length === 0
+          ? data?.subcategories?.map((s) => s.subcategoryId)
+          : (formValue.subcategoryId ?? []),
       specialities:
-        data?.business?.specialities ?? formValue.specialities ?? "",
+        formValue?.specialities === ""
+          ? data?.business?.specialities
+          : (formValue.specialities ?? ""),
       homeDelivery:
-        data?.business?.homeDelivery ?? formValue.homeDelivery ?? "",
-      description: data?.business?.description ?? formValue.description ?? "",
-      image1: data?.businessPhotos[0]?.photo ?? formValue.image1 ?? "",
-      image2: data?.businessPhotos[1]?.photo ?? formValue.image2 ?? "",
-      image3: data?.businessPhotos[2]?.photo ?? formValue.image3 ?? "",
-      image4: data?.businessPhotos[3]?.photo ?? formValue.image4 ?? "",
-      image5: data?.businessPhotos[4]?.photo ?? formValue.image5 ?? "",
+        formValue?.homeDelivery === ""
+          ? data?.business?.homeDelivery
+          : (formValue.homeDelivery ?? ""),
+      description:
+        formValue?.description === ""
+          ? data?.business?.description
+          : (formValue.description ?? ""),
+      image1:
+        formValue?.image1 === ""
+          ? String(data?.businessPhotos[0]?.photo)
+          : (formValue.image1 ?? ""),
+      image2:
+        formValue?.image2 === ""
+          ? String(data?.businessPhotos[1]?.photo)
+          : (formValue.image2 ?? ""),
+      image3:
+        formValue?.image3 === ""
+          ? String(data?.businessPhotos[2]?.photo)
+          : (formValue.image3 ?? ""),
+      image4:
+        formValue?.image4 === ""
+          ? String(data?.businessPhotos[3]?.photo)
+          : (formValue.image4 ?? ""),
+      image5:
+        formValue?.image5 === ""
+          ? String(data?.businessPhotos[4]?.photo)
+          : (formValue.image5 ?? ""),
     },
   });
 
@@ -88,7 +117,6 @@ export default function BusinessDetail({
     const finalImages = imagesToUpload.map((img) =>
       img?.startsWith("file://") ? uploadedFiles.shift() : img,
     );
-    console.log("Final image", finalImages);
 
     setFormValue("name", data.name ?? "");
     setFormValue("photo", finalImages[0] ?? "");

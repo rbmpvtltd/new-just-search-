@@ -12,8 +12,10 @@ import {
   type FormFieldProps,
 } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
+import { useAuthStore } from "@/features/auth/authStore";
 import { useBusinessFormStore } from "@/features/business/shared/store/useCreateBusinessStore";
 import { type OutputTrpcType, queryClient, trpc } from "@/lib/trpc";
+import { setTokenRole } from "@/utils/secureStore";
 export type AddBusinessPageType =
   | OutputTrpcType["businessrouter"]["add"]["getSalesman"]
   | null;
@@ -21,6 +23,8 @@ export type AddBusinessPageType =
 type ContactDetailSchema = z.infer<typeof contactDetailSchema>;
 export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
   const router = useRouter();
+  const token = useAuthStore((s) => s.token);
+  const setToken = useAuthStore((s) => s.setToken);
   const clearPage = useBusinessFormStore((s) => s.clearPage);
   const formValue = useBusinessFormStore((s) => s.formValue);
   const prevPage = useBusinessFormStore((s) => s.prevPage);
@@ -64,6 +68,8 @@ export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
           if (data.success) {
             setPage(0);
             clearPage();
+            setToken(token, "business");
+            await setTokenRole(token ?? "", "business");
             Alert.alert(data.message);
             queryClient.invalidateQueries({
               queryKey: trpc.businessrouter.show.queryKey(),

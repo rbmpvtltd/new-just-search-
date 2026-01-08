@@ -3,10 +3,12 @@ import { businessListings } from "@repo/db/dist/schema/business.schema";
 import {
   insertOfferReviewSchema,
   offerPhotos,
+  offerSubcategory,
   offers,
   offersInsertSchema,
   offersUpdateSchema,
 } from "@repo/db/dist/schema/offer.schema";
+import { productSubCategories } from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { and, asc, eq, gt, gte, sql } from "drizzle-orm";
@@ -153,6 +155,8 @@ export const offerrouter = router({
       const startDate = new Date();
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + 5);
+      console.log("Before offer insert", input);
+
       const [offer] = await db
         .insert(offers)
         .values({
@@ -172,6 +176,7 @@ export const offerrouter = router({
         .returning({
           id: offers.id,
         });
+      console.log("After inser");
 
       if (!offer) {
         throw new TRPCError({
@@ -181,7 +186,7 @@ export const offerrouter = router({
       }
       const offerId = offer.id;
       if (input.subcategoryId.length > 0) {
-        await db.insert(schemas.offer.offerSubcategory).values(
+        await db.insert(offerSubcategory).values(
           input.subcategoryId.map((subCategoryId) => ({
             offerId,
             subcategoryId: Number(subCategoryId),
@@ -194,10 +199,10 @@ export const offerrouter = router({
         input.image3,
         input.image4,
         input.image5,
-      ].filter(Boolean); // removes empty or null values
+      ].filter(Boolean);
 
       if (allPhotos.length > 0) {
-        await db.insert(schemas.offer.offerPhotos).values(
+        await db.insert(offerPhotos).values(
           allPhotos.map((photo) => ({
             offerId,
             photo,
@@ -270,7 +275,6 @@ export const offerrouter = router({
       //   .orderBy(asc(offers.id))
       //   .limit(limit);
 
-      logger.info("Offers Data: ", { offersData });
       // if (!offers) {
       //   return { message: "Offers not found" };
       // }
@@ -413,23 +417,31 @@ export const offerrouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      // return { success: true};
+      console.log("Input offer", input);
+
       const allSeletedPhoto = await db.query.offerPhotos.findMany({
         where: (offerPhotos, { eq }) => eq(offerPhotos.offerId, input.id),
       });
 
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => String(item.photo)),
-      );
-      // await db
-      //   .delete(schemas.product.productSubCategories)
-      //   .where(eq(schemas.product.productSubCategories.productId, input.id));
+      if (allSeletedPhoto.length !== 0) {
+        await cloudinaryDeleteImagesByPublicIds(
+          allSeletedPhoto.map((item) => String(item.photo)),
+        );
+
+        await db.delete(offerPhotos).where(eq(offerPhotos.offerId, input.id));
+      }
 
       await db
-        .delete(schemas.offer.offers)
-        .where(eq(schemas.offer.offers.id, input.id));
+        .delete(offerSubcategory)
+        .where(eq(offerSubcategory.offerId, input.id));
 
-      return { success: true };
+      try {
+        await db.delete(offers).where(eq(offers.id, input.id));
+      } catch (error) {
+        console.log("Error", error);
+      }
+
+      return { success: true, message: "Offer deleted successfully" };
     }),
   createOfferReview: protectedProcedure
     .input(insertOfferReviewSchema)

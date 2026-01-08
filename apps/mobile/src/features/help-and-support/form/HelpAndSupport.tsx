@@ -1,9 +1,12 @@
 "use client";
+import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { chatTokenSessionInsertSchema } from "@repo/db/src/schema/help-and-support.schema";
 import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { Stack, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import Swal from "sweetalert2";
 import type z from "zod";
 import { FormField } from "@/components/forms/formComponent";
@@ -13,6 +16,7 @@ import { trpc } from "@/lib/trpc";
 
 type HelpAndSupportSchema = z.infer<typeof chatTokenSessionInsertSchema>;
 export default function HelpAndSupport() {
+  const router = useRouter();
   const { mutate } = useMutation(
     trpc.helpAndSupportRouter.create.mutationOptions(),
   );
@@ -33,80 +37,89 @@ export default function HelpAndSupport() {
       onSuccess: (data) => {
         if (data.success) {
           Alert.alert(data.message);
-        } else {
-          Alert.alert(data.message);
+          router.replace("/(root)/(home)/home");
         }
       },
       onError: (error) => {
         console.log("Error", error);
-        Swal.fire({
-          title: error?.message,
-          icon: "error",
-          draggable: true,
-        });
+        if (isTRPCClientError(error)) {
+          Alert.alert(error.message);
+        }
       },
     });
   };
   return (
-    <View className="flex-1 bg-gray-100 h-full">
-      <View className="bg-white rounded-xl shadow-xl w-full h-full">
-        <View className="p-6 space-y-8">
-          <View className="p-6 bg-white shadow rounded-xl">
-            <Text className="text-xl font-black text-gray-800 mb-6">
-              Help and Support
-            </Text>
+    <>
+      <Stack.Screen
+        options={{
+          title: "Create Ticket",
 
-            <View className="space-y-6">
-              <FormField
-                control={control}
-                label="Subject"
-                name="subject"
-                placeholder="Select subject"
-                component="dropdown"
-                data={[
-                  { label: "Payment Issue", value: "payment issue" },
-                  {
-                    label: "Business Profile Issue",
-                    value: "business profile issue",
-                  },
-                  {
-                    label: "Hire/Job Profile Issue",
-                    value: "hire/job profile issue",
-                  },
-                  { label: "Suggestions", value: "suggestions" },
-                ]}
-                error={errors.subject?.message}
-              />
+          headerLeft: () => (
+            <View className="flex-row items-center gap-2">
+              <Pressable className="ml-2" onPress={() => router.back()}>
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  className="mr-8 self-center"
+                />
+              </Pressable>
+            </View>
+          ),
+        }}
+      />
 
-              <FormField
-                control={control}
-                label="Message"
-                name="message"
-                placeholder="Message here..."
-                component="textarea"
-                error={errors.message?.message}
+      <View className="flex-1 h-full">
+        <View className="bg-white w-full h-full">
+          <View className="">
+            <View className="p-6 ">
+              <Text className="text-xl font-black text-gray-800 mb-6">
+                Help and Support
+              </Text>
+
+              <View className="space-y-6">
+                <FormField
+                  control={control}
+                  label="Subject"
+                  name="subject"
+                  placeholder="Select subject"
+                  component="dropdown"
+                  data={[
+                    { label: "Payment Issue", value: "payment issue" },
+                    {
+                      label: "Business Profile Issue",
+                      value: "business profile issue",
+                    },
+                    {
+                      label: "Hire/Job Profile Issue",
+                      value: "hire/job profile issue",
+                    },
+                    { label: "Suggestions", value: "suggestions" },
+                  ]}
+                  error={errors.subject?.message}
+                />
+
+                <FormField
+                  control={control}
+                  label="Message"
+                  name="message"
+                  placeholder="Message here..."
+                  component="textarea"
+                  error={errors.message?.message}
+                />
+              </View>
+            </View>
+          </View>
+          <View className="flex-row justify-between w-[90%] self-center">
+            <View className="w-[45%] mx-auto">
+              <PrimaryButton
+                title="Submit"
+                isLoading={isSubmitting}
+                onPress={handleSubmit(onSubmit)}
               />
             </View>
           </View>
         </View>
-
-        <View className="flex-row justify-end w-[40%] mx-auto ">
-          <PrimaryButton
-            title="Submit"
-            onPress={handleSubmit(onSubmit)}
-            className="bg-orange-500 rounded-xl"
-          >
-            {isSubmitting ? (
-              <>
-                <Loading />
-                <Text className="text-white ml-2">Submitting...</Text>
-              </>
-            ) : (
-              <Text className="text-white font-bold">Submit</Text>
-            )}
-          </PrimaryButton>
-        </View>
       </View>
-    </View>
+    </>
   );
 }

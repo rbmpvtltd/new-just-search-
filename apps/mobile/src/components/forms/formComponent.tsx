@@ -331,7 +331,7 @@ export const FormField = <T extends FieldValues>({
             case "editor":
               return (
                 <ScrollView
-                  className="flex-1"
+                  className="flex"
                   nestedScrollEnabled
                   keyboardShouldPersistTaps="handled"
                 >

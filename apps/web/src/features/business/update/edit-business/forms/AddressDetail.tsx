@@ -40,15 +40,51 @@ export default function AddressDetail({
   } = useForm<AddressDetailSchema>({
     resolver: zodResolver(addressDetailSchema),
     defaultValues: {
-      buildingName: businessListing?.business?.buildingName ?? "",
-      streetName: businessListing?.business?.streetName ?? "",
-      area: businessListing?.business?.area ?? "",
-      landmark: businessListing?.business?.landmark ?? "",
-      latitude: Number(businessListing?.business?.latitude),
-      longitude: Number(businessListing?.business?.longitude),
-      pincode: businessListing?.business?.pincode,
-      state: businessListing?.business?.state,
-      city: businessListing?.business?.city,
+      buildingName:
+        formValue.buildingName === ""
+          ? businessListing?.business?.buildingName
+          : (formValue.buildingName ?? ""),
+      streetName:
+        formValue.streetName === ""
+          ? businessListing?.business?.streetName
+          : (formValue.streetName ?? ""),
+      address:
+        formValue.address === ""
+          ? businessListing?.business?.address
+          : (formValue.address ?? ""),
+      landmark:
+        formValue.landmark === ""
+          ? businessListing?.business?.landmark
+          : (formValue.landmark ?? ""),
+      latitude:
+        formValue.latitude === 0
+          ? businessListing?.business?.latitude
+          : (formValue.latitude ?? 0),
+      longitude:
+        formValue.longitude === 0
+          ? businessListing?.business?.longitude
+          : (formValue.longitude ?? 0),
+      pincode:
+        formValue.pincode === ""
+          ? businessListing?.business?.pincode
+          : (formValue.pincode ?? ""),
+      state:
+        formValue.state === 0
+          ? businessListing?.business?.state
+          : (formValue.state ?? 0),
+      city:
+        formValue.city === 0
+          ? businessListing?.business?.city
+          : (formValue.city ?? 0),
+      // buildingName: businessListing?.business?.buildingName ?? "",
+      // streetName: businessListing?.business?.streetName ?? "",
+      // address: businessListing?.business?.address ?? "",
+      // landmark: businessListing?.business?.landmark ?? "",
+      // latitude: Number(businessListing?.business?.latitude),
+      // longitude: Number(businessListing?.business?.longitude),
+      // pincode: businessListing?.business?.pincode,
+      // state: businessListing?.business?.state,
+      // city: businessListing?.business?.city,
     },
   });
 
@@ -101,11 +137,11 @@ export default function AddressDetail({
     {
       control,
 
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Address",
+      name: "address",
+      placeholder: "Address",
       component: "input",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -169,7 +205,7 @@ export default function AddressDetail({
   const onSubmit = (data: AddressDetailSchema) => {
     setFormValue("buildingName", data.buildingName ?? "");
     setFormValue("streetName", data.streetName ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("landmark", data.landmark ?? "");
     setFormValue("latitude", String(data.latitude) ?? "");
     setFormValue("longitude", String(data.longitude) ?? "");
@@ -202,7 +238,7 @@ export default function AddressDetail({
                   const pincode = data.postalCode || "";
                   const cityName = data.city || "";
                   const stateName = data.region || "";
-                  const area = data.name || "";
+                  const address = data.name || "";
                   const street_name = data.street || "";
                   const landmark = data.street || "";
                   const building_name = parts[0]?.match(/[A-Za-z]/)
@@ -219,7 +255,7 @@ export default function AddressDetail({
 
                   setValue("buildingName", building_name ?? "");
                   setValue("streetName", street_name ?? "");
-                  setValue("area", area ?? "");
+                  setValue("address", address ?? "");
                   setValue("landmark", landmark ?? "");
                   setValue("latitude", Number(lat));
                   setValue("longitude", Number(long));

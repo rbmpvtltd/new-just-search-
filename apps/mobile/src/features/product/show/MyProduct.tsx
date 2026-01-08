@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
 import { AdvancedImage } from "cloudinary-react-native";
 import { useRouter } from "expo-router";
 import {
@@ -13,7 +14,7 @@ import {
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { cld } from "@/lib/cloudinary";
-import { type OutputTrpcType, trpc } from "@/lib/trpc";
+import { type OutputTrpcType, queryClient, trpc } from "@/lib/trpc";
 export default function MyProductsList() {
   const {
     data,
@@ -35,7 +36,7 @@ export default function MyProductsList() {
   );
   const router = useRouter();
   if (isLoading) return <ActivityIndicator />;
-  console.log("Data", data);
+  console.log("productData", data);
 
   if (isError) return <SomethingWrong />;
   if (!data?.pages[0].productData || data.pages[0].productData.length === 0)
@@ -57,6 +58,17 @@ export default function MyProductsList() {
 
   return (
     <View className="flex-1 bg-base-100">
+      <View className="px-4 mt-4">
+        <Pressable
+          className="bg-primary py-3 rounded-xl w-[50%] flex-row self-center justify-center shadow-sm"
+          onPress={() => router.push("/(root)/profile/product/add")}
+        >
+          <Ionicons name="add-circle-outline" size={20} color="#fff" />
+          <Text className="text-secondary ml-2 font-semibold">
+            Add New Product
+          </Text>
+        </Pressable>
+      </View>
       <FlatList
         data={productsData}
         renderItem={({ item }) => <ProductCard item={item} />}
@@ -95,10 +107,22 @@ function ProductCard({ item }: { item: ProductType }) {
               },
               {
                 onSuccess: (data) => {
+                  console.log("Data", data);
+
                   if (data.success) {
+                    queryClient.invalidateQueries({
+                      queryKey:
+                        trpc.productrouter.showProduct.infiniteQueryKey(),
+                    });
                     Alert.alert("Product deleted successfully");
                   }
                 },
+                // onError: (error) => {
+                //   if (isTRPCClientError(error)) {
+                //     Alert.alert(error.message);
+                //   }
+                //   console.error("Error", error.message);
+                // },
               },
             );
           },

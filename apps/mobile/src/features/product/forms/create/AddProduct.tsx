@@ -150,6 +150,7 @@ export default function AddProduct() {
       control,
       name: "productDescription",
       label: "Product Description",
+      className: "w-[90%] bg-base-100",
       component: "editor",
       placeholder: "Offer Description",
       error: errors.productDescription?.message,
@@ -198,15 +199,15 @@ export default function AddProduct() {
     },
   ];
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
         enableOnAndroid
-        // extraScrollHeight={50}
+        extraScrollHeight={50}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          flexGrow: 1,
-          // paddingHorizontal: 12,
+          // flexGrow: 1,
+          paddingHorizontal: 1,
           paddingVertical: 0,
         }}
       >
@@ -216,7 +217,7 @@ export default function AddProduct() {
           ))}
         </View>
         <View className="flex-row items-center ml-8 w-[90%]">
-          <LableText title="Offer Images" className="" />
+          <LableText title="Product Images" className="" />
           <Text style={{ color: "red" }} className="ml-1 mt-2">
             *
           </Text>
@@ -229,7 +230,7 @@ export default function AddProduct() {
         <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2 mb-4">
           <View className="w-[45%] mx-auto">
             <PrimaryButton
-              title="Next"
+              title="Submit"
               isLoading={isSubmitting}
               onPress={handleSubmit(onSubmit)}
             />

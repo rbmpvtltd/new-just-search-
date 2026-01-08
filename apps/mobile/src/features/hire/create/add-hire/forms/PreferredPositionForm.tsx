@@ -160,36 +160,40 @@ export default function PreferredPositionForm() {
           {formFields.map((field, idx) => (
             <FormField key={field.name} {...field} />
           ))}
-          <View className="w-[90%] mt-4">
-            <View className="flex-row justify-around">
-              <Text className="text-secondary ml-4 font-medium">From</Text>
-              <Text className="text-secondary ml-4 font-medium">To</Text>
-            </View>
-            <View className="flex-row mt-4 w-[50%]">
-              {/* <View className="flex"> */}
-              <FormField
-                label=""
-                control={control}
-                name="fromHour"
-                component="datepicker"
-                mode="time"
-                // className="w-[20%] mt-0"
-                required={false}
-                placeholder="Opening Time"
-              />
-              {/* </View> */}
-              {/* <View className="flex"> */}
-              <FormField
-                label=""
-                control={control}
-                name="toHour"
-                component="datepicker"
-                mode="time"
-                className="w-[20%] mt-0"
-                required={false}
-                placeholder="AM/PM"
-              />
-              {/* </View> */}
+          <View className="w-[90%] mx-auto mt-4">
+            <Text className="text-secondary font-bold mb-2">Working Hour</Text>
+            <View className="w-[90%] mt-4">
+              <View className="flex-row justify-around">
+                <Text className="text-secondary ml-4 font-medium">From</Text>
+                <Text className="text-secondary ml-4 font-medium">To</Text>
+              </View>
+              <View className="flex-row w-[60%] gap-4 -mt-10">
+                {/* <View className="flex"> */}
+                <FormField
+                  label=""
+                  control={control}
+                  name="fromHour"
+                  component="datepicker"
+                  mode="time"
+                  className="w-full"
+                  required={false}
+                  placeholder="Opening Time"
+                />
+                {/* </View> */}
+                {/* <View className="flex"> */}
+
+                <FormField
+                  label=""
+                  control={control}
+                  name="toHour"
+                  component="datepicker"
+                  mode="time"
+                  className="w-full"
+                  required={false}
+                  placeholder="AM/PM"
+                />
+                {/* </View> */}
+              </View>
             </View>
           </View>
         </View>

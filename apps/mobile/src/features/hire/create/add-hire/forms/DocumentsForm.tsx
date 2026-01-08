@@ -25,6 +25,8 @@ type DocumentSchema = z.infer<typeof documentSchema>;
 export default function DocumentsForm({ data }: { data: AddHirePageType }) {
   const prevPage = useHireFormStore((s) => s.prevPage);
   const formValue = useHireFormStore((s) => s.formValue);
+  const setPage = useHireFormStore((s) => s.setPage);
+  const clearPage = useHireFormStore((s) => s.clearPage);
   const token = useAuthStore((s) => s.token);
   const setToken = useAuthStore((s) => s.setToken);
   const { mutate } = useMutation(trpc.hirerouter.create.mutationOptions());
@@ -61,8 +63,10 @@ export default function DocumentsForm({ data }: { data: AddHirePageType }) {
     mutate(finalData, {
       onSuccess: async (data) => {
         if (data?.success) {
-          setToken(token, "business");
-          await setTokenRole(token ?? "", "business");
+          setPage(0);
+          clearPage();
+          setToken(token, "hire");
+          await setTokenRole(token ?? "", "hire");
           Alert.alert("listing added successfully");
           queryClient.invalidateQueries({
             queryKey: trpc.hirerouter.show.queryKey(),

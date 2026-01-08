@@ -103,6 +103,7 @@ export default function EducationForm({ data }: { data: AddHirePageType }) {
         { label: "14", value: 14 },
         { label: "15", value: 15 },
       ],
+      required: false,
       error: errors.workExperienceYear?.message,
     },
     {
@@ -113,7 +114,6 @@ export default function EducationForm({ data }: { data: AddHirePageType }) {
       component: "select",
       required: false,
       options: [
-        { label: "fresher", value: "fresher" },
         { label: "0", value: 0 },
         { label: "1", value: 1 },
         { label: "2", value: 2 },

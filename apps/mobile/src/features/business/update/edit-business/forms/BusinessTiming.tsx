@@ -27,7 +27,10 @@ export default function BusinessTiming({
   } = useForm<BusinessTimingSchema>({
     resolver: zodResolver(businessTimingSchema),
     defaultValues: {
-      days: data?.business?.days ?? formValue.days ?? [],
+      days:
+        formValue.days?.length === 0
+          ? data?.business?.days
+          : (formValue.days ?? []),
       fromHour:
         formValue.fromHour === ""
           ? data?.business?.fromHour

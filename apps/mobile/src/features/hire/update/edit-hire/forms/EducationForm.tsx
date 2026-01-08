@@ -17,6 +17,7 @@ type EducationSchema = z.infer<typeof educationSchema>;
 
 export default function EducatonForm({ data }: { data: UserHireListingType }) {
   const setFormValue = useHireFormStore((s) => s.setFormValue);
+  const formValue = useHireFormStore((s) => s.formValue);
   const nextPage = useHireFormStore((s) => s.nextPage);
   const prevPage = useHireFormStore((s) => s.prevPage);
 
@@ -28,14 +29,38 @@ export default function EducatonForm({ data }: { data: UserHireListingType }) {
   } = useForm<EducationSchema>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      highestQualification: data?.hire?.highestQualification ?? NaN,
-      skillset: data?.hire?.skillset ?? "",
-      employmentStatus: data?.hire?.employmentStatus ?? "",
-      workExperienceYear: data?.hire?.workExperienceYear ?? 0,
-      workExperienceMonth: data?.hire?.workExperienceMonth ?? 0,
-      jobRole: data?.hire?.jobRole ?? "",
-      previousJobRole: data?.hire?.previousJobRole ?? "",
-      certificates: data?.hire?.certificates ?? "",
+      highestQualification:
+        formValue.highestQualification === 0
+          ? data?.hire?.highestQualification
+          : (formValue.highestQualification ?? 0),
+      skillset:
+        formValue.skillset === ""
+          ? data?.hire?.skillset
+          : (formValue.skillset ?? ""),
+      employmentStatus:
+        formValue.employmentStatus === ""
+          ? data?.hire?.employmentStatus
+          : (formValue.employmentStatus ?? ""),
+      workExperienceYear:
+        formValue.workExperienceYear === 0
+          ? data?.hire?.workExperienceYear
+          : (formValue.workExperienceYear ?? 0),
+      workExperienceMonth:
+        formValue.workExperienceMonth === 0
+          ? data?.hire?.workExperienceMonth
+          : (formValue.workExperienceMonth ?? 0),
+      jobRole:
+        formValue.jobRole === ""
+          ? data?.hire?.jobRole
+          : (formValue.jobRole ?? ""),
+      previousJobRole:
+        formValue.previousJobRole === ""
+          ? data?.hire?.previousJobRole
+          : (formValue.previousJobRole ?? ""),
+      certificates:
+        formValue.certificates === ""
+          ? data?.hire?.certificates
+          : (formValue.certificates ?? ""),
     },
   });
   const onError = (errors: FieldErrors<EducationSchema>) => {
@@ -121,7 +146,6 @@ export default function EducatonForm({ data }: { data: UserHireListingType }) {
       label: "Work Experience Month",
       component: "dropdown",
       data: [
-        { label: "fresher", value: "fresher" },
         { label: "0", value: 0 },
         { label: "1", value: 1 },
         { label: "2", value: 2 },

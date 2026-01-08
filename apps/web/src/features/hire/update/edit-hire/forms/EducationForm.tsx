@@ -21,6 +21,7 @@ export default function EducationForm({
 }) {
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const nextPage = useHireFormStore((state) => state.nextPage);
+  const formValue = useHireFormStore((state) => state.formValue);
   const prevPage = useHireFormStore((state) => state.prevPage);
   const {
     control,
@@ -29,14 +30,37 @@ export default function EducationForm({
   } = useForm<EducationSchema>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      highestQualification: hireListing?.hire?.highestQualification ?? NaN,
-      skillset: hireListing?.hire?.skillset ?? "",
-      employmentStatus: hireListing?.hire?.employmentStatus ?? "",
-      workExperienceYear: hireListing?.hire?.workExperienceYear ?? NaN,
-      workExperienceMonth: hireListing?.hire?.workExperienceMonth ?? NaN,
-      jobRole: hireListing?.hire?.jobRole ?? "",
-      previousJobRole: hireListing?.hire?.previousJobRole ?? "",
-      certificates: hireListing?.hire?.certificates ?? "",
+      highestQualification:
+        formValue.highestQualification === 0
+          ? hireListing?.hire?.highestQualification
+          : (formValue.highestQualification ?? NaN),
+      skillset:
+        formValue.skillset === ""
+          ? hireListing?.hire?.skillset
+          : (formValue.skillset ?? ""),
+      employmentStatus:
+        formValue.employmentStatus === ""
+          ? hireListing?.hire?.employmentStatus
+          : (formValue.employmentStatus ?? ""),
+      workExperienceYear:
+        formValue.workExperienceYear === null
+          ? hireListing?.hire?.workExperienceYear
+          : (formValue.workExperienceYear ?? null),
+      workExperienceMonth:
+        formValue.workExperienceMonth === null
+          ? hireListing?.hire?.workExperienceMonth
+          : (formValue.workExperienceMonth ?? null),
+      jobRole:
+        formValue.jobRole === ""
+          ? hireListing?.hire?.jobRole
+          : (formValue.jobRole ?? ""),
+      previousJobRole: formValue.previousJobRole
+        ? hireListing?.hire?.previousJobRole
+        : (formValue.previousJobRole ?? ""),
+      certificates:
+        formValue.certificates === ""
+          ? hireListing?.hire?.certificates
+          : (formValue.certificates ?? ""),
     },
   });
 
@@ -104,6 +128,7 @@ export default function EducationForm({
         { label: "14", value: 14 },
         { label: "15", value: 15 },
       ],
+      required: false,
       error: errors.workExperienceYear?.message,
     },
     {
@@ -114,7 +139,6 @@ export default function EducationForm({
       component: "select",
       required: false,
       options: [
-        { label: "fresher", value: "fresher" },
         { label: "0", value: 0 },
         { label: "1", value: 1 },
         { label: "2", value: 2 },
