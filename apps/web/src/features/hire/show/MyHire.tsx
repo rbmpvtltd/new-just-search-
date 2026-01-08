@@ -1,7 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import { Eye, Pencil, Trash } from "lucide-react";
+import { CheckCircle, Eye, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
@@ -71,11 +71,20 @@ export default function MyHire({ data }: { data: MyHireType }) {
 
           <div className="flex-1 flex flex-col justify-start pl-4">
             <div>
-              <h2 className="text-xl font-semibold text-gray-800">
-                {data.name}
+              <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-800">
+                <span>{data?.name}</span>
+                {data.status === "Approved" && (
+                  <CheckCircle
+                    size={26}
+                    className="text-green-500"
+                    aria-label="Verified"
+                  />
+                )}
               </h2>
               <p className="text-gray-600 mt-2 leading-relaxed">
-                {data.address}, {data.buildingName} {data.city.city}
+                {[data?.address, data?.city?.city, data?.state?.name]
+                  .filter(Boolean)
+                  .join(", ")}
               </p>
             </div>
 

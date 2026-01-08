@@ -8,7 +8,16 @@ import type { OutputTrpcType } from "@/lib/trpc";
 
 type MyBusinessType = OutputTrpcType["businessrouter"]["show"];
 export default function MyBusinessCard({ data }: { data: MyBusinessType }) {
-  console.log("Business data", data);
+  const fullAddress = [
+    data.buildingName,
+    data.streetName,
+    data.landmark,
+    data?.address,
+    data?.city,
+    data?.state,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   const colorScheme = useColorScheme();
   const router = useRouter();
@@ -34,13 +43,11 @@ export default function MyBusinessCard({ data }: { data: MyBusinessType }) {
           <Text className="text-secondary text-lg font-semibold mb-1 w-[80%]">
             {data?.name}
           </Text>
-          {data?.status === "Approved" && (
+          {data?.isVerified && (
             <Ionicons name="checkmark-circle" size={24} color="green" />
           )}
         </View>
-        <Text className="text-secondary text-sm mb-4">
-          {data?.address} , {data?.city} , {data?.state}
-        </Text>
+        <Text className="text-secondary text-sm mb-4">{fullAddress}</Text>
         <View className="flex-row justify-between">
           <Pressable
             onPress={() => {
