@@ -22,50 +22,10 @@ const algoliaClient = algoliasearch(
 );
 
 export async function algoliaSeed() {
-  // await algoliaHireSeed();
+  await algoliaHireSeed();
   await algoliaBusinessSeed();
-  // await algoliaProductOfferSeed();
-  // await algoliaCategorySeed();
-  // await algoliaSubCategorySeed();
-  // await algoliaAllListingSeed();
-}
-
-async function algoliaCategorySeed() {
-  try {
-    const data = await db
-      .select({
-        id: categories.id,
-        title: categories.title,
-        type: categories.type,
-      })
-      .from(categories);
-
-    await algoliaClient.saveObjects({
-      indexName: "category",
-      objects: data,
-    });
-
-    return { success: true, count: data.length };
-  } catch (error) {
-    console.error("❌ Error uploading to Algolia:", error);
-    throw error;
-  }
-}
-
-async function algoliaSubCategorySeed() {
-  try {
-    const data = await db.select().from(subcategories);
-
-    await algoliaClient.saveObjects({
-      indexName: "subcategory",
-      objects: data,
-    });
-
-    return { success: true, count: data.length };
-  } catch (error) {
-    console.error("❌ Error uploading to Algolia:", error);
-    throw error;
-  }
+  await algoliaProductOfferSeed();
+  await algoliaAllListingSeed();
 }
 
 async function algoliaHireSeed() {

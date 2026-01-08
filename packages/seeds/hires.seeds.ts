@@ -1,10 +1,9 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { JobType, UserRole } from "@repo/db/dist/enum/allEnum.enum";
+import { JobType } from "@repo/db/dist/enum/allEnum.enum";
 import { languages } from "@repo/db/dist/schema/not-related.schema";
 import { salesmen } from "@repo/db/dist/schema/user.schema";
 import { eq, type InferInsertModel } from "drizzle-orm";
-import { users } from "../db/src/schema/auth.schema";
 import {
   hireCategories,
   hireListing,
@@ -16,84 +15,15 @@ import {
   subcategories,
 } from "../db/src/schema/not-related.schema";
 import { getRightLocation } from "./business.seed";
-import { getFakeHireUser } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { insertUser, safeArray } from "./utils";
 
 export const hireSeed = async () => {
   await cleardataofhire();
-  // await testhire();
   await addHire();
   await seedHireCategories();
   await seedHireSubcategories();
-};
-
-const testhire = async () => {
-  const userId = await insertUser("588", "hire");
-  console.log("userId", userId);
-  type HireData = InferInsertModel<typeof hireListing>;
-  const hireData: HireData = {
-    id: 1851,
-    salesmanId: 5,
-    fromHour: "",
-    toHour: "",
-    userId: 2365,
-    city: 449,
-    name: "Jasraj Singh Rajpurohit",
-    slug: "jasraj-singh",
-    fatherName: "Devi Singh Raajpurohit",
-    dob: "1987-12-31",
-    gender: "Male",
-    maritalStatus: "Married",
-    languages: [2, 1],
-    specialities: null,
-    description: null,
-    latitude: 73.0449461,
-    longitude: 26.2284545,
-    buildingName: null,
-    streetName: null,
-    address: "Chamber no. 32 third floor new campus Jhalamand",
-    landmark: null,
-    pincode: "342013",
-    state: 19,
-    photo: "Banner/cbycmehjeetyxbuxc6ie",
-    isFeature: false,
-    status: "Approved",
-    website: null,
-    email: "Jasrajdoli@gmail.com",
-    mobileNumber: undefined,
-    whatsappNo: null,
-    alternativeMobileNumber: "9602188881",
-    facebook: null,
-    twitter: null,
-    linkedin: null,
-    highestQualification: 11,
-    employmentStatus: "yes",
-    workExperienceYear: 7,
-    workExperienceMonth: 1,
-    jobRole: "Advocate",
-    previousJobRole: "High court",
-    expertise: null,
-    skillset: "Advocate",
-    abilities: null,
-    jobType: ["Full time"],
-    locationPreferred: "Rajasthan",
-    certificates: "6083319081743437506.jpg",
-    workShift: ["Morning_shift", "Evening_shift"],
-    expectedSalaryFrom: "In Cases",
-    expectedSalaryTo: "In Cases",
-    jobDuration: [],
-    relocate: "Yes",
-    availability: "All Legal cases attend",
-    idProof: 1,
-    idProofPhoto: "Banner/cbycmehjeetyxbuxc6ie",
-    coverLetter: undefined,
-    resumePhoto: "Banner/cbycmehjeetyxbuxc6ie",
-    aboutYourself: null,
-  };
-  console.log("hireData", hireData);
-  await db.insert(hireListing).values(hireData);
 };
 
 const cleardataofhire = async () => {
@@ -213,21 +143,19 @@ const addHire = async () => {
       "19940945571746603611.jpg",
     ];
 
-    if (invalidPhotos.includes(row.photo)) {
-      row.photo = "82291101735900048.jpg";
-    }
-
-    const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     let hireListingPhoto: string | null = null;
-    if (row.photo) {
-      try {
-        hireListingPhoto = await uploadOnCloudinary(
-          liveHireImageUrl,
-          "Hire",
-          clouadinaryFake,
-        );
-      } catch (error) {
-        console.error("Error uploading image:", error);
+    if (!invalidPhotos.includes(row.photo)) {
+      const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
+      if (row.photo) {
+        try {
+          hireListingPhoto = await uploadOnCloudinary(
+            liveHireImageUrl,
+            "Hire",
+            clouadinaryFake,
+          );
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
       }
     }
 

@@ -1,6 +1,7 @@
 import { db, type UserRole } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
 import { franchises, salesmen } from "@repo/db/dist/schema/user.schema";
+import { logger } from "@repo/logger";
 import dotenv from "dotenv";
 import { sql as dbsql } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
@@ -26,7 +27,7 @@ export const clearAllTablesUser = async () => {
 
 export const seedUsers = async () => {
   const [rows]: any[] = await sql.execute(
-    `SELECT u.* FROM mydb.users u left join listings l on u.id = l.user_id where l.user_id is null`,
+    `SELECT u.* FROM users u left join listings l on u.id = l.user_id where l.user_id is null`,
   );
 
   for (const row of rows) {

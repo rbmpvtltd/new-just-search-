@@ -49,8 +49,6 @@ const uploadOnCloudinary = async (
       folder: folderName,
     });
 
-    console.log("result id in cloudinary.ts", result);
-
     return result.public_id;
 
     // Uncomment if you want to delete local file after upload
