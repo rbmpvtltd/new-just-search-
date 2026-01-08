@@ -114,7 +114,7 @@ export default function UpdateBusinessListing({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             flexGrow: 1,
-            paddingHorizontal: 12,
+            // paddingHorizontal: 12,
             paddingVertical: 0,
           }}
         >

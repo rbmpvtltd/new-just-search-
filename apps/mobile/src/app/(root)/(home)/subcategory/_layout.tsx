@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 export default function ProfileLayout() {
   return (
     <Stack screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="[subcategory]" options={{ title: "All Listings  " }} />
+      <Stack.Screen name="[subcategory]" options={{ title: "All Listings" }} />
       <Stack.Screen name="aboutBusiness" options={{ headerShown: false }} />
     </Stack>
 

@@ -147,6 +147,7 @@ export default function ContactDetail({ data }: { data: AddBusinessPageType }) {
         label: item.referCode,
         value: item.id,
       })),
+      dropdownPosition: "top",
       className: "w-[90%] bg-base-200",
       error: errors.salesmanId?.message,
     },

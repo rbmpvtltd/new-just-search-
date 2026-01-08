@@ -1,6 +1,6 @@
 {
-  "id": "e6d64d99-fe1f-40af-8b9d-32c7e511f1f4",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "70a540b0-ade4-41c0-a757-f0a376c65d38",
+  "prevId": "4d89278e-a7b8-4fa0-85e0-b120551a2676",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -690,6 +690,96 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.recent_view_business": {
+      "name": "recent_view_business",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "business_id": {
+          "name": "business_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "device": {
+          "name": "device",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "browser": {
+          "name": "browser",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "operating_system": {
+          "name": "operating_system",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "recent_view_business_user_id_users_id_fk": {
+          "name": "recent_view_business_user_id_users_id_fk",
+          "tableFrom": "recent_view_business",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "recent_view_business_business_id_business_listings_id_fk": {
+          "name": "recent_view_business_business_id_business_listings_id_fk",
+          "tableFrom": "recent_view_business",
+          "tableTo": "business_listings",
+          "columnsFrom": [
+            "business_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.chat_images": {
       "name": "chat_images",
       "schema": "",
@@ -1123,8 +1213,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "languages": {
-          "name": "languages",
+        "language": {
+          "name": "language",
           "type": "integer[]",
           "primaryKey": false,
           "notNull": true

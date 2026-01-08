@@ -123,7 +123,6 @@ export default function LoginFrom() {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              // secureTextEntry
               isPassword
             />
           )}

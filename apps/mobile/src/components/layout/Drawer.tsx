@@ -2,9 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import type { HeaderBackButtonProps } from "@react-navigation/elements";
 import type { UserRole } from "@repo/db";
 import { type Href, router, useSegments } from "expo-router";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, useColorScheme, View } from "react-native";
 import { fi } from "zod/v4/locales";
 import { create } from "zustand";
+import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 
 type DrawerStore = {
@@ -33,7 +34,6 @@ const drawerFields: DrawerField[] = [
     },
     icon: "home-outline",
     role: "all",
-   
   },
   {
     name: "Profile",
@@ -172,7 +172,7 @@ export function CustomDrawerContent() {
     //     );
     //   })}
     // </View>
-    <View className="flex-1 bg-background px-3 pt-6">
+    <View className="flex-1 bg-background px-3 pt-6 ">
       {items.map((field) => {
         const isFocused = `/${currentRoute}` === field.route;
         return (
@@ -224,13 +224,14 @@ export function CustomDrawerContent() {
 //  />
 
 export function DrawerMenu() {
+  const colorScheme = useColorScheme();
   const toggleOpen = useDrawerStore((state) => state.toggleOpen);
   return (
-    <Pressable onPress={() => toggleOpen()}>
+    <Pressable onPress={() => toggleOpen()} className="">
       <Ionicons
         name="menu"
-        size={24}
-        color="black"
+        size={32}
+        color={Colors[colorScheme ?? "light"].secondary}
         onPress={() => toggleOpen()}
       />
     </Pressable>

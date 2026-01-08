@@ -20,6 +20,7 @@ export default function TabOneScreen() {
       businessId: Number(premiumshops),
     }),
   );
+  console.log("premium shop is ==================>",premiumshops)
   setShopId(Array.isArray(premiumshops) ? premiumshops[0] : premiumshops);
   if (isLoading) {
     return <Loading position="center" size={"large"} />;

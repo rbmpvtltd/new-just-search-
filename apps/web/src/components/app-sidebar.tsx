@@ -42,7 +42,7 @@ interface SidebarField {
 const items: SidebarField[] = [
   {
     title: "Home",
-    url: "/(root)/profile",
+    url: "/profile",
     icon: Home,
     role: "all",
   },

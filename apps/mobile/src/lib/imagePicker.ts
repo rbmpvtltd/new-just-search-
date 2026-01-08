@@ -24,12 +24,14 @@ export const pickImage = async (fromCamera = false, MAX_SIZE_MB = 1) => {
         mediaTypes: "images",
         quality: 0.2,
         allowsEditing: true,
+        aspect: [4, 3],
         // base64: true,
       })
     : ImagePicker.launchImageLibraryAsync({
         mediaTypes: "images",
         quality: 0.2,
         allowsEditing: true,
+        aspect: [4, 3],
         // base64: true,
       }));
 

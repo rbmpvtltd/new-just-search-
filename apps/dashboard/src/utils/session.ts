@@ -28,6 +28,8 @@ export async function setToken(token: string) {
 
 export async function delToken() {
   const cookieStore = await cookies();
+  cookieStore.delete("authenticated");
+  cookieStore.delete("role");
   return cookieStore.delete("token");
 }
 

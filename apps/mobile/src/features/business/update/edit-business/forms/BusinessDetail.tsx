@@ -23,6 +23,7 @@ export default function BusinessDetail({
   data: UserBusinessListingType;
 }) {
   const setFormValue = useBusinessFormStore((s) => s.setFormValue);
+  const formValue = useBusinessFormStore((s) => s.formValue);
   const nextPage = useBusinessFormStore((s) => s.nextPage);
 
   const {
@@ -32,18 +33,23 @@ export default function BusinessDetail({
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
     defaultValues: {
-      name: data?.business?.name ?? "",
-      photo: data?.business?.photo ?? "",
-      categoryId: data?.category?.categoryId ?? 0,
-      subcategoryId: data?.subcategories?.map((s) => s.subcategoryId) ?? [],
-      specialities: data?.business?.specialities ?? "",
-      homeDelivery: data?.business?.homeDelivery ?? "",
-      description: data?.business?.description ?? "",
-      image1: data?.businessPhotos[0]?.photo ?? "",
-      image2: data?.businessPhotos[1]?.photo ?? "",
-      image3: data?.businessPhotos[2]?.photo ?? "",
-      image4: data?.businessPhotos[3]?.photo ?? "",
-      image5: data?.businessPhotos[4]?.photo ?? "",
+      name: data?.business?.name ?? formValue.name ?? "",
+      photo: data?.business?.photo ?? formValue.photo ?? "",
+      categoryId: data?.category?.categoryId ?? formValue.categoryId ?? 0,
+      subcategoryId:
+        data?.subcategories?.map((s) => s.subcategoryId) ??
+        formValue.subcategoryId ??
+        [],
+      specialities:
+        data?.business?.specialities ?? formValue.specialities ?? "",
+      homeDelivery:
+        data?.business?.homeDelivery ?? formValue.homeDelivery ?? "",
+      description: data?.business?.description ?? formValue.description ?? "",
+      image1: data?.businessPhotos[0]?.photo ?? formValue.image1 ?? "",
+      image2: data?.businessPhotos[1]?.photo ?? formValue.image2 ?? "",
+      image3: data?.businessPhotos[2]?.photo ?? formValue.image3 ?? "",
+      image4: data?.businessPhotos[3]?.photo ?? formValue.image4 ?? "",
+      image5: data?.businessPhotos[4]?.photo ?? formValue.image5 ?? "",
     },
   });
 
@@ -80,10 +86,9 @@ export default function BusinessDetail({
       "business",
     );
     const finalImages = imagesToUpload.map((img) =>
-      img?.startsWith("file://")
-        ? uploadedFiles.shift() // replace with uploaded URL
-        : img,
+      img?.startsWith("file://") ? uploadedFiles.shift() : img,
     );
+    console.log("Final image", finalImages);
 
     setFormValue("name", data.name ?? "");
     setFormValue("photo", finalImages[0] ?? "");
@@ -238,7 +243,7 @@ export default function BusinessDetail({
           *
         </Text>
       </View>
-      <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2     ">
+      <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[100%] gap-2">
         {formFields2.map((field) => (
           <FormField key={field.name} {...field} />
         ))}
@@ -246,7 +251,7 @@ export default function BusinessDetail({
 
       <View className="mx-auto w-[90%] mt-6 mb-2">
         <PrimaryButton
-          className="w-[40%] mx-auto"
+          className="w-[45%] mx-auto"
           title="Next"
           onPress={handleSubmit(onSubmit)}
           isLoading={isSubmitting}

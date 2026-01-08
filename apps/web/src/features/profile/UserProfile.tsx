@@ -172,14 +172,15 @@ export default function UserProfile({ user }: { user: UserProfile }) {
     <div className="">
       <form onSubmit={handleSubmit(onSubmit)} className="max-w-5xl ">
         <div className="w-[90%] mx-auto bg-white shadow rounded-xl p-6 flex flex-col md:flex-row items-center gap-6">
-          <Avatar className="w-32 h-32 border shadow-sm">
-            <AvatarImage src="/images/demo-img.webp" alt="User Profile" />
-            <div className="-mt-4 -ml-2">
+          <Avatar className="w-32 h-32 border shadow-sm overflow-hidden">
+            {/* <AvatarImage src="/images/demo-img.webp" alt="User Profile" /> */}
+            <div className="flex items-center justify-center w-full h-full ">
               <FormField
                 control={control}
                 label=""
                 name="profileImage"
                 required={false}
+                className="w-6 h-6 "
                 component="image"
               />
             </div>

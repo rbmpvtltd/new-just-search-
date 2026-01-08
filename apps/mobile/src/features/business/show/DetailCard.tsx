@@ -13,24 +13,32 @@ import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcat
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
 import { useShopIdStore } from "@/store/shopIdStore";
+import { OutputTrpcType } from "@/lib/trpc";
+
+type FavouriteBsinesses = OutputTrpcType["subcategoryRouter"]["subcategory"]["data"];
 
 function DetailCard({
   item,
   type,
+  navigationId
 }: {
-  item: SubcategoryHitType;
+  item: SubcategoryHitType|FavouriteBsinesses;
   type: number;
+  navigationId? : number
 }) {
   const { setShopId } = useShopIdStore();
   const colorScheme = useColorScheme();
 
+  console.log("navigation id is ====>",navigationId)
+  console.log("object id is ====>",item.objectID)
+
   return (
     <Pressable
       onPress={() => {
-        setShopId(String(item.objectID));
+        setShopId(String(navigationId ?? item.objectID));
         router.navigate({
           pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-          params: { premiumshops: item.objectID },
+          params: { premiumshops: navigationId ?? item.objectID },
         });
       }}
     >
@@ -67,7 +75,7 @@ function DetailCard({
                     router.push({
                       pathname:
                         "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                      params: { premiumshops: item.objectID },
+                      params: { premiumshops: navigationId ?? item.objectID },
                     });
                   }}
                 >
@@ -102,11 +110,11 @@ function DetailCard({
               <TouchableOpacity
                 className="bg-success-content rounded-lg py-2 px-1"
                 onPress={() => {
-                  setShopId(String(item.objectID));
+                  setShopId(String(navigationId ?? item.objectID));
                   router.navigate({
                     pathname:
                       "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                    params: { premiumshops: item.objectID },
+                    params: { premiumshops: navigationId ?? item.objectID },
                   });
                 }}
               >
@@ -114,16 +122,16 @@ function DetailCard({
                   {item.category}
                 </Text>
               </TouchableOpacity>
-              {item.subcategories.slice(0, 2).map((sub, index) => (
+              {item.subcategories.slice(0, 2).map((sub:string, index:number) => (
                 <TouchableOpacity
                   key={index.toString()}
                   className="bg-error-content rounded-lg py-2 px-2 mb-1"
                   onPress={() => {
-                    setShopId(String(item.objectID));
+                    setShopId(String(navigationId ?? item.objectID));
                     router.navigate({
                       pathname:
                         "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                      params: { premiumshops: item.objectID },
+                      params: { premiumshops: navigationId ?? item.objectID },
                     });
                   }}
                 >
@@ -136,11 +144,11 @@ function DetailCard({
                 <TouchableOpacity
                   className="bg-base-100 rounded-lg py-2 px-4 mb-1"
                   onPress={() => {
-                    setShopId(String(item.objectID));
+                    setShopId(String(navigationId ?? item.objectID));
                     router.navigate({
                       pathname:
                         "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                      params: { premiumshops: item.objectID },
+                      params: { premiumshops: navigationId ?? item.objectID },
                     });
                   }}
                 >
@@ -175,11 +183,11 @@ function DetailCard({
           <View className="rounded-lg bg-primary p-1">
             <Pressable
               onPress={() => {
-                setShopId(String(item.objectID));
+                setShopId(String(navigationId ?? item.objectID));
                 router.navigate({
                   pathname:
                     "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                  params: { premiumshops: item.objectID },
+                  params: { premiumshops: navigationId ?? item.objectID },
                 });
               }}
             >
@@ -192,11 +200,11 @@ function DetailCard({
           <View className="rounded-lg bg-primary p-1">
             <Pressable
               onPress={() => {
-                setShopId(String(item.objectID));
+                setShopId(String(navigationId ?? item.objectID));
                 router.navigate({
                   pathname:
                     "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                  params: { premiumshops: item.objectID },
+                  params: { premiumshops: navigationId ?? item.objectID },
                 });
               }}
             >
@@ -209,11 +217,11 @@ function DetailCard({
             <View className="rounded-lg bg-primary p-1">
               <Pressable
                 onPress={() => {
-                  setShopId(String(item.objectID));
+                  setShopId(String(navigationId ?? item.objectID));
                   router.navigate({
                     pathname:
                       "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                    params: { premiumshops: item.objectID },
+                    params: { premiumshops: navigationId ?? item.objectID },
                   });
                 }}
               >

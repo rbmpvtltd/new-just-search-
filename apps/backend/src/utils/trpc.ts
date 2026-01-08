@@ -32,7 +32,6 @@ export const mergeRouters = t.mergeRouters;
 export const publicProcedure = t.procedure;
 
 export const guestProcedure = publicProcedure.use(async (opts) => {
-  logger.info("GUEST  started");
   const { ctx } = opts;
 
   if (!ctx || !ctx.token) {
@@ -65,21 +64,18 @@ export const guestProcedure = publicProcedure.use(async (opts) => {
 
 export const protectedProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
-  logger.info("ctx", ctx);
   if (!ctx.token) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "cannot find token" });
   }
 
   const session = await validateSessionToken(ctx.token);
   if (!session) {
-    logger.info("session not found");
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "token is not valid",
     });
   }
 
-  logger.info("session", session);
   return opts.next({
     ctx: {
       userId: session.userId,
