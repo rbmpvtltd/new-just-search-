@@ -25,10 +25,10 @@ import { insertUser } from "./utils";
 export const businessSeed = async () => {
   await clearAllTablesBusiness();
   await addBusiness();
-  // await seedFavourites();
-  // await businessesCategories();
-  // await businessesSubcategory();
-  // await BusinessReviews();
+  await seedFavourites();
+  await businessesCategories();
+  await businessesSubcategory();
+  await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -62,14 +62,14 @@ const addBusiness = async () => {
   for (const row of rows) {
     // const row = rows[0];
     //
-    if (row.id < 587) {
-      continue;
-    }
-    logger.info("Adding business", {
-      row,
-    });
 
-    const userId = await insertUser(row.user_id, "business");
+    let userId = 0;
+    try {
+      userId = await insertUser(row.user_id, "business");
+    } catch (error) {
+      console.log("error inside user");
+      throw new Error(`User not found ${row.user_id} ${error}`);
+    }
 
     let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
 

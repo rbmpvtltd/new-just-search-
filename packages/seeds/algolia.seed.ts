@@ -127,6 +127,8 @@ async function algoliaHireSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
+    await algoliaClient.deleteIndex({ indexName: "hire_listing" });
+
     await algoliaClient.saveObjects({
       indexName: "hire_listing",
       objects: finalData,
@@ -239,6 +241,7 @@ async function algoliaBusinessSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
+    await algoliaClient.deleteIndex({ indexName: "business_listing" });
     await algoliaClient.saveObjects({
       indexName: "business_listing",
       objects: finalData,
@@ -405,6 +408,7 @@ async function algoliaProductOfferSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
+    await algoliaClient.deleteIndex({ indexName: "product_offer_listing" });
     await algoliaClient.saveObjects({
       indexName: "product_offer_listing",
       objects: finalData,
@@ -639,6 +643,7 @@ async function algoliaAllListingSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
+    await algoliaClient.deleteIndex({ indexName: "all_listing" });
     await algoliaClient.saveObjects({
       indexName: "all_listing",
       objects: finalData,
