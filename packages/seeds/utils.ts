@@ -116,7 +116,7 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
   ];
 
   let profilePhotoUrl = null;
-  if (row.photo && !invalidPhotos.includes(row.photo)) {
+  if (row?.photo && !invalidPhotos.includes(row.photo)) {
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     if (row.photo) {
       try {
