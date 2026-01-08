@@ -26,5 +26,7 @@ export const cloudinaryDeleteImageByPublicId = async (public_id: string) => {
 export const cloudinaryDeleteImagesByPublicIds = async (
   public_ids: string[],
 ) => {
+  console.log("Public", public_ids);
+
   await cloudinary.api.delete_resources(public_ids);
 };

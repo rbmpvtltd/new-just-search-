@@ -19,8 +19,8 @@ export default function PricingPlansComponent() {
     queryFn: async () => {
       const offering = await Purchases.getOfferings();
       if (
-        offering.current !== null &&
-        offering.current.availablePackages.length !== 0
+        offering?.current !== null &&
+        offering?.current?.availablePackages?.length !== 0
       ) {
         return offering;
       }

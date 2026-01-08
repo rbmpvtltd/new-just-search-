@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Gender, MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { personalDetailsHireSchema } from "@repo/db/dist/schema/hire.schema";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { type FieldErrors, useForm, useWatch } from "react-hook-form";
 import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -20,6 +20,8 @@ import type { UserHireListingType } from "..";
 
 type PersonalDetailsSchema = z.infer<typeof personalDetailsHireSchema>;
 
+let genderRef = false;
+
 export default function PersonalDetailsForm({
   data,
 }: {
@@ -28,6 +30,7 @@ export default function PersonalDetailsForm({
   console.log("Hire listing data", data);
 
   const setFormValue = useHireFormStore((s) => s.setFormValue);
+  const formValue = useHireFormStore((s) => s.formValue);
   const nextPage = useHireFormStore((s) => s.nextPage);
   const [detectedCityName, setDetectedCityName] = useState<null | string>(null);
 
@@ -40,27 +43,61 @@ export default function PersonalDetailsForm({
   } = useForm<PersonalDetailsSchema>({
     resolver: zodResolver(personalDetailsHireSchema),
     defaultValues: {
-      photo: data?.hire?.photo ?? "",
-      name: data?.hire?.name ?? "",
-      categoryId: data?.category?.categoryId ?? 0,
-      subcategoryId: data?.subcategory?.map((item) => item.subcategoryId) ?? [],
-      email: data?.hire?.email ?? "",
-      gender: data?.hire?.gender ?? "Male",
-      maritalStatus: data?.hire?.maritalStatus ?? "Married",
-      fatherName: data?.hire?.fatherName ?? "",
-      dob: data?.hire?.dob ?? "",
-      languages: data?.hire?.languages ?? [],
-      mobileNumber: data?.hire?.mobileNumber ?? "",
-      alternativeMobileNumber: data?.hire?.alternativeMobileNumber ?? "",
-      latitude: data?.hire?.latitude ?? null,
-      longitude: data?.hire?.longitude ?? null,
-      area: data?.hire?.area ?? "",
-      pincode: data?.hire?.pincode ?? "",
-      state: data?.hire?.state ?? 0,
-      city: data?.hire?.city ?? 0,
+      photo:
+        formValue.photo === "" ? data?.hire?.photo : (formValue.photo ?? ""),
+      name: formValue.name === "" ? data?.hire?.name : (formValue.name ?? ""),
+      categoryId:
+        formValue.categoryId === 0
+          ? data?.category?.categoryId
+          : (formValue.categoryId ?? 0),
+      subcategoryId:
+        formValue.subcategoryId.length === 0
+          ? data?.subcategory?.map((s) => s.subcategoryId)
+          : (formValue.subcategoryId ?? []),
+      email:
+        formValue.email === "" ? data?.hire?.email : (formValue.email ?? ""),
+      gender: data?.hire?.gender ?? formValue.gender ?? "Male",
+      maritalStatus:
+        data?.hire?.maritalStatus ?? formValue.maritalStatus ?? "Married",
+      fatherName:
+        formValue.fatherName === ""
+          ? data?.hire?.fatherName
+          : (formValue.fatherName ?? ""),
+      dob: formValue.dob === "" ? data?.hire?.dob : (formValue.dob ?? ""),
+      languages:
+        formValue.languages.length === 0
+          ? data?.hire?.languages
+          : (formValue.languages ?? []),
+      mobileNumber:
+        formValue.mobileNumber === ""
+          ? data?.hire?.mobileNumber
+          : (formValue.mobileNumber ?? ""),
+      alternativeMobileNumber:
+        formValue.alternativeMobileNumber === ""
+          ? data?.hire?.alternativeMobileNumber
+          : (formValue.alternativeMobileNumber ?? ""),
+      latitude:
+        formValue.latitude === null
+          ? data?.hire?.latitude
+          : (formValue.latitude ?? null),
+      longitude:
+        formValue.longitude === null
+          ? data?.hire?.longitude
+          : (formValue.longitude ?? null),
+      address:
+        formValue.address === ""
+          ? data?.hire?.address
+          : (formValue.address ?? ""),
+      pincode:
+        formValue.pincode === ""
+          ? data?.hire?.pincode
+          : (formValue.pincode ?? ""),
+      state: formValue.state === 0 ? data?.hire?.state : (formValue.state ?? 0),
+      city: formValue.city === 0 ? data?.hire?.city : (formValue.city ?? 0),
     },
   });
 
+  console.log("gender ref ", genderRef);
   const selectedCategoryId = useWatch({ control, name: "categoryId" });
   const { data: subCategories } = useQuery(
     trpc.hirerouter.getSubCategories.queryOptions({
@@ -126,10 +163,11 @@ export default function PersonalDetailsForm({
     setFormValue("alternativeMobileNumber", data.alternativeMobileNumber ?? "");
     setFormValue("latitude", data.latitude ?? "");
     setFormValue("longitude", data.longitude ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state);
     setFormValue("city", data.city);
+    genderRef = true;
     nextPage();
   };
   const onError = (errors: FieldErrors<PersonalDetailsSchema>) => {
@@ -289,12 +327,12 @@ export default function PersonalDetailsForm({
     },
     {
       control,
-      name: "area",
+      name: "address",
       label: "Address",
       placeholder: "Enter your Address",
       keyboardType: "default",
       component: "input",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -360,7 +398,7 @@ export default function PersonalDetailsForm({
                     const pincode = locationData.postalCode || "";
                     const cityName = locationData.city || "";
                     const stateName = locationData.region || "";
-                    const area = parts.length > 1 ? parts[2] : "";
+                    const address = parts.length > 1 ? parts[2] : "";
                     const street_name = parts.length > 1 ? parts[1] : "";
                     const landmark = locationData.street || "";
                     const building_name = parts[0].match(/[A-Za-z]/)
@@ -378,8 +416,8 @@ export default function PersonalDetailsForm({
                     setValue("pincode", pincode);
                     setValue("state", matchedState?.id ?? 0);
                     setValue(
-                      "area",
-                      building_name || area || street_name || landmark,
+                      "address",
+                      address || building_name || street_name || landmark,
                     );
                   }}
                 />
@@ -390,7 +428,7 @@ export default function PersonalDetailsForm({
 
         <View className="mx-auto w-[90%] mt-6 mb-24">
           <PrimaryButton
-            className="w-[40%] mx-auto"
+            className="w-[45%] mx-auto"
             title="Next"
             onPress={handleSubmit(onSubmit, onError)}
             isLoading={isSubmitting}

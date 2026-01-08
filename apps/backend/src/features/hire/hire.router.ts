@@ -375,7 +375,6 @@ export const hirerouter = router({
         .delete(schemas.hire.hireSubcategories)
         .where(eq(schemas.hire.hireSubcategories.hireId, isHireExists.id));
 
-      // return { deleteSubCategories: deleteSubCategories };
       await db.insert(schemas.hire.hireSubcategories).values(
         input.subcategoryId.map((subCategoryId) => ({
           subcategoryId: subCategoryId,
@@ -389,12 +388,6 @@ export const hirerouter = router({
     }),
 
   show: hireProcedure.query(async ({ ctx }) => {
-    if (!ctx.userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User not logged in",
-      });
-    }
     const hireListing = await db.query.hireListing.findFirst({
       where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
     });

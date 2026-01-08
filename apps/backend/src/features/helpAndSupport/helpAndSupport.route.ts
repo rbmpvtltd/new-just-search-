@@ -1,12 +1,14 @@
 import { EventEmitter, on } from "node:events";
 import { db, schemas } from "@repo/db";
+import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   chatTokenMessages,
   chatTokenSessionInsertSchema,
   chatTokenSessions,
 } from "@repo/db/dist/schema/help-and-support.schema";
 import { logger } from "@repo/logger";
-import { inArray } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { eq, inArray } from "drizzle-orm";
 import z from "zod";
 import { protectedProcedure, router } from "@/utils/trpc";
 import { tokenGenerator } from "./helpAndSupport.service";
@@ -29,20 +31,24 @@ export const helpAndSupportRouter = router({
     .mutation(async ({ input, ctx }) => {
       const token = await tokenGenerator();
       logger.info("Token", { token: token });
+
+      // TODO : Update this logic
       //check status
       const status = await db.query.chatTokenSessions.findFirst({
-        where: (chatTokenSessions, { eq }) => eq(chatTokenSessions.status, 1),
+        where: (chatTokenSessions, { eq, and }) =>
+          and(
+            eq(chatTokenSessions.status, 1),
+            eq(chatTokenSessions.userId, ctx.userId),
+          ),
       });
 
       //Token already exists
       if (status) {
         logger.info("Status", { status: status });
-
-        return {
-          success: false,
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
           message: "Token already exists",
-          status: 400,
-        };
+        });
       }
 
       const [chatTokenSessionsId] = await db

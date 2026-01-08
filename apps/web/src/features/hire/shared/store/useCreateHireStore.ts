@@ -43,17 +43,17 @@ const initialFormValue: CombinedForm = {
   relocate: "",
 
   // EducationSchema
-  highestQualification: NaN,
+  highestQualification: 0,
   employmentStatus: "",
-  workExperienceYear: NaN,
-  workExperienceMonth: NaN,
+  workExperienceYear: null,
+  workExperienceMonth: null,
   jobRole: "",
   skillset: "",
   previousJobRole: "",
   certificates: "",
 
   // DocumentSchema
-  idProof: NaN,
+  idProof: 0,
   idProofPhoto: "",
   coverLetter: "",
   resumePhoto: "",
@@ -63,7 +63,7 @@ const initialFormValue: CombinedForm = {
 
   // PersonalDetailsSchema
   photo: "",
-  categoryId: NaN,
+  categoryId: 0,
   subcategoryId: [],
   name: "",
   gender: "Male",
@@ -74,10 +74,10 @@ const initialFormValue: CombinedForm = {
   mobileNumber: "",
   latitude: null,
   longitude: null,
-  area: "",
+  address: "",
   pincode: "",
-  state: NaN,
-  city: NaN,
+  state: 0,
+  city: 0,
   alternativeMobileNumber: "",
   email: "",
 };

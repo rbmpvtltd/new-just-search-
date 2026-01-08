@@ -1,8 +1,18 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { AdvancedImage } from "cloudinary-react-native";
+import { router, Stack } from "expo-router";
 import { memo, useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  useColorScheme,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { cld } from "@/lib/cloudinary";
@@ -52,41 +62,56 @@ function HelpAndSupportPrivateChat({
       markRead({ messageId: unread });
     }
   }, [store, markRead]);
-
+  const colorScheme = useColorScheme();
   return (
-    <View className="flex-1">
-      <View className="flex-row items-center gap-3 bg-gray-300 p-3 rounded-xl sticky top-0 left-0 right-0 z-10">
-        <View className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 border border-gray-300 items-center justify-center">
-          <AdvancedImage
-            cldImg={cld.image("Banner/cbycmehjeetyxbuxc6ie")}
-            className="w-full h-full rounded-full"
-          />
-        </View>
-        <View>
-          <Text className="font-semibold text-gray-900 text-lg">Admin</Text>
-        </View>
-      </View>
-      <ScrollView>
-        <View className="mt-3 space-y-3 px-2 max-h-full gap-2 overflow-y-scroll mb-2">
-          {store.map((msg) => (
-            <View
-              key={msg.id}
-              className={`max-w-[80%] px-2 py-2 rounded-2xl shadow-sm ${msg.sendByRole === "User" ? "bg-blue-100 self-end" : "bg-gray-200 self-start"}`}
-            >
-              <Text className="text-gray-800">{msg.message}</Text>
-              <Text className="text-[10px] text-gray-500 mt-1 text-right">
-                {msg.updatedAt
-                  ? new Date(msg.updatedAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : ""}
-              </Text>
+    <>
+      <Stack.Screen
+        options={{
+          title: "Admin",
+
+          headerLeft: () => (
+            <View className="flex-row items-center gap-2">
+              <Pressable className="ml-2" onPress={() => router.back()}>
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  className="mr-2 self-center"
+                />
+              </Pressable>
+              <View className="mr-2 w-10 h-10 rounded-full overflow-hidden border border-gray-300 items-center justify-center">
+                <AdvancedImage
+                  cldImg={cld.image("Banner/cbycmehjeetyxbuxc6ie")}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </View>
             </View>
-          ))}
-        </View>
-      </ScrollView>
-    </View>
+          ),
+        }}
+      />
+
+      <View className="flex-1">
+        <ScrollView>
+          <View className="mt-3 space-y-3 px-2 max-h-full gap-2 overflow-y-scroll mb-2">
+            {store.map((msg) => (
+              <View
+                key={msg.id}
+                className={`max-w-[80%] px-2 py-2 rounded-2xl shadow-sm ${msg.sendByRole === "User" ? "bg-blue-100 self-end" : "bg-gray-200 self-start"}`}
+              >
+                <Text className="text-gray-800">{msg.message}</Text>
+                <Text className="text-[10px] text-gray-500 mt-1 text-right">
+                  {msg.updatedAt
+                    ? new Date(msg.updatedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : ""}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    </>
   );
 }
 
@@ -99,7 +124,7 @@ function SendMessage({ chatTokenSessionId }: { chatTokenSessionId: number }) {
   return (
     <View
       className="flex-row p-[10px] bg-base-100 border-t border-gray-200"
-      style={{ paddingBottom: insets.bottom }}
+      style={{ paddingBottom: insets.bottom - 40 }}
     >
       <TextInput
         className="bg-white flex-1 rounded-[20px] p-[12px] mr-[10px] text-[16px] text-gray-800 border border-gray-200"
@@ -137,7 +162,7 @@ export default function HelpAndSupportChat({
 }) {
   return (
     <BoundaryWrapper>
-      <View className="h-[79vh]">
+      <View className="h-full">
         <MemorizedPrivateChat chatTokenSessionId={chatTokenSessionId} />
         <MemorizedSendMessage chatTokenSessionId={chatTokenSessionId} />
       </View>

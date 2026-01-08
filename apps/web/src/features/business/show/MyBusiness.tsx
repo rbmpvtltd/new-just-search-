@@ -57,12 +57,12 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
         <div className="flex flex-col sm:flex-row gap-6 p-4 sm:p-6">
           <div className="flex justify-center sm:justify-start sm:w-1/4">
             <div className="w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-lg overflow-hidden border shadow-sm bg-gray-50">
-              {data.business.photo ? (
+              {data?.photo ? (
                 <CldImage
                   width="640"
                   height="640"
                   className="w-full h-full object-cover"
-                  src={data.business.photo}
+                  src={data?.photo}
                   alt="Business image"
                 />
               ) : (
@@ -80,17 +80,17 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
           <div className="">
             <div>
               <h2 className="text-xl font-semibold text-gray-800">
-                {data.business.name}
+                {data?.name}
               </h2>
               <p className="text-gray-600 mt-2 leading-relaxed">
-                {data.business.area}, {data.business.city}
+                {data?.address}, {data?.city} , {data?.state}
               </p>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               {/* We make a shared class for all */}
               <Link
-                href={`/profile/business/edit/${data.business.id}`}
+                href={`/profile/business/edit/${data?.id}`}
                 className="inline-flex items-center justify-center gap-2 rounded-lg shadow-sm font-medium px-4 py-2 text-white bg-emerald-500 hover:bg-emerald-600 transition-colors h-10"
               >
                 <Pencil className="w-4 h-4" />

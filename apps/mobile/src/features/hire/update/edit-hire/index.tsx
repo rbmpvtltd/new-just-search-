@@ -40,9 +40,9 @@ export default function UpdateHireListing({
 
   const steps = [
     "Personal Details",
-    "Education",
-    "Preferred Role",
-    "Documents",
+    "Education Details",
+    "Preferred Position",
+    "Documents Required",
   ];
 
   const renderForm = () => {

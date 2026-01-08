@@ -2,6 +2,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { feedbackInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
@@ -28,10 +30,12 @@ const feedbackOptions = [
 ];
 export default function Feedback() {
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(trpc.userRouter.feedback.mutationOptions());
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<FeedbackSchema>({
     resolver: zodResolver(feedbackInsertSchema),
@@ -46,10 +50,14 @@ export default function Feedback() {
       onSuccess: (data) => {
         if (data.success) {
           sweetAlertSuccess(data.message);
+          reset();
+          router.replace("/");
         }
       },
       onError: (error) => {
-        sweetAlertError(error.message);
+        if (isTRPCClientError(error)) {
+          sweetAlertError(error.message);
+        }
       },
     });
   };

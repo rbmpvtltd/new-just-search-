@@ -24,6 +24,7 @@ export default function BusinessDetail({
 }) {
   const trpc = useTRPC();
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
+  const formValue = useBusinessFormStore((state) => state.formValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
 
   const {
@@ -33,20 +34,54 @@ export default function BusinessDetail({
   } = useForm<BusinessDetailSchema>({
     resolver: zodResolver(businessDetailSchema),
     defaultValues: {
-      photo: businessListing?.business?.photo,
-      name: businessListing?.business?.name,
-      categoryId: businessListing?.category?.categoryId,
-      subcategoryId: businessListing?.subcategories.map(
-        (item) => item.subcategoryId,
-      ),
-      specialities: businessListing?.business?.specialities ?? "",
-      homeDelivery: businessListing?.business?.homeDelivery ?? "",
-      description: businessListing?.business?.description ?? "",
-      image1: businessListing?.businessPhotos[0]?.photo ?? "",
-      image2: businessListing?.businessPhotos[1]?.photo ?? "",
-      image3: businessListing?.businessPhotos[2]?.photo ?? "",
-      image4: businessListing?.businessPhotos[3]?.photo ?? "",
-      image5: businessListing?.businessPhotos[4]?.photo ?? "",
+      photo:
+        formValue?.photo === ""
+          ? businessListing?.business?.photo
+          : (formValue?.photo ?? ""),
+      name:
+        formValue?.name === ""
+          ? businessListing?.business?.name
+          : (formValue?.name ?? ""),
+      categoryId:
+        formValue?.categoryId === 0
+          ? businessListing?.category?.categoryId
+          : (formValue.categoryId ?? 0),
+      subcategoryId:
+        formValue?.subcategoryId.length === 0
+          ? businessListing?.subcategories?.map((s) => s.subcategoryId)
+          : (formValue.subcategoryId ?? []),
+      specialities:
+        formValue?.specialities === ""
+          ? businessListing?.business?.specialities
+          : (formValue.specialities ?? ""),
+      homeDelivery:
+        formValue?.homeDelivery === ""
+          ? businessListing?.business?.homeDelivery
+          : (formValue.homeDelivery ?? ""),
+      description:
+        formValue?.description === ""
+          ? businessListing?.business?.description
+          : (formValue.description ?? ""),
+      image1:
+        formValue?.image1 === ""
+          ? String(businessListing?.businessPhotos[0]?.photo)
+          : (formValue.image1 ?? ""),
+      image2:
+        formValue?.image2 === ""
+          ? String(businessListing?.businessPhotos[1]?.photo)
+          : (formValue.image2 ?? ""),
+      image3:
+        formValue?.image3 === ""
+          ? String(businessListing?.businessPhotos[2]?.photo)
+          : (formValue.image3 ?? ""),
+      image4:
+        formValue?.image4 === ""
+          ? String(businessListing?.businessPhotos[3]?.photo)
+          : (formValue.image4 ?? ""),
+      image5:
+        formValue?.image5 === ""
+          ? String(businessListing?.businessPhotos[4]?.photo)
+          : (formValue.image5 ?? ""),
     },
   });
 

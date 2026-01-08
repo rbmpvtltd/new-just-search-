@@ -2,22 +2,27 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { requestAccountsInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
+import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
 import { FormField } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 
 type DeleteRequestSchema = z.infer<typeof requestAccountsInsertSchema>;
 export default function AccountDeleteRequestForm() {
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(
     trpc.userRouter.accountDeleteRequest.mutationOptions(),
   );
   const {
     control,
+    reset,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<DeleteRequestSchema>({
@@ -30,19 +35,16 @@ export default function AccountDeleteRequestForm() {
   const onSubmit = (data: DeleteRequestSchema) => {
     mutate(data, {
       onSuccess: (data) => {
-        Swal.fire({
-          title: data?.message,
-          icon: "success",
-          draggable: true,
-        });
+        if (data?.success) {
+          sweetAlertSuccess(data?.message);
+          router.replace("/");
+          reset();
+        }
       },
       onError: (error) => {
-        console.log("Error", error);
-        Swal.fire({
-          title: error?.message,
-          icon: "error",
-          draggable: true,
-        });
+        if (isTRPCClientError(error)) {
+          sweetAlertError(error.message);
+        }
       },
     });
   };
@@ -52,7 +54,6 @@ export default function AccountDeleteRequestForm() {
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-3xl bg-gray-50 rounded-2xl shadow-lg overflow-hidden"
       >
-        {/* Header */}
         <div className="px-8 py-6 border-b border-gray-200 bg-gray-50">
           <h2 className="text-2xl font-semibold text-gray-800">
             Request to Delete Account
@@ -62,7 +63,6 @@ export default function AccountDeleteRequestForm() {
           </p>
         </div>
 
-        {/* Form Body */}
         <div className="p-8 space-y-6">
           <div>
             <FormField

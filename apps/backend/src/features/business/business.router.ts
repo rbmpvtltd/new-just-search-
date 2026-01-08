@@ -451,7 +451,6 @@ export const businessrouter = router({
         message: "User not logged in",
       });
     }
-    console.log("Business show");
 
     const business = await db.query.businessListings.findFirst({
       where: (businessListings, { eq }) =>
@@ -459,9 +458,16 @@ export const businessrouter = router({
       with: {
         businessPhotos: true,
       },
+      columns: {
+        id: true,
+        name: true,
+        city: true,
+        state: true,
+        photo: true,
+        status: true,
+        address: true,
+      },
     });
-
-    console.log("Business", business);
 
     if (!business) {
       throw new TRPCError({
@@ -469,8 +475,28 @@ export const businessrouter = router({
         message: "Business not found",
       });
     }
+
+    const city = (
+      await db.query.cities.findFirst({
+        where: (cities, { eq }) => eq(cities.id, business.city),
+        columns: {
+          city: true,
+        },
+      })
+    )?.city;
+
+    const state = (
+      await db.query.states.findFirst({
+        where: (states, { eq }) => eq(states.id, business.state),
+        columns: {
+          name: true,
+        },
+      })
+    )?.name;
     return {
-      business,
+      ...business,
+      city: city,
+      state: state,
       success: true,
     };
   }),

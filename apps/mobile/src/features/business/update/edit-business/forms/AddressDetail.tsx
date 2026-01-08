@@ -36,17 +36,36 @@ export default function AddressDetail({
     resolver: zodResolver(addressDetailSchema),
     defaultValues: {
       buildingName:
-        data?.business?.buildingName ?? formValue.buildingName ?? "",
-      streetName: data?.business?.streetName ?? formValue.streetName ?? "",
-      address: data?.business?.address ?? formValue.address ?? "",
-      landmark: data?.business?.landmark ?? formValue.landmark ?? "",
+        formValue.buildingName === ""
+          ? data?.business?.buildingName
+          : (formValue.buildingName ?? ""),
+      streetName:
+        formValue.streetName === ""
+          ? data?.business?.streetName
+          : (formValue.streetName ?? ""),
+      address:
+        formValue.address === ""
+          ? data?.business?.address
+          : (formValue.address ?? ""),
+      landmark:
+        formValue.landmark === ""
+          ? data?.business?.landmark
+          : (formValue.landmark ?? ""),
       latitude:
-        Number(data?.business?.latitude) ?? Number(formValue.latitude) ?? NaN,
+        formValue.latitude === 0
+          ? data?.business?.latitude
+          : (formValue.latitude ?? 0),
       longitude:
-        Number(data?.business?.longitude) ?? Number(formValue.longitude) ?? NaN,
-      pincode: data?.business?.pincode ?? formValue.pincode ?? "",
-      state: data?.business?.state ?? formValue.state ?? 0,
-      city: data?.business?.city ?? formValue.city ?? 0,
+        formValue.longitude === 0
+          ? data?.business?.longitude
+          : (formValue.longitude ?? 0),
+      pincode:
+        formValue.pincode === ""
+          ? data?.business?.pincode
+          : (formValue.pincode ?? ""),
+      state:
+        formValue.state === 0 ? data?.business?.state : (formValue.state ?? 0),
+      city: formValue.city === 0 ? data?.business?.city : (formValue.city ?? 0),
     },
   });
   const states = data?.getStates.map((item) => {

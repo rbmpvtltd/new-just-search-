@@ -53,7 +53,7 @@ export default function PersonalDetailsForm({
       alternativeMobileNumber: formValue.alternativeMobileNumber ?? "",
       latitude: formValue.latitude ?? null,
       longitude: formValue.longitude ?? null,
-      area: formValue.area ?? "",
+      address: formValue.address ?? "",
       pincode: formValue.pincode ?? "",
       state: formValue.state ?? 0,
       city: formValue.city ?? 0,
@@ -125,7 +125,7 @@ export default function PersonalDetailsForm({
     setFormValue("alternativeMobileNumber", data.alternativeMobileNumber ?? "");
     setFormValue("latitude", data.latitude ?? "");
     setFormValue("longitude", data.longitude ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state);
     setFormValue("city", data.city);
@@ -293,12 +293,12 @@ export default function PersonalDetailsForm({
     },
     {
       control,
-      name: "area",
+      name: "address",
       label: "Address",
       placeholder: "Enter your Address",
       keyboardType: "default",
       component: "input",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -344,67 +344,69 @@ export default function PersonalDetailsForm({
   ];
   return (
     // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAwareScrollView
-        className="w-[100%]"
-        extraScrollHeight={0}
-        enableOnAndroid={true}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="mx-auto w-[90%]">
-          {formFields.map((field, idx) => (
-            <React.Fragment key={idx.toString()}>
-              <FormField {...field} />
-              {field.name === "alternativeMobileNumber" && (
-                <LocationAutoDetect
-                  onResult={(locationData) => {
-                    const formatted = locationData.formattedAddress ?? "";
-                    const parts = formatted.split(",").map((p) => p.trim());
+    // <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    //   <KeyboardAwareScrollView
+    //     className="w-[100%]"
+    //     extraScrollHeight={0}
+    //     enableOnAndroid={true}
+    //     keyboardShouldPersistTaps="handled"
+    //   >
+    <>
+      <View className="mx-auto w-[90%]">
+        {formFields.map((field, idx) => (
+          <React.Fragment key={idx.toString()}>
+            <FormField {...field} />
+            {field.name === "alternativeMobileNumber" && (
+              <LocationAutoDetect
+                onResult={(locationData) => {
+                  const formatted = locationData.formattedAddress ?? "";
+                  const parts = formatted.split(",").map((p) => p.trim());
 
-                    const lat = locationData.latitude;
-                    const lng = locationData.longitude;
-                    const pincode = locationData.postalCode || "";
-                    const cityName = locationData.city || "";
-                    const stateName = locationData.region || "";
-                    const area =
-                      parts.length > 1 ? `${parts[2]} ${parts[3]}` : "";
-                    const street_name = parts.length > 1 ? parts[1] : "";
-                    const landmark = locationData.street || "";
-                    const building_name = parts[0].match(/[A-Za-z]/)
-                      ? parts[0]
-                      : "";
+                  const lat = locationData.latitude;
+                  const lng = locationData.longitude;
+                  const pincode = locationData.postalCode || "";
+                  const cityName = locationData.city || "";
+                  const stateName = locationData.region || "";
+                  const address =
+                    parts.length > 1 ? `${parts[2]} ${parts[3]}` : "";
+                  const street_name = parts.length > 1 ? parts[1] : "";
+                  const landmark = locationData.street || "";
+                  const building_name = parts[0].match(/[A-Za-z]/)
+                    ? parts[0]
+                    : "";
 
-                    const matchedState = data?.getStates?.find(
-                      (item) => item?.name === stateName.toLocaleUpperCase(),
-                    );
+                  const matchedState = data?.getStates?.find(
+                    (item) => item?.name === stateName.toLocaleUpperCase(),
+                  );
 
-                    setDetectedCityName(cityName);
+                  setDetectedCityName(cityName);
 
-                    setValue("latitude", Number(lat));
-                    setValue("longitude", Number(lng));
-                    setValue("pincode", pincode);
-                    setValue("state", matchedState?.id ?? 0);
-                    setValue(
-                      "area",
-                      area || building_name || street_name || landmark,
-                    );
-                  }}
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </View>
+                  setValue("latitude", Number(lat));
+                  setValue("longitude", Number(lng));
+                  setValue("pincode", pincode);
+                  setValue("state", matchedState?.id ?? 0);
+                  setValue(
+                    "address",
+                    address || building_name || street_name || landmark,
+                  );
+                }}
+              />
+            )}
+          </React.Fragment>
+        ))}
+      </View>
 
-        <View className="mx-auto w-[90%] mt-6 mb-24">
-          <PrimaryButton
-            className="w-[40%] mx-auto"
-            title="Next"
-            onPress={handleSubmit(onSubmit, onError)}
-            isLoading={isSubmitting}
-          />
-        </View>
-      </KeyboardAwareScrollView>
-    </TouchableWithoutFeedback>
+      <View className="mx-auto w-[90%] mt-6 mb-24">
+        <PrimaryButton
+          className="w-[45%] mx-auto"
+          title="Next"
+          onPress={handleSubmit(onSubmit, onError)}
+          isLoading={isSubmitting}
+        />
+      </View>
+    </>
+    //   </KeyboardAwareScrollView>
+    // </TouchableWithoutFeedback>
     // </SafeAreaView>
   );
 }

@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { feedbackInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
-import { Alert, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import type z from "zod";
 import { FormField } from "@/components/forms/formComponent";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
@@ -24,6 +25,7 @@ const feedbackOptions = [
 ];
 
 export default function Feedback() {
+  const router = useRouter();
   const { mutate } = useMutation(trpc.userRouter.feedback.mutationOptions());
 
   const {
@@ -44,6 +46,7 @@ export default function Feedback() {
       onSuccess: (data) => {
         if (data.success) {
           Alert.alert(data.message);
+          router.replace("/(root)/(home)/home");
           reset();
         }
       },
@@ -54,7 +57,7 @@ export default function Feedback() {
   };
 
   return (
-    <View className="m-4 shadow-md bg-base-200 rounded-lg h-full">
+    <ScrollView className="m-4 shadow-md bg-base-200 rounded-lg h-full">
       <View className="">
         <Text className="text-xl text-secondary font-semibold p-2 ">
           What feedback do you have?
@@ -91,12 +94,12 @@ export default function Feedback() {
       <View className="flex-row justify-between w-[90%] self-center mt-6 mb-12">
         <View className="w-[45%] mx-auto">
           <PrimaryButton
-            title="Next"
+            title="Submit"
             isLoading={isSubmitting}
             onPress={handleSubmit(onSubmit)}
           />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }

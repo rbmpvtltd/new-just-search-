@@ -2,11 +2,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { Eye, Pencil, Trash } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
-import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
@@ -77,7 +75,7 @@ export default function MyHire({ data }: { data: MyHireType }) {
                 {data.name}
               </h2>
               <p className="text-gray-600 mt-2 leading-relaxed">
-                {data.area}, {data.city.city}
+                {data.address}, {data.buildingName} {data.city.city}
               </p>
             </div>
 

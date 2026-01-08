@@ -22,6 +22,7 @@ export default function PreferredPositionForm({
 }) {
   const setFormValue = useHireFormStore((state) => state.setFormValue);
   const prevPage = useHireFormStore((state) => state.prevPage);
+  const formValue = useHireFormStore((state) => state.formValue);
   const nextPage = useHireFormStore((state) => state.nextPage);
   const {
     control,
@@ -30,16 +31,46 @@ export default function PreferredPositionForm({
   } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
-      jobType: hireListing?.hire?.jobType ?? [],
-      locationPreferred: hireListing?.hire?.locationPreferred ?? "",
-      relocate: hireListing?.hire?.relocate ?? "",
-      expectedSalaryFrom: hireListing?.hire?.expectedSalaryFrom ?? "",
-      expectedSalaryTo: hireListing?.hire?.expectedSalaryTo ?? "",
-      jobDuration: hireListing?.hire?.jobDuration ?? [],
-      fromHour: hireListing?.hire?.fromHour ?? "",
-      toHour: hireListing?.hire?.toHour ?? "",
-      workShift: hireListing?.hire?.workShift ?? [],
-      availability: hireListing?.hire?.availability ?? "",
+      jobType:
+        formValue?.jobType.length === 0
+          ? hireListing?.hire?.jobType
+          : (formValue?.jobType ?? []),
+      locationPreferred:
+        formValue?.locationPreferred === ""
+          ? hireListing?.hire?.locationPreferred
+          : (formValue?.locationPreferred ?? ""),
+      relocate:
+        formValue?.relocate === ""
+          ? hireListing?.hire?.relocate
+          : (formValue?.relocate ?? ""),
+      expectedSalaryFrom:
+        formValue?.expectedSalaryFrom === ""
+          ? hireListing?.hire?.expectedSalaryFrom
+          : (formValue?.expectedSalaryFrom ?? ""),
+      expectedSalaryTo:
+        formValue.expectedSalaryTo === ""
+          ? hireListing?.hire?.expectedSalaryTo
+          : (formValue.expectedSalaryTo ?? ""),
+      jobDuration:
+        formValue?.jobDuration.length === 0
+          ? hireListing?.hire?.jobDuration
+          : (formValue?.jobDuration ?? []),
+      fromHour:
+        formValue.fromHour === ""
+          ? hireListing?.hire?.fromHour
+          : (formValue.fromHour ?? ""),
+      toHour:
+        formValue.toHour === ""
+          ? hireListing?.hire?.toHour
+          : (formValue.toHour ?? ""),
+      workShift:
+        formValue.workShift.length === 0
+          ? hireListing?.hire?.workShift
+          : (formValue.workShift ?? []),
+      availability:
+        formValue?.availability === ""
+          ? hireListing?.hire?.availability
+          : (formValue?.availability ?? ""),
     },
   });
 

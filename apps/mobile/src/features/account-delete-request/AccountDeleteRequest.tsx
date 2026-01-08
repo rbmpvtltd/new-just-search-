@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { requestAccountsInsertSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Text, View } from "react-native";
 import type z from "zod";
@@ -11,6 +12,7 @@ import { trpc } from "@/lib/trpc";
 
 type DeleteRequestSchema = z.infer<typeof requestAccountsInsertSchema>;
 export default function AccountDeleteRequestForm() {
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -29,7 +31,10 @@ export default function AccountDeleteRequestForm() {
   const onSubmit = (data: DeleteRequestSchema) => {
     mutate(data, {
       onSuccess: (data) => {
-        Alert.alert(data?.message);
+        if (data?.success) {
+          Alert.alert(data?.message);
+          router.replace("/(root)/(home)/home");
+        }
       },
       onError: (error) => {
         console.log("Error", error);
@@ -61,7 +66,7 @@ export default function AccountDeleteRequestForm() {
       <View className="flex-row justify-between w-[90%] self-center mt-6 mb-12">
         <View className="w-[45%] mx-auto">
           <PrimaryButton
-            title="Next"
+            title="Submit"
             isLoading={isSubmitting}
             onPress={handleSubmit(onSubmit)}
           />

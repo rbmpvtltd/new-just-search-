@@ -1,12 +1,14 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 export default function MyOffer() {
@@ -39,8 +41,6 @@ export default function MyOffer() {
   if (isLoading) {
     return <Spinner />;
   }
-
-  console.log("Offer data", offersData);
 
   return (
     <div className="p-2">
@@ -88,11 +88,13 @@ type OfferType = NonNullable<
   OutputTrpcType["offerrouter"]["showOffer"]
 >["offersData"][number];
 function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
+  const trpc = useTRPC();
   const today = new Date();
   const end = new Date(offer.offerEndDate);
-
+  const { mutate: deleteOffer, isPending } = useMutation(
+    trpc.offerrouter.deleteOffer.mutationOptions(),
+  );
   const status = today <= end ? "Active" : "Expired";
-  console.log("OFFERS Data ----------------------------", offer);
 
   return (
     <div className="">
@@ -145,11 +147,28 @@ function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
             </Button>
           </Link>
           <Button
+            onClick={() => {
+              deleteOffer(
+                { id: offer.id },
+                {
+                  onSuccess: async (data) => {
+                    if (data?.success) {
+                      sweetAlertSuccess(data.message);
+                      const queryClient = getQueryClient();
+                      queryClient.invalidateQueries({
+                        queryKey: trpc.offerrouter.showOffer.queryKey(),
+                      });
+                    }
+                  },
+                },
+              );
+            }}
+            disabled={isPending}
             size="icon"
             variant="outline"
             className="cursor-pointer hover:bg-red-500"
           >
-            <Trash className="w-4 h-4" />
+            {isPending ? <Spinner /> : <Trash className="w-4 h-4" />}
           </Button>
         </div>
       </div>

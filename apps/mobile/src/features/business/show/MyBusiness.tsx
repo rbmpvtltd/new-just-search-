@@ -8,6 +8,8 @@ import type { OutputTrpcType } from "@/lib/trpc";
 
 type MyBusinessType = OutputTrpcType["businessrouter"]["show"];
 export default function MyBusinessCard({ data }: { data: MyBusinessType }) {
+  console.log("Business data", data);
+
   const colorScheme = useColorScheme();
   const router = useRouter();
   return (
@@ -19,25 +21,30 @@ export default function MyBusinessCard({ data }: { data: MyBusinessType }) {
         <View className="border-b border-secondary mb-4" />
         <View className="w-[100%] h-44">
           <AdvancedImage
-            cldImg={cld.image(data?.business.photo || "")}
+            cldImg={cld.image(
+              data?.photo ||
+                data.businessPhotos[0]?.photo ||
+                data?.businessPhotos[1]?.photo ||
+                "",
+            )}
             className="w-[100%] h-[100%]"
           />
         </View>
         <View className="w-full flex-row items-center justify-between">
           <Text className="text-secondary text-lg font-semibold mb-1 w-[80%]">
-            {data?.business?.name}
+            {data?.name}
           </Text>
-          <Ionicons name="checkmark-circle" size={24} color="green" />
+          {data?.status === "Approved" && (
+            <Ionicons name="checkmark-circle" size={24} color="green" />
+          )}
         </View>
         <Text className="text-secondary text-sm mb-4">
-          {data?.business?.area}
+          {data?.address} , {data?.city} , {data?.state}
         </Text>
         <View className="flex-row justify-between">
           <Pressable
             onPress={() => {
-              router.push(
-                `/(root)/profile/business/edit/${data?.business?.id}`,
-              );
+              router.push(`/(root)/profile/business/edit/${data?.id}`);
             }}
             style={{
               backgroundColor: Colors[colorScheme ?? "light"].success,

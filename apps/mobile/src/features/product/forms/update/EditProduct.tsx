@@ -122,6 +122,7 @@ export default function EditProduct({
       label: "Product Price",
       component: "input",
       keyboardType: "numeric",
+      type: "number",
       placeholder: "Offer Price",
       className: "w-[90%] bg-base-200",
       error: errors.rate?.message,
@@ -239,7 +240,7 @@ export default function EditProduct({
         <View className="mt-2 flex-row flex-wrap items-center justify-center mx-auto w-[90%] gap-2 ">
           <View className="w-[45%] mx-auto mb-4">
             <PrimaryButton
-              title="Next"
+              title="Submit"
               isLoading={isSubmitting}
               onPress={handleSubmit(onSubmit)}
             />

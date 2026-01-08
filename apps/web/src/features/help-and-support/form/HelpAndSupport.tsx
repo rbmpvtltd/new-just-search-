@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { chatTokenSessionInsertSchema } from "@repo/db/src/schema/help-and-support.schema";
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import type z from "zod";
@@ -15,6 +16,7 @@ import { useTRPC } from "@/trpc/client";
 type HelpAndSupportSchema = z.infer<typeof chatTokenSessionInsertSchema>;
 export default function HelpAndSupport() {
   const trpc = useTRPC();
+  const router = useRouter();
   const { mutate } = useMutation(
     trpc.helpAndSupportRouter.create.mutationOptions(),
   );
@@ -35,6 +37,7 @@ export default function HelpAndSupport() {
       onSuccess: (data) => {
         if (data.success) {
           sweetAlertSuccess(data.message);
+          router.replace("/profile/help-and-support");
         }
       },
       onError: (error) => {

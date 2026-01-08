@@ -46,7 +46,7 @@ const initialFormValue: CombinedForm = {
   relocate: "",
 
   // EducationSchema
-  highestQualification: NaN,
+  highestQualification: 0,
   employmentStatus: "",
   workExperienceYear: 0,
   workExperienceMonth: 0,
@@ -77,7 +77,7 @@ const initialFormValue: CombinedForm = {
   mobileNumber: "",
   latitude: null,
   longitude: null,
-  area: "",
+  address: "",
   pincode: "",
   state: 0,
   city: 0,

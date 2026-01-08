@@ -35,16 +35,44 @@ export default function PreferredPositionForm({
   } = useForm<PreferredPositionSchema>({
     resolver: zodResolver(preferredPositionSchema),
     defaultValues: {
-      jobType: data?.hire?.jobType ?? [],
-      locationPreferred: data?.hire?.locationPreferred ?? "",
-      workShift: data?.hire?.workShift ?? [],
-      expectedSalaryFrom: data?.hire?.expectedSalaryFrom ?? "",
-      expectedSalaryTo: data?.hire?.expectedSalaryTo ?? "",
-      fromHour: data?.hire?.fromHour ?? "",
-      toHour: data?.hire?.toHour ?? "",
-      jobDuration: data?.hire?.jobDuration ?? [],
-      availability: data?.hire?.availability ?? "",
-      relocate: data?.hire?.relocate ?? "",
+      jobType:
+        formValue.jobType.length === 0
+          ? data?.hire?.jobType
+          : (formValue.jobType ?? []),
+      locationPreferred:
+        formValue.locationPreferred === ""
+          ? data?.hire?.locationPreferred
+          : (formValue.locationPreferred ?? ""),
+      workShift:
+        formValue.workShift.length === 0
+          ? data?.hire?.workShift
+          : (formValue.workShift ?? []),
+      expectedSalaryFrom:
+        formValue.expectedSalaryFrom === ""
+          ? data?.hire?.expectedSalaryFrom
+          : (formValue.expectedSalaryFrom ?? ""),
+      expectedSalaryTo:
+        formValue.expectedSalaryTo === ""
+          ? data?.hire?.expectedSalaryTo
+          : (formValue.expectedSalaryTo ?? ""),
+      fromHour:
+        formValue.fromHour === ""
+          ? data?.hire?.fromHour
+          : (formValue.fromHour ?? ""),
+      toHour:
+        formValue.toHour === "" ? data?.hire?.toHour : (formValue.toHour ?? ""),
+      jobDuration:
+        formValue.jobDuration.length === 0
+          ? data?.hire?.jobDuration
+          : (formValue.jobDuration ?? []),
+      availability:
+        formValue.availability === ""
+          ? data?.hire?.availability
+          : (formValue.availability ?? ""),
+      relocate:
+        formValue.relocate === ""
+          ? data?.hire?.relocate
+          : (formValue.relocate ?? ""),
     },
   });
 
@@ -129,7 +157,7 @@ export default function PreferredPositionForm({
     {
       control,
       name: "relocate",
-      label: "relocate?",
+      label: "Relocate?",
       component: "dropdown",
       data: [
         {
@@ -175,7 +203,7 @@ export default function PreferredPositionForm({
                 <Text className="text-secondary ml-4 font-medium">From</Text>
                 <Text className="text-secondary ml-4 font-medium">To</Text>
               </View>
-              <View className="flex-row mt-4 w-[50%]">
+              <View className="flex-row w-[60%] gap-4 -mt-10">
                 {/* <View className="flex"> */}
                 <FormField
                   label=""
@@ -183,7 +211,7 @@ export default function PreferredPositionForm({
                   name="fromHour"
                   component="datepicker"
                   mode="time"
-                  // className="w-[20%] mt-0"
+                  className="w-full"
                   required={false}
                   placeholder="Opening Time"
                 />
@@ -196,7 +224,7 @@ export default function PreferredPositionForm({
                   name="toHour"
                   component="datepicker"
                   mode="time"
-                  className="w-[20%] mt-0"
+                  className="w-full"
                   required={false}
                   placeholder="AM/PM"
                 />

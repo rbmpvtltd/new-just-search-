@@ -1,7 +1,10 @@
+import { log } from "node:console";
 import { db, schemas } from "@repo/db";
 import {
   insertProductReviewSchema,
   productInsertSchema,
+  productPhotos,
+  productSubCategories,
   products,
 } from "@repo/db/dist/schema/product.schema";
 import { logger } from "@repo/logger";
@@ -335,24 +338,28 @@ export const productrouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // return { success: true};
       const allSeletedPhoto = await db.query.productPhotos.findMany({
         where: (productPhotos, { eq }) => eq(productPhotos.productId, input.id),
       });
 
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => String(item.photo)),
-      );
-      // await db
-      //   .delete(schemas.product.productSubCategories)
-      //   .where(eq(schemas.product.productSubCategories.productId, input.id));
+      if (allSeletedPhoto.length !== 0) {
+        await cloudinaryDeleteImagesByPublicIds(
+          allSeletedPhoto.map((item) => String(item.photo)),
+        );
+
+        await db
+          .delete(productPhotos)
+          .where(eq(productPhotos.productId, input.id));
+      }
 
       await db
-        .delete(schemas.product.products)
-        .where(eq(schemas.product.products.id, input.id));
+        .delete(productSubCategories)
+        .where(eq(productSubCategories.productId, input.id));
 
-      return { success: true };
+      await db.delete(products).where(eq(products.id, input.id));
+      return { success: true, message: "Product deleted successfully" };
     }),
+
   createProductReview: protectedProcedure
     .input(insertProductReviewSchema)
     .mutation(async ({ input, ctx }) => {

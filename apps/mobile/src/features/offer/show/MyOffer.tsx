@@ -13,7 +13,7 @@ import {
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { cld } from "@/lib/cloudinary";
-import { type OutputTrpcType, trpc } from "@/lib/trpc";
+import { type OutputTrpcType, queryClient, trpc } from "@/lib/trpc";
 export default function MyOffersList() {
   const {
     data,
@@ -114,14 +114,12 @@ function OfferCard({ item }: { item: OfferType }) {
           deleteOffer(
             { id: item?.id },
             {
-              onSuccess: async (data) => {
-                if (!data?.success) {
-                  console.warn(
-                    "Delete product mutation returned no data:",
-                    data,
-                  );
-                  Alert.alert("Offer deleted successfully");
-                  return;
+              onSuccess: (data) => {
+                if (data.success) {
+                  queryClient.invalidateQueries({
+                    queryKey: trpc.offerrouter.showOffer.infiniteQueryKey(),
+                  });
+                  Alert.alert("Product deleted successfully");
                 }
               },
             },

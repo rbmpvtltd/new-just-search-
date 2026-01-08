@@ -44,10 +44,10 @@ const initialFormValue: CombinedBusinessForm = {
 
   buildingName: "",
   streetName: "",
-  area: "",
+  address: "",
   landmark: "",
-  latitude: NaN,
-  longitude: NaN,
+  latitude: 0,
+  longitude: 0,
   pincode: "",
   state: 0,
   city: 0,

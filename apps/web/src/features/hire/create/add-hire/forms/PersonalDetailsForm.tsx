@@ -54,7 +54,7 @@ export default function PersonalDetailsForm({
       email: formValue.email ?? "",
       latitude: formValue.latitude ?? null,
       longitude: formValue.longitude ?? null,
-      area: formValue.area ?? "",
+      address: formValue.address ?? "",
       pincode: formValue.pincode ?? "",
       state: formValue.state ?? 0,
       city: formValue.city ?? 0,
@@ -252,7 +252,7 @@ export default function PersonalDetailsForm({
     },
     {
       control,
-      type: "text",
+      type: "number",
       label: "Latitude",
       name: "latitude",
       placeholder: "Latitude",
@@ -262,7 +262,7 @@ export default function PersonalDetailsForm({
     },
     {
       control,
-      type: "text",
+      type: "number",
       label: "Longitude",
       name: "longitude",
       placeholder: "Longitude",
@@ -273,12 +273,12 @@ export default function PersonalDetailsForm({
     {
       control,
       type: "text",
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Address",
+      name: "address",
+      placeholder: "Address",
       component: "input",
       section: "loction",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -336,7 +336,7 @@ export default function PersonalDetailsForm({
     setFormValue("email", data.email ?? "");
     setFormValue("latitude", data.latitude ?? "");
     setFormValue("longitude", data.longitude ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state ?? "");
     setFormValue("city", data.city ?? "");
@@ -384,7 +384,7 @@ export default function PersonalDetailsForm({
                       const pincode = data.postalCode || "";
                       const cityName = data.city || "";
                       const stateName = data.region || "";
-                      const area = parts[0]?.match(/[A-Za-z]/)
+                      const address = parts[0]?.match(/[A-Za-z]/)
                         ? parts[0]
                         : formatted;
                       const matchedState = states?.find(
@@ -395,7 +395,7 @@ export default function PersonalDetailsForm({
 
                       setValue("latitude", Number(lat));
                       setValue("longitude", Number(long));
-                      setValue("area", area);
+                      setValue("address", address);
                       setValue("pincode", pincode);
                       setValue("state", matchedState?.value ?? 0);
                     }}
@@ -410,7 +410,7 @@ export default function PersonalDetailsForm({
                     <div
                       key={field.name}
                       className={
-                        field.name === "area"
+                        field.name === "address"
                           ? "md:col-span-2 lg:col-span-3"
                           : ""
                       }

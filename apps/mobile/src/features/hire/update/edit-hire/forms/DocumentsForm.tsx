@@ -60,6 +60,8 @@ export default function DocumentsForm({ data }: { data: UserHireListingType }) {
       idProofPhoto: files[0] ?? "",
       resumePhoto: files[1] ?? "",
     };
+    console.log("Final Data", finalData);
+
     useHireFormStore.setState((state) => ({
       formValue: finalData,
     }));

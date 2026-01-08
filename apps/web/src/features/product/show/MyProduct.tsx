@@ -7,6 +7,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
@@ -25,7 +26,7 @@ export default function MyProduct() {
       limit: 10,
     }),
   );
-  const offersData = myProducts?.products ?? [];
+  const productData = myProducts?.productData ?? [];
 
   const handleNext = () => {
     setPrevCursors((prev) => [...prev, page ?? 0]);
@@ -43,8 +44,8 @@ export default function MyProduct() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4 p-4">
-      {myProducts?.products ? (
-        myProducts.products.map((product) => (
+      {myProducts?.productData ? (
+        myProducts.productData.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))
       ) : (
@@ -76,15 +77,13 @@ export default function MyProduct() {
 
 type ProductType = NonNullable<
   OutputTrpcType["productrouter"]["showProduct"]
->["products"][number];
+>["productData"][number];
 
 function ProductCard({ product }: { product: ProductType }) {
   const trpc = useTRPC();
   const { mutate: deleteProduct, isPending } = useMutation(
     trpc.productrouter.deleteProduct.mutationOptions(),
   );
-
-  
 
   return (
     <div className="bg-gray-100 rounded-2xl shadow-lg overflow-hidden flex sm:flex-row flex-col gap-4 p-4">
@@ -127,24 +126,13 @@ function ProductCard({ product }: { product: ProductType }) {
                 { id: product.id },
                 {
                   onSuccess: async (data) => {
-                    console.log("data is", data);
-                    if (!data?.success) {
-                      console.warn(
-                        "Delete product mutation returned no data:",
-                        data,
-                      );
-                      return;
+                    if (data?.success) {
+                      sweetAlertSuccess(data.message);
+                      const queryClient = getQueryClient();
+                      queryClient.invalidateQueries({
+                        queryKey: trpc.productrouter.showProduct.queryKey(),
+                      });
                     }
-
-                    const queryClient = await getQueryClient();
-
-                    await queryClient.invalidateQueries();
-
-                    await Swal.fire({
-                      title: "Deleted!",
-                      icon: "success",
-                      draggable: true,
-                    });
                   },
                 },
               );

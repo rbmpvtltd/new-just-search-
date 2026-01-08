@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { Stack } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -12,14 +13,13 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
+import { DrawerMenu } from "@/components/layout/Drawer";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useHireFormStore } from "../../shared/store/useCreateHireStore";
 import DocumentsForm from "./forms/DocumentsForm";
 import EducationForm from "./forms/EducationForm";
 import PersonalDetailsForm from "./forms/PersonalDetailsForm";
 import PreferredPositionForm from "./forms/PreferredPositionForm";
-import { Stack } from "expo-router";
-import { DrawerMenu } from "@/components/layout/Drawer";
 
 export type AddHirePageType = OutputTrpcType["hirerouter"]["add"] | null;
 
@@ -99,9 +99,9 @@ function AddHirePage() {
 
   const steps = [
     "Personal Details",
-    "Education",
-    "Preferred Role",
-    "Documents",
+    "Education Details",
+    "Preferred Position",
+    "Documents Required",
   ];
 
   const renderForm = () => {
