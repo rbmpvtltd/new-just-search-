@@ -250,7 +250,7 @@ export default function BusinessDetail({
       </View>
 
       <View className="flex-row justify-between w-[90%] self-center mt-6 mb-16">
-        <View className="w-[50%] mx-auto">
+        <View className="w-[45%] mx-auto">
           <PrimaryButton
             title="Next"
             isLoading={isSubmitting}

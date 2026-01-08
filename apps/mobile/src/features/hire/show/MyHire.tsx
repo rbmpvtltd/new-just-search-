@@ -18,13 +18,6 @@ export default function MyHireCard({ data }: { data: MyHireType }) {
         </Text>
         <View className="border-b border-secondary mb-4" />
 
-        {/* <Image
-          source={{
-            uri: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
-          }}
-          className="w-full h-44 rounded-lg mb-3"
-          resizeMode="cover"
-        /> */}
         <View className="w-[100%] h-44">
           <AdvancedImage
             cldImg={cld.image(data?.photo || "")}
@@ -33,12 +26,18 @@ export default function MyHireCard({ data }: { data: MyHireType }) {
         </View>
         <View className="w-full flex-row items-center justify-between">
           <Text className="text-secondary text-lg font-semibold mb-1 w-[80%]">
-            {data.name}
+            {data?.name}
           </Text>
-          <Ionicons name="checkmark-circle" size={24} color="green" />
+          {data?.status === "Approved" && (
+            <Ionicons name="checkmark-circle" size={24} color="green" />
+          )}
         </View>
 
-        <Text className="text-secondary text-sm mb-4">{data.area}</Text>
+        <Text className="text-secondary text-sm mb-4">
+          {[data.address, data.city.city, data.state.name]
+            .filter(Boolean)
+            .join(", ")}
+        </Text>
 
         <View className="flex-row justify-between">
           <Pressable

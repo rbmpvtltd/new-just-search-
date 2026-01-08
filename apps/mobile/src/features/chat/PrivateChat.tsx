@@ -1,8 +1,17 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { AdvancedImage } from "cloudinary-react-native";
+import { Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
@@ -75,41 +84,48 @@ function PrivateChat({
   }, [markRead, userData, store]);
 
   return (
-    <View className="flex-1">
-      <View className="flex-row items-center gap-3 bg-gray-300 p-3 rounded-xl sticky top-0 left-0 right-0 z-10">
-        <View className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 border border-gray-300 items-center justify-center">
-          {displayName?.[0].profileImage ? (
-            <AdvancedImage
-              cldImg={cld.image(displayName?.[0]?.profileImage)}
-              className="w-full h-full rounded-full"
-            />
-          ) : (
-            <Text className="text-blue-600 font-semibold text-lg">
-              {displayName?.[0]?.displayName?.charAt(0).toUpperCase()}
-            </Text>
-          )}
-        </View>
+    <>
+      {/* <Stack.Screen
+        options={{
+          headerShown: true,
+          title: "Chat",
+          headerTitle: () => (
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-full overflow-hidden bg-blue-100 border border-gray-300 items-center justify-center">
+                {displayName?.[0]?.profileImage ? (
+                  <AdvancedImage
+                    cldImg={cld.image(displayName[0].profileImage)}
+                    className="w-full h-full rounded-full"
+                  />
+                ) : (
+                  <Text className="text-blue-600 font-semibold text-lg">
+                    {displayName?.[0]?.displayName?.charAt(0).toUpperCase()}
+                  </Text>
+                )}
+              </View>
 
-        <View>
-          <Text className="font-semibold text-gray-900 text-lg">
-            {displayName?.[0]?.displayName}
-          </Text>
-        </View>
-      </View>
+              <Text className="font-semibold text-gray-900 text-lg">
+                {displayName?.[0]?.displayName}
+              </Text>
+            </View>
+          ),
+        }}
+      /> */}
 
-      <View>
-        <Text className="text-secondary"> hi</Text>
-      </View>
-      <ScrollView className="flex-1">
-        <View>
-          <Text className="text-secondary"> hi</Text>
-        </View>
-        <View className="mt-3 space-y-3 px-2 gap-2 mb-2">
-          {store.map((msg) => (
-            <View key={msg.id} className="px-1">
+      <View className="flex-1">
+        <FlatList
+          data={store}
+          keyExtractor={(item) => String(item.id)}
+          contentContainerStyle={{
+            paddingHorizontal: 8,
+            paddingBottom: 12,
+            paddingTop: 8,
+          }}
+          renderItem={({ item: msg }) => (
+            <View className="px-1 mb-2">
               {msg.message && (
                 <View
-                  className={`max-w-[80%] px-2 py-2 rounded-2xl shadow-sm ${
+                  className={`max-w-[80%] px-3 py-2 rounded-2xl shadow-sm ${
                     msg.senderId === userData?.userId
                       ? "bg-blue-100 self-end"
                       : "bg-gray-200 self-start"
@@ -118,12 +134,11 @@ function PrivateChat({
                   <Text className="text-gray-800">{msg.message}</Text>
 
                   <Text className="text-[10px] text-gray-500 mt-1 text-right">
-                    {msg.updatedAt
-                      ? new Date(msg.updatedAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : ""}
+                    {msg.updatedAt &&
+                      new Date(msg.updatedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Text>
                 </View>
               )}
@@ -143,10 +158,11 @@ function PrivateChat({
                 </View>
               )}
             </View>
-          ))}
-        </View>
-      </ScrollView>
-    </View>
+          )}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+    </>
   );
 }
 
@@ -199,9 +215,35 @@ export default function StoreChat({
   displayName: OtherUerDisplayNameAndImageType;
 }) {
   return (
-    <BoundaryWrapper>
-      <View className="flex-1 border-red-200 border">
-        <KeyboardAwareScrollView contentContainerClassName="flex-1">
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: "Chat",
+          headerTitle: () => (
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-full overflow-hidden bg-blue-100 border border-gray-300 items-center justify-center">
+                {displayName?.[0]?.profileImage ? (
+                  <AdvancedImage
+                    cldImg={cld.image(displayName[0].profileImage)}
+                    className="w-full h-full rounded-full"
+                  />
+                ) : (
+                  <Text className="text-blue-600 font-semibold text-lg">
+                    {displayName?.[0]?.displayName?.charAt(0).toUpperCase()}
+                  </Text>
+                )}
+              </View>
+
+              <Text className="font-semibold text-gray-900 text-lg">
+                {displayName?.[0]?.displayName}
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      <BoundaryWrapper>
+        <View className="flex-1">
           <MemorizedPrivateChat
             conversationId={conversationId}
             displayName={displayName}
@@ -209,8 +251,8 @@ export default function StoreChat({
           />
 
           <MemorizedSendMessage conversationId={conversationId} />
-        </KeyboardAwareScrollView>
-      </View>
-    </BoundaryWrapper>
+        </View>
+      </BoundaryWrapper>
+    </>
   );
 }

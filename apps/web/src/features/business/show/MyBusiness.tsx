@@ -1,6 +1,6 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
-import { Eye, Pencil, Trash } from "lucide-react";
+import { CheckCircle, Eye, Pencil, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -41,6 +41,16 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
   const handleDelete = () => {
     mutate();
   };
+  const fullAddress = [
+    data.buildingName,
+    data.streetName,
+    data.landmark,
+    data?.address,
+    data?.city,
+    data?.state,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-gray-100 to-gray-200 p-4">
@@ -79,11 +89,19 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
 
           <div className="">
             <div>
-              <h2 className="text-xl font-semibold text-gray-800">
-                {data?.name}
+              <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-800">
+                <span>{data?.name}</span>
+                {data.isVerified && (
+                  <CheckCircle
+                    size={26}
+                    className="text-green-500"
+                    aria-label="Verified"
+                  />
+                )}
               </h2>
+
               <p className="text-gray-600 mt-2 leading-relaxed">
-                {data?.address}, {data?.city} , {data?.state}
+                {fullAddress}
               </p>
             </div>
 
