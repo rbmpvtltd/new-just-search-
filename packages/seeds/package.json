@@ -10,7 +10,7 @@
     "slugify": "^1.6.6"
   },
   "scripts": {
-    "seeds": "bun ./seeds.ts",
+    "seeds": "bun ./seeds_1.ts",
     "build": ""
   },
   "devDependencies": {
