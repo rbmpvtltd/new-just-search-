@@ -110,7 +110,7 @@ export default function HomeLayout() {
                       ],
                     );
                   } else {
-                    router.push("/(root)/(home)/favourites");
+                    router.navigate("/(root)/(home)/favourites");
                   }
                 }}
               >
@@ -139,7 +139,7 @@ export default function HomeLayout() {
                       ],
                     );
                   } else {
-                    router.push("/(root)/(home)/notification");
+                    router.navigate("/(root)/(home)/notification");
                   }
                 }}
               >

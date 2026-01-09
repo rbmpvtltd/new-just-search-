@@ -1,6 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import StoreChat from "@/features/chat/PrivateChat";
 import { trpc } from "@/lib/trpc";
@@ -15,8 +14,6 @@ function Chats({ conversationId }: { conversationId: number }) {
       conversationId: Number(conversationId),
     }),
   );
-
-  console.log("Conversation id", conversationId);
 
   return (
     <StoreChat
@@ -33,9 +30,11 @@ export default function Chat() {
   return (
     <>
       {/* <Stack.Screen  options={{ headerShown: true, title: "Chat" }} /> */}
+      {/* <SafeAreaView className="flex-1" edges={["top"]}> */}
       <BoundaryWrapper>
         <Chats conversationId={Number(conversationId)} />
       </BoundaryWrapper>
+      {/* </SafeAreaView> */}
     </>
   );
 }

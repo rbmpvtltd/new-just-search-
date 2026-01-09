@@ -1,6 +1,6 @@
 import { logger } from "@repo/logger";
 import { seedRequestAccounts } from "./account_delete_request.seed";
-import { algoliaSeed } from "./algolia.seed";
+// import { algoliaSeed } from "./algolia.seed";
 import { businessSeed } from "./business.seed";
 import { fakeSeed } from "./fake.seed";
 import { feedbackseed } from "./feedback.seed";
@@ -19,43 +19,43 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 (async () => {
   try {
     // Postgres seeding
-    // await notRelated();
-    // logger.info("Complete", {
-    //   message: "notRelated",
-    // });
-    // await userSeed();
-    // logger.info("Complete", {
-    //   message: "userseed",
-    // });
-    // await fakeSeed();
-    // logger.info("Complete", {
-    //   message: "fakeSeed",
-    // });
+    await notRelated();
+    logger.info("Complete", {
+      message: "notRelated",
+    });
+    await userSeed();
+    logger.info("Complete", {
+      message: "userseed",
+    });
+    await fakeSeed();
+    logger.info("Complete", {
+      message: "fakeSeed",
+    });
     await businessSeed();
     logger.info("Complete", {
       message: "business",
     });
-    // await productSeed();
-    // logger.info("Complete", {
-    //   message: "productSeed",
-    // });
-    // await offerSeed();
-    // logger.info("Complete", {
-    //   message: "offerseed",
-    // });
-    // await hireSeed();
-    // logger.info("Complete", {
-    //   message: "hireseed",
-    // });
-    // await feedbackseed();
-    // logger.info("Complete", {
-    //   message: "feedbackseed",
-    // });
-    // await seedRequestAccounts();
-    // logger.info("Complete", {
-    //   message: "seedRequestAccounts",
-    // });
-    // await planSeed();
+    await productSeed();
+    logger.info("Complete", {
+      message: "productSeed",
+    });
+    await offerSeed();
+    logger.info("Complete", {
+      message: "offerseed",
+    });
+    await hireSeed();
+    logger.info("Complete", {
+      message: "hireseed",
+    });
+    await feedbackseed();
+    logger.info("Complete", {
+      message: "feedbackseed",
+    });
+    await seedRequestAccounts();
+    logger.info("Complete", {
+      message: "seedRequestAccounts",
+    });
+    await planSeed();
     // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");

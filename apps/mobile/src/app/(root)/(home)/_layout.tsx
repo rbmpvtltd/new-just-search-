@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
-import { KeyboardAvoidingView, Text, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Text, View } from "react-native";
 
 export default function HomeLayout() {
   return (
