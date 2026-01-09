@@ -98,6 +98,7 @@ export const addOffer = async () => {
     const images = ["image2", "image3", "image4", "image5"];
     for (const image of images) {
       if (row[image]) {
+        if (row[image].startsWith("/tmp") === true) continue;
         const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
         const offerPhotoUrl = await uploadOnCloudinary(
           liveOfferImageUrl,

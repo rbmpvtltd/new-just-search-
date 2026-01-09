@@ -66,18 +66,24 @@ export const addProduct = async () => {
       continue;
     }
 
-    const liveProductsImageUrl = `https://justsearch.net.in/assets/images/image1`;
-    const uploaded = await uploadOnCloudinary(
+    console.log("Image seeds", row.image1);
+
+    if (row.image1.startsWith("/tmp") === true) continue;
+
+    const liveProductsImageUrl = `https://justsearch.net.in/assets/images/${row.image1}`;
+    const mainImage = await uploadOnCloudinary(
       liveProductsImageUrl,
-      "Products",
+      "products",
       clouadinaryFake,
     );
+
+    console.log("Uploaded", mainImage);
 
     const [productCreated] = await db
       .insert(products)
       .values({
         id: row.id,
-        mainImage: uploaded,
+        mainImage,
         status: true,
         businessId: business.id,
         categoryId: category.id,
@@ -101,10 +107,12 @@ export const addProduct = async () => {
     const images = ["image2", "image3", "image4", "image5"];
     for (const image of images) {
       if (row[image]) {
+        if (row[image].startsWith("/tmp") === true) continue;
+
         const liveProductsImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
         const uploaded = await uploadOnCloudinary(
           liveProductsImageUrl,
-          "Products",
+          "products",
           clouadinaryFake,
         );
         const photoUrl = uploaded;

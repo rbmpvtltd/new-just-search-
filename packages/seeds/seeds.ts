@@ -14,7 +14,7 @@ import { userSeed } from "./user.seed";
 
 export const clouadinaryFake = false;
 export const dummyImageUrl = "dummyImageUrl";
-export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
+export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
 (async () => {
   try {
@@ -31,36 +31,36 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "fakeSeed",
     // });
-    // await businessSeed();
+    await businessSeed();
+    logger.info("Complete", {
+      message: "business",
+    });
+    // await productSeed();
     // logger.info("Complete", {
-    //   message: "business",
+    //   message: "productSeed",
     // });
-    await productSeed();
-    logger.info("Complete", {
-      message: "productSeed",
-    });
-    await offerSeed();
-    logger.info("Complete", {
-      message: "offerseed",
-    });
-    await hireSeed();
-    logger.info("Complete", {
-      message: "hireseed",
-    });
-    await feedbackseed();
-    logger.info("Complete", {
-      message: "feedbackseed",
-    });
-    await seedRequestAccounts();
-    logger.info("Complete", {
-      message: "seedRequestAccounts",
-    });
-    await planSeed();
+    // await offerSeed();
+    // logger.info("Complete", {
+    //   message: "offerseed",
+    // });
+    // await hireSeed();
+    // logger.info("Complete", {
+    //   message: "hireseed",
+    // });
+    // await feedbackseed();
+    // logger.info("Complete", {
+    //   message: "feedbackseed",
+    // });
+    // await seedRequestAccounts();
+    // logger.info("Complete", {
+    //   message: "seedRequestAccounts",
+    // });
+    // await planSeed();
     // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
 
-    await Bun.$`notify-send -u normal "Seeding Complete" "Please check your seeds"`;
+    // await Bun.$`notify-send -u normal "Seeding Complete" "Please check your seeds"`;
     process.exit(0);
   } catch (err) {
     console.error("❌ Seed error:", err);
