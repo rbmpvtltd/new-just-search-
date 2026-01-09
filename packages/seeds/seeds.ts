@@ -31,10 +31,10 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "fakeSeed",
     // });
-    await businessSeed();
-    logger.info("Complete", {
-      message: "business",
-    });
+    // await businessSeed();
+    // logger.info("Complete", {
+    //   message: "business",
+    // });
     await productSeed();
     logger.info("Complete", {
       message: "productSeed",
@@ -56,7 +56,7 @@ export const customName = `Banner/cbycmehjeetyxbuxc6ie`;
       message: "seedRequestAccounts",
     });
     await planSeed();
-    await algoliaSeed();
+    // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
 

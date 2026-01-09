@@ -52,6 +52,10 @@ export const addProduct = async () => {
       continue;
     }
 
+    if (Number(row.id) % 10 === 0) {
+      console.log("product adding at ", row.id);
+    }
+
     const [category] = await db
       .select()
       .from(categories)
