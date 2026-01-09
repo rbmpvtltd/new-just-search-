@@ -57,7 +57,7 @@ export default function PersonalDetailsForm({
       email: data?.hire?.email ?? "",
       latitude: data?.hire?.latitude ?? null,
       longitude: data?.hire?.longitude ?? null,
-      area: data?.hire?.area ?? "",
+      address: data?.hire?.address ?? "",
       pincode: data?.hire?.pincode ?? "",
       state: data?.hire?.state,
       city: data?.hire?.city,
@@ -289,11 +289,11 @@ export default function PersonalDetailsForm({
       control,
       type: "text",
       label: "Address",
-      name: "area",
+      name: "address",
       placeholder: "Address",
       component: "input",
       section: "loction",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -349,7 +349,7 @@ export default function PersonalDetailsForm({
     setFormValue("email", data.email ?? "");
     setFormValue("latitude", data.latitude ?? "");
     setFormValue("longitude", data.longitude ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", data.state ?? "");
     setFormValue("city", data.city ?? "");
@@ -394,7 +394,7 @@ export default function PersonalDetailsForm({
                       const pincode = data.postalCode || "";
                       const cityName = data.city || "";
                       const stateName = data.region || "";
-                      const area = parts[0]?.match(/[A-Za-z]/)
+                      const address = parts[0]?.match(/[A-Za-z]/)
                         ? parts[0]
                         : formatted;
                       const matchedState = states?.find(
@@ -405,7 +405,7 @@ export default function PersonalDetailsForm({
 
                       setValue("latitude", Number(lat));
                       setValue("longitude", Number(long));
-                      setValue("area", area);
+                      setValue("address", address);
                       setValue("pincode", pincode);
                       setValue("state", matchedState?.value ?? 0);
                     }}
@@ -420,7 +420,7 @@ export default function PersonalDetailsForm({
                     <div
                       key={field.name}
                       className={
-                        field.name === "area"
+                        field.name === "address"
                           ? "md:col-span-2 lg:col-span-3"
                           : ""
                       }

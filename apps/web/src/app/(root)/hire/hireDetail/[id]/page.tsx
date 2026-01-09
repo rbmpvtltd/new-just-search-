@@ -69,7 +69,7 @@ async function page({
           <div className="flex items-center">
             <MdLocationPin />
             <p className="line-clamp-1">
-              {data?.data?.area} {data?.data?.streetName},{" "}
+              {data?.data?.address} {data?.data?.streetName},{" "}
               {data?.data?.buildingName} {data?.data?.city}, {data?.data?.state}
               , {data?.data?.pincode}
             </p>

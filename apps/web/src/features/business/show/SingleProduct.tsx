@@ -290,7 +290,6 @@ function ReviewForm({
       rate: 5,
       email: "",
       name: "Guest",
-      view: false,
       status: true,
     },
   });

@@ -253,6 +253,6 @@ export default function StoreChat({
           <MemorizedSendMessage conversationId={conversationId} />
         </View>
       </BoundaryWrapper>
-    </>
+g    </>
   );
 }

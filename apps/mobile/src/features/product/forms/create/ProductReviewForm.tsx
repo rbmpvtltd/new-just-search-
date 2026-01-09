@@ -1,10 +1,9 @@
-import { trpc } from "@/lib/trpc";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertProductReviewSchema } from "@repo/db/dist/schema/product.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -13,8 +12,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-
-import z from "zod";
+import type z from "zod";
+import { trpc } from "@/lib/trpc";
 
 type ReviewFormValues = z.infer<typeof insertProductReviewSchema>;
 
@@ -44,7 +43,6 @@ function ProductReviewForm({
       rate: 5,
       email: "",
       name: "Guest",
-      view: false,
       status: true,
     },
   });
