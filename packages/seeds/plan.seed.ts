@@ -1,11 +1,6 @@
 import { db } from "@repo/db";
 import { planAttributes, plans } from "@repo/db/dist/schema/plan.schema";
-import dotenv from "dotenv";
-import { eq, type InferInsertModel } from "drizzle-orm";
-import { users } from "../db/src/schema/auth.schema";
-import { sql } from "./mysqldb.seed";
-
-dotenv.config();
+import type { InferInsertModel } from "drizzle-orm";
 
 export const planSeed = async () => {
   await clearAllTablesBusiness();

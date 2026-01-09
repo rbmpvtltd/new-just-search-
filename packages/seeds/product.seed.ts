@@ -1,15 +1,9 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { recentViewProducts } from "@repo/db/dist/schema/product.schema";
-import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import { businessListings } from "../db/src/schema/business.schema";
-import {
-  categories,
-  cities,
-  subcategories,
-} from "../db/src/schema/not-related.schema";
+import { categories, subcategories } from "../db/src/schema/not-related.schema";
 import {
   productPhotos,
   productReviews,
@@ -20,7 +14,6 @@ import {
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 
-dotenv.config();
 export const productSeed = async () => {
   await clearAllTablesBusiness();
   await addProduct();
