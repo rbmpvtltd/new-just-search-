@@ -11,7 +11,7 @@
   },
   "scripts": {
     "seeds": "bun ./seeds.ts",
-    "build": "bun x tsc -p tsconfig.json"
+    "build": ""
   },
   "devDependencies": {
     "@types/bun": "latest"
