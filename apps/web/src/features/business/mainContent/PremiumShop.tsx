@@ -1,19 +1,19 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import Link from "next/link";
+import { GoHeart } from "react-icons/go";
+import { MdLocationPin } from "react-icons/md";
+import { useTRPC } from "@/trpc/client";
+import { Badge } from "../../../components/ui/badge";
+import { Card, CardContent } from "../../../components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "../../../components/ui/carousel";
-import { Card, CardContent } from "../../../components/ui/card";
-import Image from "next/image";
-import { GoHeart } from "react-icons/go";
 import Rating from "../../../components/ui/Rating";
-import { Badge } from "../../../components/ui/badge";
-import { MdLocationPin } from "react-icons/md";
-import Link from "next/link";
 import Favourite from "../shared/Favourite";
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "@/trpc/client";
 
 function PremiumShop() {
   const trpc = useTRPC();
@@ -80,7 +80,7 @@ function PremiumShop() {
                         <div className="flex p-2">
                           <MdLocationPin />
                           <p className="px-2 text-[12px] flex text-secondary-text break-words w-[80%] ">
-                            {item.area} {item.streetName} {item.buildingName}
+                            {item.address} {item.streetName} {item.buildingName}
                           </p>
                         </div>
                       </div>

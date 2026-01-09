@@ -36,7 +36,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     defaultValues: {
       buildingName: formValue.buildingName ?? "",
       streetName: formValue.streetName ?? "",
-      area: formValue.area ?? "",
+      address: formValue.address ?? "",
       landmark: formValue.landmark ?? "",
       latitude: formValue.latitude ?? null,
       longitude: formValue.longitude ?? null,
@@ -107,11 +107,11 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
     {
       control,
 
-      label: "Area",
-      name: "area",
-      placeholder: "Area",
+      label: "Address",
+      name: "address",
+      placeholder: "Address",
       component: "input",
-      error: errors.area?.message,
+      error: errors.address?.message,
     },
     {
       control,
@@ -173,7 +173,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
   const onSubmit = (data: AddressDetailSchema) => {
     setFormValue("buildingName", data.buildingName ?? "");
     setFormValue("streetName", data.streetName ?? "");
-    setFormValue("area", data.area ?? "");
+    setFormValue("address", data.address ?? "");
     setFormValue("landmark", data.landmark ?? "");
     setFormValue("latitude", data.latitude ?? "");
     setFormValue("longitude", data.longitude ?? "");
@@ -205,7 +205,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
                   const pincode = data.postalCode || "";
                   const cityName = data.city || "";
                   const stateName = data.region || "";
-                  const area = data.name || "";
+                  const address = data.name || "";
                   const street_name = data.street || "";
                   const landmark = data.street || "";
                   const building_name = parts[0]?.match(/[A-Za-z]/)
@@ -220,7 +220,7 @@ export default function AddressDetail({ data }: { data: AddBusinessPageType }) {
 
                   setValue("buildingName", building_name ?? "");
                   setValue("streetName", street_name ?? "");
-                  setValue("area", area ?? "");
+                  setValue("address", address ?? "");
                   setValue("landmark", landmark ?? "");
                   setValue("latitude", Number(lat));
                   setValue("longitude", Number(long));

@@ -105,7 +105,7 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
           <Ionicons name="location-outline" size={16} className="ml-1" />
         </Text>
         <Text className=" text-secondary flex-1 flex-wrap">
-          {[shop?.buildingName, shop?.streetName, shop?.landMark, shop?.area]
+          {[shop?.buildingName, shop?.streetName, shop?.landMark, shop?.address]
             .filter(Boolean)
             .join(", ")}
         </Text>

@@ -98,7 +98,7 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
               <p className="text-sm">
-                {singleShop?.area} {singleShop?.streetName}{" "}
+                {singleShop?.address} {singleShop?.streetName}{" "}
                 {singleShop?.buildingName}
               </p>
             </div>
