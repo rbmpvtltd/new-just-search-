@@ -1,4 +1,5 @@
 import { logger } from "@repo/logger";
+// import dotenv from "dotenv";
 import { seedRequestAccounts } from "./account_delete_request.seed";
 // import { algoliaSeed } from "./algolia.seed";
 import { businessSeed } from "./business.seed";
@@ -16,8 +17,11 @@ export const clouadinaryFake = false;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
+// dotenv.config();
+
 (async () => {
   try {
+    console.log(process.env);
     // Postgres seeding
     await notRelated();
     logger.info("Complete", {
@@ -56,6 +60,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
       message: "seedRequestAccounts",
     });
     await planSeed();
+    // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
   } catch (err) {
