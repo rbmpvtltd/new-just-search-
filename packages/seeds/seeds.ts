@@ -56,16 +56,18 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
       message: "seedRequestAccounts",
     });
     await planSeed();
-    // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
-
-    // await Bun.$`notify-send -u normal "Seeding Complete" "Please check your seeds"`;
-    process.exit(0);
   } catch (err) {
     console.error("❌ Seed error:", err);
-    await Bun.$`notify-send -u critical "Seeding Failed" "Please check your seeds"`;
-    process.exit(1);
   } finally {
+    Bun.serve({
+      port: 4001,
+      fetch() {
+        return new Response("Hello from Bun!");
+      },
+    });
+
+    console.log("Server running on http://localhost:4001");
   }
 })();
