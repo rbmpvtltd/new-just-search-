@@ -2,7 +2,7 @@ import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
 import { salesmen } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
-import { eq, type InferInsertModel } from "drizzle-orm";
+import { eq, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
   businessCategories,
@@ -23,13 +23,61 @@ import { clouadinaryFake } from "./seeds";
 import { insertUser } from "./utils";
 
 export const businessSeed = async () => {
-  await clearAllTablesBusiness();
-  await addBusiness();
-  await seedFavourites();
-  await businessesCategories();
-  await businessesSubcategory();
-  await BusinessReviews();
+  await updateBusinessPhoto();
+  // await clearAllTablesBusiness();
+  // await addBusiness();
+  // await seedFavourites();
+  // await businessesCategories();
+  // await businessesSubcategory();
+  // await BusinessReviews();
   // await seedRecentViewsBusiness();
+};
+
+const updateBusinessPhoto = async () => {
+  const [rows]: any[] = await sql.execute(
+    "SELECT * FROM listings WHERE type = 1",
+  );
+
+  for (const row of rows) {
+    //TODO: comment this line in future;
+    if (row.id < 147) continue;
+    const isBuissnessExist = await db
+      .select()
+      .from(businessListings)
+      .where(eq(businessListings.id, row.id))
+      .limit(1);
+
+    if (!isBuissnessExist) {
+      console.error("Business not found", row.id);
+      continue;
+    }
+
+    const invalidPhotos = [
+      "20469712961736937230.jpg",
+      "9233936721737361584.jpeg",
+    ];
+
+    if (invalidPhotos.includes(row.photo)) {
+      console.error("Invalid photo", row.id);
+      continue;
+    }
+
+    const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row.photo}`;
+    console.log("row id ", row.id, "row photo ", row.photo);
+    const businessMainPhoto = await uploadOnCloudinary(
+      liveBusinessImageUrl,
+      "business",
+      clouadinaryFake,
+    );
+
+    console.log("businessMainPhoto", businessMainPhoto);
+    await db
+      .update(businessListings)
+      .set({
+        photo: businessMainPhoto,
+      })
+      .where(eq(businessListings.id, row.id));
+  }
 };
 
 export const clearAllTablesBusiness = async () => {
@@ -128,6 +176,13 @@ const addBusiness = async () => {
       const { days, fromHour, toHour } = scheduleExtracter(row.schedules);
       const { latitude, longitude } = getRightLocation(row);
 
+      const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row.photo}`;
+      const businessMainPhoto = await uploadOnCloudinary(
+        liveBusinessImageUrl,
+        "business",
+        clouadinaryFake,
+      );
+
       const businessData: BusinessData = {
         id: row.id,
         salesmanId: saleman[0]?.id ?? 1,
@@ -139,7 +194,7 @@ const addBusiness = async () => {
         contactPerson: row.contact_person,
         ownerNumber: row.owner_no,
         slug,
-        photo: row.photo,
+        photo: businessMainPhoto,
         specialities: row.specialities,
         description: row.description,
         homeDelivery: row.home_delivery,

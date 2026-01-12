@@ -22,9 +22,9 @@ const algoliaClient = algoliasearch(
 );
 
 export async function algoliaSeed() {
-  // await algoliaHireSeed();
-  // await algoliaBusinessSeed();
-  // await algoliaProductOfferSeed();
+  await algoliaHireSeed();
+  await algoliaBusinessSeed();
+  await algoliaProductOfferSeed();
   await algoliaAllListingSeed();
 }
 
@@ -167,7 +167,7 @@ async function algoliaBusinessSeed() {
         "searchable(category)",
         "searchable(rating)",
         "searchable(subcategories)",
-        "categoryId"
+        "categoryId",
       ],
     },
   });
@@ -288,9 +288,9 @@ async function algoliaProductOfferSeed() {
     indexName: "product_offer_listing",
     indexSettings: {
       attributesForFaceting: [
-          "price",
-          "searchable(category)",
-          "searchable(subcategories)",
+        "price",
+        "searchable(category)",
+        "searchable(subcategories)",
       ],
     },
   });
@@ -460,17 +460,6 @@ async function algoliaProductOfferSeed() {
   }
 }
 
-// Run the seed function
-// algoliaSeed()
-//   .then((result) => {
-//     console.log("Seed completed:", result);
-//     process.exit(0);
-//   })
-//   .catch((error) => {
-//     console.error("Seed failed:", error);
-//     process.exit(1);
-//   });
-
 async function algoliaAllListingSeed() {
   await algoliaClient.setSettings({
     indexName: "all_listing",
@@ -479,7 +468,7 @@ async function algoliaAllListingSeed() {
         "searchable(category)",
         "searchable(rating)",
         "searchable(subcategories)",
-        "categoryId"
+        "categoryId",
       ],
     },
   });

@@ -1,6 +1,7 @@
 import { logger } from "@repo/logger";
 // import dotenv from "dotenv";
 import { seedRequestAccounts } from "./account_delete_request.seed";
+import { algoliaSeed } from "./algolia.seed";
 // import { algoliaSeed } from "./algolia.seed";
 import { businessSeed } from "./business.seed";
 import { fakeSeed } from "./fake.seed";
@@ -13,7 +14,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = true;
+export const clouadinaryFake = false;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
@@ -32,13 +33,14 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     //   message: "userseed",
     // });
     // await fakeSeed();
-    // logger.info("Complete", {
-    //   message: "fakeSeed",
-    // });
-    // await businessSeed();
-    // logger.info("Complete", {
-    //   message: "business",
-    // });
+    logger.info("Complete", {
+      message: "fakeSeed",
+    });
+    await businessSeed();
+    logger.info("Complete", {
+      message: "business",
+    });
+    process.exit();
     // await productSeed();
     // logger.info("Complete", {
     //   message: "productSeed",
@@ -60,18 +62,19 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     //   message: "seedRequestAccounts",
     // });
     // await planSeed();
-    await algoliaSeed();
+    // await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
   } catch (err) {
     console.error("❌ Seed error:", err);
   } finally {
-    Bun.serve({
-      port: 4001,
-      fetch() {
-        return new Response("Hello from Bun!");
-      },
-    });
+    // TODO: uncommit this on live server
+    // Bun.serve({
+    //   port: 4001,
+    //   fetch() {
+    //     return new Response("Hello from Bun!");
+    //   },
+    // });
 
     console.log("Server running on http://localhost:4001");
   }
