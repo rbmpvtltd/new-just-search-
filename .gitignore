@@ -52,3 +52,4 @@ yarn.lock
 apps/mobile/build
 apps/mobile/builds
 apps/mobile/GoogleService-Info.plist
+backup

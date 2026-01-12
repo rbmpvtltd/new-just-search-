@@ -1,6 +1,5 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import { businessListings } from "../db/src/schema/business.schema";
@@ -12,12 +11,9 @@ import {
   offerSubcategory,
   offers,
 } from "../db/src/schema/offer.schema";
-import { getFakeBusinessUser } from "./fake.seed";
 // import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
-
-dotenv.config();
 
 export const offerSeed = async () => {
   await clearOfferSeed();

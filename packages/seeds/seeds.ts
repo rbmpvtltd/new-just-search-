@@ -1,4 +1,5 @@
 import { logger } from "@repo/logger";
+// import dotenv from "dotenv";
 import { seedRequestAccounts } from "./account_delete_request.seed";
 // import { algoliaSeed } from "./algolia.seed";
 import { businessSeed } from "./business.seed";
@@ -16,8 +17,11 @@ export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
+// dotenv.config();
+
 (async () => {
   try {
+    console.log(process.env);
     // Postgres seeding
     // await notRelated();
     // logger.info("Complete", {
@@ -59,13 +63,16 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
-
-    // await Bun.$`notify-send -u normal "Seeding Complete" "Please check your seeds"`;
-    process.exit(0);
   } catch (err) {
     console.error("❌ Seed error:", err);
-    await Bun.$`notify-send -u critical "Seeding Failed" "Please check your seeds"`;
-    process.exit(1);
   } finally {
+    Bun.serve({
+      port: 4001,
+      fetch() {
+        return new Response("Hello from Bun!");
+      },
+    });
+
+    console.log("Server running on http://localhost:4001");
   }
 })();

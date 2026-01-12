@@ -1,13 +1,10 @@
 import { db, type UserRole } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
 import { franchises, salesmen } from "@repo/db/dist/schema/user.schema";
-import { logger } from "@repo/logger";
-import dotenv from "dotenv";
 import { sql as dbsql } from "drizzle-orm";
 import { sql } from "./mysqldb.seed";
 import { insertUser } from "./utils";
 
-dotenv.config();
 export const userSeed = async () => {
   await clearAllTablesUser();
   await seedUsers();

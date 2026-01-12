@@ -4,6 +4,28 @@
   "remoteCache": {
     "signature": true
   },
+  "globalEnv": [
+    "CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET",
+    "CLOUDINARY_URL",
+    "CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET",
+    "CLOUDINARY_URL",
+    "NEXT_PUBLIC_ALGOLIA_APP_ID",
+    "ALGOLIA_ADMIN_API_KEY",
+    "PGHOST",
+    "PGUSER",
+    "PGPASSWORD",
+    "PGPORT",
+    "PGDATABASE",
+    "BCRYPT_SALT",
+    "MYSQL_HOST",
+    "MYSQL_USER",
+    "MYSQL_PASSWORD",
+    "MYSQL_DATABASE"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

@@ -23,32 +23,32 @@ import { slugify } from "./utils";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  await state();
-  await citie();
-  await bannerSeed();
+  // await state();
+  // await citie();
+  // await bannerSeed();
   await seedCategories();
-  await seedSubcategories();
-  await seedOccupation();
-  await seedDocuments();
-  await seedHighestQualification();
-  await seedSalutation();
-  await seedLanguages();
+  // await seedSubcategories();
+  // await seedOccupation();
+  // await seedDocuments();
+  // await seedHighestQualification();
+  // await seedSalutation();
+  // await seedLanguages();
 };
 
 export const clearAllTablesNotRelated = async () => {
   // logger.info("================== execution comes here ====================");
-  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE occupation RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`);
-  await db.execute(
-    `TRUNCATE TABLE highest_qualification RESTART IDENTITY CASCADE;`,
-  );
-  await db.execute(`TRUNCATE TABLE salutation RESTART IDENTITY CASCADE;`);
-  await db.execute(`TRUNCATE TABLE languages RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE occupation RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`);
+  // await db.execute(
+  //   `TRUNCATE TABLE highest_qualification RESTART IDENTITY CASCADE;`,
+  // );
+  // await db.execute(`TRUNCATE TABLE salutation RESTART IDENTITY CASCADE;`);
+  // await db.execute(`TRUNCATE TABLE languages RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
 
@@ -152,7 +152,7 @@ export const seedCategories = async () => {
         id: Number(row?.id) ?? 12,
         title: row.title ?? "",
         slug,
-        photo: "banner/cbycmehjeetyxbuxc6ie", //TODO: change the photo with original when upload on cloudinary
+        photo: categoryPhotoPublicId,
         isPopular: Boolean(row.is_popular),
         status: Boolean(row.status),
         type: Number(row.type),
