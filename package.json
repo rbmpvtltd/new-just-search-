@@ -9,6 +9,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
+    "seeds": "turbo run seeds",
     "dbsync": "turbo run dbsync"
   },
   "devDependencies": {

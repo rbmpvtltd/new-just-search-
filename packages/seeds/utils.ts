@@ -113,16 +113,19 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
   }
   const invalidPhotos = [
     "1755250626_1106f170-2186-47ca-a852-e1d054891447.jpeg",
+    "2612170061736937822.jpg",
   ];
 
   let profilePhotoUrl = null;
   if (row?.photo && !invalidPhotos.includes(row.photo)) {
-    const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
+    const liveHireImageUrl = row.photo.startsWith("https")
+      ? row.photo
+      : `https://www.justsearch.net.in/assets/images/${row.photo}`;
     if (row.photo) {
       try {
         profilePhotoUrl = await uploadOnCloudinary(
           liveHireImageUrl,
-          "Hire",
+          "profile",
           clouadinaryFake,
         );
       } catch (error) {

@@ -150,7 +150,7 @@ const addHire = async () => {
         try {
           hireListingPhoto = await uploadOnCloudinary(
             liveHireImageUrl,
-            "Hire",
+            "hire",
             clouadinaryFake,
           );
         } catch (error) {
@@ -298,7 +298,7 @@ const addHire = async () => {
       //   landmark: "asldkfj",
       //   pincode: "342005",
       //   state: 19,
-      //   photo: "Banner/cbycmehjeetyxbuxc6ie",
+      //   photo: "banner/cbycmehjeetyxbuxc6ie",
       //   isFeature: false,
       //   status: "Approved",
       //   website: "alsdfkjalskdj",
@@ -328,9 +328,9 @@ const addHire = async () => {
       //   relocate: "No",
       //   availability: "Now",
       //   idProof: 1,
-      //   idProofPhoto: "Banner/cbycmehjeetyxbuxc6ie",
+      //   idProofPhoto: "banner/cbycmehjeetyxbuxc6ie",
       //   coverLetter: "asdklfj",
-      //   resumePhoto: "Banner/cbycmehjeetyxbuxc6ie",
+      //   resumePhoto: "banner/cbycmehjeetyxbuxc6ie",
       //   aboutYourself: "asdlfkjads",
       // };
       console.log("hireData", hireData);

@@ -21,13 +21,14 @@ const Input = forwardRef<TextInput, InputProps>(
     const colorScheme = useColorScheme();
     const [showPassword, setShowPassword] = React.useState(false);
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-      >
+      // <KeyboardAvoidingView
+      //   behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //   keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      // >
+      <>
         <TextInput
+          returnKeyType="done"
           ref={ref}
-          
           editable={editable}
           style={[
             {
@@ -60,7 +61,9 @@ const Input = forwardRef<TextInput, InputProps>(
             />
           </Pressable>
         )}
-      </KeyboardAvoidingView>
+      </>
+
+      // </KeyboardAvoidingView>
     );
   },
 );

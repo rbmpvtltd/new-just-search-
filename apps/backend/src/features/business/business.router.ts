@@ -462,10 +462,13 @@ export const businessrouter = router({
         id: true,
         name: true,
         city: true,
-        state: true,
         photo: true,
+        state: true,
         status: true,
         address: true,
+        landmark: true,
+        streetName: true,
+        buildingName: true,
       },
     });
 
@@ -493,8 +496,19 @@ export const businessrouter = router({
         },
       })
     )?.name;
+
+    const isVerified = (
+      await db.query.planUserActive.findFirst({
+        where: (planUserActive, { eq }) =>
+          eq(planUserActive.userId, ctx.userId),
+        columns: {
+          features: true,
+        },
+      })
+    )?.features.verifyBag;
     return {
       ...business,
+      isVerified: isVerified,
       city: city,
       state: state,
       success: true,

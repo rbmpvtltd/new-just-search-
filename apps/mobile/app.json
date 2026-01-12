@@ -23,7 +23,7 @@
           "apiKey": "AIzaSyDPqnuBZzSBSjHFU6XP6ehN4PCn66JmgF4"
         }
       },
-      "softwareKeyboardLayoutMode": "pan",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

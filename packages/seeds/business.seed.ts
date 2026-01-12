@@ -178,7 +178,7 @@ const addBusiness = async () => {
             const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
             const businessPhotoUrl = await uploadOnCloudinary(
               liveBusinessImageUrl,
-              "Business",
+              "business",
               clouadinaryFake,
             );
 

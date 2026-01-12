@@ -173,6 +173,9 @@ export const salesmanUserRouter = router({
           .where(eq(hireListing.salesmanId, ctx.userId))
       )[0]?.count ?? 0;
 
+    
+    // const unPaidUsers = await db.query.
+
     return { allBusiness, allhire };
   }),
 });

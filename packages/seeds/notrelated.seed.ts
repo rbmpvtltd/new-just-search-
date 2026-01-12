@@ -107,7 +107,7 @@ export const bannerSeed = async () => {
     if (row.photo) {
       bannerPhotoPublicId = await uploadOnCloudinary(
         liveProfileImageUrl,
-        "Banner",
+        "banner",
         clouadinaryFake,
       );
     }
@@ -152,7 +152,7 @@ export const seedCategories = async () => {
         id: Number(row?.id) ?? 12,
         title: row.title ?? "",
         slug,
-        photo: "Banner/cbycmehjeetyxbuxc6ie", //TODO: change the photo with original when upload on cloudinary
+        photo: "banner/cbycmehjeetyxbuxc6ie", //TODO: change the photo with original when upload on cloudinary
         isPopular: Boolean(row.is_popular),
         status: Boolean(row.status),
         type: Number(row.type),

@@ -220,7 +220,7 @@ export default function HireDetailsCard(item: any) {
             <Ionicons name="location-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary w-[100%]">
               <Text className="font-semibold w-[90%]">Location:</Text>
-              {data?.data?.area}, {data?.data?.city},{data?.data?.state},{" "}
+              {data?.data?.address}, {data?.data?.city},{data?.data?.state},{" "}
               {data?.data?.pincode}
             </Text>
           </View>

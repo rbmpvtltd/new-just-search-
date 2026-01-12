@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Notifications from "expo-notifications";
 import { router, Tabs, usePathname } from "expo-router";
 import { Pressable, useColorScheme } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Loading } from "@/components/ui/Loading";
 import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import Colors from "@/constants/Colors";

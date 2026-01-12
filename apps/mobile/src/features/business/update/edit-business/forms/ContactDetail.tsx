@@ -146,33 +146,36 @@ export default function ContactDetail({
     },
   ];
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAwareScrollView
-        // enableOnAndroid
-        extraScrollHeight={80}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, paddingVertical: 6 }}
-      >
-        <View className="mx-auto w-[90%]">
-          {formFields.map((field) => (
-            <FormField key={field.name} {...field} />
-          ))}
-        </View>
+    <KeyboardAwareScrollView
+      enableOnAndroid
+      enableAutomaticScroll
+      keyboardOpeningTime={0}
+      extraScrollHeight={30}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingVertical: 6,
+        paddingBottom: 120, // VERY IMPORTANT for last input
+      }}
+    >
+      <View className="mx-auto w-[90%]">
+        {formFields.map((field) => (
+          <FormField key={field.name} {...field} />
+        ))}
+      </View>
 
-        <View className="flex-row justify-between w-[90%] self-center mt-6">
-          <View className="w-[45%]">
-            <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
-          </View>
-          <View className="w-[45%]">
-            <PrimaryButton
-              title="Submit"
-              isLoading={isSubmitting}
-              onPress={handleSubmit(onSubmit)}
-            />
-          </View>
+      <View className="flex-row justify-between w-[90%] self-center mt-6">
+        <View className="w-[45%]">
+          <PrimaryButton title="Back" variant="outline" onPress={prevPage} />
         </View>
-      </KeyboardAwareScrollView>
-    </TouchableWithoutFeedback>
+        <View className="w-[45%]">
+          <PrimaryButton
+            title="Submit"
+            isLoading={isSubmitting}
+            onPress={handleSubmit(onSubmit)}
+          />
+        </View>
+      </View>
+    </KeyboardAwareScrollView>
   );
 }
