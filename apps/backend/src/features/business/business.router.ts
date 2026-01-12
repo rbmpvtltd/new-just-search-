@@ -971,7 +971,7 @@ export const businessrouter = router({
             'latitude', business_listings.latitude,
             'longitude', business_listings.longitude,
             'phoneNumber', business_listings.phone_number,
-            'area', business_listings.area,
+            'area', business_listings.address,
             'streetName', business_listings.street_name,
             'buildingName', business_listings.building_name
           ))

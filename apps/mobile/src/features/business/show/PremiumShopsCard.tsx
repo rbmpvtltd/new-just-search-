@@ -7,6 +7,7 @@ import {
   Pressable,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
@@ -20,6 +21,8 @@ import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import Review from "../../../components/forms/review";
 import ReviewForm from "../create/add-business/forms/ReviewForm";
+import Colors from "@/constants/Colors";
+import { useState } from "react";
 
 type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] | undefined;
 
@@ -28,9 +31,41 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
   const latitude = Number(shop?.latitude);
   const longitude = Number(shop?.longitude);
   const { data } = useQuery(trpc.auth.verifyauth.queryOptions());
+  const colorScheme = useColorScheme()
+  const [fav, setFav] = useState<boolean>(shop?.isFavourite ?? false)
 
   const clearToken = useAuthStore((state) => state.clearToken);
-  const { mutate: toggleWishlist } = useToggleWishlist();
+  const mutation = useMutation(
+    trpc.businessrouter.toggleFavourite.mutationOptions({
+      onSuccess: (data) => {
+        console.log("favourit toggle successfully",data)
+      },
+      onError: (err) => {
+        setFav((prev) => !prev);
+        if (err.shape?.data.httpStatus === 401) {
+          Alert.alert(
+            "Login Required",
+            "You need to login to use favorites feature",
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Login",
+                onPress: () => {
+                  clearToken();
+                  router.navigate("/(root)/profile");
+                },
+              },
+            ],
+          );
+        }
+      },
+    }),
+  );
+
+  const handleFavClick = () => {
+    setFav((prev) => !prev);
+    mutation.mutate({businessId:shop?.id ?? 0});
+  };
 
   const {
     mutateAsync: createConversation,
@@ -62,38 +97,15 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
         )} */}
         <View className="w-[10%] ">
           <Pressable
-            onPress={() => {
-              if (!data?.success) {
-                showLoginAlert({
-                  message: "Need to login to add to your wishlist",
-                  onConfirm: () => {
-                    clearToken();
-                    router.push("/(root)/profile");
-                  },
-                });
-                return;
-              }
-              toggleWishlist(
-                { listing_id: shop?.id?.toString() },
-                {
-                  onSuccess: () => {
-                    console.log("Wishlist added successfully");
-                  },
-                  onError: (error) => {
-                    console.log("error", error);
-                    Alert.alert("Error toggling wishlist", error?.message);
-                  },
-                },
-              );
-            }}
+           onPress={handleFavClick}
           >
-            {/* <Ionicons
+            <Ionicons
               size={30}
               color={
-                isFavourite ? "red" : Colors[colorScheme ?? "light"].secondary
+                fav ? "red" : Colors[colorScheme ?? "light"].secondary
               }
-              name={isFavourite ? "heart" : "heart-outline"}
-            /> TODO : ==> uncomment and set initial favourite when send from backend*/}
+              name={fav ? "heart" : "heart-outline"}
+            />
           </Pressable>
         </View>
       </View>

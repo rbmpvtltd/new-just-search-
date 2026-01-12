@@ -25,10 +25,18 @@ export const subcategoryRouter = router({
     .query(async ({ input, ctx }) => {
       const limit = input.limit ?? 10;
       const offset = (input.page - 1) * limit;
-      let data: any;
+      
+      const totalCount = await db
+        .select({ count: count() })
+        .from(businessListings)
+        .innerJoin(
+          businessCategories,
+          eq(businessListings.id, businessCategories.businessId),
+        )
+        .where(eq(businessCategories.categoryId, input.categoryId));
 
       if (ctx.userId) {
-        data = await db
+      const data = await db
           .select({
             id: businessListings.id,
             name: businessListings.name,
@@ -98,8 +106,13 @@ export const subcategoryRouter = router({
           .groupBy(businessListings.id, favourites.id)
           .limit(limit)
           .offset(offset);
+          return {
+        data,
+        page: input.page,
+        totalPages: Math.ceil(Number(totalCount[0]?.count ?? 0) / limit),
+      };
       } else {
-        data = await db
+        const data = await db
           .select({
             id: businessListings.id,
             name: businessListings.name,
@@ -163,22 +176,15 @@ export const subcategoryRouter = router({
           .groupBy(businessListings.id)
           .limit(limit)
           .offset(offset);
-      }
-
-      const totalCount = await db
-        .select({ count: count() })
-        .from(businessListings)
-        .innerJoin(
-          businessCategories,
-          eq(businessListings.id, businessCategories.businessId),
-        )
-        .where(eq(businessCategories.categoryId, input.categoryId));
-
-      return {
+          return {
         data,
         page: input.page,
         totalPages: Math.ceil(Number(totalCount[0]?.count ?? 0) / limit),
       };
+      }
+
+      
+      
     }),
   businessesByCategoryInfinate: publicProcedure
     .input(

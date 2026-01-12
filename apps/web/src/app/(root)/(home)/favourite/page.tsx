@@ -34,17 +34,22 @@ async function page() {
 
   return (
     <div>
-      {data?.data?.map((item, i) => (
-        <div key={i.toString()}>
-          <BussinessListingCard
-            navigationId={item.shop[0]?.id}
-            item={item.shop[0]}
-            rating={item.rating}
-            category={item.category ?? ""}
-            subcategory={item.subcategories}
-          />
-        </div>
-      ))}
+      {data?.data?.map((item, i) => {
+        const shop = item.shop?.[0];
+        if (!shop) return null;
+
+        return (
+          <div key={i.toString()}>
+            <BussinessListingCard
+              navigationId={item.shop[0]?.id}
+              item={shop}
+              rating={item.rating}
+              category={item.category ?? ""}
+              subcategory={item.subcategories}
+            />
+          </div>
+        )
+      })}
     </div>
   );
 }

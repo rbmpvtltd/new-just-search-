@@ -20,6 +20,7 @@ import {
   deleteSession,
   validateSessionToken,
 } from "./lib/session";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_ANDROID_CLIENT_ID);
 
@@ -67,7 +68,10 @@ export const authRouter = router({
           id: string;
           email: string | null;
           name: string | null;
+          givenName: string | null;
         };
+
+        console.log("execution comes here");
 
         if (input.provider === "google") {
           // Verify Google token
@@ -95,7 +99,9 @@ export const authRouter = router({
             id: payload.sub,
             email: payload.email || null,
             name: payload.name || null,
+            givenName: payload.given_name || null,
           };
+          
         } else {
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -104,8 +110,29 @@ export const authRouter = router({
         }
         console.log("======= Verified User =========", input);
 
+        const existingUser = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, verifiedUser.email ?? ""));
+          let user = existingUser[0];
+          if (!user) {
+            const inserted = await db
+              .insert(users)
+              .values({
+                displayName: verifiedUser.name || verifiedUser?.givenName,
+                email: verifiedUser.email,
+                role: UserRole.guest,
+                googleId: verifiedUser.id,
+                createdAt: new Date(),
+              })
+              .returning();
+
+            user = inserted[0];
+          }
+          const session = await createSession(Number(user?.id));
+
         return {
-          data: input,
+          data: session,
           success: true,
         };
       } catch (error: any) {

@@ -17,6 +17,7 @@ function Hit({ hit }: { hit: any }) {
   console.log("=================================>", hit);
   return (
     <BussinessListingCard
+      navigationId={hit.objectID}
       item={hit}
       rating={hit.rating}
       category={hit.category}

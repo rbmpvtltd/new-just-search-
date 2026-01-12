@@ -12,51 +12,51 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = false;
+export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
 (async () => {
   try {
     // Postgres seeding
-    await notRelated();
-    logger.info("Complete", {
-      message: "notRelated",
-    });
-    await userSeed();
-    logger.info("Complete", {
-      message: "userseed",
-    });
-    await fakeSeed();
-    logger.info("Complete", {
-      message: "fakeSeed",
-    });
-    await businessSeed();
-    logger.info("Complete", {
-      message: "business",
-    });
-    await productSeed();
-    logger.info("Complete", {
-      message: "productSeed",
-    });
-    await offerSeed();
-    logger.info("Complete", {
-      message: "offerseed",
-    });
-    await hireSeed();
-    logger.info("Complete", {
-      message: "hireseed",
-    });
-    await feedbackseed();
-    logger.info("Complete", {
-      message: "feedbackseed",
-    });
-    await seedRequestAccounts();
-    logger.info("Complete", {
-      message: "seedRequestAccounts",
-    });
-    await planSeed();
-    // await algoliaSeed();
+    // await notRelated();
+    // logger.info("Complete", {
+    //   message: "notRelated",
+    // });
+    // await userSeed();
+    // logger.info("Complete", {
+    //   message: "userseed",
+    // });
+    // await fakeSeed();
+    // logger.info("Complete", {
+    //   message: "fakeSeed",
+    // });
+    // await businessSeed();
+    // logger.info("Complete", {
+    //   message: "business",
+    // });
+    // await productSeed();
+    // logger.info("Complete", {
+    //   message: "productSeed",
+    // });
+    // await offerSeed();
+    // logger.info("Complete", {
+    //   message: "offerseed",
+    // });
+    // await hireSeed();
+    // logger.info("Complete", {
+    //   message: "hireseed",
+    // });
+    // await feedbackseed();
+    // logger.info("Complete", {
+    //   message: "feedbackseed",
+    // });
+    // await seedRequestAccounts();
+    // logger.info("Complete", {
+    //   message: "seedRequestAccounts",
+    // });
+    // await planSeed();
+    await algoliaSeed();
 
     console.log("✅ All seeds inserted successfully");
 

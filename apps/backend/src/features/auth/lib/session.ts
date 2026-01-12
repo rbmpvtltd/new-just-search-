@@ -13,7 +13,7 @@ interface Session {
   userId: number;
 }
 
-interface SessionWithToken extends Session {
+export interface SessionWithToken extends Session {
   token: string;
 }
 

@@ -5,7 +5,7 @@ import { useAuthStore } from "@/features/auth/authStore";
 import { MemoizedDetailCard } from "@/features/business/show/DetailCard";
 import { trpc } from "@/lib/trpc";
 
-async function FavouritesBusinesses() {
+function FavouritesBusinesses() {
   const { data, error } = useQuery(
     trpc.businessrouter.favouritesShops.queryOptions(),
   );
@@ -41,6 +41,9 @@ async function FavouritesBusinesses() {
             navigationId={item.shop[0]?.id}
             item={item.shop[0]}
             type={1}
+            category={item.category ?? ""}
+            subcategory={item.subcategories}
+            rating={item.rating}
           />
         </View>
       ))}

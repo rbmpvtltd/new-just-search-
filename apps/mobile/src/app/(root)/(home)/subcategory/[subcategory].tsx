@@ -214,9 +214,12 @@ function SubcategoryHitCard({
       onTitleExtract(hit.category);
     }
   }, [hit.category, onTitleExtract]);
+  console.log("=============================hit is =======>",hit)
 
   return hit.listingType === "business" ? (
-    <MemoizedDetailCard type={1} item={hit} />
+    <MemoizedDetailCard navigationId={Number(hit.objectID)} type={1} item={hit}  rating={String(hit.rating)}
+      category={hit.category}
+      subcategory={hit.subcategory} />
   ) : (
     // <HireCard item={hit} />
     <HireCard item={hit} />
