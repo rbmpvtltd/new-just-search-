@@ -22,13 +22,27 @@ const algoliaClient = algoliasearch(
 );
 
 export async function algoliaSeed() {
-  await algoliaHireSeed();
-  await algoliaBusinessSeed();
-  await algoliaProductOfferSeed();
+  // await algoliaHireSeed();
+  // await algoliaBusinessSeed();
+  // await algoliaProductOfferSeed();
   await algoliaAllListingSeed();
 }
 
 async function algoliaHireSeed() {
+  await algoliaClient.setSettings({
+    indexName: "hire_listing",
+    indexSettings: {
+      attributesForFaceting: [
+        "gender",
+        "languages",
+        "searchable(category)",
+        "searchable(subcategories)",
+        "expectedSalary",
+        "searchable(workShift)",
+        "workExp",
+      ],
+    },
+  });
   try {
     const data = await db
       .select({
@@ -127,7 +141,7 @@ async function algoliaHireSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
-    await algoliaClient.deleteIndex({ indexName: "hire_listing" });
+    await algoliaClient.clearObjects({ indexName: "hire_listing" });
 
     await algoliaClient.saveObjects({
       indexName: "hire_listing",
@@ -146,6 +160,17 @@ async function algoliaHireSeed() {
 }
 
 async function algoliaBusinessSeed() {
+  await algoliaClient.setSettings({
+    indexName: "business_listing",
+    indexSettings: {
+      attributesForFaceting: [
+        "searchable(category)",
+        "searchable(rating)",
+        "searchable(subcategories)",
+        "categoryId"
+      ],
+    },
+  });
   try {
     const data = await db
       .select({
@@ -241,7 +266,7 @@ async function algoliaBusinessSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
-    await algoliaClient.deleteIndex({ indexName: "business_listing" });
+    await algoliaClient.clearObjects({ indexName: "business_listing" });
     await algoliaClient.saveObjects({
       indexName: "business_listing",
       objects: finalData,
@@ -259,6 +284,16 @@ async function algoliaBusinessSeed() {
 }
 
 async function algoliaProductOfferSeed() {
+  await algoliaClient.setSettings({
+    indexName: "product_offer_listing",
+    indexSettings: {
+      attributesForFaceting: [
+          "price",
+          "searchable(category)",
+          "searchable(subcategories)",
+      ],
+    },
+  });
   try {
     const offersData = await db
       .select({
@@ -408,7 +443,7 @@ async function algoliaProductOfferSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
-    await algoliaClient.deleteIndex({ indexName: "product_offer_listing" });
+    await algoliaClient.clearObjects({ indexName: "product_offer_listing" });
     await algoliaClient.saveObjects({
       indexName: "product_offer_listing",
       objects: finalData,
@@ -437,6 +472,17 @@ async function algoliaProductOfferSeed() {
 //   });
 
 async function algoliaAllListingSeed() {
+  await algoliaClient.setSettings({
+    indexName: "all_listing",
+    indexSettings: {
+      attributesForFaceting: [
+        "searchable(category)",
+        "searchable(rating)",
+        "searchable(subcategories)",
+        "categoryId"
+      ],
+    },
+  });
   try {
     // =========== BUSINESS DATA ============
     const businessData = await db
@@ -643,7 +689,7 @@ async function algoliaAllListingSeed() {
       `Preparing to upload ${finalData.length} records to Algolia...`,
     );
 
-    await algoliaClient.deleteIndex({ indexName: "all_listing" });
+    await algoliaClient.clearObjects({ indexName: "all_listing" });
     await algoliaClient.saveObjects({
       indexName: "all_listing",
       objects: finalData,
