@@ -23,9 +23,9 @@ const algoliaClient = algoliasearch(
 
 export async function algoliaSeed() {
   await algoliaHireSeed();
-  await algoliaBusinessSeed();
-  await algoliaProductOfferSeed();
-  await algoliaAllListingSeed();
+  // await algoliaBusinessSeed();
+  // await algoliaProductOfferSeed();
+  // await algoliaAllListingSeed();
 }
 
 async function algoliaHireSeed() {
