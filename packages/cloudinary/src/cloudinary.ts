@@ -14,20 +14,50 @@ export default cloudinary;
 
 // import fs, { unlinkSync } from "fs";
 
-const multiUploadOnCloudinary = async (files: string[], folderName = "") => {
-  const uploadPromises = [];
-  for (const file of files) {
-    uploadPromises.push(
-      cloudinary.uploader.upload(file, {
+import type { UploadApiResponse } from "cloudinary";
+
+export type MultiUploadOnCloudinaryFile = {
+  filename: string;
+  id: string | number;
+};
+
+const multiUploadOnCloudinary = async (
+  files: MultiUploadOnCloudinaryFile[],
+  folderName = "",
+  test = false,
+) => {
+  if (test) {
+    const customName = `Banner/cbycmehjeetyxbuxc6ie`;
+
+    const result = {
+      public_id: customName,
+    };
+
+    return files.map((file) => ({
+      id: file.id,
+      public_id: result.public_id,
+    }));
+  }
+  const uploadPromises = files.map(async (file) => {
+    const cloudinaryData: UploadApiResponse = await cloudinary.uploader.upload(
+      file.filename,
+      {
         resource_type: "auto",
         folder: folderName,
-      }),
+      },
     );
-  }
-  const results = await Promise.all(uploadPromises);
 
-  return results.map((result) => result.public_id);
+    console.log("cloudinaryData", cloudinaryData);
+
+    return {
+      id: file.id,
+      public_id: cloudinaryData.public_id,
+    };
+  });
+
+  return Promise.all(uploadPromises);
 };
+
 const uploadOnCloudinary = async (
   localFilePath: string,
   folderName = "",
@@ -48,6 +78,8 @@ const uploadOnCloudinary = async (
       resource_type: "auto",
       folder: folderName,
     });
+
+    console.log("cloudinaryData", result);
 
     return result.public_id;
 

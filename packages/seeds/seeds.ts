@@ -24,7 +24,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
   try {
     console.log(process.env);
     // Postgres seeding
-    // await notRelated();
+    await notRelated();
     // logger.info("Complete", {
     //   message: "notRelated",
     // });
@@ -36,7 +36,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     logger.info("Complete", {
       message: "fakeSeed",
     });
-    await businessSeed();
+    // await businessSeed();
     logger.info("Complete", {
       message: "business",
     });
@@ -63,21 +63,19 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // });
     // await planSeed();
     // await algoliaSeed();
-    console.log("Completed");
-
     console.log("✅ All seeds inserted successfully");
     Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
   } catch (err) {
     console.error("❌ Seed error:", err);
   }
   // TODO: uncommit this on live server
-  Bun.serve({
-    port: 4001,
-    fetch() {
-      return new Response("Hello from Bun!");
-    },
-  });
+  // Bun.serve({
+  //   port: 4001,
+  //   fetch() {
+  //     return new Response("Hello from Bun!");
+  //   },
+  // });
 
   // Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
-  console.log("Server running on http://localhost:4001");
+  // console.log("Server running on http://localhost:4001");
 })();

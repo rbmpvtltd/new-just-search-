@@ -1,4 +1,8 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
+import {
+  type MultiUploadOnCloudinaryFile,
+  multiUploadOnCloudinary,
+} from "@repo/cloudinary/dist/cloudinary";
 import { db } from "@repo/db";
 import {
   highestQualification,
@@ -25,8 +29,8 @@ export const notRelated = async () => {
   await clearAllTablesNotRelated();
   // await state();
   // await citie();
-  // await bannerSeed();
-  await seedCategories();
+  await bannerSeed();
+  // await seedCategories();
   // await seedSubcategories();
   // await seedOccupation();
   // await seedDocuments();
@@ -37,18 +41,18 @@ export const notRelated = async () => {
 
 export const clearAllTablesNotRelated = async () => {
   // logger.info("================== execution comes here ====================");
-  // await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE cities RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE states RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE banners RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE subcategories RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE categories RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE occupation RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`);
-  // await db.execute(
-  //   `TRUNCATE TABLE highest_qualification RESTART IDENTITY CASCADE;`,
-  // );
-  // await db.execute(`TRUNCATE TABLE salutation RESTART IDENTITY CASCADE;`);
-  // await db.execute(`TRUNCATE TABLE languages RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE occupation RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE documents RESTART IDENTITY CASCADE;`);
+  await db.execute(
+    `TRUNCATE TABLE highest_qualification RESTART IDENTITY CASCADE;`,
+  );
+  await db.execute(`TRUNCATE TABLE salutation RESTART IDENTITY CASCADE;`);
+  await db.execute(`TRUNCATE TABLE languages RESTART IDENTITY CASCADE;`);
   console.log(" All tables cleared successfully!");
 };
 
@@ -96,7 +100,7 @@ const citie = async () => {
 
 // banner
 
-export const bannerSeed = async () => {
+export const bannerSeed1 = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM `banners`");
   type DbBanner = InferInsertModel<typeof banners>;
   const dbBannerValue: DbBanner[] = [];
@@ -124,6 +128,45 @@ export const bannerSeed = async () => {
   }
   await db.insert(banners).values(dbBannerValue);
   console.log(" Banners migrated successfully!");
+};
+export const bannerSeed = async () => {
+  const [rows]: any[] = await sql.execute("SELECT * FROM `banners`");
+  type DbBanner = InferInsertModel<typeof banners>;
+  const dbBannerValue: DbBanner[] = [];
+  const clouadinaryData: MultiUploadOnCloudinaryFile[] = [];
+  for (const row of rows) {
+    const liveProfileImageUrl = `https://www.justsearch.net.in/assets/images/banners/${row.photo}`;
+
+    if (row.photo) {
+      clouadinaryData.push({
+        filename: liveProfileImageUrl,
+        id: row.id,
+      });
+    }
+  }
+  const bannerPhotoPublicIds = await multiUploadOnCloudinary(
+    clouadinaryData,
+    "banner",
+    clouadinaryFake,
+  );
+  for (const row of rows) {
+    const bannerPhotoPublicId = bannerPhotoPublicIds.find(
+      (item) => item.id === row.id,
+    )?.public_id;
+
+    dbBannerValue.push({
+      // id: row.id,
+      route: row.route ?? null,
+      photo: bannerPhotoPublicId ?? "",
+      isActive: typeof row.status === "number" ? Boolean(row.status) : false,
+      type: row.type,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    });
+  }
+
+  await db.insert(banners).values(dbBannerValue);
+  console.log(" Banners seed successfully!");
 };
 
 // categories

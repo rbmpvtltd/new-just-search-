@@ -40,7 +40,7 @@ const updateBusinessPhoto = async () => {
 
   for (const row of rows) {
     //TODO: comment this line in future;
-    if (row.id < 1311) continue;
+    if (row.id < 1329) continue;
     const isBuissnessExist = await db
       .select()
       .from(businessListings)
@@ -62,6 +62,7 @@ const updateBusinessPhoto = async () => {
       "460541731739343371.jpg",
       "15017575881740386618.jpg",
       "9027662451740469698.jpg",
+      "21306861181742460413.jpg",
     ];
 
     if (invalidPhotos.includes(row.photo)) {
