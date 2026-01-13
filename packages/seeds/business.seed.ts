@@ -1,8 +1,11 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
+import {
+  type MultiUploadOnCloudinaryFile,
+  multiUploadOnCloudinary,
+} from "@repo/cloudinary/dist/cloudinary";
 import { db } from "@repo/db";
 import { salesmen } from "@repo/db/dist/schema/user.schema";
-import { logger } from "@repo/logger";
-import { eq, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
+import { eq, type InferInsertModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
   businessCategories,
@@ -17,7 +20,6 @@ import {
   cities,
   subcategories,
 } from "../db/src/schema/not-related.schema";
-import { getFakeBusinessUser } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { insertUser } from "./utils";
@@ -26,10 +28,10 @@ export const businessSeed = async () => {
   // await updateBusinessPhoto();
   await clearAllTablesBusiness();
   await addBusiness();
-  await seedFavourites();
-  await businessesCategories();
-  await businessesSubcategory();
-  await BusinessReviews();
+  // await seedFavourites();
+  // await businessesCategories();
+  // await businessesSubcategory();
+  // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -140,6 +142,7 @@ const addBusiness = async () => {
   );
 
   // ADD Business Users
+  console.log("Adding Business Users");
   const allPromiseUsers: Promise<number>[] = [];
   for (const row of rows) {
     allPromiseUsers.push(insertUser(row.user_id, "business"));
@@ -153,6 +156,7 @@ const addBusiness = async () => {
       console.error(i, "reason", o.reason);
     }
   });
+  console.log("Added Business Users");
 
   // Get City
   const allCities = await db.select().from(cities);
@@ -166,7 +170,53 @@ const addBusiness = async () => {
 
   // Get Saleman
   const allSalesmen = await db.select().from(salesmen);
+
+  // uploadOnCloudinary
+  const images = [
+    "photo",
+    "image1",
+    "image2",
+    "image3",
+    "image4",
+    "image5",
+  ] as const;
+  type ImgKey = (typeof images)[number];
+  type CloudinaryItem = { id: string | number; public_id: string };
+  const cloudinaryImages: Record<ImgKey, CloudinaryItem[]> = {
+    photo: [],
+    image1: [],
+    image2: [],
+    image3: [],
+    image4: [],
+    image5: [],
+  };
+  for (const image of images) {
+    const rowPhotoCloudinary: MultiUploadOnCloudinaryFile[] = [];
+    for (const row of rows) {
+      const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
+
+      if (row.photo) {
+        rowPhotoCloudinary.push({
+          filename: liveBusinessImageUrl,
+          id: row.id,
+        });
+      }
+    }
+    const businessPhotoPublicIds = await multiUploadOnCloudinary(
+      rowPhotoCloudinary,
+      "business",
+      clouadinaryFake,
+    );
+    cloudinaryImages[image] = businessPhotoPublicIds;
+    console.log("add photos on cloudinary of ", image);
+  }
+
   // Adding Businesses
+  console.log("Adding Businesses");
+  type BusinessData = InferInsertModel<typeof businessListings>;
+  const dbBusinessValue: BusinessData[] = [];
+  type PhotoBusinessData = InferInsertModel<typeof businessPhotos>;
+  const dbPhotoBusinessValue: PhotoBusinessData[] = [];
   for (const row of rows) {
     const userId = allUsers.find((u) => u === row.user_id);
     if (!userId) {
@@ -177,99 +227,105 @@ const addBusiness = async () => {
     const foundCity = allCities.find((c) => c.id === row.city);
     const city = foundCity ? foundCity : jodhpur;
 
-    const salesman = allSalesmen.find(
-      (s) => s.referCode === row.refer_code.toUpperCase(),
-    );
-    const salesmanId = salesman ? salesman.id : 1;
+    const salesmanId = (() => {
+      if (row.refer_code) {
+        const findSalesman = allSalesmen.find(
+          (s) => s.referCode === row.refer_code.toUpperCase(),
+        );
+        return findSalesman ? findSalesman.id : 1;
+      } else {
+        return 1;
+      }
+    })();
+
+    const businessPhotoPublicId = cloudinaryImages.photo.find(
+      (item) => item.id === row.id,
+    )?.public_id;
 
     let slug = row.slug;
     if (skipSlug.includes(row.slug)) {
       slug = `${row.slug}-${row.id}`;
     }
-    try {
-      type BusinessData = InferInsertModel<typeof businessListings>;
-      const { days, fromHour, toHour } = scheduleExtracter(row.schedules);
-      const { latitude, longitude } = getRightLocation(row);
+    const { days, fromHour, toHour } = scheduleExtracter(row.schedules);
+    const { latitude, longitude } = getRightLocation(row);
 
-      const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row.photo}`;
-      const businessMainPhoto = await uploadOnCloudinary(
-        liveBusinessImageUrl,
-        "business",
-        clouadinaryFake,
-      );
+    const businessData: BusinessData = {
+      id: row.id,
+      salesmanId,
+      userId,
+      name: row.name,
+      days,
+      fromHour,
+      toHour,
+      contactPerson: row.contact_person,
+      ownerNumber: row.owner_no,
+      slug,
+      photo: businessPhotoPublicId,
+      specialities: row.specialities,
+      description: row.description,
+      homeDelivery: row.home_delivery,
+      latitude,
+      longitude,
+      buildingName: row.building_name,
+      streetName: row.street_name,
+      address: row.real_address ?? row.area,
+      landmark: row.landmark,
+      pincode: String(row.pincode),
+      state: city.stateId,
+      city: city.id,
+      status: "Approved",
+      email: row.email,
+      phoneNumber: row.phone_number,
+      whatsappNo: row.whatsapp_no,
+      alternativeMobileNumber: row.alternative_mobile_number,
+      facebook: row.facebook,
+      twitter: row.twitter,
+      linkedin: row.linkedin,
+      listingVideo: row.listing_video,
+      isFeature: !!row.is_feature,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
 
-      const businessData: BusinessData = {
-        id: row.id,
-        salesmanId,
-        userId,
-        name: row.name,
-        days,
-        fromHour,
-        toHour,
-        contactPerson: row.contact_person,
-        ownerNumber: row.owner_no,
-        slug,
-        photo: businessMainPhoto,
-        specialities: row.specialities,
-        description: row.description,
-        homeDelivery: row.home_delivery,
-        latitude,
-        longitude,
-        buildingName: row.building_name,
-        streetName: row.street_name,
-        address: row.real_address ?? row.area,
-        landmark: row.landmark,
-        pincode: String(row.pincode),
-        state: city.stateId,
-        city: city.id,
-        status: "Approved",
-        email: row.email,
-        phoneNumber: row.phone_number,
-        whatsappNo: row.whatsapp_no,
-        alternativeMobileNumber: row.alternative_mobile_number,
-        facebook: row.facebook,
-        twitter: row.twitter,
-        linkedin: row.linkedin,
-        listingVideo: row.listing_video,
-        isFeature: !!row.is_feature,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-      };
-      // console.log("businessData", businessData);
-      const [newbusinessListing] = await db
-        .insert(businessListings)
-        .values(businessData)
-        .returning();
+    dbBusinessValue.push(businessData);
 
-      if (newbusinessListing) {
-        const images = ["image1", "image2", "image3", "image4", "image5"];
-        for (const image of images) {
-          if (row[image]) {
-            const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-            const businessPhotoUrl = await uploadOnCloudinary(
-              liveBusinessImageUrl,
-              "business",
-              clouadinaryFake,
-            );
-
-            if (businessPhotoUrl) {
-              await db.insert(businessPhotos).values({
-                businessId: newbusinessListing.id,
-                photo: businessPhotoUrl,
-                createdAt: row.created_at,
-                updatedAt: row.updated_at,
-              });
-            }
-          }
-        }
+    for (const image of images) {
+      if (row[image]) {
+        const findImage = cloudinaryImages[image].find(
+          (item) => item.id === row.id,
+        )?.public_id;
+        dbPhotoBusinessValue.push({
+          businessId: row.id,
+          photo: findImage,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+        });
       }
-    } catch (error: any) {
-      console.error("row id is ", row.id, "user id", row.user_id);
-      throw new Error("error in business", error);
     }
   }
 
-  console.log(" Business migration completed!");
+  // await db.insert(businessListings).values(dbBusinessValue);
+  const data1 = dbBusinessValue.slice(0, 500);
+  const data2 = dbBusinessValue.slice(500, 1000);
+  const data3 = dbBusinessValue.slice(1000, 1500);
+  const data4 = dbBusinessValue.slice(1500, 2000);
+  await db.insert(businessListings).values(data1);
+  console.log("Business added completed!", data1.length);
+
+  await db.insert(businessListings).values(data2);
+  console.log("Business added completed!", data2.length);
+
+  await db.insert(businessListings).values(data3);
+  console.log("Business added completed!", data3.length);
+
+  await db.insert(businessListings).values(data4);
+  console.log("Business added completed!", data4.length);
+
+  await db.insert(businessPhotos).values(dbPhotoBusinessValue);
+  console.log(
+    "all Business photos added completed!",
+    dbPhotoBusinessValue.length,
+  );
 };
 // favourite
 const seedFavourites = async () => {
