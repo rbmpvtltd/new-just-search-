@@ -14,7 +14,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = true;
+export const clouadinaryFake = false;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
@@ -33,9 +33,9 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     //   message: "userseed",
     // });
     // await fakeSeed();
-    logger.info("Complete", {
-      message: "fakeSeed",
-    });
+    // logger.info("Complete", {
+    //   message: "fakeSeed",
+    // });
     // await businessSeed();
     // logger.info("Complete", {
     //   message: "business",
@@ -78,4 +78,6 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
   // Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
   // console.log("Server running on http://localhost:4001");
+      process.exit(0);
+
 })();
