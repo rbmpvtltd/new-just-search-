@@ -143,6 +143,7 @@ interface DrawerField {
 
 export function CustomDrawerContent() {
   const segment = useSegments();
+  const colorScheme = useColorScheme();
   const currentRoute = segment.join("/");
   const toggleOpen = useDrawerStore((state) => state.toggleOpen);
   let role = useAuthStore((s) => s.role);
@@ -172,7 +173,10 @@ export function CustomDrawerContent() {
     //     );
     //   })}
     // </View>
-    <View className="flex-1 bg-background px-3 pt-6 ">
+    <View
+      className="flex-1 bg-base-100 px-3 pt-6 "
+      style={{ backgroundColor: Colors[colorScheme ?? "light"]["base-100"] }}
+    >
       {items.map((field) => {
         const isFocused = `/${currentRoute}` === field.route;
         return (
@@ -183,7 +187,7 @@ export function CustomDrawerContent() {
               router.navigate(field.route);
             }}
             className={`flex-row items-center gap-3 rounded-xl px-4 py-3 mb-2
-              ${isFocused ? "bg-primary-content" : "active:bg-gray-100"}
+              ${isFocused ? "bg-primary-content" : "active:bg-base-200"}
             `}
           >
             {isFocused && (
@@ -194,17 +198,25 @@ export function CustomDrawerContent() {
               <Ionicons
                 name={field.icon}
                 size={20}
-                color={isFocused ? "#2563eb" : "#6b7280"}
+                color={
+                  isFocused
+                    ? Colors[colorScheme ?? "light"]["primary"]
+                    : Colors[colorScheme ?? "light"]["secondary"]
+                }
               />
             )}
 
             <Text
-              className={`text-base font-medium
-                ${isFocused ? "bg-primary-content" : "text-gray-700"}
-              `}
+              style={{
+                color: isFocused
+                  ? Colors[colorScheme ?? "light"].primary
+                  : Colors[colorScheme ?? "light"]["secondary-content"],
+                fontWeight: "500",
+                fontSize: 16,
+              }}
             >
               {field.name === "Profile" && !authenticated
-                ? field.name === "Profile" && "Log In"
+                ? "Log In"
                 : field.name}
             </Text>
           </Pressable>

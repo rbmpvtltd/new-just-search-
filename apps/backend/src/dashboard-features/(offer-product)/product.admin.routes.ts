@@ -8,8 +8,9 @@ import {
   productUpdateSchema,
 } from "@repo/db/dist/schema/product.schema";
 import { TRPCError } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
 import {
   buildOrderByClause,
@@ -310,6 +311,38 @@ export const adminProductRouter = router({
         success: true,
         message: "Offer updated successfully",
       };
+    }),
+
+  multidelete: adminProcedure
+    .input(
+      z.object({
+        ids: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const allSeletedPhoto = await db
+        .select({
+          photo: productPhotos.photo,
+        })
+        .from(productPhotos)
+        .where(inArray(productPhotos.productId, input.ids));
+
+      if (allSeletedPhoto.length !== 0) {
+        await cloudinaryDeleteImagesByPublicIds(
+          allSeletedPhoto?.map((item) => String(item.photo)),
+        );
+        await db
+          .delete(productPhotos)
+          .where(inArray(productPhotos.productId, input.ids));
+      }
+
+      await db
+        .delete(productSubCategories)
+        .where(inArray(productSubCategories.productId, input.ids));
+
+      await db.delete(products).where(inArray(products.id, input.ids));
+
+      return { success: true };
     }),
   // multidelete: adminProcedure
   //   .input(

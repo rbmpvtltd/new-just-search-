@@ -1,7 +1,38 @@
+// export default {
+//   light: {
+//     "base-100": "#fff",
+//     "base-200": "#f5f5f5",
+//     "base-300": "#9f9f9f",
+//     primary: "#ff7821",
+//     "primary-content": "#fee8eb",
+//     secondary: "#000",
+//     "secondary-content": "#202838",
+//     success: "#006E0B",
+//     "success-contect": "#d1e7dd",
+//     error: "#f00",
+//     "error-content": "#f8d7da",
+//     info: "#2564d4",
+//   },
+//   dark: {
+//     "base-100": "#000",
+//     "base-200": "#202838",
+//     "base-300": "#A1A1AA",
+//     primary: "#ba4e0c",
+//     "primary-content": "#fee8eb",
+//     secondary: "#fff",
+//     "secondary-content": "#e4e4e4",
+//     success: "#006E0B",
+//     "success-contect": "#d1e7dd",
+//     error: "#f00",
+//     "error-content": "#f8d7da",
+//     info: "#2564d4",
+//   },
+// };
+
 export default {
   light: {
-    "base-100": "#fff",
-    "base-200": "#f5f5f5",
+    "base-100": "#F5F6FA",
+    "base-200": "#FFFFFF",
     "base-300": "#9f9f9f",
     primary: "#ff7821",
     "primary-content": "#fee8eb",
@@ -15,7 +46,7 @@ export default {
   },
   dark: {
     "base-100": "#000",
-    "base-200": "#202838",
+    "base-200": "#262626",
     "base-300": "#A1A1AA",
     primary: "#ba4e0c",
     "primary-content": "#fee8eb",
