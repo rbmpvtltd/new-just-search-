@@ -24,10 +24,10 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
   try {
     console.log(process.env);
     // Postgres seeding
-    // await notRelated();
-    // logger.info("Complete", {
-    //   message: "notRelated",
-    // });
+    await notRelated();
+    logger.info("Complete", {
+      message: "notRelated",
+    });
     // await userSeed();
     // logger.info("Complete", {
     //   message: "userseed",
@@ -49,7 +49,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "offerseed",
     // });
-    await hireSeed();
+    // await hireSeed();
     // logger.info("Complete", {
     //   message: "hireseed",
     // });
@@ -64,7 +64,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // await planSeed();
     // await algoliaSeed();
     console.log("✅ All seeds inserted successfully");
-    Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
+    // Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
   } catch (err) {
     console.error("❌ Seed error:", err);
   }

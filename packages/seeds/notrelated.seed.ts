@@ -27,16 +27,16 @@ import { slugify } from "./utils";
 
 export const notRelated = async () => {
   await clearAllTablesNotRelated();
-  // await state();
-  // await citie();
-  // await bannerSeed();
+  await state();
+  await citie();
+  await bannerSeed();
   await seedCategories();
-  // await seedSubcategories();
-  // await seedOccupation();
-  // await seedDocuments();
-  // await seedHighestQualification();
-  // await seedSalutation();
-  // await seedLanguages();
+  await seedSubcategories();
+  await seedOccupation();
+  await seedDocuments();
+  await seedHighestQualification();
+  await seedSalutation();
+  await seedLanguages();
 };
 
 export const clearAllTablesNotRelated = async () => {
