@@ -9,7 +9,7 @@ import { DebouncedInput } from "@/components/ui/input-debounced";
 import { active } from "./data";
 import { MuiltDeleteButton } from "../form/delete.form";
 import { MuiltActiveButton } from "../form/active.form";
-import { MuiltPopularButton } from "../form/popular.form";
+// import { MuiltPopularButton } from "../form/popular.form";
 import { AddNewEntiry } from "../form/add.form";
 
 interface DataTableToolbarProps<TData> {
@@ -53,7 +53,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         <MuiltActiveButton />
-        <MuiltPopularButton />
+        {/* <MuiltPopularButton /> */}
         <MuiltDeleteButton />
         <DataTableViewOptions table={table} />
         <AddNewEntiry />

@@ -7,9 +7,11 @@ import {
   offersInsertSchema,
   offersUpdateSchema,
 } from "@repo/db/dist/schema/offer.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { and, eq, gte, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import z from "zod";
+import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
 import {
   buildOrderByClause,
@@ -386,6 +388,42 @@ export const adminOfferRouter = router({
         message: "Offer updated successfully",
       };
     }),
+
+  multidelete: adminProcedure
+    .input(
+      z.object({
+        ids: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+
+      const allSeletedPhoto = await db
+        .select({
+          photo: offerPhotos.photo,
+        })
+        .from(offerPhotos)
+        .where(inArray(offerPhotos.offerId, input.ids));
+
+
+      if (allSeletedPhoto.length !== 0) {
+        await cloudinaryDeleteImagesByPublicIds(
+          allSeletedPhoto?.map((item) => String(item.photo)),
+        );
+        await db
+          .delete(offerPhotos)
+          .where(inArray(offerPhotos.offerId, input.ids));
+      }
+
+      logger.info("deleted");
+      await db
+        .delete(offerSubcategory)
+        .where(inArray(offerSubcategory.offerId, input.ids));
+
+      await db.delete(offers).where(inArray(offers.id, input.ids));
+
+      return { success: true };
+    }),
+
   // multidelete: adminProcedure
   //   .input(
   //     z.object({

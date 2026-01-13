@@ -1,18 +1,16 @@
 "use client";
 
+import type { ListingStatus } from "@repo/db";
 import { create } from "zustand";
 
-type IsActive = {
+type ListingStatusItem = {
   id: number;
-  isActive: boolean;
+  listingStatus: ListingStatus;
 };
 interface TableState {
-  active: IsActive[];
-  toggleActive: (id: number, isActive: boolean) => void;
+  listingStatusList: ListingStatusItem[];
+  toggleListingStatus: (id: number, listingStatus: ListingStatus) => void;
   emptyActive: () => void;
-  popular: IsActive[];
-  togglePopular: (id: number, isActive: boolean) => void;
-  emptyPopular: () => void;
   select: number[];
   emptySelect: () => void;
   addSelect: (id: number) => void;
@@ -21,36 +19,27 @@ interface TableState {
 }
 
 export const useTableStore = create<TableState>()((set) => ({
-  active: [],
-  popular: [],
-  toggleActive: (id: number, isActive: boolean) =>
+  listingStatusList: [],
+  toggleListingStatus: (id: number, listingStatus: ListingStatus) =>
     set((state) => {
-      const isSelected = state.active.some((item) => item.id === id);
+      const isSelected = state.listingStatusList.some((item) => item.id === id);
       if (isSelected) {
         return {
-          active: state.active.filter((item) => item.id !== id),
+          listingStatusList: state.listingStatusList.filter(
+            (item) => item.id !== id,
+          ),
         };
       } else {
         return {
-          active: [...state.active, { id, isActive }],
+          listingStatusList: [
+            ...state.listingStatusList,
+            { id, listingStatus },
+          ],
         };
       }
     }),
-  togglePopular: (id: number, isActive: boolean) =>
-    set((state) => {
-      const isSelected = state.popular.some((item) => item.id === id);
-      if (isSelected) {
-        return {
-          popular: state.popular.filter((item) => item.id !== id),
-        };
-      } else {
-        return {
-          popular: [...state.popular, { id, isActive }],
-        };
-      }
-    }),
-  emptyActive: () => set({ active: [] }),
-  emptyPopular: () => set({ popular: [] }),
+
+  emptyActive: () => set({ listingStatusList: [] }),
   emptySelect: () => set({ select: [] }),
   select: [],
   addSelect: (id) =>

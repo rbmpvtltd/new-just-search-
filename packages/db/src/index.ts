@@ -15,6 +15,7 @@ import {
   JobDuration,
   JobType,
   MaritalStatus,
+  type Status,
   type UserRole as UserRoleType,
   WorkShift,
 } from "./enum/allEnum.enum";
@@ -24,13 +25,14 @@ import * as chat from "./schema/chat.schema";
 import * as help_and_support from "./schema/help-and-support.schema";
 import * as hire from "./schema/hire.schema";
 import * as not_related from "./schema/not-related.schema";
+import * as notification from "./schema/notification.schema";
 import * as offer from "./schema/offer.schema";
 import * as plan from "./schema/plan.schema";
 import * as product from "./schema/product.schema";
 import * as user from "./schema/user.schema";
-import * as notification from "./schema/notification.schema";
 
 export type UserRole = (typeof UserRoleType)[keyof typeof UserRoleType];
+export type ListingStatus = (typeof Status)[keyof typeof Status];
 
 export const MARITAL_STATUS = MaritalStatus;
 export const GENDER = Gender;

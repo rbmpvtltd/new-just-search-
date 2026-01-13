@@ -1,9 +1,17 @@
 "use client";
 
+import type { ListingStatus } from "@repo/db";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CldImage } from "next-cloudinary";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
 import { EditEntiry } from "../form/edit.form";
 import { useTableStore } from "../store";
@@ -29,22 +37,33 @@ function ActionCell({ id }: { id: number }) {
 // SelectHeader.tsx (or inline)
 //
 
-function ActiveCell({ isActive, id }: { isActive: boolean; id: number }) {
-  const allActive = useTableStore((state) => state.active);
-  const toggleActive = useTableStore((state) => state.toggleActive);
-  const isSelected = allActive.filter((item) => item.id === id)[0];
-  const active = isSelected ? isSelected.isActive : isActive;
-  const handleToggle = () => {
-    toggleActive(id, !active);
+function ActiveCell({
+  listingStatus,
+  id,
+}: {
+  listingStatus: ListingStatus;
+  id: number;
+}) {
+  const allStatus = useTableStore((state) => state.listingStatusList);
+  const toggleStatus = useTableStore((state) => state.toggleListingStatus);
+  const isSelected = allStatus.filter((item) => item.id === id)[0];
+  const status = isSelected ? isSelected.listingStatus : listingStatus;
+
+  const changeValue = (value: ListingStatus) => {
+    toggleStatus(id, value);
   };
 
   return (
-    <Checkbox
-      checked={active}
-      onCheckedChange={handleToggle}
-      aria-label="Select all"
-      className="translate-y-0.5"
-    />
+    <Select defaultValue={status} onValueChange={changeValue}>
+      <SelectTrigger className="w-[120px]">
+        <SelectValue placeholder="Select" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="Pending">Pending</SelectItem>
+        <SelectItem value="Approved">Approved</SelectItem>
+        <SelectItem value="Rejected">Rejected</SelectItem>
+      </SelectContent>
+    </Select>
   );
 }
 
@@ -180,12 +199,12 @@ export const columns: ColumnDef<Subcategory>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Active" />
+      <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => (
       <ActiveCell
         id={row.original.id}
-        isActive={row.original.status === "Approved"}
+        listingStatus={row.original.status ?? "Approved"}
       />
     ),
   },

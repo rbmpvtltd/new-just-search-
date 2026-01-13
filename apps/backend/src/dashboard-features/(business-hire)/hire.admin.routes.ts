@@ -519,28 +519,27 @@ export const adminHireRouter = router({
       z.array(
         z.object({
           id: z.number(),
-          isActive: z.boolean(),
+          listingStatus: z.enum(["Pending", "Approved", "Rejected"]),
         }),
       ),
     )
     .mutation(async ({ input }) => {
       await db
-        .update(categories)
+        .update(hireListing)
         .set({
-          status: sql`CASE ${categories.id} 
+          status: sql`CASE ${hireListing.id} 
             ${sql.join(
               input.map(
-                (item) =>
-                  sql`WHEN ${item.id} THEN ${item.isActive ? sql`true` : sql`false`}`,
+                (item) => sql`WHEN ${item.id} THEN ${item.listingStatus}`,
               ),
               sql` `,
             )}
-                ELSE ${categories.status} 
+                ELSE ${hireListing.status} 
                 END`,
         })
         .where(
           inArray(
-            categories.id,
+            hireListing.id,
             input.map((item) => item.id),
           ),
         );

@@ -1,7 +1,9 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/trpc/client";
+import { useTableStore } from "../store";
+import { getQueryClient } from "@/trpc/query-client";
 import {
   Dialog,
   DialogClose,
@@ -11,39 +13,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useTRPC } from "@/trpc/client";
-import { getQueryClient } from "@/trpc/query-client";
-import { useTableStore } from "../store";
+import { useState } from "react";
 
 export function MuiltActiveButton() {
   const [open, setOpen] = useState(false);
   const trpc = useTRPC();
-  const status = useTableStore((state) => state.listingStatusList);
+  const active = useTableStore((state) => state.active);
   const empty = useTableStore((state) => state.emptyActive);
-  const isActiveExist = status.length >= 1;
+  const isActiveExist = active.length >= 1;
   // const isPending = false;
 
   const { mutate, isPending } = useMutation(
-    trpc.adminBusinessRouter.multiactive.mutationOptions(),
+    trpc.adminCategoryRouter.multiactive.mutationOptions(),
   );
 
-  const updatedStatus = status.map((item) => ({
-    id: item.id,
-    listingStatus: item.listingStatus,
-  }));
   const buttonDisable = !isActiveExist || isPending;
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
         <Button disabled={buttonDisable} className="">
-          {isPending ? "Saving..." : "Save"}
+          {isPending ? "Saving..." : "Save Status"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogTitle>Change Status</DialogTitle>
+        <DialogTitle>Change Active Banner</DialogTitle>
         <DialogDescription>
-          Are you sure you wanna change status
+          Are you sure you wanna change active banner
         </DialogDescription>
         <DialogFooter className="mt-2">
           <DialogClose asChild>
@@ -53,12 +49,12 @@ export function MuiltActiveButton() {
           <Button
             disabled={isPending}
             onClick={() => {
-              mutate(updatedStatus, {
+              mutate(active, {
                 onSuccess: async (data) => {
                   if (data.success) {
                     const queryClient = getQueryClient();
                     await queryClient.invalidateQueries({
-                      queryKey: trpc.adminBusinessRouter.list.queryKey(),
+                      queryKey: trpc.adminCategoryRouter.list.queryKey(),
                     });
                     setTimeout(() => {
                       empty();
