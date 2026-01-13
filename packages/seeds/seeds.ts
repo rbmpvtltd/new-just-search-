@@ -24,11 +24,11 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
   try {
     console.log(process.env);
     // Postgres seeding
-    await notRelated();
+    // await notRelated();
     // logger.info("Complete", {
     //   message: "notRelated",
     // });
-    await userSeed();
+    // await userSeed();
     // logger.info("Complete", {
     //   message: "userseed",
     // });
@@ -36,10 +36,10 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     logger.info("Complete", {
       message: "fakeSeed",
     });
-    await businessSeed();
-    logger.info("Complete", {
-      message: "business",
-    });
+    // await businessSeed();
+    // logger.info("Complete", {
+    //   message: "business",
+    // });
     // process.exit();
     // await productSeed();
     // logger.info("Complete", {
@@ -49,7 +49,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "offerseed",
     // });
-    // await hireSeed();
+    await hireSeed();
     // logger.info("Complete", {
     //   message: "hireseed",
     // });

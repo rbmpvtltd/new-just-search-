@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { FaPhoneAlt, FaWhatsappSquare } from "react-icons/fa";
@@ -6,16 +7,17 @@ import { MdLocationPin } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
+import { useParams } from "next/navigation";
 
-async function page({
-  params,
-}: {
-  params: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const { id } = await params;
-  const { data } = await asyncHandler(
-    trpcServer.hirerouter.singleHire.query({ hireId: Number(id) }),
+function page() {
+  const trpc = useTRPC()
+ const {id} = useParams<{ id:string }>()
+  const { data } = useQuery(
+    trpc.hirerouter.singleHire.queryOptions({ hireId: Number(id) }),
   );
+  console.log("paramss",id)
 
   const calculateAge = (dob: string): number => {
     const birthDate = new Date(dob);
@@ -34,7 +36,7 @@ async function page({
     return age;
   };
 
-  console.log(data);
+  // console.log(data);
   return (
     <div className="px-4 w-[90%] mx-auto">
       <div className="flex gap-6 flex-col md:flex-row items-center">

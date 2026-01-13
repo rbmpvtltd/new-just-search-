@@ -52,7 +52,7 @@ function AllCategory({ isOpen, setIsOpen, data, type = 0 }: AllCategoryProps) {
                 <Link
                   key={index.toString()}
                   href={{
-                    pathname: `/business/listings/${item.id}`,
+                    pathname: `/subcategory/${item.id}`,
                     query: { page: 1 },
                   }}
                 >

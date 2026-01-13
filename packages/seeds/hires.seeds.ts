@@ -18,13 +18,18 @@ import { getRightLocation } from "./business.seed";
 import { sql } from "./mysqldb.seed";
 import { clouadinaryFake } from "./seeds";
 import { insertUser, safeArray } from "./utils";
+import { multiUploadOnCloudinary, type MultiUploadOnCloudinaryFile } from "@repo/cloudinary/dist/cloudinary";
 
 export const hireSeed = async () => {
   await cleardataofhire();
   await addHire();
-  await seedHireCategories();
-  await seedHireSubcategories();
+  // await seedHireCategories();
+  // await seedHireSubcategories();
 };
+
+// const updateHirePhoto = async ()=>{
+
+// }
 
 const cleardataofhire = async () => {
   await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
@@ -39,7 +44,37 @@ const addHire = async () => {
   const [rows]: any[] = await sql.execute(
     "SELECT *, REPLACE(longitude , ',', '') as clear_longitude, REPLACE(latitude , ',', '') as clear_latitude FROM listings WHERE type = 2",
   );
+  const clouadinaryHireData: MultiUploadOnCloudinaryFile[] = [];
 
+  const allPromisesUser: Promise<number>[] = [];
+  for(const row of rows){
+      allPromisesUser.push(insertUser(row.user_id,"hire"))
+  }
+  
+  const allSettledHireUsers = await Promise.allSettled(allPromisesUser);
+  const allHireUsers = [];
+  allSettledHireUsers.forEach((o, i) => {
+    if (o.status === "fulfilled") {
+      allHireUsers.push(o.value);
+    } else {
+      console.error(i, "reason", o.reason);
+    }
+  });
+  for (const row of rows) {
+      const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
+    if (row.photo) {
+      clouadinaryHireData.push({
+        filename: liveHireImageUrl,
+        id: row.id,
+      });
+    }
+  }
+  
+  const categoryPhotoPublicIds = await multiUploadOnCloudinary(
+    clouadinaryHireData,
+    "hire",
+    clouadinaryFake,
+  );
   // const fakeUser = await getFakeHireUser();
 
   // if (!fakeUser) {
@@ -72,6 +107,15 @@ const addHire = async () => {
 
     uneducated: 78,
   };
+
+  const allCities = await db.select().from(cities);
+    const [jodhpur] = await db
+      .select()
+      .from(cities)
+      .where(eq(cities.city, "Jodhpur"));
+    if (!jodhpur) {
+      throw new Error("Jodhpur city not found");
+    }
 
   for (const row of rows) {
     // const row = rows[0];
@@ -119,15 +163,14 @@ const addHire = async () => {
     // if (!createUser) {
     //   console.log("User not found" + row.id);
     // }
+     const hireListingPhoto = categoryPhotoPublicIds.find(
+      (item) => item.id === row.id,
+    )?.public_id;
 
     const userId = await insertUser(row.user_id, "hire");
+    const foundCity = allCities.find((c) => c.id === row.city);
+    const city = foundCity ? foundCity : jodhpur;
 
-    let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
-
-    if (!city) {
-      console.log("City not found", row.id);
-      [city] = await db.select().from(cities).where(eq(cities.city, "Jodhpur"));
-    }
     const invalidPhotos = [
       "20469712961736937230.jpg",
       "9233936721737361584.jpeg",
@@ -143,21 +186,6 @@ const addHire = async () => {
       "19940945571746603611.jpg",
     ];
 
-    let hireListingPhoto: string | null = null;
-    if (!invalidPhotos.includes(row.photo)) {
-      const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
-      if (row.photo) {
-        try {
-          hireListingPhoto = await uploadOnCloudinary(
-            liveHireImageUrl,
-            "hire",
-            clouadinaryFake,
-          );
-        } catch (error) {
-          console.error("Error uploading image:", error);
-        }
-      }
-    }
 
     // console.log("=====");
     // console.log("createUser-------------------", createUser);
@@ -269,9 +297,9 @@ const addHire = async () => {
         relocate: row.relocate === 1 ? "Yes" : "No",
         availability: row.availability,
         idProof: row.id_proof,
-        idProofPhoto: hireListingPhoto,
+        idProofPhoto: "",
         coverLetter: row.cover_letter,
-        resumePhoto: hireListingPhoto,
+        resumePhoto: "",
         aboutYourself: row.about_yourself,
       };
       // const hireData: HireData = {
