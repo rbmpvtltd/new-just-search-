@@ -39,20 +39,28 @@ const multiUploadOnCloudinary = async (
     }));
   }
   const uploadPromises = files.map(async (file) => {
-    const cloudinaryData: UploadApiResponse = await cloudinary.uploader.upload(
-      file.filename,
-      {
-        resource_type: "auto",
-        folder: folderName,
-      },
-    );
-
-    console.log("cloudinaryData", cloudinaryData);
-
-    return {
-      id: file.id,
-      public_id: cloudinaryData.public_id,
-    };
+    try {
+      const cloudinaryData: UploadApiResponse =
+        await cloudinary.uploader.upload(file.filename, {
+          resource_type: "auto",
+          folder: folderName,
+        });
+      console.log("cloudinaryData", cloudinaryData);
+      return {
+        id: file.id,
+        public_id: cloudinaryData.public_id,
+      };
+    } catch (error) {
+      console.error(
+        "Error uploading file to Cloudinary: in id ",
+        file.id,
+        error,
+      );
+      return {
+        id: file.id,
+        public_id: "",
+      };
+    }
   });
 
   return Promise.all(uploadPromises);
