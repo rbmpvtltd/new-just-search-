@@ -14,7 +14,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = false;
+export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
@@ -24,14 +24,14 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
   try {
     console.log(process.env);
     // Postgres seeding
-    await notRelated();
-    logger.info("Complete", {
-      message: "notRelated",
-    });
-    // await userSeed();
+    // await notRelated();
     // logger.info("Complete", {
-    //   message: "userseed",
+    //   message: "notRelated",
     // });
+    await userSeed();
+    logger.info("Complete", {
+      message: "userseed",
+    });
     // await fakeSeed();
     // logger.info("Complete", {
     //   message: "fakeSeed",

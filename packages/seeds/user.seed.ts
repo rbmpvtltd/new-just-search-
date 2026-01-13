@@ -23,17 +23,30 @@ export const clearAllTablesUser = async () => {
 };
 
 export const seedUsers = async () => {
+  console.log("===== user seed start ======");
   const [rows]: any[] = await sql.execute(
     `SELECT u.* FROM users u left join listings l on u.id = l.user_id where l.user_id is null`,
   );
-
-  for (const row of rows) {
+  const allUsersPromise : Promise<number>[] = [];
+   for (const row of rows) {
     let role: UserRole = "guest";
     if (row.phone) {
       role = "visiter";
     }
-    await insertUser(row.id, role);
+    allUsersPromise.push(insertUser(row.id, role));
   }
+  const allSettledHireUsers = await Promise.allSettled(allUsersPromise);
+  allSettledHireUsers.forEach((o, i) => {
+    if (o.status === "fulfilled") {
+      console.log("user created successfully")
+    } else {
+      console.error(i, "reason", o.reason);
+    }
+  });
+  
+
+ 
+  console.log("===== user success end =====")
 };
 
 const seedfranchises = async () => {

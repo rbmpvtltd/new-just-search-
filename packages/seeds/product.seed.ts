@@ -34,6 +34,9 @@ export const clearAllTablesBusiness = async () => {
 // 1. Product
 export const addProduct = async () => {
   const [ProductRows]: any[] = await sql.execute("SELECT * FROM products");
+  const allProductPromises : Promise<number>[] = [];
+  
+
   for (const row of ProductRows) {
     const [business] = await db
       .select()
