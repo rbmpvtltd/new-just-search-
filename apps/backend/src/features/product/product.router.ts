@@ -1,4 +1,3 @@
-import { log } from "node:console";
 import { db, schemas } from "@repo/db";
 import {
   insertProductReviewSchema,
@@ -7,19 +6,17 @@ import {
   productSubCategories,
   products,
 } from "@repo/db/dist/schema/product.schema";
-import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, sql } from "drizzle-orm";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
+import { businessProcedure, protectedProcedure, router } from "@/utils/trpc";
 import {
-  businessProcedure,
-  protectedProcedure,
-  router,
-  visitorProcedure,
-} from "@/utils/trpc";
-import { createProductReview, productReviewExist } from "./product.service";
+  createProductReview,
+  productApproved,
+  productReviewExist,
+} from "./product.service";
 
 export const productrouter = router({
   add: businessProcedure.query(async ({ ctx }) => {
@@ -161,6 +158,7 @@ export const productrouter = router({
         );
       }
 
+      await productApproved(productId);
       return {
         success: true,
         message: "Product added successfully",

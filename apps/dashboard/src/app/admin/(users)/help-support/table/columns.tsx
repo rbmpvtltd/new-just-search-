@@ -9,8 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
-import ChangeStatus from "../form/change.status";
-import { ViewChat } from "../form/edit.form";
+// import ChangeStatus from "../form/change.status";
+// import { ViewChat } from "../form/edit.form";
 import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {

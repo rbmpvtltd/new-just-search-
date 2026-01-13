@@ -69,12 +69,12 @@ export default function HomeLayout() {
             </>
           ),
           headerRight: () => (
-            <View className="flex-row gap-4 bi">
+            <View className="flex-row gap-4">
               <Pressable
                 onPress={() => {
                   if (!isAuthenticated) {
                     showLoginAlert({
-                      message: "Need to login to access your chat sessions",
+                      message: "Need to login to access your chat history",
                       onConfirm: () => {
                         clearToken();
                         router.navigate("/(root)/profile");

@@ -18,6 +18,7 @@ import {
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
+import { hireApproved } from "./hire.service";
 
 export const hirerouter = router({
   add: visitorProcedure.query(async () => {
@@ -227,6 +228,21 @@ export const hirerouter = router({
         .where(eq(schemas.auth.users.id, ctx.userId));
 
       await changeRoleInSession(ctx.sessionId, "hire");
+
+      const myPlan = await db.query.planUserActive.findFirst({
+        where: (planUserActive, { eq }) =>
+          eq(planUserActive.userId, ctx.userId),
+      });
+
+      if (myPlan) {
+        const plan = await db.query.plans.findFirst({
+          where: (plans, { eq }) => eq(plans.id, myPlan.planId),
+        });
+
+        if (plan?.role === "hire") {
+          await hireApproved(createHire.id);
+        }
+      }
 
       logger.info("we not get here");
       return {

@@ -8,21 +8,17 @@ import {
   offersInsertSchema,
   offersUpdateSchema,
 } from "@repo/db/dist/schema/offer.schema";
-import { productSubCategories } from "@repo/db/dist/schema/product.schema";
-import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
-import { and, asc, eq, gt, gte, sql } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import z from "zod";
 import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
+import { businessProcedure, protectedProcedure, router } from "@/utils/trpc";
 import {
-  businessProcedure,
-  protectedProcedure,
-  publicProcedure,
-  router,
-  visitorProcedure,
-} from "@/utils/trpc";
-import { createOfferReview, offerReviewExist } from "./offer.service";
+  createOfferReview,
+  offerApproved,
+  offerReviewExist,
+} from "./offer.service";
 
 export const offerrouter = router({
   add: businessProcedure.query(async ({ ctx }) => {
@@ -210,6 +206,7 @@ export const offerrouter = router({
         );
       }
 
+      await offerApproved(offerId);
       return {
         success: true,
         message: "Offer added successfully",

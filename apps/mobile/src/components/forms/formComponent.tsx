@@ -115,7 +115,6 @@ export const FormField = <T extends FieldValues>({
             case "input": {
               return (
                 <Input
-                
                   ref={ref}
                   className={`${className} w-[90%] m-auto`}
                   placeholder={placeholder}

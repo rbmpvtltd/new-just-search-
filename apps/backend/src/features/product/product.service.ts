@@ -1,12 +1,20 @@
 import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
-import { productReviews } from "@repo/db/dist/schema/product.schema";
+import {
+  businessCategories,
+  businessListings,
+} from "@repo/db/dist/schema/business.schema";
+import { productReviews, products } from "@repo/db/dist/schema/product.schema";
 import { TRPCError } from "@trpc/server";
+import { algoliasearch } from "algoliasearch";
 import { and, eq, sql } from "drizzle-orm";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
-
+const algoliaClient = algoliasearch(
+  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+  process.env.ALGOLIA_ADMIN_API_KEY!,
+);
 async function singleShop(shopId: number) {
   const singleShopData = await db
     .select({
@@ -210,4 +218,77 @@ async function createProductReview(
   }
 }
 
-export { singleShop, productReviewExist, createProductReview };
+async function productApproved(productId: number) {
+  const product = (
+    await db
+      .select({
+        id: products.id,
+        name: products.productName,
+        discountPercent: products.discountPercent,
+        businessId: products.businessId,
+        finalPrice: products.finalPrice,
+        price: products.rate,
+        photos: sql<string[]>`
+      COALESCE(
+        (SELECT ARRAY_AGG(product_photos.photo)
+         FROM product_photos
+         WHERE product_photos.product_id = products.id),
+        '{}'
+      )
+    `,
+        subcategories: sql<string[]>`
+      COALESCE(
+        ARRAY_AGG(DISTINCT subcategories.name)
+        FILTER (WHERE subcategories.id IS NOT NULL),
+        '{}'
+      )
+    `,
+        category: sql<string | null>`
+      MAX(${schemas.not_related.categories.title})
+    `,
+      })
+      .from(products)
+      .leftJoin(
+        schemas.product.productSubCategories,
+        eq(products.id, schemas.product.productSubCategories.productId),
+      )
+      .leftJoin(
+        schemas.not_related.subcategories,
+        eq(
+          schemas.product.productSubCategories.subcategoryId,
+          schemas.not_related.subcategories.id,
+        ),
+      )
+      .leftJoin(businessListings, eq(products.businessId, businessListings.id))
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(
+        schemas.not_related.categories,
+        eq(businessCategories.categoryId, schemas.not_related.categories.id),
+      )
+      .groupBy(products.id)
+      .where(eq(products.id, productId))
+  )[0];
+
+  await algoliaClient.saveObjects({
+    indexName: "product_offer_listing",
+    objects: [
+      {
+        objectID: `products:${productId}`,
+        navigationId: product?.id,
+        name: product?.name,
+        photo: product?.photos,
+        businessId: product?.businessId,
+        price: product?.price,
+        discountPercent: product?.discountPercent ?? 0,
+        finalPrice: product?.finalPrice ?? 0,
+        subecategory: product?.subcategories,
+        category: product?.category,
+      },
+    ],
+  });
+}
+
+export { singleShop, productReviewExist, createProductReview, productApproved };
