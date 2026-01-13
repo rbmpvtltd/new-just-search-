@@ -14,7 +14,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = false;
+export const clouadinaryFake = true;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
@@ -28,7 +28,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "notRelated",
     // });
-    // await userSeed();
+    await userSeed();
     // logger.info("Complete", {
     //   message: "userseed",
     // });
@@ -36,7 +36,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     logger.info("Complete", {
       message: "fakeSeed",
     });
-    // await businessSeed();
+    await businessSeed();
     logger.info("Complete", {
       message: "business",
     });

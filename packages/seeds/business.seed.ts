@@ -23,13 +23,13 @@ import { clouadinaryFake } from "./seeds";
 import { insertUser } from "./utils";
 
 export const businessSeed = async () => {
-  await updateBusinessPhoto();
-  // await clearAllTablesBusiness();
-  // await addBusiness();
-  // await seedFavourites();
-  // await businessesCategories();
-  // await businessesSubcategory();
-  // await BusinessReviews();
+  // await updateBusinessPhoto();
+  await clearAllTablesBusiness();
+  await addBusiness();
+  await seedFavourites();
+  await businessesCategories();
+  await businessesSubcategory();
+  await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -104,82 +104,89 @@ export const clearAllTablesBusiness = async () => {
   console.log(" All tables cleared successfully!");
 };
 
+const skipSlug = [
+  "ritik",
+  "rajasthan-arts-crafts",
+  "payal-prajapat",
+  "prince-art-exporter",
+  "parikrama-advertising",
+  "manish-garment",
+  "yash-aman-hospital",
+  "hotel-ratan-vilas",
+  "bhadariya-mobile",
+  "vinayak-shopee",
+  "",
+  "dinesh-auto-repair",
+  "mayur-plastics",
+  "mahalaxmi-mobile",
+  "ambika-enterprises",
+  "creation-point",
+  "pawan-electricals",
+  "mahaveer-kirana-store",
+  "mahadev-sabji-mandi",
+  "shri-balaji-medical-store",
+  "lakki-fresh-fruit-sabji-bhandar",
+  "lakshmi-cement-jali-udyog",
+  "mobile-doctor",
+  "anmol-fashion",
+  "sunil-handicrafts-exports",
+  "sarwan-kumar",
+  "sagar",
+];
+
 const addBusiness = async () => {
   const [rows]: any[] = await sql.execute(
     "SELECT *, REPLACE(longitude , ',', '') as clear_longitude, REPLACE(latitude , ',', '') as clear_latitude FROM listings WHERE type = 1",
   );
 
-  // const fakeUser = await getFakeBusinessUser();
-
-  // if (!fakeUser) {
-  //   throw new Error("Failed to generate a fake user!");
-  // }
-
+  // ADD Business Users
+  const allPromiseUsers: Promise<number>[] = [];
   for (const row of rows) {
-    // const row = rows[0];
-    //
+    allPromiseUsers.push(insertUser(row.user_id, "business"));
+  }
+  const allUsersSettled = await Promise.allSettled(allPromiseUsers);
+  const allUsers: number[] = [];
+  allUsersSettled.forEach((o, i) => {
+    if (o.status === "fulfilled") {
+      allUsers.push(o.value);
+    } else {
+      console.error(i, "reason", o.reason);
+    }
+  });
 
-    let userId = 0;
-    try {
-      userId = await insertUser(row.user_id, "business");
-    } catch (error) {
-      console.log("error inside user");
-      throw new Error(`User not found ${row.user_id} ${error}`);
+  // Get City
+  const allCities = await db.select().from(cities);
+  const [jodhpur] = await db
+    .select()
+    .from(cities)
+    .where(eq(cities.city, "Jodhpur"));
+  if (!jodhpur) {
+    throw new Error("Jodhpur city not found");
+  }
+
+  // Get Saleman
+  const allSalesmen = await db.select().from(salesmen);
+  // Adding Businesses
+  for (const row of rows) {
+    const userId = allUsers.find((u) => u === row.user_id);
+    if (!userId) {
+      console.log("User not found", row.id);
+      continue;
     }
 
-    let [city] = await db.select().from(cities).where(eq(cities.id, row.city));
+    const foundCity = allCities.find((c) => c.id === row.city);
+    const city = foundCity ? foundCity : jodhpur;
 
-    if (!city) {
-      console.log("City not found", row.id);
-      [city] = await db.select().from(cities).where(eq(cities.city, "Jodhpur"));
-      if (!city) {
-        throw new Error(`City not found ${row.city}`);
-      }
-    }
+    const salesman = allSalesmen.find(
+      (s) => s.referCode === row.refer_code.toUpperCase(),
+    );
+    const salesmanId = salesman ? salesman.id : 1;
 
-    const skipSlug = [
-      "ritik",
-      "rajasthan-arts-crafts",
-      "payal-prajapat",
-      "prince-art-exporter",
-      "parikrama-advertising",
-      "manish-garment",
-      "yash-aman-hospital",
-      "hotel-ratan-vilas",
-      "bhadariya-mobile",
-      "vinayak-shopee",
-      "",
-      "dinesh-auto-repair",
-      "mayur-plastics",
-      "mahalaxmi-mobile",
-      "ambika-enterprises",
-      "creation-point",
-      "pawan-electricals",
-      "mahaveer-kirana-store",
-      "mahadev-sabji-mandi",
-      "shri-balaji-medical-store",
-      "lakki-fresh-fruit-sabji-bhandar",
-      "lakshmi-cement-jali-udyog",
-      "mobile-doctor",
-      "anmol-fashion",
-      "sunil-handicrafts-exports",
-      "sarwan-kumar",
-      "sagar",
-    ];
     let slug = row.slug;
     if (skipSlug.includes(row.slug)) {
       slug = `${row.slug}-${row.id}`;
     }
     try {
-      const saleman = await db
-        .select()
-        .from(salesmen)
-        .where(
-          eq(
-            salesmen.referCode,
-            row.refer_code ? row.refer_code.toUpperCase() : null,
-          ),
-        );
       type BusinessData = InferInsertModel<typeof businessListings>;
       const { days, fromHour, toHour } = scheduleExtracter(row.schedules);
       const { latitude, longitude } = getRightLocation(row);
@@ -193,7 +200,7 @@ const addBusiness = async () => {
 
       const businessData: BusinessData = {
         id: row.id,
-        salesmanId: saleman[0]?.id ?? 1,
+        salesmanId,
         userId,
         name: row.name,
         days,
