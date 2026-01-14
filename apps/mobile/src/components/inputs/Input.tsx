@@ -1,16 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { forwardRef } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   TextInput,
   type TextInputProps,
   useColorScheme,
+  View,
 } from "react-native";
 import Colors from "@/constants/Colors";
 
-// Extend TextInputProps to accept all standard props + optional custom ones
 type InputProps = TextInputProps & {
   isPassword?: boolean;
   customStyle?: object;
@@ -21,11 +19,7 @@ const Input = forwardRef<TextInput, InputProps>(
     const colorScheme = useColorScheme();
     const [showPassword, setShowPassword] = React.useState(false);
     return (
-      // <KeyboardAvoidingView
-      //   behavior={Platform.OS === "ios" ? "padding" : undefined}
-      //   keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-      // >
-      <>
+      <View className="relative">
         <TextInput
           returnKeyType="done"
           ref={ref}
@@ -38,7 +32,7 @@ const Input = forwardRef<TextInput, InputProps>(
               borderRadius: 8,
               fontSize: 16,
               color: Colors[colorScheme ?? "light"]["secondary"],
-              paddingRight: isPassword ? 55 : 10,
+              paddingRight: isPassword ? 50 : 10,
             },
             customStyle,
           ]}
@@ -52,7 +46,7 @@ const Input = forwardRef<TextInput, InputProps>(
         {isPassword && (
           <Pressable
             onPress={() => setShowPassword((prev) => !prev)}
-            className="absolute right-10 top-3.5"
+            className="absolute right-4 top-1/2 -translate-y-1/2"
           >
             <Ionicons
               name={showPassword ? "eye-off-outline" : "eye-outline"}
@@ -61,9 +55,7 @@ const Input = forwardRef<TextInput, InputProps>(
             />
           </Pressable>
         )}
-      </>
-
-      // </KeyboardAvoidingView>
+      </View>
     );
   },
 );

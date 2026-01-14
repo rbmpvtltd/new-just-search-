@@ -53,14 +53,12 @@ export default async function PricingCard({
         )}
       </div>
 
-      {/* Price */}
       <div className="py-5 text-center border-b">
         <p className="text-3xl font-bold text-secondary">
           ₹{plan.amount} {plan?.amount > 0 && "+ GST / year"}
         </p>
       </div>
 
-      {/* Features */}
       <div className="p-5 space-y-3 flex-1">
         {plan.attribute?.map((feature: any, index: number) => (
           <div

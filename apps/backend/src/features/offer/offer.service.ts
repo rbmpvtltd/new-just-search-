@@ -1,12 +1,22 @@
 import { db, schemas } from "@repo/db";
 import { users } from "@repo/db/dist/schema/auth.schema";
-import { offerReviews } from "@repo/db/dist/schema/offer.schema";
+import {
+  businessCategories,
+  businessListings,
+} from "@repo/db/dist/schema/business.schema";
+import { offerReviews, offers } from "@repo/db/dist/schema/offer.schema";
 import { TRPCError } from "@trpc/server";
+import { algoliasearch } from "algoliasearch";
 import { and, eq, sql } from "drizzle-orm";
 import { reviewExist } from "../business/business.service";
 
 const businessListing = schemas.business.businessListings;
 const business_reviews = schemas.business.businessReviews;
+
+const algoliaClient = algoliasearch(
+  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+  process.env.ALGOLIA_ADMIN_API_KEY!,
+);
 
 async function singleShop(shopId: number) {
   const singleShopData = await db
@@ -208,4 +218,76 @@ async function createOfferReview(
   }
 }
 
-export { singleShop, offerReviewExist, createOfferReview };
+async function offerApproved(offerId: number) {
+  const offer = (
+    await db
+      .select({
+        id: offers.id,
+        price: offers.rate,
+        discountPercent: offers.discountPercent,
+        businessId: offers.businessId,
+        finalPrice: offers.finalPrice,
+        name: offers.offerName,
+        photos: sql<string[]>`
+      COALESCE(
+        (SELECT ARRAY_AGG(offer_photos.photo)
+         FROM offer_photos
+         WHERE offer_photos.offer_id = offers.id),
+        '{}'
+      )
+    `,
+        subcategories: sql<string[]>`
+      COALESCE(
+        ARRAY_AGG(DISTINCT subcategories.name)
+        FILTER (WHERE subcategories.id IS NOT NULL),
+        '{}'
+      )
+    `,
+        category: sql<string | null>`
+      MAX(${schemas.not_related.categories.title})
+    `,
+      })
+      .from(offers)
+      .leftJoin(
+        schemas.offer.offerSubcategory,
+        eq(offers.id, schemas.offer.offerSubcategory.offerId),
+      )
+      .leftJoin(
+        schemas.not_related.subcategories,
+        eq(
+          schemas.offer.offerSubcategory.subcategoryId,
+          schemas.not_related.subcategories.id,
+        ),
+      )
+      .leftJoin(businessListings, eq(offers.businessId, businessListings.id))
+      .leftJoin(
+        businessCategories,
+        eq(businessListings.id, businessCategories.businessId),
+      )
+      .leftJoin(
+        schemas.not_related.categories,
+        eq(businessCategories.categoryId, schemas.not_related.categories.id),
+      )
+      .groupBy(offers.id)
+      .where(eq(offers.id, offerId))
+  )[0];
+
+  await algoliaClient.saveObjects({
+    indexName: "product_offer_listing",
+    objects: [
+      {
+        objectID: `offers:${offer?.id}`,
+        navigationId: offer?.id,
+        name: offer?.name,
+        photo: offer?.photos,
+        businessId: offer?.businessId,
+        price: offer?.price,
+        discountPercent: offer?.discountPercent ?? 0,
+        finalPrice: offer?.finalPrice ?? 0,
+        subecategory: offer?.subcategories,
+        category: offer?.category,
+      },
+    ],
+  });
+}
+export { singleShop, offerReviewExist, createOfferReview, offerApproved };

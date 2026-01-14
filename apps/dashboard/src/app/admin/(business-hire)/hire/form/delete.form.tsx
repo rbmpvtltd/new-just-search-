@@ -1,9 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useTRPC } from "@/trpc/client";
-import { useTableStore } from "../store";
-import { getQueryClient } from "@/trpc/query-client";
 import {
   Dialog,
   DialogClose,
@@ -13,7 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
+import { useTableStore } from "../store";
 
 export function MuiltDeleteButton() {
   const [open, setOpen] = useState(false);
@@ -22,7 +22,7 @@ export function MuiltDeleteButton() {
   const emptySelect = useTableStore((state) => state.emptySelect);
 
   const { mutate: deleteMany, isPending } = useMutation(
-    trpc.adminCategoryRouter.multidelete.mutationOptions(),
+    trpc.adminHireRouter.multidelete.mutationOptions(),
   );
 
   const isActiveExist = select.length >= 1;
@@ -40,7 +40,7 @@ export function MuiltDeleteButton() {
         <DialogTitle>Delete Selected</DialogTitle>
 
         <DialogDescription>
-          Are you sure you wanna delete selected banner
+          Are you sure you wanna delete selected hire listing
         </DialogDescription>
         <DialogFooter className="mt-2">
           <DialogClose asChild>
@@ -58,7 +58,7 @@ export function MuiltDeleteButton() {
                     if (data.success) {
                       const queryClient = getQueryClient();
                       queryClient.invalidateQueries({
-                        queryKey: trpc.adminCategoryRouter.list.queryKey(),
+                        queryKey: trpc.adminHireRouter.list.queryKey(),
                       });
                       setTimeout(() => {
                         emptySelect();

@@ -459,28 +459,27 @@ export const adminBusinessRouter = router({
       z.array(
         z.object({
           id: z.number(),
-          isActive: z.boolean(),
+          listingStatus: z.enum(["Pending", "Approved", "Rejected"]),
         }),
       ),
     )
     .mutation(async ({ input }) => {
       await db
-        .update(categories)
+        .update(businessListings)
         .set({
-          status: sql`CASE ${categories.id} 
+          status: sql`CASE ${businessListings.id} 
             ${sql.join(
               input.map(
-                (item) =>
-                  sql`WHEN ${item.id} THEN ${item.isActive ? sql`true` : sql`false`}`,
+                (item) => sql`WHEN ${item.id} THEN ${item.listingStatus}`,
               ),
               sql` `,
             )}
-                ELSE ${categories.status} 
+                ELSE ${businessListings.status} 
                 END`,
         })
         .where(
           inArray(
-            categories.id,
+            businessListings.id,
             input.map((item) => item.id),
           ),
         );
@@ -517,6 +516,44 @@ export const adminBusinessRouter = router({
             input.map((item) => item.id),
           ),
         );
+
+      return { success: true };
+    }),
+
+  multidelete: adminProcedure
+    .input(
+      z.object({
+        ids: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const allSeletedPhoto = await db
+        .select({
+          photo: businessPhotos.photo,
+        })
+        .from(businessPhotos)
+        .where(inArray(businessPhotos.businessId, input.ids));
+
+      if (allSeletedPhoto.length !== 0) {
+        await cloudinaryDeleteImagesByPublicIds(
+          allSeletedPhoto?.map((item) => String(item.photo)),
+        );
+        await db
+          .delete(businessPhotos)
+          .where(inArray(businessPhotos.businessId, input.ids));
+      }
+
+      await db
+        .delete(businessSubcategories)
+        .where(inArray(businessSubcategories.businessId, input.ids));
+
+      await db
+        .delete(businessCategories)
+        .where(inArray(businessCategories.businessId, input.ids));
+        
+      await db
+        .delete(businessListings)
+        .where(inArray(businessListings.id, input.ids));
 
       return { success: true };
     }),

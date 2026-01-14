@@ -1,9 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useTRPC } from "@/trpc/client";
-import { useTableStore } from "../store";
-import { getQueryClient } from "@/trpc/query-client";
 import {
   Dialog,
   DialogClose,
@@ -13,26 +11,31 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
+import { useTableStore } from "../store";
 
 export function MuiltPopularButton() {
   const [open, setOpen] = useState(false);
   const trpc = useTRPC();
-  const active = useTableStore((state) => state.popular);
-  const empty = useTableStore((state) => state.emptyPopular);
-  const isActiveExist = active.length >= 1;
-  // const isPending = false;
+  // const active = useTableStore((state) => state.);
+  // const empty = useTableStore((state) => state.emptyPopular);
+  // const isActiveExist = active.length >= 1;
+  const isPending = false;
 
-  const { mutate, isPending } = useMutation(
-    trpc.adminCategoryRouter.multipopular.mutationOptions(),
-  );
+  // const { mutate, isPending } = useMutation(
+  //   trpc.adminCategoryRouter.multipopular.mutationOptions(),
+  // );
 
-  const buttonDisable = !isActiveExist || isPending;
+  // const buttonDisable = !isActiveExist || isPending;
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button disabled={buttonDisable} className="">
+        <Button
+          // disabled={buttonDisable}
+          className=""
+        >
           {isPending ? "Saving..." : "Save Popular"}
         </Button>
       </DialogTrigger>
@@ -48,22 +51,22 @@ export function MuiltPopularButton() {
 
           <Button
             disabled={isPending}
-            onClick={() => {
-              mutate(active, {
-                onSuccess: async (data) => {
-                  if (data.success) {
-                    const queryClient = getQueryClient();
-                    await queryClient.invalidateQueries({
-                      queryKey: trpc.adminCategoryRouter.list.queryKey(),
-                    });
-                    setTimeout(() => {
-                      empty();
-                    });
-                    setOpen(false);
-                  }
-                },
-              });
-            }}
+            // onClick={() => {
+            //   mutate(active, {
+            //     onSuccess: async (data) => {
+            //       if (data.success) {
+            //         const queryClient = getQueryClient();
+            //         await queryClient.invalidateQueries({
+            //           queryKey: trpc.adminCategoryRouter.list.queryKey(),
+            //         });
+            //         setTimeout(() => {
+            //           empty();
+            //         });
+            //         setOpen(false);
+            //       }
+            //     },
+            //   });
+            // }}
           >
             {isPending ? "Saving..." : "Save"}
           </Button>

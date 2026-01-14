@@ -16,6 +16,7 @@ import { uploadOnCloudinary } from "@repo/cloudinary";
 import { type UserRole as DbUserRole, db } from "@repo/db";
 import type { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { users } from "@repo/db/dist/schema/auth.schema";
+import type { planUserActive } from "@repo/db/dist/schema/plan.schema";
 import { profiles } from "@repo/db/dist/schema/user.schema";
 import { eq, type InferInsertModel } from "drizzle-orm";
 import slugifylib from "slugify";
@@ -90,6 +91,7 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
 
   const row = rows[0];
   type DbUser = InferInsertModel<typeof users>;
+  type DbUserActivePlans = InferInsertModel<typeof planUserActive>;
 
   const user: DbUser = {
     id: row?.id,
@@ -106,7 +108,23 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
     updatedAt: row?.updated_at,
   };
 
+  const plan = await db.query.plans.findMany();
+
+  const [subscriptions]: any[] = await sql.execute(
+    "SELECT * FROM user_subscriptions where user_id = ?",
+    [row?.id],
+  );
+
+  const userActivePlans: DbUserActivePlans = {
+    id: subscriptions?.id,
+    planId: subscriptions?.plan_id,
+    userId: row?.id,
+    features: subscriptions?.features,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
   //TODO: add current user plan
+
   const [insertedUser] = await db.insert(users).values(user).returning();
 
   if (!insertedUser) {

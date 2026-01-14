@@ -20,27 +20,8 @@ function FirstCaraousel({
 }: {
   bannerFirst: BannerFirstCaraousel[] | null;
 }) {
-  console.log(bannerFirst);
-  const trpc = useTRPC();
-  const { mutate } = useMutation(trpc.businessrouter.test.mutationOptions());
-
   return (
     <Carousel opts={{ loop: true }} className="w-full ">
-      <Button
-        title="Test"
-        onClick={() =>
-          mutate(
-            {},
-            {
-              onSuccess: (data) => {
-                console.log(data);
-              },
-            },
-          )
-        }
-      >
-        Test{" "}
-      </Button>
       <CarouselContent className="ml-10">
         {bannerFirst?.map((item, index: number) => (
           <CarouselItem
