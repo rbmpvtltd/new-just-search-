@@ -14,7 +14,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const cloudinaryUploadOnline = true;
+export const cloudinaryUploadOnline = false;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
@@ -40,7 +40,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "business",
     // });
-    // process.exit();
+    // // process.exit();
     // await productSeed();
     // logger.info("Complete", {
     //   message: "productSeed",

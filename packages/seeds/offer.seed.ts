@@ -56,7 +56,7 @@ export const addOffer = async () => {
     const images = ["image2", "image3", "image4", "image5"];
     for (const image of images) {
       if(!offer[image]){
-        console.log(`====== Product Doesn't have ${image} ======`);
+        console.log(`====== Offer Doesn't have ${image} ======`);
         continue
       }
       if (offer[image].startsWith("/tmp") === true) continue;
@@ -109,6 +109,7 @@ export const addOffer = async () => {
 
     
     dbOfferValue.push({
+        id:row.id,
         businessId: business.id,
         mainImage:mainImage ?? "",
         categoryId: category.id,
