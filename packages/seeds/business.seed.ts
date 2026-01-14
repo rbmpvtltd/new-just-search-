@@ -29,10 +29,10 @@ export const businessSeed = async () => {
   // await updateBusinessPhoto();
   await clearAllTablesBusiness();
   await addBusiness();
-  // await seedFavourites();
+  await seedFavourites();
   await businessesCategories();
   await businessesSubcategory();
-  // await BusinessReviews();
+  await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
 
@@ -656,7 +656,7 @@ const updateBusinessPhoto = async () => {
     const businessMainPhoto = await uploadOnCloudinary(
       liveBusinessImageUrl,
       "business",
-      clouadinaryFake,
+      cloudinaryUploadOnline,
     );
 
     console.log("businessMainPhoto", businessMainPhoto);
