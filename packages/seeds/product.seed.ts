@@ -21,8 +21,8 @@ import {
 export const productSeed = async () => {
   await clearAllTablesBusiness();
   await addProduct();
-  // await addProductReviews();
-  // await addProductSubCategroy();
+  await addProductReviews();
+  await addProductSubCategroy();
   // await addRecentViewProduct();
 };
 
@@ -47,7 +47,7 @@ export const addProduct = async () => {
   for (const product of ProductRows) {
     if (product.image1.startsWith("/tmp") === true) continue;
     const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${product.image1}`;
-    if (product.photo) {
+    if (product.image1) {
       cloudinaryProductData.push({
         filename: liveHireImageUrl,
         id: product.id,

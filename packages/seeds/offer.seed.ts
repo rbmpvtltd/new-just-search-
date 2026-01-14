@@ -1,6 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { eq, type InferInsertModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import { businessListings } from "../db/src/schema/business.schema";
 import { categories, subcategories } from "../db/src/schema/not-related.schema";
@@ -14,12 +14,13 @@ import {
 // import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
 import { cloudinaryUploadOnline } from "./seeds";
+import { multiUploadOnCloudinary, type MultiUploadOnCloudinaryFile } from "@repo/cloudinary/dist/cloudinary";
 
 export const offerSeed = async () => {
   await clearOfferSeed();
   await addOffer();
-  await addOfferReviews();
-  await addOfferSubcategories();
+  // await addOfferReviews();
+  // await addOfferSubcategories();
 };
 
 const clearOfferSeed = async () => {
@@ -37,40 +38,79 @@ export const addOffer = async () => {
   const [mysqlOffers]: any[] = await (sql as any).execute(
     "SELECT * FROM offers",
   );
+  type DbOfferType = InferInsertModel<typeof offers>;
+  type DbOfferPhotoType = InferInsertModel<typeof offerPhotos>;
+  const dbOfferValue : DbOfferType[]=[];
+  const dbOfferPhotosValues:DbOfferPhotoType[]=[];
+  const cloudinaryOfferData : MultiUploadOnCloudinaryFile[] = [];
+  const cloudinaryOfferPhotosData:MultiUploadOnCloudinaryFile[]=[];
 
+  for(const offer of mysqlOffers){
+    const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${offer.image1}`;
+    if(offer.image1){
+      cloudinaryOfferData.push({
+        filename:liveOfferImageUrl,
+        id:offer.id
+      })
+    }
+    const images = ["image2", "image3", "image4", "image5"];
+    for (const image of images) {
+      if(!offer[image]){
+        console.log(`====== Product Doesn't have ${image} ======`);
+        continue
+      }
+      if (offer[image].startsWith("/tmp") === true) continue;
+      const liveProductsPhotoImageUrl = `https://justsearch.net.in/assets/images/${offer[image]}`;
+      cloudinaryOfferPhotosData.push({
+        filename: liveProductsPhotoImageUrl,
+        id: `${offer.id}-${image}`,
+      });
+    }
+  }
+
+  const offerPhotosPublicIds = await multiUploadOnCloudinary(
+    [...cloudinaryOfferData,...cloudinaryOfferPhotosData],
+    "offer",
+    cloudinaryUploadOnline,
+  )
+  
+
+  const allBusinesslistings = await db.select().from(businessListings);
+  const allCategories = await db.select().from(categories);
   for (const row of mysqlOffers) {
-    const [business] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
-
+    // const business = await db
+    //   .select()
+    //   .from(businessListings)
+    //   .where(eq(businessListings.id, row.listing_id));
+    const business = allBusinesslistings.find((business)=> business.id,row.listing_id);
+    const category = allCategories.find((category)=> category.id,row.category_id);
+    const mainImage = offerPhotosPublicIds.find((offer)=> offer.id === row.id)?.public_id;
     if (!business) {
       console.log("business not found", row.id);
       continue;
     }
+    // const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row.image1}`;
+    // const mainImage = await uploadOnCloudinary(
+    //   liveOfferImageUrl,
+    //   "offer",
+    //   cloudinaryUploadOnline,
+    // );
 
-    const [category] = await db
-      .select()
-      .from(categories)
-      .where(eq(categories.id, row.category_id));
+
+    // const [category] = await db
+    //   .select()
+    //   .from(categories)
+    //   .where(eq(categories.id, row.category_id));
 
     if (!category) {
       console.log("category not found", row.id);
       continue;
     }
 
-    const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row.image1}`;
-    const mainImage = await uploadOnCloudinary(
-      liveOfferImageUrl,
-      "offer",
-      cloudinaryUploadOnline,
-    );
-
-    const [offerCreate] = await db
-      .insert(offers)
-      .values({
+    
+    dbOfferValue.push({
         businessId: business.id,
-        mainImage,
+        mainImage:mainImage ?? "",
         categoryId: category.id,
         offerName: row.product_name,
         offerSlug: row.product_slug,
@@ -85,31 +125,38 @@ export const addOffer = async () => {
         updatedAt: row.updated_at,
         expires_at: row.expires_at ?? new Date(),
       })
-      .returning({ id: offers.id });
+      
 
-    if (!offerCreate) {
-      console.log("offer not created", row.id);
-      throw new Error("offer not created");
-    }
+    
     const images = ["image2", "image3", "image4", "image5"];
     for (const image of images) {
       if (row[image]) {
         if (row[image].startsWith("/tmp") === true) continue;
-        const liveOfferImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-        const offerPhotoUrl = await uploadOnCloudinary(
-          liveOfferImageUrl,
-          "offer",
-          cloudinaryUploadOnline,
-        );
+        const offerPhotoUrl = offerPhotosPublicIds.find((item)=> item.id === `${item.id}-${image}`)?.public_id
 
-        await db.insert(offerPhotos).values({
-          offerId: offerCreate.id,
-          photo: offerPhotoUrl,
+        dbOfferPhotosValues.push({
+          offerId: row.id,
+          photo: offerPhotoUrl ?? "",
           createdAt: row.created_at,
           updatedAt: row.updated_at,
         });
       }
     }
+  }
+  if(Array.isArray(dbOfferValue) && dbOfferValue.length > 0){
+    await db.insert(offers).values(dbOfferValue);
+    console.log("============= Successfully Insert Offers Data =============");
+  }else {
+    console.log("========================= dbOfferValue =========================",dbOfferValue);
+    console.log("====== dbOfferValue Doesn't have Data Or May Not Be Array ======")
+  }
+
+  if(Array.isArray(dbOfferPhotosValues) && dbOfferPhotosValues.length > 0){
+    await db.insert(offerPhotos).values(dbOfferPhotosValues);
+    console.log("========== Successfully Insert OffersPhotos Data ==========");
+  }else {
+    console.log("====================== dbOfferPhotosValue ======================",dbOfferValue);
+    console.log("=== dbOfferPhotosValue Doesn't have Data Or May Not Be Array ===")
   }
 
   console.log("successfully seed of offer and offer photo");

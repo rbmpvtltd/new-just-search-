@@ -36,19 +36,19 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "fakeSeed",
     // });
-    await businessSeed();
+    // await businessSeed();
     // logger.info("Complete", {
     //   message: "business",
     // });
     // process.exit();
-    await productSeed();
-    logger.info("Complete", {
-      message: "productSeed",
-    });
-    // await offerSeed();
+    // await productSeed();
     // logger.info("Complete", {
-    //   message: "offerseed",
+    //   message: "productSeed",
     // });
+    await offerSeed();
+    logger.info("Complete", {
+      message: "offerseed",
+    });
     // await hireSeed();
     // logger.info("Complete", {
     //   message: "hireseed",
