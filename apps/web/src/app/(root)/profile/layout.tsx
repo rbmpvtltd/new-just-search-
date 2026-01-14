@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import FooterSection from "@/components/footer";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function ProfileLayout({
@@ -12,6 +13,7 @@ export default function ProfileLayout({
       <main className="w-full">
         <SidebarTrigger />
         {children}
+        <FooterSection />
       </main>
     </SidebarProvider>
   );

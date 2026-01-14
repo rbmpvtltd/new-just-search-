@@ -532,14 +532,29 @@ export const adminBusinessRouter = router({
           photo: businessPhotos.photo,
         })
         .from(businessPhotos)
-        .where(inArray(businessPhotos.id, input.ids));
+        .where(inArray(businessPhotos.businessId, input.ids));
 
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto?.map((item) => String(item.photo)),
-      );
+      if (allSeletedPhoto.length !== 0) {
+        await cloudinaryDeleteImagesByPublicIds(
+          allSeletedPhoto?.map((item) => String(item.photo)),
+        );
+        await db
+          .delete(businessPhotos)
+          .where(inArray(businessPhotos.businessId, input.ids));
+      }
+
       await db
-        .delete(businessPhotos)
-        .where(inArray(businessPhotos.id, input.ids));
+        .delete(businessSubcategories)
+        .where(inArray(businessSubcategories.businessId, input.ids));
+
+      await db
+        .delete(businessCategories)
+        .where(inArray(businessCategories.businessId, input.ids));
+        
+      await db
+        .delete(businessListings)
+        .where(inArray(businessListings.id, input.ids));
+
       return { success: true };
     }),
 });

@@ -15,7 +15,6 @@ export default function ClientWrapper({
       <HeroHeader />
       {children}
       <Toaster />
-      <FooterSection />
     </TRPCReactProvider>
   );
 }

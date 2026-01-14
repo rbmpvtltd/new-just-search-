@@ -23,12 +23,12 @@ import { clouadinaryFake } from "./seeds";
 import { insertUser } from "./utils";
 
 export const businessSeed = async () => {
-  await updateBusinessPhoto();
+  // await updateBusinessPhoto();
   // await clearAllTablesBusiness();
   // await addBusiness();
   // await seedFavourites();
-  // await businessesCategories();
-  // await businessesSubcategory();
+  await businessesCategories();
+  await businessesSubcategory();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
 };
@@ -121,9 +121,11 @@ const addBusiness = async () => {
 
     let userId = 0;
     try {
+      console.log("Row user id", row.user_id);
+      if (row.user_id === null) continue
       userId = await insertUser(row.user_id, "business");
     } catch (error) {
-      console.log("error inside user");
+      console.log("error inside user", error);
       throw new Error(`User not found ${row.user_id} ${error}`);
     }
 

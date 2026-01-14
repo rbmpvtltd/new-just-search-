@@ -13,6 +13,7 @@ import {
   cities,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
@@ -497,21 +498,41 @@ export const adminHireRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      //TODO: remove subcategory of these categories;
       const allSeletedPhoto = await db
         .select({
-          photo: categories.photo,
+          photo: hireListing.photo,
+          cetificate: hireListing.certificates,
+          idProofPhoto: hireListing.idProofPhoto,
+          resumePhoto: hireListing.resumePhoto,
         })
-        .from(categories)
-        .where(inArray(categories.id, input.ids));
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => item.photo),
-      );
-      //TODO: test that subcategory is also deleting
+        .from(hireListing)
+        .where(inArray(hireListing.id, input.ids));
+
+      const publicIds = allSeletedPhoto
+        .flatMap((item) => [
+          item.photo,
+          item.cetificate,
+          item.idProofPhoto,
+          item.resumePhoto,
+        ])
+        .filter(Boolean);
+
+      if (publicIds.length > 0) {
+        await cloudinaryDeleteImagesByPublicIds(
+          publicIds?.map((item) => String(item)),
+        );
+      }
+
       await db
-        .delete(subcategories)
-        .where(inArray(subcategories.categoryId, input.ids));
-      await db.delete(categories).where(inArray(categories.id, input.ids));
+        .delete(hireSubcategories)
+        .where(inArray(hireSubcategories.hireId, input.ids));
+
+      await db
+        .delete(hireCategories)
+        .where(inArray(hireCategories.hireId, input.ids));
+
+      await db.delete(hireListing).where(inArray(hireListing.id, input.ids));
+
       return { success: true };
     }),
   multiactive: adminProcedure
