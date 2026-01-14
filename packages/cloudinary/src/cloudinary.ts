@@ -24,9 +24,9 @@ export type MultiUploadOnCloudinaryFile = {
 const multiUploadOnCloudinary = async (
   files: MultiUploadOnCloudinaryFile[],
   folderName = "",
-  test = false,
+  onlineUpload = false,
 ) => {
-  if (test) {
+  if (!onlineUpload) {
     const customName = `Banner/cbycmehjeetyxbuxc6ie`;
 
     const result = {
@@ -69,11 +69,11 @@ const multiUploadOnCloudinary = async (
 const uploadOnCloudinary = async (
   localFilePath: string,
   folderName = "",
-  test = false,
+  uploadOnline = false,
 ) => {
   // if (!localFilePath) return null;
   try {
-    if (test) {
+    if (!uploadOnline) {
       const customName = `Banner/cbycmehjeetyxbuxc6ie`;
       const result = {
         public_id: customName,

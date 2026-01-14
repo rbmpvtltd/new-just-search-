@@ -16,7 +16,7 @@ import {
 } from "../db/src/schema/not-related.schema";
 import { getRightLocation } from "./business.seed";
 import { sql } from "./mysqldb.seed";
-import { clouadinaryFake } from "./seeds";
+import { cloudinaryUploadOnline } from "./seeds";
 import { insertUser, safeArray } from "./utils";
 import { multiUploadOnCloudinary, type MultiUploadOnCloudinaryFile } from "@repo/cloudinary/dist/cloudinary";
 
@@ -70,10 +70,10 @@ const addHire = async () => {
     }
   }
   
-  const categoryPhotoPublicIds = await multiUploadOnCloudinary(
+  const hirePhotosPublicIds = await multiUploadOnCloudinary(
     clouadinaryHireData,
     "hire",
-    clouadinaryFake,
+    cloudinaryUploadOnline,
   );
   // const fakeUser = await getFakeHireUser();
 
@@ -163,7 +163,7 @@ const addHire = async () => {
     // if (!createUser) {
     //   console.log("User not found" + row.id);
     // }
-     const hireListingPhoto = categoryPhotoPublicIds.find(
+     const hireListingPhoto = hirePhotosPublicIds.find(
       (item) => item.id === row.id,
     )?.public_id;
 

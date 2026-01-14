@@ -19,7 +19,7 @@ import { profiles } from "@repo/db/dist/schema/user.schema";
 import { eq, type InferInsertModel } from "drizzle-orm";
 import slugifylib from "slugify";
 import { sql } from "./mysqldb.seed";
-import { clouadinaryFake, dummyImageUrl } from "./seeds";
+import { cloudinaryUploadOnline, dummyImageUrl } from "./seeds";
 
 export const slugify = (name: string) =>
   slugifylib(name, {
@@ -126,7 +126,7 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
         profilePhotoUrl = await uploadOnCloudinary(
           liveHireImageUrl,
           "profile",
-          clouadinaryFake,
+          cloudinaryUploadOnline,
         );
       } catch (error) {
         console.error("Error uploading image:", error);

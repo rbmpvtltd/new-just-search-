@@ -21,7 +21,7 @@ import {
   subcategories,
 } from "../db/src/schema/not-related.schema";
 import { sql } from "./mysqldb.seed";
-import { clouadinaryFake } from "./seeds";
+import { cloudinaryUploadOnline } from "./seeds";
 import { insertUser } from "./utils";
 
 export const businessSeed = async () => {
@@ -77,7 +77,7 @@ const updateBusinessPhoto = async () => {
     const businessMainPhoto = await uploadOnCloudinary(
       liveBusinessImageUrl,
       "business",
-      clouadinaryFake,
+      cloudinaryUploadOnline,
     );
 
     console.log("businessMainPhoto", businessMainPhoto);
@@ -205,7 +205,7 @@ const addBusiness = async () => {
     const businessPhotoPublicIds = await multiUploadOnCloudinary(
       rowPhotoCloudinary,
       "business",
-      clouadinaryFake,
+      cloudinaryUploadOnline,
     );
     cloudinaryImages[image] = businessPhotoPublicIds;
     console.log("add photos on cloudinary of ", image);

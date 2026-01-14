@@ -14,7 +14,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const clouadinaryFake = true;
+export const cloudinaryUploadOnline = true;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
@@ -28,10 +28,10 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "notRelated",
     // });
-    await userSeed();
-    logger.info("Complete", {
-      message: "userseed",
-    });
+    // await userSeed();
+    // logger.info("Complete", {
+    //   message: "userseed",
+    // });
     // await fakeSeed();
     // logger.info("Complete", {
     //   message: "fakeSeed",
@@ -41,10 +41,10 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     //   message: "business",
     // });
     // process.exit();
-    // await productSeed();
-    // logger.info("Complete", {
-    //   message: "productSeed",
-    // });
+    await productSeed();
+    logger.info("Complete", {
+      message: "productSeed",
+    });
     // await offerSeed();
     // logger.info("Complete", {
     //   message: "offerseed",

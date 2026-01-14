@@ -1,6 +1,6 @@
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { db } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { eq, type InferInsertModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import { businessListings } from "../db/src/schema/business.schema";
 import { categories, subcategories } from "../db/src/schema/not-related.schema";
@@ -12,13 +12,17 @@ import {
 } from "../db/src/schema/product.schema";
 // import { fakeBusinessSeed, fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
-import { clouadinaryFake } from "./seeds";
+import { cloudinaryUploadOnline } from "./seeds";
+import {
+  multiUploadOnCloudinary,
+  type MultiUploadOnCloudinaryFile,
+} from "@repo/cloudinary/dist/cloudinary";
 
 export const productSeed = async () => {
   await clearAllTablesBusiness();
   await addProduct();
-  await addProductReviews();
-  await addProductSubCategroy();
+  // await addProductReviews();
+  // await addProductSubCategroy();
   // await addRecentViewProduct();
 };
 
@@ -34,14 +38,51 @@ export const clearAllTablesBusiness = async () => {
 // 1. Product
 export const addProduct = async () => {
   const [ProductRows]: any[] = await sql.execute("SELECT * FROM products");
-  const allProductPromises : Promise<number>[] = [];
-  
+  type DbProduct = InferInsertModel<typeof products>;
+  type DbProductPhotos = InferInsertModel<typeof productPhotos>;
+  const dbProductValue:DbProduct[] = [];
+  const dbProductPhotosValue:DbProductPhotos[] = []; 
+  const cloudinaryProductData: MultiUploadOnCloudinaryFile[] = [];
+  const cloudinaryProductPhotosData: MultiUploadOnCloudinaryFile[] = [];
+  for (const product of ProductRows) {
+    if (product.image1.startsWith("/tmp") === true) continue;
+    const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${product.image1}`;
+    if (product.photo) {
+      cloudinaryProductData.push({
+        filename: liveHireImageUrl,
+        id: product.id,
+      });
+    }
+    const images = ["image2", "image3", "image4", "image5"];
+    for (const image of images) {
+      if(!product[image]){
+        console.log(`====== Product Doesn't have ${image} ======`);
+        continue
+      }
+      if (product[image].startsWith("/tmp") === true) continue;
+      const liveProductsPhotoImageUrl = `https://justsearch.net.in/assets/images/${product[image]}`;
+      cloudinaryProductPhotosData.push({
+        filename: liveProductsPhotoImageUrl,
+        id: `${product.id}-${image}`,
+      });
+    }
+  }
+
+  const productPhotosPublicIds = await multiUploadOnCloudinary(
+    [...cloudinaryProductData, ...cloudinaryProductPhotosData],
+    "products",
+    cloudinaryUploadOnline,
+  );
+
+  const allBusinesslistings = await db.select().from(businessListings);
+  const allCategories = await db.select().from(categories);
 
   for (const row of ProductRows) {
-    const [business] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
+    const business = allBusinesslistings.find((item)=>item.id === row.listing_id);
+    const category = allCategories.find((item)=> item.id === row.category_id);
+    const mainImage = productPhotosPublicIds.find(
+      (item) => item.id === row.id,
+    )?.public_id;
 
     if (!business) {
       console.log("business not found", row.id);
@@ -52,34 +93,39 @@ export const addProduct = async () => {
       console.log("product adding at ", row.id);
     }
 
-    const [category] = await db
-      .select()
-      .from(categories)
-      .where(eq(categories.id, row.category_id));
+    // const [category] = await db
+    //   .select()
+    //   .from(categories)
+    //   .where(eq(categories.id, row.category_id));
+
 
     if (!category) {
       console.log("category not found", row.id);
       continue;
     }
+    // const [productCreated] = await db
+    //   .insert(products)
+    //   .values({
+    //     id: row.id,
+    //     mainImage: mainImage ?? "",
+    //     status: true,
+    //     businessId: business.id,
+    //     categoryId: category.id,
+    //     productName: row.product_name,
+    //     productSlug: row.product_slug,
+    //     rate: row.rate,
+    //     discountPercent: row.discount_percent,
+    //     finalPrice: row.final_price,
+    //     productDescription: row.product_description,
+    //     createdAt: row.created_at,
+    //     updatedAt: row.updated_at,
+    //   })
+    //   .returning();
 
-    console.log("Image seeds", row.image1);
-
-    if (row.image1.startsWith("/tmp") === true) continue;
-
-    const liveProductsImageUrl = `https://justsearch.net.in/assets/images/${row.image1}`;
-    const mainImage = await uploadOnCloudinary(
-      liveProductsImageUrl,
-      "products",
-      clouadinaryFake,
-    );
-
-    console.log("Uploaded", mainImage);
-
-    const [productCreated] = await db
-      .insert(products)
-      .values({
+    
+      dbProductValue.push({
         id: row.id,
-        mainImage,
+        mainImage: mainImage ?? "",
         status: true,
         businessId: business.id,
         categoryId: category.id,
@@ -92,30 +138,20 @@ export const addProduct = async () => {
         createdAt: row.created_at,
         updatedAt: row.updated_at,
       })
-      .returning();
+      
 
-    if (!productCreated) {
-      console.log("product not found", row.id);
-      throw new Error("product not found");
-    }
+    
 
     // Product Photos
     const images = ["image2", "image3", "image4", "image5"];
     for (const image of images) {
       if (row[image]) {
-        if (row[image].startsWith("/tmp") === true) continue;
-
-        const liveProductsImageUrl = `https://justsearch.net.in/assets/images/${row[image]}`;
-        const uploaded = await uploadOnCloudinary(
-          liveProductsImageUrl,
-          "products",
-          clouadinaryFake,
-        );
-        const photoUrl = uploaded;
-
+        const photoUrl = productPhotosPublicIds.find(
+          (item) => item.id === `${row.id}-${image}`,
+        )?.public_id;
         if (photoUrl) {
-          await db.insert(productPhotos).values({
-            productId: productCreated.id,
+          dbProductPhotosValue.push({
+            productId: row.id,
             photo: photoUrl,
             createdAt: row.created_at,
             updatedAt: row.updated_at,
@@ -123,6 +159,20 @@ export const addProduct = async () => {
         }
       }
     }
+  }
+  if(Array.isArray(dbProductValue) && dbProductValue.length > 0){
+    await db.insert(products).values(dbProductValue);
+    console.log("=========== Product Successfully Inserted ===========");
+  }else {
+    console.log("====================== dbProductValue ======================",dbProductValue);
+    console.log("=== dbProductValue Doesn't have Data Or May Not Be Array ===")
+  }
+  if(Array.isArray(dbProductPhotosValue) && dbProductPhotosValue.length > 0){
+    await db.insert(productPhotos).values(dbProductPhotosValue);
+    console.log("======= Product Photos Successfully Inserted ========")
+  }else{
+    console.log("====================== dbProductPhotosValue ======================",dbProductValue);
+    console.log("=== dbProductPhotosValue Doesn't have Data Or May Not Be Array ===")
   }
   console.log("successfully seed of product and product photo");
 };

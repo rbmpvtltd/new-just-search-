@@ -13,7 +13,7 @@ import {
 } from "../db/src/schema/offer.schema";
 // import { fakeSeed, fakeUserSeed } from "./fake.seed";
 import { sql } from "./mysqldb.seed";
-import { clouadinaryFake } from "./seeds";
+import { cloudinaryUploadOnline } from "./seeds";
 
 export const offerSeed = async () => {
   await clearOfferSeed();
@@ -63,7 +63,7 @@ export const addOffer = async () => {
     const mainImage = await uploadOnCloudinary(
       liveOfferImageUrl,
       "offer",
-      clouadinaryFake,
+      cloudinaryUploadOnline,
     );
 
     const [offerCreate] = await db
@@ -99,7 +99,7 @@ export const addOffer = async () => {
         const offerPhotoUrl = await uploadOnCloudinary(
           liveOfferImageUrl,
           "offer",
-          clouadinaryFake,
+          cloudinaryUploadOnline,
         );
 
         await db.insert(offerPhotos).values({

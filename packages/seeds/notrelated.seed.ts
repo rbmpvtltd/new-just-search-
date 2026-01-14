@@ -22,7 +22,7 @@ import {
 // import { uploadOnCloudinary } from "../db/src/index";
 import { sql } from "./mysqldb.seed";
 // import { uploadOnCloudinary } from "@repo/cloudinary";
-import { clouadinaryFake } from "./seeds";
+import { cloudinaryUploadOnline } from "./seeds";
 import { slugify } from "./utils";
 
 export const notRelated = async () => {
@@ -147,7 +147,7 @@ export const bannerSeed = async () => {
   const bannerPhotoPublicIds = await multiUploadOnCloudinary(
     clouadinaryData,
     "banner",
-    clouadinaryFake,
+    cloudinaryUploadOnline,
   );
   for (const row of rows) {
     const bannerPhotoPublicId = bannerPhotoPublicIds.find(
@@ -189,7 +189,7 @@ export const seedCategories = async () => {
   const categoryPhotoPublicIds = await multiUploadOnCloudinary(
     clouadinaryData,
     "category",
-    clouadinaryFake,
+    cloudinaryUploadOnline,
   );
   for (const row of rows) {
     const categoryPhotoPublicId = categoryPhotoPublicIds.find(
