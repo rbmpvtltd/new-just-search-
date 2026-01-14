@@ -14,6 +14,7 @@ export const safeArray = (val: any) => {
 
 import { uploadOnCloudinary } from "@repo/cloudinary";
 import { type UserRole as DbUserRole, db } from "@repo/db";
+import type { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { users } from "@repo/db/dist/schema/auth.schema";
 import { profiles } from "@repo/db/dist/schema/user.schema";
 import { eq, type InferInsertModel } from "drizzle-orm";
@@ -151,20 +152,19 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
     cityId = cityRecord?.id ?? null; // 👈 fallback to "Unknown" city id
   }
 
-  if (row?.marital_status === "married") {
-    row.marital_status = "Married";
-  }
-  if (row?.marital_status === "unmarried") {
-    row.marital_status = "Unmarried";
-  }
-  if (row?.marital_status === "widowed") {
-    row.marital_status = "Widowed";
-  }
-  if (row?.marital_status === "divorced") {
-    row.marital_status = "Divorced";
-  }
-  if (row?.marital_status === "others") {
-    row.marital_status = "Others";
+  let maritalStatus: keyof typeof MaritalStatus = "Others";
+  if (row?.marital_status) {
+    if (row.marital_status === "married") {
+      maritalStatus = "Married";
+    } else if (row?.marital_status === "unmarried") {
+      maritalStatus = "Unmarried";
+    } else if (row?.marital_status === "widowed") {
+      maritalStatus = "Widowed";
+    } else if (row?.marital_status === "divorced") {
+      maritalStatus = "Divorced";
+    } else {
+      maritalStatus = "Others";
+    }
   }
 
   let occupationId = null;
@@ -191,7 +191,7 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
     profileImage: profilePhotoUrl,
     address: row?.area ?? row?.address,
     dob: row?.dob ?? null,
-    maritalStatus: row?.marital_status ?? null,
+    maritalStatus,
     occupation: occupationId,
     state: row?.state ?? 19,
     pincode: row?.zip ?? "000000",

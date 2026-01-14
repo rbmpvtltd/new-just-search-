@@ -22,7 +22,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
 (async () => {
   try {
-    console.log(process.env);
+    // console.log(process.env);
     // Postgres seeding
     // await notRelated();
     // logger.info("Complete", {
@@ -36,7 +36,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "fakeSeed",
     // });
-    // await businessSeed();
+    await businessSeed();
     // logger.info("Complete", {
     //   message: "business",
     // });
@@ -78,6 +78,5 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
   // Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
   // console.log("Server running on http://localhost:4001");
-      process.exit(0);
-
+  process.exit(0);
 })();

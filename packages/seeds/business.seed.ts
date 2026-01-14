@@ -5,6 +5,7 @@ import {
 } from "@repo/cloudinary/dist/cloudinary";
 import { db } from "@repo/db";
 import { salesmen } from "@repo/db/dist/schema/user.schema";
+import { logger } from "@repo/logger";
 import { eq, type InferInsertModel } from "drizzle-orm";
 import { users } from "../db/src/schema/auth.schema";
 import {
@@ -33,61 +34,6 @@ export const businessSeed = async () => {
   // await businessesSubcategory();
   // await BusinessReviews();
   // await seedRecentViewsBusiness();
-};
-
-const updateBusinessPhoto = async () => {
-  const [rows]: any[] = await sql.execute(
-    "SELECT * FROM listings WHERE type = 1",
-  );
-
-  for (const row of rows) {
-    //TODO: comment this line in future;
-    if (row.id < 1329) continue;
-    const isBuissnessExist = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.id))
-      .limit(1);
-
-    if (!isBuissnessExist) {
-      console.error("Business not found", row.id);
-      continue;
-    }
-
-    const invalidPhotos = [
-      "20469712961736937230.jpg",
-      "9233936721737361584.jpeg",
-      "8263138481737439311.jpeg",
-      "2542177821738044989.jpeg",
-      "11006388771738843807.jpeg",
-      "6708903161739015419.PNG",
-      "460541731739343371.jpg",
-      "15017575881740386618.jpg",
-      "9027662451740469698.jpg",
-      "21306861181742460413.jpg",
-    ];
-
-    if (invalidPhotos.includes(row.photo)) {
-      console.error("Invalid photo", row.id);
-      continue;
-    }
-
-    const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row.photo}`;
-    console.log("row id ", row.id, "row photo ", row.photo);
-    const businessMainPhoto = await uploadOnCloudinary(
-      liveBusinessImageUrl,
-      "business",
-      cloudinaryUploadOnline,
-    );
-
-    console.log("businessMainPhoto", businessMainPhoto);
-    await db
-      .update(businessListings)
-      .set({
-        photo: businessMainPhoto,
-      })
-      .where(eq(businessListings.id, row.id));
-  }
 };
 
 export const clearAllTablesBusiness = async () => {
@@ -156,7 +102,7 @@ const addBusiness = async () => {
       console.error(i, "reason", o.reason);
     }
   });
-  console.log("Added Business Users");
+  console.log("✅ All Added Business Users");
 
   // Get City
   const allCities = await db.select().from(cities);
@@ -190,6 +136,7 @@ const addBusiness = async () => {
     image4: [],
     image5: [],
   };
+  console.log("✅ cloudinary Upload Started Businesses");
   for (const image of images) {
     const rowPhotoCloudinary: MultiUploadOnCloudinaryFile[] = [];
     for (const row of rows) {
@@ -207,12 +154,18 @@ const addBusiness = async () => {
       "business",
       cloudinaryUploadOnline,
     );
+    console.log(
+      "✅ adding photos Object ",
+      image,
+      businessPhotoPublicIds.length,
+    );
+    logger.info("✅ adding photos Object ", image, businessPhotoPublicIds);
     cloudinaryImages[image] = businessPhotoPublicIds;
-    console.log("add photos on cloudinary of ", image);
+    console.log("✅ add photos on cloudinary of ", image);
   }
+  console.log("✅ cloudinary Upload completed Businesses");
 
   // Adding Businesses
-  console.log("Adding Businesses");
   type BusinessData = InferInsertModel<typeof businessListings>;
   const dbBusinessValue: BusinessData[] = [];
   type PhotoBusinessData = InferInsertModel<typeof businessPhotos>;
@@ -659,4 +612,59 @@ export const getRightLocation = (
     latitude: Number(clear_latitude),
     longitude: Number(clear_longitude),
   };
+};
+
+const updateBusinessPhoto = async () => {
+  const [rows]: any[] = await sql.execute(
+    "SELECT * FROM listings WHERE type = 1",
+  );
+
+  for (const row of rows) {
+    //TODO: comment this line in future;
+    if (row.id < 1329) continue;
+    const isBuissnessExist = await db
+      .select()
+      .from(businessListings)
+      .where(eq(businessListings.id, row.id))
+      .limit(1);
+
+    if (!isBuissnessExist) {
+      console.error("Business not found", row.id);
+      continue;
+    }
+
+    const invalidPhotos = [
+      "20469712961736937230.jpg",
+      "9233936721737361584.jpeg",
+      "8263138481737439311.jpeg",
+      "2542177821738044989.jpeg",
+      "11006388771738843807.jpeg",
+      "6708903161739015419.PNG",
+      "460541731739343371.jpg",
+      "15017575881740386618.jpg",
+      "9027662451740469698.jpg",
+      "21306861181742460413.jpg",
+    ];
+
+    if (invalidPhotos.includes(row.photo)) {
+      console.error("Invalid photo", row.id);
+      continue;
+    }
+
+    const liveBusinessImageUrl = `https://justsearch.net.in/assets/images/${row.photo}`;
+    console.log("row id ", row.id, "row photo ", row.photo);
+    const businessMainPhoto = await uploadOnCloudinary(
+      liveBusinessImageUrl,
+      "business",
+      clouadinaryFake,
+    );
+
+    console.log("businessMainPhoto", businessMainPhoto);
+    await db
+      .update(businessListings)
+      .set({
+        photo: businessMainPhoto,
+      })
+      .where(eq(businessListings.id, row.id));
+  }
 };

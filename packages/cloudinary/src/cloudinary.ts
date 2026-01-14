@@ -21,6 +21,15 @@ export type MultiUploadOnCloudinaryFile = {
   id: string | number;
 };
 
+function withTimeout<T>(promise: Promise<T>, ms = 30000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("Upload timeout")), ms),
+    ),
+  ]);
+}
+
 const multiUploadOnCloudinary = async (
   files: MultiUploadOnCloudinaryFile[],
   folderName = "",
@@ -40,30 +49,44 @@ const multiUploadOnCloudinary = async (
   }
   const uploadPromises = files.map(async (file) => {
     try {
-      const cloudinaryData: UploadApiResponse =
-        await cloudinary.uploader.upload(file.filename, {
+      const cloudinaryData: UploadApiResponse = await withTimeout(
+        cloudinary.uploader.upload(file.filename, {
           resource_type: "auto",
           folder: folderName,
-        });
-      console.log("cloudinaryData", cloudinaryData);
+        }),
+        30_000, // 30 sec timeout
+      );
+
       return {
         id: file.id,
         public_id: cloudinaryData.public_id,
       };
     } catch (error) {
-      console.error(
-        "Error uploading file to Cloudinary: in id ",
-        file.id,
-        error,
-      );
+      console.error("Upload failed:", file.id, error);
+
       return {
         id: file.id,
-        public_id: "",
+        public_id: "Banner/cbycmehjeetyxbuxc6ie",
       };
     }
   });
 
-  return Promise.all(uploadPromises);
+  const allImageSettled = await Promise.allSettled(uploadPromises);
+  console.log("All Images Settled");
+  type Image = {
+    id: string | number;
+    public_id: string;
+  };
+  const allImages: Image[] = [];
+  allImageSettled.forEach((o, i) => {
+    if (o.status === "fulfilled") {
+      allImages.push(o.value);
+    } else {
+      console.error(i, "reason", o.reason);
+    }
+  });
+
+  return allImages;
 };
 
 const uploadOnCloudinary = async (
@@ -94,11 +117,7 @@ const uploadOnCloudinary = async (
     // Uncomment if you want to delete local file after upload
     // fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
   } catch (err) {
-    console.log("errr", err);
-
-    // Uncomment if you are using localFilePath not url
-    // fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
-    throw new Error(`Cloudinary upload failed: ${err}`);
+    return "";
   }
 };
 
