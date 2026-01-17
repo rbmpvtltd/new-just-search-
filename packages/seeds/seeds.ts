@@ -14,7 +14,7 @@ import { productSeed } from "./product.seed";
 // import { seedRequestAccounts } from "./requestacount.seed";
 import { userSeed } from "./user.seed";
 
-export const cloudinaryUploadOnline = false;
+export const cloudinaryUploadOnline = true;
 export const dummyImageUrl = "dummyImageUrl";
 export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
@@ -40,15 +40,14 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     // logger.info("Complete", {
     //   message: "business",
     // });
-    // // process.exit();
     // await productSeed();
     // logger.info("Complete", {
     //   message: "productSeed",
     // });
-    await offerSeed();
-    logger.info("Complete", {
-      message: "offerseed",
-    });
+    // await offerSeed();
+    // logger.info("Complete", {
+    //   message: "offerseed",
+    // });
     // await hireSeed();
     // logger.info("Complete", {
     //   message: "hireseed",
@@ -62,7 +61,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     //   message: "seedRequestAccounts",
     // });
     // await planSeed();
-    // await algoliaSeed();
+    await algoliaSeed();
     console.log("✅ All seeds inserted successfully");
     // Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
   } catch (err) {

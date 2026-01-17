@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   StyleSheet,
@@ -15,6 +15,8 @@ import {
   useInstantSearch,
   useRefinementList,
 } from "react-instantsearch-core";
+import Slider from "@react-native-community/slider";
+import { useLocationStore } from "@/store/locationStore";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = width * 0.7;
@@ -30,10 +32,16 @@ export function SubcategoryFilters({
   onToggleDrawer,
   indexName = "business_listing",
 }: FiltersProps) {
-  const { setUiState } = useInstantSearch();
+  const { setUiState, uiState } = useInstantSearch();
   const translateX = React.useRef(new Animated.Value(DRAWER_WIDTH)).current;
+  const latitude = useLocationStore(state => state.latitude);
+  const longitude = useLocationStore(state => state.longitude)
+  // Distance filter state
+  const [pendingRadiusKm, setPendingRadiusKm] = React.useState<number>(2000);
 
-  // Local state to track pending filter selections
+
+  console.log(`========== latitude is ${latitude} and longitude is ${longitude} ==========`);
+
   const [pendingFilters, setPendingFilters] = React.useState<{
     category: string[];
     subcategories: string[];
@@ -169,6 +177,11 @@ export function SubcategoryFilters({
         workExp: workExp.filter((w) => w.isRefined).map((w) => w.value),
       };
       setPendingFilters(current);
+
+      const currentRadius = uiState[indexName]?.configure?.aroundRadius;
+      if (currentRadius !== undefined) {
+        setPendingRadiusKm(Number(currentRadius) / 1000); // Convert meters to km
+      }
     }
   }, [isDrawerOpen]);
 
@@ -199,10 +212,10 @@ export function SubcategoryFilters({
 
   // Apply all pending filters
   const applyFilters = () => {
-    setUiState((prev) => ({
-      ...prev,
-      all_listing: {
-        ...prev.all_listing,
+    const newUiState: any = {
+      ...uiState,
+      [indexName]: {
+        ...uiState[indexName],
         refinementList: {
           category: pendingFilters.category,
           subcategories: pendingFilters.subcategories,
@@ -213,8 +226,20 @@ export function SubcategoryFilters({
           workExp: pendingFilters.workExp,
         },
       },
-    }));
+    };
 
+    // Add geo search parameters if user location is available
+    if (latitude && longitude) {
+      newUiState[indexName] = {
+        ...newUiState[indexName],
+        configure: {
+          ...uiState[indexName]?.configure,
+          aroundLatLng: `${latitude}, ${longitude}`,
+          aroundRadius: pendingRadiusKm * 1000, // Convert km to meters
+        },
+      };
+    }
+    setUiState(newUiState);
     onToggleDrawer();
   };
 
@@ -228,7 +253,20 @@ export function SubcategoryFilters({
       rating: [],
       workExp: [],
     });
+    setPendingRadiusKm(2000);
     clear();
+    setUiState((prev) => {
+      const newState = { ...prev };
+      if (newState[indexName]?.configure) {
+        const { aroundLatLng, aroundRadius, ...restConfigure } =
+          newState[indexName].configure;
+        newState[indexName] = {
+          ...newState[indexName],
+          configure: restConfigure,
+        };
+      }
+      return newState;
+    });
     onToggleDrawer();
   };
 
@@ -239,13 +277,13 @@ export function SubcategoryFilters({
 
   if (!isDrawerOpen) {
     return (
-      <Pressable style={styles.filtersButton} onPress={onToggleDrawer}>
+      <Pressable className="py-5 flex-row justify-center items-center" onPress={onToggleDrawer}>
         <Text className="text-center text-xl text-secondary-content">
           Filters
         </Text>
         {totalPendingFilters > 0 && (
-          <View style={styles.itemCount}>
-            <Text style={styles.itemCountText}>{totalPendingFilters}</Text>
+          <View className="bg-primary rounded-3xl py-1 px-2 ml-1">
+            <Text className="text-secondary font-extrabold">{totalPendingFilters}</Text>
           </View>
         )}
       </Pressable>
@@ -257,8 +295,8 @@ export function SubcategoryFilters({
       {/* Backdrop */}
       <TouchableWithoutFeedback onPress={onToggleDrawer}>
         <Animated.View
+        className={"absolute top-0 right-0 bottom-0 left-0 bg-base-100 z-40"}
           style={[
-            styles.backdrop,
             {
               opacity: translateX.interpolate({
                 inputRange: [0, DRAWER_WIDTH],
@@ -277,7 +315,7 @@ export function SubcategoryFilters({
             transform: [{ translateX }],
           },
         ]}
-        className={"bg-base-200"}
+        className={`bg-base-200 absolute top-0 right-0 bottom-0 z-50 shadow-base-200 shadow-sm`}
       >
         <ScrollView className="flex-1">
           <View className="flex-row justify-between items-center p-6 border-b-[1px] border-b-secondary bg-base-200">
@@ -288,6 +326,29 @@ export function SubcategoryFilters({
           </View>
 
           <View className="p-6 bg-base-200">
+            {(latitude && longitude) && (
+              <View className="mb-7">
+                <Text className="text-xl font-semibold mb-3 text-secondary">
+                  Distance
+                </Text>
+                <View className="mt-3">
+                  <Slider
+                    className="w-full h-12"
+                    minimumValue={0}
+                    maximumValue={2000}
+                    step={1}
+                    value={pendingRadiusKm}
+                    onValueChange={setPendingRadiusKm}
+                    minimumTrackTintColor="#ff7821"
+                    maximumTrackTintColor="#ddd"
+                    thumbTintColor="#ff7821"
+                  />
+                  <Text className="text-base mt-2 text-secondary">
+                    {pendingRadiusKm} km
+                  </Text>
+                </View>
+              </View>
+            )}
             {/* Categories */}
             {categories.length > 0 && (
               <View className="mb-7">
@@ -298,7 +359,7 @@ export function SubcategoryFilters({
                   {categories.map((category) => (
                     <Pressable
                       key={category.value}
-                      style={styles.item}
+                      className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
                       onPress={() =>
                         togglePendingFilter("category", category.value)
                       }
@@ -339,7 +400,7 @@ export function SubcategoryFilters({
                   {subCategories.map((subcategory) => (
                     <Pressable
                       key={subcategory.value}
-                      style={styles.item}
+                      className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
                       onPress={() =>
                         togglePendingFilter("subcategories", subcategory.value)
                       }
@@ -380,7 +441,7 @@ export function SubcategoryFilters({
                   {expectedSalary.map((salary) => (
                     <Pressable
                       key={salary.value}
-                      style={styles.item}
+                      className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
                       onPress={() =>
                         togglePendingFilter("expectedSalary", salary.value)
                       }
@@ -421,7 +482,7 @@ export function SubcategoryFilters({
                   {gender.map((gen) => (
                     <Pressable
                       key={gen.value}
-                      style={styles.item}
+                      className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
                       onPress={() => togglePendingFilter("gender", gen.value)}
                     >
                       <Text
@@ -457,7 +518,8 @@ export function SubcategoryFilters({
                   {languages.map((lang) => (
                     <Pressable
                       key={lang.value}
-                      style={styles.item}
+                      className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
+
                       onPress={() =>
                         togglePendingFilter("languages", lang.value)
                       }
@@ -495,7 +557,7 @@ export function SubcategoryFilters({
                   {rating.map((rate) => (
                     <Pressable
                       key={rate.value}
-                      style={styles.item}
+                      className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
                       onPress={() => togglePendingFilter("rating", rate.value)}
                     >
                       <Text
@@ -531,7 +593,7 @@ export function SubcategoryFilters({
                   {workExp.map((exp) => (
                     <Pressable
                       key={exp.value}
-                      style={styles.item}
+                      className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
                       onPress={() => togglePendingFilter("workExp", exp.value)}
                     >
                       <Text
@@ -560,7 +622,7 @@ export function SubcategoryFilters({
 
           {/* Action Buttons */}
           <View className="flex-row p-5 border-t-[1px] border-t-secondary bg-base-200">
-            <View style={styles.filterListButton}>
+            <View className="flex-1 mx-2">
               <Button
                 title="Clear all"
                 color="#252b33"
@@ -568,7 +630,7 @@ export function SubcategoryFilters({
                 onPress={clearAllFilters}
               />
             </View>
-            <View style={styles.filterListButton}>
+            <View className="flex-1 mx-2">
               <Button
                 onPress={applyFilters}
                 title="See results"
@@ -583,59 +645,8 @@ export function SubcategoryFilters({
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#000",
-    zIndex: 998,
-  },
   drawer: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
     width: DRAWER_WIDTH,
-    backgroundColor: "#ffffff",
-    zIndex: 999,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: -2,
-      height: 0,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
     elevation: 5,
-  },
-  item: {
-    paddingVertical: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
-    alignItems: "center",
-  },
-  itemCount: {
-    backgroundColor: "#252b33",
-    borderRadius: 24,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginLeft: 4,
-  },
-  itemCountText: {
-    color: "#ffffff",
-    fontWeight: "800",
-  },
-  filterListButton: {
-    flex: 1,
-    marginHorizontal: 8,
-  },
-  filtersButton: {
-    paddingVertical: 18,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  }
 });

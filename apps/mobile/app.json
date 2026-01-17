@@ -60,6 +60,13 @@
       "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Just Search to use your location.",
+          "locationAlwaysPermission" : "Allow Just Search to use your location"
+        }
+      ],
       "expo-router",
       "expo-secure-store",
       [

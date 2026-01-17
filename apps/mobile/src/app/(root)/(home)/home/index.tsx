@@ -23,7 +23,8 @@ import { UpdateModel } from "@/features/version/Component/UpdateModel";
 import { searchClient } from "@/lib/algoliaClient";
 import { trpc } from "@/lib/trpc";
 import { deviceId, platform } from "@/utils/getDeviceId";
-
+import * as Location from "expo-location";
+import { useLocationStore } from "@/store/locationStore";
 // import Banner1 from "@/components/home/Banner1";
 // import Banner2 from "@/components/home/Banner2";
 // import Banner3 from "@/components/home/Banner3";
@@ -112,6 +113,9 @@ export default function TabOneScreen() {
   const { data: latestVersion, isLoading } = useQuery(
     trpc.versionRouter.checkLatestVesion.queryOptions(),
   );
+  const setLongitude = useLocationStore((state)=> state.setLongitude);
+  const setLatitude = useLocationStore((state) => state.setLatitude)
+  
   console.log("Latest virsion", latestVersion);
 
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -140,6 +144,23 @@ export default function TabOneScreen() {
       responseListener.remove();
     };
   }, []);
+
+   useEffect(() => {
+      async function getCurrentLocation() {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          console.log("Permission to access location was denied");
+          return;
+        }
+  
+        let location = await Location.getCurrentPositionAsync({});
+        setLatitude(location.coords.latitude);
+        setLongitude(location.coords.longitude)
+      }
+  
+      getCurrentLocation();
+    }, []);
+  
 
   if (isLoading) {
     return <Loading position="center" />;

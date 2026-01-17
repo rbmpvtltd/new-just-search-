@@ -286,16 +286,20 @@ const seedFavourites = async () => {
 
   type FavouriteData = InferInsertModel<typeof favourites>;
   const allData: FavouriteData[] = [];
+  const allUsers = await db.select().from(users);
+  const allBusinessListing = await db.select().from(businessListings);
   for (const row of favourite) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
+    const user = allUsers.find((user)=> user.id === row.user_id);
+    const businessListing = allBusinessListing.find((business)=>business.id === row.listing_id);
+    // const [user] = await db
+    //   .select()
+    //   .from(users)
+    //   .where(eq(users.id, row.user_id));
 
-    const [businessListing] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
+    // const [businessListing] = await db
+    //   .select()
+    //   .from(businessListings)
+    //   .where(eq(businessListings.id, row.listing_id));
 
     if (!user) {
       continue;
@@ -320,32 +324,44 @@ const seedFavourites = async () => {
 // businessesSubcategory
 const businessesSubcategory = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_subcategory");
+  type DbBusinessSubcategoryType = InferInsertModel<typeof businessSubcategories>
+  const dbBusinessSubcategoryValue : DbBusinessSubcategoryType[] = [];
+  const allBusinessListing = await db.select().from(businessListings);
+  const allSubcategories = await db.select().from(subcategories);
+
 
   for (const row of rows) {
-    const [business] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
+    const business = allBusinessListing.find((business)=> business.id === row.listing_id);
+    // const [business] = await db
+    //   .select()
+    //   .from(businessListings)
+    //   .where(eq(businessListings.id, row.listing_id));
 
     if (!business) {
       console.log("business not found", row.id);
       continue;
     }
-
-    const [subcategory] = await db
-      .select()
-      .from(subcategories)
-      .where(eq(subcategories.id, row.subcategory_id));
+    const subcategory = allSubcategories.find((subcat)=> subcat.id === row.subcategory_id);
+    // const [subcategory] = await db
+    //   .select()
+    //   .from(subcategories)
+    //   .where(eq(subcategories.id, row.subcategory_id));
 
     if (!subcategory) {
       console.log("subcategory not found", row.id);
       continue;
     }
 
-    await db.insert(businessSubcategories).values({
+    dbBusinessSubcategoryValue.push({
       businessId: business.id,
       subcategoryId: subcategory.id,
     });
+  }
+  if(Array.isArray(dbBusinessSubcategoryValue) && dbBusinessSubcategoryValue.length > 0){
+    await db.insert(businessSubcategories).values(dbBusinessSubcategoryValue);
+  }else {
+    console.log("====================== dbBusinessSubcategoryValue ======================",dbBusinessSubcategoryValue);
+    console.log("=== dbBusinessSubcategoryValue Doesn't have Data Or May Not Be Array ===")
   }
 
   console.log("businessSubcategories seeding complete");
@@ -354,51 +370,72 @@ const businessesSubcategory = async () => {
 // businesses_categories
 const businessesCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_category");
+  type DbBusinessCategoryType = InferInsertModel<typeof businessCategories>;
+  const dbBusinessCategoryValues :DbBusinessCategoryType[] = [];
+  const allBusinessListing = await db.select().from(businessListings);
+  const allCategories = await db.select().from(categories);
 
   for (const row of rows) {
-    const [business] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
+    const business = allBusinessListing.find((business)=>business.id === row.listing_id);
+    // const [business] = await db
+    //   .select()
+    //   .from(businessListings)
+    //   .where(eq(businessListings.id, row.listing_id));
     if (!business) {
       console.log("business not found", row.id);
       continue;
     }
-    const [category] = await db
-      .select()
-      .from(categories)
-      .where(eq(categories.id, row.category_id));
+    const category = allCategories.find((category)=>category.id === row.category_id);
+    // const [category] = await db
+    //   .select()
+    //   .from(categories)
+    //   .where(eq(categories.id, row.category_id));
     if (!category) {
       console.log("category not found", row.id);
       continue;
     }
 
-    await db.insert(businessCategories).values({
+    dbBusinessCategoryValues.push({
       businessId: business.id,
       categoryId: category.id,
     });
   }
+  if(Array.isArray(dbBusinessCategoryValues) && dbBusinessCategoryValues.length > 0){
+    await db.insert(businessCategories).values(dbBusinessCategoryValues);
+  }else {
+    console.log("====================== dbBusinessCategoryValues ======================",dbBusinessCategoryValues);
+    console.log("=== dbBusinessCategoryValues Doesn't have Data Or May Not Be Array ===")
+  }
+
+  console.log("businessCategories seeding complete");
 };
 
 // business_reviews
 
 const BusinessReviews = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_reviews");
+  type DbBusinessReviewType = InferInsertModel<typeof businessReviews>;
+  const dbBusinessReviewValues : DbBusinessReviewType[] = [];
+  const allUsers = await db.select().from(users);
+  const allBusinessListing = await db.select().from(businessListings);
+
+
   for (const row of rows) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
+    const user = allUsers.find((user)=> user.id === row.user_id);
+    // const [user] = await db
+    //   .select()
+    //   .from(users)
+    //   .where(eq(users.id, row.user_id));
 
     if (!user) {
       console.log("user not found:", row.id);
       continue;
     }
-
-    const [business] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
+    const business = allBusinessListing.find((business)=> business.id === row.listing_id);
+    // const [business] = await db
+    //   .select()
+    //   .from(businessListings)
+    //   .where(eq(businessListings.id, row.listing_id));
 
     if (!business) {
       console.log("business not found:", row.id);
@@ -406,7 +443,7 @@ const BusinessReviews = async () => {
     }
 
     // insert into postgres (business_reviews table)
-    await db.insert(businessReviews).values({
+    dbBusinessReviewValues.push({
       id: row.id,
       userId: user.id,
       businessId: business.id,
@@ -415,6 +452,12 @@ const BusinessReviews = async () => {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });
+  }
+  if(Array.isArray(dbBusinessReviewValues) && dbBusinessReviewValues.length > 0){
+    await db.insert(businessReviews).values(dbBusinessReviewValues);
+  }else {
+    console.log("====================== dbBusinessReviewValues ======================",dbBusinessReviewValues);
+    console.log("=== dbBusinessReviewValues Doesn't have Data Or May Not Be An Array ===")
   }
 
   console.log("Business reviews migrated successfully!");

@@ -8,6 +8,7 @@ import type { OutputTrpcType } from "@/trpc/type";
 import { Badge } from "@/components/ui/badge";
 import Rating from "@/components/ui/Rating";
 import Link from "next/link";
+import { CldImage } from "next-cloudinary";
 
 export type HireListing = {
   objectID: string;
@@ -19,9 +20,10 @@ export type HireListing = {
   languages: string[];
   subcategories: string[];
   buildingName?: string;
+  photo:string;
   workExp: number;
   workShift: string[];
-  area?: string;
+  address?: string;
   phoneNumber?: string;
   city?: string;
   latitude?: number;
@@ -44,12 +46,12 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
                   pathname: `/hire/hireDetail/${item.objectID}`,
                 }}
               >
-                <Image
-                  width={300}
-                  height={300}
-                  className="rounded-md object-cover"
-                  alt="Bussiness Image"
-                  src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change image when upload on cloudinary
+                <CldImage
+                  width="300"
+                  height="300"
+                  className="max-w-100 max-h-100 object-cover"
+                  src={item.photo ?? ""}
+                  alt="Business image"
                 />
               </Link>
             </div>
@@ -68,7 +70,7 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
               <p className="text-sm">
-                {item?.area} {item?.buildingName}
+                {item?.buildingName}, {item?.address}, {item?.city}
               </p>
             </div>
             <div className="flex flex-col md:flex-row gap-4 ">

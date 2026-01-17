@@ -180,37 +180,31 @@ export const addProduct = async () => {
 // 2. products_reviews
 const addProductReviews = async () => {
   const [review]: any[] = await sql.execute("SELECT  * FROM products_reviews");
+  type DbProductReviewType = InferInsertModel<typeof productReviews>;
+  const dbProductReviewValues: DbProductReviewType[] =[]
+  const allUsers = await db.select().from(users);
+  const allBusinessListing = await db.select().from(businessListings);
+  const allProducts = await db.select().from(products);
 
   for (const row of review) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
+    const user = allUsers.find((user)=> user.id === row.user_id);
+    const business = allBusinessListing.find((business)=>business.id === row.listing_id);
 
     if (!user) {
       console.log(`user not found ${row.id} using faKe user`);
       continue;
     }
 
-    const [business] = await db
-      .select()
-      .from(businessListings)
-      .where(eq(businessListings.id, row.listing_id));
-
     if (!business) {
       console.log(`business not found ${row.id} using faKe business`);
       continue;
     }
-
-    const [product] = await db
-      .select()
-      .from(products)
-      .where(eq(products.id, row.product_id));
+    const product = allProducts.find((product)=> product.id === row.product_id);
     if (!product) {
       console.log("Product not found", row.id);
       continue;
     }
-    await db.insert(productReviews).values({
+    dbProductReviewValues.push({
       id: row.id,
       userId: user.id,
       businessId: business.id,
@@ -224,7 +218,14 @@ const addProductReviews = async () => {
       updatedAt: row.updated_at,
     });
   }
-  // console.log('successfully seed of productReviews')
+  if(Array.isArray(dbProductReviewValues) && dbProductReviewValues.length > 0){
+    await db.insert(productReviews).values(dbProductReviewValues);
+    console.log("======= ProductReview Photos Successfully Inserted ========")
+  }else{
+    console.log("====================== dbProductReviewValues ======================",dbProductReviewValues);
+    console.log("=== dbProductReviewValues Doesn't have Data Or May Not Be Array ===")
+  }
+  console.log('successfully seed of productReviews')
 };
 
 // 4.ProductSubcCategroy
@@ -232,29 +233,33 @@ const addProductSubCategroy = async () => {
   const [subCategory]: any[] = await sql.execute(
     "SELECT * FROM product_subcategory",
   );
+  type DbProductSubcategory = InferInsertModel<typeof productSubCategories>;
+  const dbProductSubcategoryValue : DbProductSubcategory[]= []
+  const allProducts = await db.select().from(products);
+  const allSubcategories = await db.select().from(subcategories);
   for (const row of subCategory) {
-    const [Product] = await db
-      .select()
-      .from(products)
-      .where(eq(products.id, row.product_id));
-    if (!Product) {
+    const product = allProducts.find((product)=>product.id === row.product_id)
+    const subCategory = allSubcategories.find((subcategory)=> subcategory.id === row.subcategory_id);
+    if (!product) {
       console.log("Product not found", row.id);
       continue;
     }
-
-    const [subCategory] = await db
-      .select()
-      .from(subcategories)
-      .where(eq(subcategories.id, row.subcategory_id));
     if (!subCategory) {
       console.log("subCategory not found", row.id);
       continue;
     }
 
-    await db.insert(productSubCategories).values({
-      productId: Product.id,
+    dbProductSubcategoryValue.push({
+      productId: product.id,
       subcategoryId: subCategory.id,
     });
+  }
+  if(Array.isArray(dbProductSubcategoryValue) && dbProductSubcategoryValue.length > 0){
+    await db.insert(productSubCategories).values(dbProductSubcategoryValue);
+    console.log("======= dbProductSubcategoryValue Successfully Inserted ========")
+  }else{
+    console.log("====================== dbProductSubcategoryValue ======================",dbProductSubcategoryValue);
+    console.log("=== dbProductSubcategoryValue Doesn't have Data Or May Not Be Array ===")
   }
   console.log("succcessfully seed of product_subcategory");
 };

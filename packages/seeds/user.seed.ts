@@ -13,7 +13,6 @@ export const userSeed = async () => {
 };
 
 export const clearAllTablesUser = async () => {
-  // await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE profiles RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE users RESTART IDENTITY CASCADE;`);
   await db.execute(`TRUNCATE TABLE franchises RESTART IDENTITY CASCADE;`);
@@ -35,8 +34,8 @@ export const seedUsers = async () => {
     }
     allUsersPromise.push(insertUser(row.id, role));
   }
-  const allSettledHireUsers = await Promise.allSettled(allUsersPromise);
-  allSettledHireUsers.forEach((o, i) => {
+  const allSettledUsers = await Promise.allSettled(allUsersPromise);
+  allSettledUsers.forEach((o, i) => {
     if (o.status === "fulfilled") {
       console.log("user created successfully")
     } else {

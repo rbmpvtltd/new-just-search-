@@ -1,143 +1,6 @@
 "use client";
-
-// import {
-//   InstantSearch,
-//   SearchBox,
-//   Hits,
-//   Configure,
-//   RangeInput,
-//   ClearRefinements,
-// } from "react-instantsearch";
-// import { serverAlgolia } from "@repo/algolia";
-// import React, { useState } from "react";
-// import Image from "next/image";
-// import Link from "next/link";
-
-// function Hit({ hit }: { hit: any }) {
-//   console.log("hit is ", hit.categoryId);
-//   return (
-//     <div className="p-4 flex w-full flex-wrap justify-between gap-4">
-//       <div className="shadow-[0_4px_12px_rgba(0,0,0,0.650)] py-4 rounded-md hover:scale-101 transform transition-all duration-300 flex flex-col justify-between items-center lg:w-[30%] md:w-[45%] w-[95%]">
-//         <Link
-//           href={{
-//             pathname: hit.discountPercent
-//               ? `/business/singleOffer/${hit.navigationId}`
-//               : `/business/singleProduct/${hit.navigationId}`,
-//           }}
-//         >
-//           <div className="relative">
-//             <Image
-//               width={200}
-//               height={400}
-//               alt="offer image"
-//               src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
-//             />
-//             {hit.discountPercent && (
-//               <span className="absolute z-1 top-3 w-[70px] bg-error text-end px-4 text-white rounded-r-md">
-//                 -{hit.discountPercent}%
-//               </span>
-//             )}
-//           </div>
-//         </Link>
-//         <h2 className="text-center font-medium line-clamp-2 px-4 w-full break-words">
-//           {hit.name}
-//         </h2>
-//         {hit.discountPercent && (
-//           <h2>
-//             ₹ <span className="line-through">{hit.price}</span>
-//           </h2>
-//         )}
-//         <h2 className="font-semibold text-primary">
-//           ₹ {hit.finalPrice ?? hit.price}
-//         </h2>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default function AlgoliaSearch() {
-//   const [discount, setDiscount] = useState(0);
-
-//   return (
-//     <InstantSearch
-//       searchClient={serverAlgolia}
-//       indexName="product_offer_listing"
-//     >
-//       <div className="search-container p-4">
-//         <SearchBox
-//           placeholder="Search Anything From Hires"
-//           classNames={{
-//             root: "w-full",
-//             form: "flex items-center justify-between border border-black px-2 rounded",
-//             input: "flex-1 outline-none py-2",
-//             submit: "ml-2", // search icon button
-//             reset: "ml-2", // clear icon button (optional)
-//           }}
-//         />
-
-//         <Configure
-//           analytics={false}
-//           hitsPerPage={20}
-//           filters={`discountPercent > ${discount}`}
-//         />
-
-//         <div className="content flex gap-4 mt-6">
-//           {/* in sidebar ne apne according baad me manage karunga */}
-//           <aside className="filters w-64 shadow-2xl sticky">
-//             <div className="flex items-center justify-between mb-4">
-//               <h3 className="font-bold text-2xl">Filters</h3>
-
-//               <ClearRefinements
-//                 classNames={{
-//                   button:
-//                     "text-sm px-2 py-1 border rounded bg-primary text-white",
-//                 }}
-//               >
-//                 Clear All Filters
-//               </ClearRefinements>
-//             </div>
-
-//             <div className="mb-6">
-//               <h4 className="font-bold mb-2 text-sm lg:text-base">Price</h4>
-//               <RangeInput
-//                 attribute="price"
-//                 classNames={{
-//                   root: "flex flex-col gap-2",
-//                   input:
-//                     "border border-gray-300 px-2 py-1.5 rounded w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
-//                   submit:
-//                     "px-3 py-1 bg-primary text-white rounded text-sm mt-2",
-//                 }}
-//               />
-//             </div>
-//             <div className="mb-6">
-//               <h4 className="font-bold mb-2 text-sm lg:text-base">
-//                 Discount %
-//               </h4>
-
-//               <input
-//                 type="range"
-//                 min={1}
-//                 max={100}
-//                 value={discount}
-//                 onChange={(e) => setDiscount(Number(e.target.value))}
-//                 className="w-full my-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               />
-//               <div className="text-sm mt-1 text-gray-600">{discount}% </div>
-//             </div>
-//           </aside>
-
-//           <main className="results  flex-1 w-[80%]">
-//             <Hits hitComponent={Hit} />
-//           </main>
-//         </div>
-//       </div>
-//     </InstantSearch>
-//   );
-// }
-
 import { algoliaClient } from "@repo/algolia";
-import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -153,7 +16,7 @@ import {
 
 function Hit({ hit }: { hit: any }) {
   return (
-    <div className="shadow-[0_4px_12px_rgba(0,0,0,0.650)] py-4 rounded-md hover:scale-105 transform transition-all duration-300 flex flex-col justify-between items-center">
+    <div className="h-100 shadow-[0_4px_12px_rgba(0,0,0,0.650)] py-4 rounded-md hover:scale-105 transform transition-all duration-300 flex flex-col justify-center items-center">
       <Link
         href={{
           pathname: hit.discountPercent
@@ -164,16 +27,16 @@ function Hit({ hit }: { hit: any }) {
       >
         <div className="relative w-full mx-auto flex justify-center">
           <div className="relative">
-            {/* TODO: why we are using this image */}
-            <Image
-              width={200}
-              height={400}
-              alt="offer image"
-              src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
-              className="object-contain"
+            <CldImage
+              width="200"
+              height="400"
+              className="h-50 object-cover"
+              aspectRatio={"hflip"}
+              src={hit.photo[0] ?? ""}
+              alt="Business image"
             />
             {hit.discountPercent > 0 && (
-              <span className="absolute z-10 top-3 left-0 min-w-[70px] bg-error text-end px-4 py-1 text-white rounded-r-md font-semibold text-sm">
+              <span className="absolute z-10 top-3 left-0 min-w-17.5 bg-error text-end px-4 py-1 text-white rounded-r-md font-semibold text-sm">
                 -{hit.discountPercent}%
               </span>
             )}
@@ -181,7 +44,7 @@ function Hit({ hit }: { hit: any }) {
         </div>
       </Link>
       <div className="w-full px-4 mt-3 space-y-2">
-        <h2 className="text-center font-medium line-clamp-2 w-full break-words min-h-[3rem]">
+        <h2 className="text-center font-medium line-clamp-2 w-full wrap-break-words min-h-12">
           {hit.name}
         </h2>
         <div className="flex flex-col items-center gap-1">
@@ -235,8 +98,8 @@ export default function AlgoliaSearch() {
           hitsPerPage={20}
           filters={
             discount > 0
-              ? `(discountPercent >= ${discount} OR discountPercent = 0)`
-              : ""
+              ? `(discountPercent >= ${discount} OR discountPercent = 0) AND (offerEndDate > ${Date.now()} OR offerEndDate = 0)`
+              : `(offerEndDate > ${Date.now()} OR offerEndDate = 0)`
           }
         />
 

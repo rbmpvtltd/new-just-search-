@@ -75,12 +75,14 @@ const state = async () => {
 const citie = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM cities");
   type DbCity = InferInsertModel<typeof cities>;
+  const allStates = await db.select().from(states)
   const dbcityvalue: DbCity[] = [];
   for (const row of rows) {
-    const [state] = await db
-      .select()
-      .from(states)
-      .where(eq(states.id, row.state_id));
+    const state = allStates.find((state)=>state.id === row.state_id)
+    // const [state] = await db
+    //   .select()
+    //   .from(states)
+    //   .where(eq(states.id, row.state_id));
 
     if (!state) {
       console.log("State not found for city id", row.id);

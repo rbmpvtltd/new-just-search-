@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Rating from "@/components/ui/Rating";
 import type { OutputTrpcType } from "@/trpc/type";
 import Favourite from "../../shared/Favourite";
+import { CldImage } from "next-cloudinary";
 
 type BusinessListing = {
   objectID: string;
@@ -55,18 +56,18 @@ export const BussinessListingCard = ({
       <div className="flex flex-col justify-center gap-4">
         <div className="p-4 flex flex-col md:flex-row gap-6 rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.40)] hover:scale-102 transition-all transform duration-300">
           <div className="mx-auto md:mx-0">
-            <div className="relative max-w-[400px] mx-auto ">
+            <div className="relative max-w-100 mx-auto ">
               <Link
                 href={{
                   pathname: `/subcategory/aboutBusiness/${navigationId}`,
                 }}
               >
-                <Image
-                  width={300}
-                  height={300}
-                  className="rounded-md object-cover"
-                  alt="Bussiness Image"
-                  src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change image when upload on cloudinary
+                <CldImage
+                  width="300"
+                  height="300"
+                  className="max-w-100 max-h-100 object-cover"
+                  src={item.photo ?? ""}
+                  alt="Business image"
                 />
               </Link>
               {/* <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">

@@ -19,8 +19,8 @@ import { multiUploadOnCloudinary, type MultiUploadOnCloudinaryFile } from "@repo
 export const offerSeed = async () => {
   await clearOfferSeed();
   await addOffer();
-  // await addOfferReviews();
-  // await addOfferSubcategories();
+  await addOfferReviews();
+  await addOfferSubcategories();
 };
 
 const clearOfferSeed = async () => {
@@ -166,29 +166,26 @@ export const addOffer = async () => {
 export const addOfferReviews = async () => {
   const [reviews]: any[] = await sql.execute("SELECT * FROM offer_reviews");
   // const fakeUser = await getFakeBusinessUser()
+  type DbOfferReview = InferInsertModel<typeof offerReviews>;
+  const dbOfferReviewValue:DbOfferReview[] = []
+  const allUsers = await db.select().from(users);
+  const allOffers = await db.select().from(offers);
+
 
   for (const row of reviews) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, row.user_id));
-
+    const user = allUsers.find((user)=> user.id === row.user_id);
+    const offer = allOffers.find((offer)=> offer.id === row.offer_id)
+ 
     if (!user) {
       console.log("user not found", row.id);
       continue;
     }
-
-    const [offer] = await db
-      .select()
-      .from(offers)
-      .where(eq(offers.id, row.offer_id));
-
     if (!offer) {
       console.log("offer not found", row.id);
       continue;
     }
 
-    await db.insert(offerReviews).values({
+    dbOfferReviewValue.push({
       userId: user!.id,
       offerId: offer.id,
       name: row.name,
@@ -201,38 +198,48 @@ export const addOfferReviews = async () => {
       updatedAt: row.updated_at,
     });
   }
+   if(Array.isArray(dbOfferReviewValue) && dbOfferReviewValue.length > 0){
+    await db.insert(offerReviews).values(dbOfferReviewValue);
+    console.log("========== Successfully Insert dbOfferReviewValue Data ==========");
+  }else {
+    console.log("====================== dbOfferReviewValue ======================",dbOfferReviewValue);
+    console.log("=== dbOfferReviewValue Doesn't have Data Or May Not Be Array ===")
+  }
   console.log("successfully seed of offerReviews");
 };
 
 // 3. OfferSubcategory
 export const addOfferSubcategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM offer_subcategory");
+  type DbOfferSubcategory = InferInsertModel<typeof offerSubcategory>;
+  const dbOfferSubcategoryValue: DbOfferSubcategory[] = [];
+  const allOffers = await db.select().from(offers);
+  const allSubcategories = await db.select().from(subcategories);
 
   for (const row of rows) {
-    const [offer] = await db
-      .select()
-      .from(offers)
-      .where(eq(offers.id, row.offer_id));
+    const offer = allOffers.find((offer)=> offer.id === row.offer_id);
+    const subcategory = allSubcategories.find((subcategory)=> subcategory.id === row.subcategory_id);
 
     if (!offer) {
       console.log("offerId not found", row.id);
       continue;
     }
-
-    const [subcategory] = await db
-      .select()
-      .from(subcategories)
-      .where(eq(subcategories.id, row.subcategory_id));
-
     if (!subcategory) {
       console.log("subCategory not found", row.id);
       continue;
     }
 
-    await db.insert(offerSubcategory).values({
+    dbOfferSubcategoryValue.push({
       offerId: offer.id,
       subcategoryId: subcategory.id,
     });
+  }
+  if(Array.isArray(dbOfferSubcategoryValue) && dbOfferSubcategoryValue.length > 0){
+    await db.insert(offerSubcategory).values(dbOfferSubcategoryValue);
+    console.log("========== Successfully Insert dbOfferSubcategoryValue Data ==========");
+  }else {
+    console.log("====================== dbOfferSubcategoryValue ======================",dbOfferSubcategoryValue);
+    console.log("=== dbOfferSubcategoryValue Doesn't have Data Or May Not Be Array ===")
   }
   console.log("successfully seed of OfferSubcategories");
 };

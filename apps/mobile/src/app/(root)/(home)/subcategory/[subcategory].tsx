@@ -208,7 +208,6 @@ function SubcategoryHitCard({
   type,
   onTitleExtract,
 }: SubcategoryHitCardProps) {
-  // Extract title from first hit
   useEffect(() => {
     if (hit.category) {
       onTitleExtract(hit.category);

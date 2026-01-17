@@ -2,6 +2,7 @@ import { db, schemas } from "@repo/db";
 import { hireCategories } from "@repo/db/dist/schema/hire.schema";
 import {
   categories,
+  languages,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
 import {
@@ -51,7 +52,13 @@ async function algoliaHireSeed() {
         photo: hireListing.photo,
         address: hireListing.address,
         gender: hireListing.gender,
-        languages: hireListing.languages,
+        languages: sql<string[]>`
+          COALESCE(
+            ARRAY_AGG(DISTINCT ${languages.name})
+            FILTER (WHERE ${languages.name} IS NOT NULL),
+            '{}'
+          )
+        `,
         workExp: hireListing.workExperienceYear,
         buildingName: hireListing.buildingName,
         expectedSalary: hireListing.expectedSalaryFrom,
@@ -74,6 +81,11 @@ async function algoliaHireSeed() {
         `,
       })
       .from(hireListing)
+      .leftJoin(
+        sql`LATERAL unnest(${hireListing.languages}) AS lang_id(id)`,
+        sql`true`,
+      )
+      .leftJoin(languages, sql`lang_id.id = ${languages.id}`)
       .innerJoin(
         schemas.hire.hireCategories,
         eq(hireListing.id, schemas.hire.hireCategories.hireId),
@@ -291,6 +303,9 @@ async function algoliaProductOfferSeed() {
         "price",
         "searchable(category)",
         "searchable(subcategories)",
+        "discountPercent",
+        "finalPrice",
+        "offerEndDate",
       ],
     },
   });
@@ -300,6 +315,7 @@ async function algoliaProductOfferSeed() {
         id: offers.id,
         price: offers.rate,
         discountPercent: offers.discountPercent,
+        offerEndDate: offers.offerEndDate,
         businessId: offers.businessId,
         finalPrice: offers.finalPrice,
         name: offers.offerName,
@@ -400,6 +416,7 @@ async function algoliaProductOfferSeed() {
         id: item.id,
         objectId: `product:${item.id}`,
         name: item.name,
+        offerEndDate: 0,
         businessId: item.businessId,
         price: item.price,
         finalPrice: item.finalPrice,
@@ -414,6 +431,7 @@ async function algoliaProductOfferSeed() {
         id: item.id,
         objectId: `offers:${item.id}`,
         name: item.name,
+        offerEndDate: new Date(item.offerEndDate).getTime(),
         businessId: item.businessId,
         price: item.price,
         finalPrice: item.finalPrice,
@@ -429,6 +447,7 @@ async function algoliaProductOfferSeed() {
         objectID: item.objectId,
         navigationId: item.id,
         name: item.name,
+        offerEndDate: item.offerEndDate,
         photo: item.photos,
         businessId: item.businessId,
         price: item.price,

@@ -18,18 +18,17 @@ import { getRightLocation } from "./business.seed";
 import { sql } from "./mysqldb.seed";
 import { cloudinaryUploadOnline } from "./seeds";
 import { insertUser, safeArray } from "./utils";
-import { multiUploadOnCloudinary, type MultiUploadOnCloudinaryFile } from "@repo/cloudinary/dist/cloudinary";
+import {
+  multiUploadOnCloudinary,
+  type MultiUploadOnCloudinaryFile,
+} from "@repo/cloudinary/dist/cloudinary";
 
 export const hireSeed = async () => {
   await cleardataofhire();
   await addHire();
-  // await seedHireCategories();
-  // await seedHireSubcategories();
+  await seedHireCategories();
+  await seedHireSubcategories();
 };
-
-// const updateHirePhoto = async ()=>{
-
-// }
 
 const cleardataofhire = async () => {
   await db.execute(`TRUNCATE  TABLE hire_categories RESTART IDENTITY CASCADE;`);
@@ -44,15 +43,16 @@ const addHire = async () => {
   const [rows]: any[] = await sql.execute(
     "SELECT *, REPLACE(longitude , ',', '') as clear_longitude, REPLACE(latitude , ',', '') as clear_latitude FROM listings WHERE type = 2",
   );
-  const clouadinaryHireData: MultiUploadOnCloudinaryFile[] = [];
+  type HireData = InferInsertModel<typeof hireListing>;
+  const dbHireData: HireData[] = [];
 
+  const clouadinaryHireData: MultiUploadOnCloudinaryFile[] = [];
   const allPromisesUser: Promise<number>[] = [];
-  for(const row of rows){
-      allPromisesUser.push(insertUser(row.user_id,"hire"))
+  for (const row of rows) {
+    allPromisesUser.push(insertUser(row.user_id, "hire"));
   }
-  
   const allSettledHireUsers = await Promise.allSettled(allPromisesUser);
-  const allHireUsers = [];
+  const allHireUsers: number[] = [];
   allSettledHireUsers.forEach((o, i) => {
     if (o.status === "fulfilled") {
       allHireUsers.push(o.value);
@@ -61,7 +61,7 @@ const addHire = async () => {
     }
   });
   for (const row of rows) {
-      const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
+    const liveHireImageUrl = `https://www.justsearch.net.in/assets/images/${row.photo}`;
     if (row.photo) {
       clouadinaryHireData.push({
         filename: liveHireImageUrl,
@@ -69,17 +69,13 @@ const addHire = async () => {
       });
     }
   }
-  
+
   const hirePhotosPublicIds = await multiUploadOnCloudinary(
     clouadinaryHireData,
     "hire",
     cloudinaryUploadOnline,
   );
-  // const fakeUser = await getFakeHireUser();
 
-  // if (!fakeUser) {
-  //   throw new Error("Failed to generate a fake user!");
-  // }
   const educationMap: Record<string, number | null> = {
     "2": null,
     "b.e / b.tech": 1,
@@ -109,106 +105,35 @@ const addHire = async () => {
   };
 
   const allCities = await db.select().from(cities);
-    const [jodhpur] = await db
-      .select()
-      .from(cities)
-      .where(eq(cities.city, "Jodhpur"));
-    if (!jodhpur) {
-      throw new Error("Jodhpur city not found");
-    }
+  const allSalesmen = await db.select().from(salesmen);
+  const [jodhpur] = await db
+    .select()
+    .from(cities)
+    .where(eq(cities.city, "Jodhpur"));
+  if (!jodhpur) {
+    throw new Error("Jodhpur city not found");
+  }
 
   for (const row of rows) {
-    // const row = rows[0];
-
-    // return;
-    // let [createUser] = await db
-    //   .select()
-    //   .from(users)
-    //   .where(eq(users.id, Number(row.user_id)));
-
-    // if (!createUser) {
-    //   const [user]: any[] = await sql.execute(
-    //     `SELECT * FROM users WHERE id = ${row.user_id}`,
-    //   );
-
-    //   if (user[0]) {
-    //     const mySqlUser = user[0];
-    //     // return
-    //     try {
-    //       [createUser] = await db
-    //         .insert(users)
-    //         .values({
-    //           id: mySqlUser.id,
-    //           displayName: row.name ?? mySqlUser.name,
-    //           email: mySqlUser.email,
-    //           googleId: mySqlUser.google_id,
-    //           password: mySqlUser.password,
-    //           role: UserRole.hire,
-    //           phoneNumber: mySqlUser.phone,
-    //         })
-    //         .returning();
-    //       console.log(createUser);
-    //       // TODO: user profile is not added yet
-    //     } catch (e) {
-    //       if (e instanceof Error) {
-    //         console.error("error is ", e.message);
-    //       }
-    //     }
-    //   } else {
-    //     createUser = fakeUser;
-    //   }
-    // }
-
-    // // return
-    // if (!createUser) {
-    //   console.log("User not found" + row.id);
-    // }
-     const hireListingPhoto = hirePhotosPublicIds.find(
+    const hireListingPhoto = hirePhotosPublicIds.find(
       (item) => item.id === row.id,
     )?.public_id;
 
-    const userId = await insertUser(row.user_id, "hire");
+    const userId = allHireUsers?.find((item) => item === row.user_id);
     const foundCity = allCities.find((c) => c.id === row.city);
     const city = foundCity ? foundCity : jodhpur;
 
-    const invalidPhotos = [
-      "20469712961736937230.jpg",
-      "9233936721737361584.jpeg",
-      "8263138481737439311.jpeg",
-      "2542177821738044989.jpeg",
-      "11006388771738843807.jpeg",
-      "6708903161739015419.PNG",
-      "460541731739343371.jpg",
-      "15017575881740386618.jpg",
-      "9027662451740469698.jpg",
-      "3709273371738146929.jpeg",
-      "6924536251755946456.jpeg",
-      "19940945571746603611.jpg",
-    ];
-
-
-    // console.log("=====");
-    // console.log("createUser-------------------", createUser);
-    // return;
-
     try {
-      // if (!createUser) {
-      //   console.log("User not found" + row.id);
-      // }
       const qualificationKey =
         typeof row.highest_qualification === "string"
           ? row.highest_qualification.toLowerCase().trim()
           : "";
 
-      const saleman = await db
-        .select()
-        .from(salesmen)
-        .where(
-          eq(
-            salesmen.referCode,
-            row.refer_code ? row.refer_code.toUpperCase() : null,
-          ),
-        );
+      const saleman = allSalesmen.find((salesman) =>
+        salesman.referCode === row.refer_code
+          ? row.refer_code.toUpperCase()
+          : null,
+      );
 
       const highestQualification = educationMap[qualificationKey] ?? null;
       const { latitude, longitude } = getRightLocation(row);
@@ -222,7 +147,6 @@ const addHire = async () => {
           return languageDB?.id;
         }),
       );
-      type HireData = InferInsertModel<typeof hireListing>;
       const jobType = safeArray(row.job_type).map((jobType: string) => {
         if (jobType.toLocaleLowerCase() === "full time")
           return JobType.FullTime;
@@ -231,12 +155,12 @@ const addHire = async () => {
       const workShift = safeArray(row.work_shift).map((workType: string) => {
         return workType.split("_")[0];
       });
-      const hireData: HireData = {
+      dbHireData.push({
         id: row.id,
-        salesmanId: saleman[0]?.id ?? 1,
+        salesmanId: saleman?.id ?? 1,
         fromHour: "",
         toHour: "",
-        userId,
+        userId: userId ?? 0,
         city: city?.id ?? 449,
         name: row.name,
         slug: row.slug,
@@ -301,76 +225,23 @@ const addHire = async () => {
         coverLetter: row.cover_letter,
         resumePhoto: "",
         aboutYourself: row.about_yourself,
-      };
-      // const hireData: HireData = {
-      //   id: 419,
-      //   salesmanId: 1,
-      //   fromHour: "",
-      //   toHour: "",
-      //   userId: 588,
-      //   city: 449,
-      //   name: "Ruchika Mewara",
-      //   slug: "ruchika-mewara",
-      //   fatherName: "Amarjeet Singh",
-      //   dob: "Thu Jun 08 2000 00:00:00 GMT+0530 (India Standard Time)",
-      //   gender: "Female",
-      //   maritalStatus: "Others",
-      //   languages: [2, 1],
-      //   specialities: "alsdkfj",
-      //   description: "aslkdfjalsdkj",
-      //   latitude: 73.02745391487893,
-      //   longitude: 26.214785486607322,
-      //   buildingName: "kalsjdflsak",
-      //   streetName: "alksdjf",
-      //   address: "sector 2",
-      //   landmark: "asldkfj",
-      //   pincode: "342005",
-      //   state: 19,
-      //   photo: "banner/cbycmehjeetyxbuxc6ie",
-      //   isFeature: false,
-      //   status: "Approved",
-      //   website: "alsdfkjalskdj",
-      //   email: "sc@gmail.com",
-      //   mobileNumber: "8695310446",
-      //   whatsappNo: "95225654654",
-      //   alternativeMobileNumber: "8695310446",
-      //   facebook: "alksdjf",
-      //   twitter: "alskdjf",
-      //   linkedin: null,
-      //   highestQualification: 12,
-      //   employmentStatus: "no",
-      //   workExperienceYear: 3,
-      //   workExperienceMonth: 6,
-      //   jobRole: "Pre primary",
-      //   previousJobRole: null,
-      //   expertise: "All Subjects",
-      //   skillset: "js is",
-      //   abilities: "afe",
-      //   jobType: ["FullTime"],
-      //   locationPreferred: "asdf",
-      //   certificates: "safd",
-      //   workShift: ["Morning"],
-      //   expectedSalaryFrom: "asdf",
-      //   expectedSalaryTo: "asdfk",
-      //   jobDuration: ["Day"],
-      //   relocate: "No",
-      //   availability: "Now",
-      //   idProof: 1,
-      //   idProofPhoto: "banner/cbycmehjeetyxbuxc6ie",
-      //   coverLetter: "asdklfj",
-      //   resumePhoto: "banner/cbycmehjeetyxbuxc6ie",
-      //   aboutYourself: "asdlfkjads",
-      // };
-      console.log("hireData", hireData);
-      await db.insert(hireListing).values(hireData);
-
-      // console.log("hire", hire);
+      });
     } catch (error) {
       throw new Error(`Error creating hire: ${error}`);
     }
-
-    console.log("successsfully hire listings seed");
   }
+  if (Array.isArray(dbHireData) && dbHireData.length > 0) {
+    await db.insert(hireListing).values(dbHireData);
+    console.log("========== Successfully Insert dbHireData Data ==========");
+  } else {
+    console.log(
+      "====================== dbHireData ======================",
+      dbHireData,
+    );
+    console.log("=== dbHireData Doesn't have Data Or May Not Be Array ===");
+  }
+
+  console.log("successsfully hire listings seed");
 };
 
 // seedRecentViewsHire
@@ -414,62 +285,90 @@ const addHire = async () => {
 export const seedHireSubcategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_subcategory");
   console.log("rows", rows);
+  type DbHireSubcategory = InferInsertModel<typeof hireSubcategories>;
+  const dbHireSubcategoryValue: DbHireSubcategory[] = [];
+  const allHires = await db.select().from(hireListing);
+  const allSubcategories = await db.select().from(subcategories);
 
   for (const row of rows) {
-    const [hire] = await db
-      .select()
-      .from(hireListing)
-      .where(eq(hireListing.id, row.listing_id));
-
+    const hire = allHires.find((hire) => hire.id === row.listing_id);
+    const subcat = allSubcategories.find(
+      (subcategory) => subcategory.id === row.subcategory_id,
+    );
     if (!hire) {
       console.log("hire not found", hire);
       continue;
     }
-
-    const [subcat] = await db
-      .select()
-      .from(subcategories)
-      .where(eq(subcategories.id, row.subcategory_id));
 
     if (!subcat) {
       console.log("subcategory not found");
       continue;
     }
 
-    await db.insert(hireSubcategories).values({
+    dbHireSubcategoryValue.push({
       hireId: hire.id,
       subcategoryId: subcat.id,
     });
   }
+  if (
+    Array.isArray(dbHireSubcategoryValue) &&
+    dbHireSubcategoryValue.length > 0
+  ) {
+    await db.insert(hireSubcategories).values(dbHireSubcategoryValue);
+    console.log(
+      "========== Successfully Insert dbHireSubcategoryValue Data ==========",
+    );
+  } else {
+    console.log(
+      "====================== dbHireSubcategoryValue ======================",
+      dbHireSubcategoryValue,
+    );
+    console.log(
+      "=== dbHireSubcategoryValue Doesn't have Data Or May Not Be Array ===",
+    );
+  }
+  console.log("successfully seed of dbHireSubcategoryValue");
 };
 
 // hires_categories
 export const seedHireCategories = async () => {
   const [rows]: any[] = await sql.execute("SELECT * FROM listing_category");
+  type DbHireCategory = InferInsertModel<typeof hireCategories>;
+  const dbHireCategoryValue: DbHireCategory[] = [];
+  const allHires = await db.select().from(hireListing);
+  const allCategories = await db.select().from(categories);
 
   for (const row of rows) {
-    const [hire] = await db
-      .select()
-      .from(hireListing)
-      .where(eq(hireListing.id, row.listing_id));
+    const hire = allHires.find((hire) => hire.id === row.listing_id);
+    const category = allCategories.find(
+      (category) => category.id === row.category_id,
+    );
 
     if (!hire) {
       continue;
     }
-
-    const [category] = await db
-      .select()
-      .from(categories)
-      .where(eq(categories.id, row.category_id));
-
     if (!category) {
       continue;
     }
 
-    await db.insert(hireCategories).values({
+    dbHireCategoryValue.push({
       hireId: hire.id,
       categoryId: category.id,
     });
+  }
+  if (Array.isArray(dbHireCategoryValue) && dbHireCategoryValue.length > 0) {
+    await db.insert(hireCategories).values(dbHireCategoryValue);
+    console.log(
+      "========== Successfully Insert dbHireCategoryValue Data ==========",
+    );
+  } else {
+    console.log(
+      "====================== dbHireCategoryValue ======================",
+      dbHireCategoryValue,
+    );
+    console.log(
+      "=== dbHireCategoryValue Doesn't have Data Or May Not Be Array ===",
+    );
   }
 
   console.log("successfully seed of HireCategories");
