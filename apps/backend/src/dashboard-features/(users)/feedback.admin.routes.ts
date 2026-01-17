@@ -130,7 +130,6 @@ export const adminFeedbackRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      //TODO: remove subcategory of these categories;
       const allSeletedPhoto = await db
         .select({
           photo: categories.photo,
@@ -140,7 +139,6 @@ export const adminFeedbackRouter = router({
       await cloudinaryDeleteImagesByPublicIds(
         allSeletedPhoto.map((item) => item.photo),
       );
-      //TODO: test that subcategory is also deleting
       await db
         .delete(subcategories)
         .where(inArray(subcategories.categoryId, input.ids));

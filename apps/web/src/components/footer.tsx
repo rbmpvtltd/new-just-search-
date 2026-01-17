@@ -61,8 +61,8 @@ const links = [
 
 export default function FooterSection() {
   return (
-    <footer className="border-b bg-white pt-20 dark:bg-transparent border-t">
-      <div className="mx-auto max-w-5xl px-6">
+    <footer className="border-b bg-white pt-20 dark:bg-transparent border-t ">
+      <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-12 md:grid-cols-5">
           <div className="md:col-span-2">
             <Link href="/" aria-label="go home" className="block size-fit">

@@ -1,5 +1,9 @@
 "use client";
-import { IconDatabase } from "@tabler/icons-react";
+import {
+  IconBuildingSkyscraper,
+  IconHome,
+  IconUsers,
+} from "@tabler/icons-react";
 import type { SidebarData } from "@/types/sidebar";
 
 export const adminSidebarData: SidebarData = {
@@ -14,17 +18,17 @@ export const adminSidebarData: SidebarData = {
     {
       name: "Home",
       url: "/",
-      icon: IconDatabase,
+      icon: IconHome,
     },
     {
       name: "Manage Business",
       url: "/business",
-      icon: IconDatabase,
+      icon: IconBuildingSkyscraper,
     },
     {
       name: "Manage Hire",
       url: "/hire",
-      icon: IconDatabase,
+      icon: IconUsers,
     },
   ],
 };

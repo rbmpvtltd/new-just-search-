@@ -391,10 +391,17 @@ export const adminHireRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      //TODO: delete photo from cloudinary
       const isHireExists = await db.query.hireListing.findFirst({
         where: (hireListing, { eq }) =>
           eq(hireListing.userId, Number(input.userId)),
+        columns: {
+          id: true,
+          userId: true,
+          photo: true,
+          certificates: true,
+          resumePhoto: true,
+          idProofPhoto: true,
+        },
       });
 
       if (!isHireExists) {
@@ -402,6 +409,19 @@ export const adminHireRouter = router({
           code: "NOT_FOUND",
           message: "Hire listing not found",
         });
+      }
+
+      const imageToDelete = [
+        isHireExists.photo,
+        isHireExists.resumePhoto,
+        isHireExists.idProofPhoto,
+        isHireExists.certificates,
+      ]
+        .filter(Boolean)
+        .map(String);
+
+      if (imageToDelete.length > 0) {
+        await cloudinaryDeleteImagesByPublicIds(imageToDelete);
       }
 
       const updateHire = await db
@@ -458,7 +478,6 @@ export const adminHireRouter = router({
         })
         .where(eq(hireListing.userId, isHireExists.userId));
 
-      // return { updateHire: updateHire };
       if (!updateHire) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

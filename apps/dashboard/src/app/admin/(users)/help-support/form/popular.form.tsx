@@ -1,9 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useTRPC } from "@/trpc/client";
-import { useTableStore } from "../store";
-import { getQueryClient } from "@/trpc/query-client";
 import {
   Dialog,
   DialogClose,
@@ -13,7 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
+import { useTableStore } from "../store";
 
 export function MuiltPopularButton() {
   const [open, setOpen] = useState(false);
@@ -24,7 +24,7 @@ export function MuiltPopularButton() {
   // const isPending = false;
 
   const { mutate, isPending } = useMutation(
-    trpc.adminCategoryRouter.multipopular.mutationOptions(),
+    trpc.adminHelpAndSupportRouter.multipopular.mutationOptions(),
   );
 
   const buttonDisable = !isActiveExist || isPending;
@@ -54,7 +54,7 @@ export function MuiltPopularButton() {
                   if (data.success) {
                     const queryClient = getQueryClient();
                     await queryClient.invalidateQueries({
-                      queryKey: trpc.adminCategoryRouter.list.queryKey(),
+                      queryKey: trpc.adminHelpAndSupportRouter.list.queryKey(),
                     });
                     setTimeout(() => {
                       empty();

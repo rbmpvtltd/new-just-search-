@@ -66,7 +66,6 @@ function SingleProductComp({
   productPhotos: string[];
   product: SingleProductType;
 }) {
-
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState<any>(null);
   const content = parse(product?.description ?? "");
@@ -112,16 +111,15 @@ function SingleProductComp({
                         width={500}
                         height={400}
                         alt="banner image"
-                        src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change photo url when upload on cloudinary
-                        
+                        src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" 
                         className="rounded-md"
                       /> */}
                       <CldImage
                         width="500"
                         height="400"
                         className="border rounded"
-                        src={item}
-                        alt={item}
+                        src={item ?? ""}
+                        alt="Product Image"
                       />
                     </CardContent>
                   </Card>

@@ -142,8 +142,8 @@ interface DrawerField {
 }
 
 export function CustomDrawerContent() {
-  const segment = useSegments();
   const colorScheme = useColorScheme();
+  const segment = useSegments();
   const currentRoute = segment.join("/");
   const toggleOpen = useDrawerStore((state) => state.toggleOpen);
   let role = useAuthStore((s) => s.role);

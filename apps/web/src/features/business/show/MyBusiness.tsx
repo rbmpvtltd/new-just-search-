@@ -53,10 +53,10 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
     .join(", ");
 
   return (
-    <div className="min-h-screen w-full bg-linear-to-br from-gray-100 to-gray-200 p-4">
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="p-4 border-b border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-800">
+    <div className="min-h-screen w-full bg-linear-to-br from-gray-50 to-gray-200 p-4 sm:p-6">
+      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-md overflow-hidden border border-gray-100">
+        <div className="p-5 sm:p-6 border-b border-gray-100">
+          <h1 className="text-2xl font-semibold text-gray-900">
             My Business Listing
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -64,15 +64,15 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-6 p-4 sm:p-6">
-          <div className="flex justify-center sm:justify-start sm:w-1/4">
-            <div className="w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-lg overflow-hidden border shadow-sm bg-gray-50">
+        <div className="flex flex-col sm:flex-row gap-6 p-5 sm:p-6">
+          <div className="flex justify-center sm:justify-start sm:w-1/3">
+            <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-xl overflow-hidden border bg-gray-50 shadow-sm">
               {data?.photo ? (
                 <CldImage
                   width="640"
                   height="640"
                   className="w-full h-full object-cover"
-                  src={data?.photo}
+                  src={data.photo}
                   alt="Business image"
                 />
               ) : (
@@ -84,40 +84,46 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
                   className="w-full h-full object-contain bg-gray-100"
                 />
               )}
+
+              <div className="absolute top-3 left-3">
+                {data?.isVerified ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-green-100 text-green-700 text-xs font-medium px-2 py-1">
+                    <CheckCircle size={14} />
+                    Verified
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1">
+                    Pending
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="">
+          <div className="flex-1 space-y-4">
             <div>
-              <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-800">
-                <span>{data?.name}</span>
-                {data.isVerified && (
-                  <CheckCircle
-                    size={26}
-                    className="text-green-500"
-                    aria-label="Verified"
-                  />
-                )}
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                {data?.name}
               </h2>
 
-              <p className="text-gray-600 mt-2 leading-relaxed">
+              <p className="mt-2 flex items-start gap-2 text-gray-600 leading-relaxed">
+                <span className="mt-1 text-gray-400">📍</span>
                 {fullAddress}
               </p>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              {/* We make a shared class for all */}
+            <div className="flex flex-wrap gap-3 pt-2">
               <Link
                 href={`/profile/business/edit/${data?.id}`}
-                className="inline-flex items-center justify-center gap-2 rounded-lg shadow-sm font-medium px-4 py-2 text-white bg-emerald-500 hover:bg-emerald-600 transition-colors h-10"
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white bg-emerald-500 hover:bg-emerald-600 shadow-sm transition"
               >
                 <Pencil className="w-4 h-4" />
-                Edit
+                Edit Listing
               </Link>
 
               <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-lg shadow-sm font-medium px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 transition-colors h-10"
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 shadow-sm transition"
               >
                 <Eye className="w-4 h-4" />
                 View
@@ -127,11 +133,11 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
                 onClick={handleDelete}
                 disabled={isPending}
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-lg shadow-sm font-medium px-4 py-2 text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-70 h-10"
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 shadow-sm transition disabled:opacity-60"
               >
                 {isPending ? (
                   <>
-                    <Spinner /> Deleting...
+                    <Spinner /> Deleting…
                   </>
                 ) : (
                   <>

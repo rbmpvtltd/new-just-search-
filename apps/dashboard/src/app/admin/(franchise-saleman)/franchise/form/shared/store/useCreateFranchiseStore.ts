@@ -47,7 +47,7 @@ const initialFormValue: CombinedForm = {
 
   //franchise
   referPrifixed: "",
-  employeeLimit: NaN,
+  employeeLimit: 0,
   gstNo: "",
 };
 

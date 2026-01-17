@@ -204,7 +204,7 @@ export default function DrawerLayout() {
                     ],
                   );
                 } else {
-                  router.push("/home"); // TODO: add real favorites redirect
+                  router.push("/(root)/(home)/favourites");
                 }
               }}
             >

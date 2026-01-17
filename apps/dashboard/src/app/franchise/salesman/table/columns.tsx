@@ -60,7 +60,7 @@ function SelectHeader({ ids }: { ids: number[] }) {
   );
 }
 
-type ListerArray = OutputTrpcType["franchiseSalemanRouter"]["list"]["data"];
+type ListerArray = OutputTrpcType["franchiseSalesmanRouter"]["list"]["data"];
 type Lister = UnwrapArray<ListerArray>;
 
 export const columns: ColumnDef<Lister>[] = [

@@ -19,6 +19,8 @@ export default function BusinessTiming({
 }: {
   businessListing: UserBusinessListingType;
 }) {
+  console.log("Business Listing", businessListing);
+
   const setFormValue = useBusinessFormStore((state) => state.setFormValue);
   const formValue = useBusinessFormStore((state) => state.formValue);
   const nextPage = useBusinessFormStore((state) => state.nextPage);
@@ -35,11 +37,11 @@ export default function BusinessTiming({
           ? businessListing?.business?.days
           : (formValue.days ?? []),
       fromHour:
-        formValue.fromHour === ""
+        formValue.fromHour === "10:30"
           ? businessListing?.business?.fromHour
           : (formValue.fromHour ?? ""),
       toHour:
-        formValue.toHour === ""
+        formValue.toHour === "20:30"
           ? businessListing?.business?.toHour
           : (formValue.toHour ?? ""),
     },

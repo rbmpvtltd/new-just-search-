@@ -139,6 +139,7 @@
 import { algoliaClient } from "@repo/algolia";
 import Image from "next/image";
 import Link from "next/link";
+import { CldImage } from "next-cloudinary";
 import { useState } from "react";
 import {
   ClearRefinements,
@@ -164,14 +165,25 @@ function Hit({ hit }: { hit: any }) {
       >
         <div className="relative w-full mx-auto flex justify-center">
           <div className="relative">
-            {/* TODO: why we are using this image */}
-            <Image
+            {/* <Image
               width={200}
               height={400}
               alt="offer image"
               src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
               className="object-contain"
-            />
+            /> */}
+
+            {hit.photo ? (
+              <CldImage
+                width="200"
+                height="400"
+                className="object-contain"
+                src={hit.photo}
+                alt="Offer Image"
+              />
+            ) : (
+              "no photo"
+            )}
             {hit.discountPercent > 0 && (
               <span className="absolute z-10 top-3 left-0 min-w-[70px] bg-error text-end px-4 py-1 text-white rounded-r-md font-semibold text-sm">
                 -{hit.discountPercent}%

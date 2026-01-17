@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
+import { AdvancedImage } from "cloudinary-react-native";
 import {
   Stack,
   useFocusEffect,
@@ -30,6 +31,7 @@ import PrimaryButton from "@/components/inputs/SubmitBtn";
 import TextAreaInput from "@/components/inputs/TextAreaInput";
 import Colors from "@/constants/Colors";
 import { OfferReviewForm } from "@/features/offer/forms/create/OfferReviewForm";
+import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
 import { dialPhone } from "@/utils/getContact";
 
@@ -164,11 +166,16 @@ export default function TabOneScreen() {
             renderItem={() => (
               <View className="relative bg-base-200">
                 <View className="relative h-[300px] mx-auto mt-2 w-[60%] bg-base-200 ">
-                  <Image
+                  {/* <Image
                     className="w-full rounded-lg aspect-[3/4]"
                     source={{
-                      uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC5GqGqODTAQhCbZtEwK2EMiGE91vkaXT-Iw&s`, // change image when upload on cloudinary
+                      uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC5GqGqODTAQhCbZtEwK2EMiGE91vkaXT-Iw&s`, 
                     }}
+                  /> */}
+                  <AdvancedImage
+                    cldImg={cld.image(offer?.photos[0] || "")}
+                    className="w-[80%] mx-auto rounded-lg aspect-[3/4] mt-4 self-end"
+                    resizeMode="cover"
                   />
                   <Text className="absolute bg-error text-secondary mt-8 pl-8 pr-3 rounded-r-md t-10">
                     -{offer?.discountPercent}%

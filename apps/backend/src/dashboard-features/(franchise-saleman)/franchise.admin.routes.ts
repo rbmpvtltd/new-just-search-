@@ -18,6 +18,7 @@ import {
   profileInsertSchema,
   profiles,
   profileUpdateSchema,
+  salesmen,
 } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
@@ -40,6 +41,7 @@ import {
   usersColumns,
   usersGlobalFilterColumns,
 } from "./franchise.admin.service";
+import { generateReferCode } from "./salesman.admin.service";
 
 export const adminFranchiseRouter = router({
   list: adminProcedure.input(tableInputSchema).query(async ({ input }) => {
@@ -94,6 +96,7 @@ export const adminFranchiseRouter = router({
     const salutation = await db.query.salutation.findMany();
     return { states, occupation, salutation };
   }),
+
   create: adminProcedure
     .input(
       usersInsertSchema
@@ -159,6 +162,28 @@ export const adminFranchiseRouter = router({
         userId: newUserData?.id,
       });
 
+      const franchise = await db.query.franchises.findFirst({
+        where: (franchise, { eq }) => eq(franchise.userId, newUserData?.id),
+        columns: {
+          id: true,
+          referPrifixed: true,
+          lastAssignCode: true,
+        },
+      });
+      if (!franchise)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Franchise not found",
+        });
+      const prifix = franchise.referPrifixed;
+      const lastAssignCode = franchise.lastAssignCode;
+      const code = await generateReferCode(lastAssignCode, prifix);
+
+      await db.insert(salesmen).values({
+        franchiseId: franchise.id,
+        referCode: code.newReferCode,
+        userId: newUserData?.id,
+      });
       return { success: true, message: "Franchise created successfully" };
     }),
   edit: adminProcedure
@@ -283,7 +308,6 @@ export const adminFranchiseRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      //TODO: remove subcategory of these categories;
       const allSeletedPhoto = await db
         .select({
           photo: categories.photo,
@@ -293,7 +317,6 @@ export const adminFranchiseRouter = router({
       await cloudinaryDeleteImagesByPublicIds(
         allSeletedPhoto.map((item) => item.photo),
       );
-      //TODO: test that subcategory is also deleting
       await db
         .delete(subcategories)
         .where(inArray(subcategories.categoryId, input.ids));

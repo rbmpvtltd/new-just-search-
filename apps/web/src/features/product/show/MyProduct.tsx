@@ -86,35 +86,42 @@ function ProductCard({ product }: { product: ProductType }) {
   );
 
   return (
-    <div className="bg-gray-100 rounded-2xl shadow-lg overflow-hidden flex sm:flex-row flex-col gap-4 p-4">
-      <div className="flex justify-center sm:w-48">
-        {product?.mainImage ? (
-          <CldImage
-            width="200"
-            height="200"
-            className="border rounded"
-            src={product.mainImage}
-            alt={product.productName}
-          />
-        ) : (
-          <div className="flex items-center justify-center h-40 w-40 border rounded text-gray-400">
-            No photo
-          </div>
-        )}
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition p-4 flex flex-col sm:flex-row gap-5">
+      {/* Image */}
+      <div className="flex justify-center sm:justify-start sm:w-44">
+        <div className="w-40 h-40 rounded-xl overflow-hidden border bg-gray-50 flex items-center justify-center">
+          {product?.mainImage ? (
+            <CldImage
+              width="200"
+              height="200"
+              className="w-full h-full object-cover"
+              src={product.mainImage}
+              alt={product.productName}
+            />
+          ) : (
+            <span className="text-sm text-gray-400">No image</span>
+          )}
+        </div>
       </div>
 
+      {/* Content */}
       <div className="flex-1 flex flex-col justify-between">
+        {/* Info */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             {product.productName}
           </h2>
-          <p className="text-gray-600 mt-2">₹{product.rate}</p>
+
+          <p className="mt-1 text-lg font-medium text-emerald-600">
+            ₹{product.rate}
+          </p>
         </div>
 
-        <div className="mt-4 flex gap-2">
+        {/* Actions */}
+        <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href={`/profile/product/edit/${product.id}`}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm flex items-center gap-2"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-emerald-500 hover:bg-emerald-600 shadow-sm transition"
           >
             <Pencil className="w-4 h-4" />
             Edit
@@ -139,11 +146,11 @@ function ProductCard({ product }: { product: ProductType }) {
             }}
             disabled={isPending}
             type="submit"
-            className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 shadow-sm transition disabled:opacity-60"
           >
             {isPending ? (
               <>
-                <Spinner /> Deleting...
+                <Spinner /> Deleting…
               </>
             ) : (
               <>

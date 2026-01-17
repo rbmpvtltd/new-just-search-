@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 // import Favourite from "../../shared/Favourite";
 import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
 import { FaPhoneAlt } from "react-icons/fa";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import { MdLocationPin } from "react-icons/md";
@@ -34,14 +35,15 @@ type BusinessListing = {
     lng: number;
   };
 };
-type businesses = OutputTrpcType["businessrouter"]["favouritesShops"]["data"][0]["shop"][0];
+type businesses =
+  OutputTrpcType["businessrouter"]["favouritesShops"]["data"][0]["shop"][0];
 
 export const BussinessListingCard = ({
   item,
   navigationId,
   category,
   subcategory,
-  rating
+  rating,
 }: {
   item: BusinessListing | businesses;
   navigationId?: number;
@@ -61,12 +63,19 @@ export const BussinessListingCard = ({
                   pathname: `/subcategory/aboutBusiness/${navigationId}`,
                 }}
               >
-                <Image
+                {/* <Image
                   width={300}
                   height={300}
                   className="rounded-md object-cover"
                   alt="Bussiness Image"
-                  src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change image when upload on cloudinary
+                  src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg"
+                /> */}
+                <CldImage
+                  width="300"
+                  height="300"
+                  className="rounded-md"
+                  src={item?.photo ?? ""}
+                  alt="Shop Image"
                 />
               </Link>
               {/* <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">

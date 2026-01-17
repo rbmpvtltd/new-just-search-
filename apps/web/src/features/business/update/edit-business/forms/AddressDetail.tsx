@@ -207,8 +207,8 @@ export default function AddressDetail({
     setFormValue("streetName", data.streetName ?? "");
     setFormValue("address", data.address ?? "");
     setFormValue("landmark", data.landmark ?? "");
-    setFormValue("latitude", String(data.latitude) ?? "");
-    setFormValue("longitude", String(data.longitude) ?? "");
+    setFormValue("latitude", data.latitude ?? "");
+    setFormValue("longitude", data.longitude ?? "");
     setFormValue("pincode", data.pincode ?? "");
     setFormValue("state", Number(data.state) ?? "");
     setFormValue("city", Number(data.city) ?? "");

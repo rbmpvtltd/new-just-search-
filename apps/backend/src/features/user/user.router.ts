@@ -1,4 +1,5 @@
 import { db, schemas } from "@repo/db";
+import { plans, planUserActive } from "@repo/db/dist/schema/plan.schema";
 import {
   account_delete_request,
   feedbackInsertSchema,
@@ -19,8 +20,18 @@ export const userRouter = router({
     const profile = await db.query.profiles.findFirst({
       where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
     });
+
+    const plan = (
+      await db
+        .select({
+          name: plans.name,
+        })
+        .from(planUserActive)
+        .leftJoin(plans, eq(plans.id, planUserActive.planId))
+        .where(eq(planUserActive.userId, ctx.userId))
+    )[0];
     const role = ctx.role;
-    return { getStates, profile, role, getOccupations, getSlutation };
+    return { getStates, profile, role, getOccupations, getSlutation, plan };
   }),
 
   getCities: protectedProcedure

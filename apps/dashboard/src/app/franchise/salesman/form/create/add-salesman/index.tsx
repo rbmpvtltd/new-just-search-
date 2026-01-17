@@ -10,7 +10,7 @@ import UserForm from "./forms/UserForm";
 export function AddSalesmanPage({ setOpen }: { setOpen: SetOpen }) {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
-    trpc.franchiseSalemanRouter.add.queryOptions(),
+    trpc.franchiseSalesmanRouter.add.queryOptions(),
   );
   const page = useSalesmanFormStore((state) => state.page);
   const steps = ["User Form", "Profile Form", "Salesman Form"];

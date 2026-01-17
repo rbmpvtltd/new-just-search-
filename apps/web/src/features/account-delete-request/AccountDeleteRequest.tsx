@@ -49,7 +49,7 @@ export default function AccountDeleteRequestForm() {
     });
   };
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center pb-14">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-3xl bg-gray-50 rounded-2xl shadow-lg overflow-hidden"
@@ -72,7 +72,7 @@ export default function AccountDeleteRequestForm() {
               component="textarea"
               placeholder="Enter your reason..."
               error={errors?.reason?.message}
-              className="w-full min-h-[120px]"
+              className="w-full max-h-96 "
             />
           </div>
         </div>

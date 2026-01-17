@@ -32,7 +32,7 @@ export default function SalesmanForm({
 }) {
   const trpc = useTRPC();
   const { mutate } = useMutation(
-    trpc.franchiseSalemanRouter.create.mutationOptions(),
+    trpc.franchiseSalesmanRouter.create.mutationOptions(),
   );
   const formValue = useSalesmanFormStore((s) => s.formValue);
   const prevPage = useSalesmanFormStore((s) => s.prevPage);
@@ -71,7 +71,7 @@ export default function SalesmanForm({
           });
           const queryClient = getQueryClient();
           queryClient.invalidateQueries({
-            queryKey: trpc.franchiseSalemanRouter.list.queryKey(),
+            queryKey: trpc.franchiseSalesmanRouter.list.queryKey(),
           });
           setOpen(false);
         }
