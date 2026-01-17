@@ -5,7 +5,6 @@ import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { Camera } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
@@ -21,12 +20,11 @@ import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
-type UserProfile = OutputTrpcType["userRouter"]["edit"] | null;
+type UserProfile = OutputTrpcType["userRouter"]["edit"] | null | undefined;
 
 type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
-export default function UserProfile({ user }: { user: UserProfile }) {
+ function UserProfile({ data }: { data: UserProfile }) {
   const trpc = useTRPC();
-  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -34,20 +32,22 @@ export default function UserProfile({ user }: { user: UserProfile }) {
   } = useForm<UserUpdateSchema>({
     resolver: zodResolver(profileUpdateSchema),
     defaultValues: {
-      profileImage: user?.profile?.profileImage ?? "",
-      salutation: user?.profile?.salutation ?? NaN,
-      firstName: user?.profile?.firstName ?? "",
-      lastName: user?.profile?.lastName ?? "",
-      dob: user?.profile?.dob ?? "",
-      occupation: user?.profile?.occupation ?? null,
-      maritalStatus: user?.profile?.maritalStatus ?? "Married",
-      address: user?.profile?.address ?? "",
-      pincode: user?.profile?.pincode ?? "",
-      city: user?.profile?.city ?? 0,
-      state: user?.profile?.state ?? 0,
+      profileImage: data?.profile?.profileImage ?? "",
+      salutation: data?.profile?.salutation ?? NaN,
+      firstName: data?.profile?.firstName ?? "",
+      lastName: data?.profile?.lastName ?? "",
+      dob: data?.profile?.dob ?? "",
+      occupation: data?.profile?.occupation ?? null,
+      maritalStatus: data?.profile?.maritalStatus ?? "Married",
+      address: data?.profile?.address ?? "",
+      pincode: data?.profile?.pincode ?? "",
+      city: data?.profile?.city ?? 0,
+      state: data?.profile?.state ?? 0,
     },
   });
+
   const { mutate } = useMutation(trpc.userRouter.update.mutationOptions());
+
   const onSubmit = async (data: UserUpdateSchema) => {
     const file = await uploadToCloudinary([data.profileImage], "profile");
     const finalData = {
@@ -74,7 +74,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
     });
   };
 
-  const states = user?.getStates?.map((item) => {
+  const states = data?.getStates?.map((item) => {
     return {
       label: item.name,
       value: item.id,
@@ -88,8 +88,6 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       state: Number(selectedStateId),
     }),
   );
-
-  console.log("Cities", cities);
 
   const formFields: FormFieldProps<UserUpdateSchema>[] = [
     {
@@ -108,7 +106,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       placeholder: "Occupation",
       required: false,
       component: "select",
-      options: user?.getOccupations?.map((item) => {
+      options: data?.getOccupations?.map((item) => {
         return {
           label: item.name,
           value: item.id,
@@ -204,20 +202,20 @@ export default function UserProfile({ user }: { user: UserProfile }) {
 
           <div className="flex-1 text-center md:text-left space-y-2">
             <h2 className="text-2xl font-semibold tracking-tight">
-              {user?.profile?.firstName
-                ? `${user?.profile?.firstName} ${user?.profile?.lastName ?? ""}`
+              {data?.profile?.firstName
+                ? `${data?.profile?.firstName} ${data?.profile?.lastName ?? ""}`
                 : "User Name"}
             </h2>
 
             <p className="text-sm text-muted-foreground">
-              {user?.role.toUpperCase() ?? "Guest"}
+              {data?.role.toUpperCase() ?? "Guest"}
             </p>
 
             <div className="h-px w-20 bg-gray-200 mx-auto md:mx-0 my-2" />
 
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-700 text-sm font-medium">
               <span className="w-2 h-2 rounded-full bg-green-500" />
-              {user?.plan?.name ?? "Free Plan"}
+              {data?.plan?.name ?? "Free Plan"}
             </div>
           </div>
         </div>
@@ -231,7 +229,7 @@ export default function UserProfile({ user }: { user: UserProfile }) {
                 name="salutation"
                 required={false}
                 component="select"
-                options={user?.getSlutation.map((item) => {
+                options={data?.getSlutation.map((item) => {
                   return {
                     label: item.name,
                     value: item.id,
@@ -280,4 +278,15 @@ export default function UserProfile({ user }: { user: UserProfile }) {
       </form>
     </div>
   );
+}
+
+export default function GetUserProfile() {
+  const trpc = useTRPC();
+  const { data, isLoading } = useQuery(trpc.userRouter.edit.queryOptions());
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  return <UserProfile data={data} />;
 }

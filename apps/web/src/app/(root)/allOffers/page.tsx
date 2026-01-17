@@ -1,6 +1,5 @@
 "use client";
 import { algoliaClient } from "@repo/algolia";
-import { CldImage } from "next-cloudinary";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";

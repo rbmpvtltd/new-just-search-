@@ -54,7 +54,7 @@ function GetData({ setOpen, id }: { setOpen: SetOpen; id: number }) {
   const trpc = useTRPC();
 
   const { data, isFetching } = useSuspenseQuery(
-    trpc.franchiseSalemanRouter.edit.queryOptions(
+    trpc.franchiseSalesmanRouter.edit.queryOptions(
       { id },
       {
         staleTime: 0,

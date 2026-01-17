@@ -9,7 +9,7 @@ import SalesmanForm from "./forms/SalesmanForm";
 import UserForm from "./forms/UserForm";
 
 export type EditFranchiseSalesmanType =
-  OutputTrpcType["franchiseSalemanRouter"]["edit"];
+  OutputTrpcType["franchiseSalesmanRouter"]["edit"];
 export function EditSalesmanPage({
   id,
   data,

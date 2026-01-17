@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import Rating from "@/components/ui/Rating";
 import type { OutputTrpcType } from "@/trpc/type";
 import Favourite from "../../shared/Favourite";
-import { CldImage } from "next-cloudinary";
 
 type BusinessListing = {
   objectID: string;
