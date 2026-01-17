@@ -66,7 +66,7 @@ export const BussinessListingCard = ({
                 <CldImage
                   width="300"
                   height="300"
-                  className="max-w-100 max-h-100 object-cover"
+                  className="h-70 object-cover"
                   src={item.photo ?? ""}
                   alt="Business image"
                 />
@@ -79,7 +79,7 @@ export const BussinessListingCard = ({
               </div> TODO: navigate to single shop when trying clicked on favourite */}
             </div>
           </div>
-          <div className="flex flex-col py-2 justify-between gap-2 ">
+          <div className="flex flex-col py-2 mt-4 gap-4 ">
             <h1 className="text-2xl font-bold ">{item.name}</h1>
             <div className="flex gap-2 flex-wrap">
               <Badge variant="default">{category}</Badge>
@@ -102,7 +102,7 @@ export const BussinessListingCard = ({
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${navigationId}`);
+                  router.push(`/subcategory/aboutBusiness/${navigationId}`);
                   console.log("clicked", item.latitude, item.longitude);
                 }}
                 type="button"
@@ -113,7 +113,7 @@ export const BussinessListingCard = ({
               </Button>
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${navigationId}`);
+                  router.push(`/subcategory/aboutBusiness/${navigationId}`);
                   console.log("chatting with", navigationId);
                 }}
                 type="button"
@@ -125,7 +125,7 @@ export const BussinessListingCard = ({
               {/* </div> */}
               <Button
                 onClick={() => {
-                  router.push(`/business/shop/${navigationId}`);
+                  router.push(`/subcategory/aboutBusiness/${navigationId}`);
                   console.log("calling on", item.phoneNumber);
                 }}
                 type="button"

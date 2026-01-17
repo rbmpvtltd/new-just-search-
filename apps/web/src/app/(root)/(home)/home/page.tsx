@@ -8,6 +8,8 @@ import { getTrpcUrl } from "@/trpc/helper";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 import { ErrorComponent } from "@/utils/error/ErrorComponent";
+import HomeSearchBar from "@/components/home-searchbar";
+
 
 export default async function Page() {
   console.log(getTrpcUrl());
@@ -35,6 +37,7 @@ export default async function Page() {
   return (
     <div className="mx-auto">
       <FirstCaraousel bannerFirst={bannerFirst} />
+      <HomeSearchBar />
       <Category category={category} allCategory={allCategory} />
       <PremiumShop />
       <PopularaBanner

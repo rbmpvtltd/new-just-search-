@@ -23,10 +23,10 @@ const algoliaClient = algoliasearch(
 );
 
 export async function algoliaSeed() {
-  await algoliaHireSeed();
+  // await algoliaHireSeed();
   // await algoliaBusinessSeed();
   // await algoliaProductOfferSeed();
-  // await algoliaAllListingSeed();
+  await algoliaAllListingSeed();
 }
 
 async function algoliaHireSeed() {
@@ -484,9 +484,14 @@ async function algoliaAllListingSeed() {
     indexName: "all_listing",
     indexSettings: {
       attributesForFaceting: [
+       "gender",
+       "searchable(rating)",
+        "languages",
         "searchable(category)",
-        "searchable(rating)",
         "searchable(subcategories)",
+        "expectedSalary",
+        "searchable(workShift)",
+        "workExp",
         "categoryId",
       ],
     },
@@ -704,7 +709,7 @@ async function algoliaAllListingSeed() {
     });
 
     console.log(
-      `✅ Successfully uploaded ${finalData.length} records to Algolia index: business_listing`,
+      `✅ Successfully uploaded ${finalData.length} records to Algolia index: all_listing`,
     );
 
     return { success: true, count: finalData.length };
