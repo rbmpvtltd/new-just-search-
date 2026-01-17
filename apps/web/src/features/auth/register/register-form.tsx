@@ -13,10 +13,10 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useTRPC } from "@/trpc/client";
 import { setRole, setToken } from "@/utils/session";
 
@@ -25,16 +25,19 @@ const formSchema = z
     displayName: z
       .string()
       .min(3, "Display name must be at least 3 characters long.")
-      .max(20, "Display name must be at most 20 characters long."),
+      .max(20, "Display name must be at most 20 characters long.")
+      .regex(/^[^0-9]+$/, "Display name cannot contain numbers"),
+
     mobileNumber: z
       .string()
       .regex(/^\d+$/, "Mobile must be digits only")
       .min(10, "Mobile number must be 10 digits")
-      .max(10, "Mobile number must be 10 digits"),
+      .max(10, "Mobile number must be 10 digits")
+      .regex(/^\d{10}$/, "Mobile number must be exactly 10 digits"),
     email: z.string().optional().or(z.literal("")),
     password: z
       .string()
-      .min(6, { message: "Password must be at least 6 characters." }),
+      .min(8, { message: "Password must be at least 6 characters." }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -90,15 +93,19 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
     },
   });
 
-  const sendOTP = async (identifier: string) => {
+  const sendOTP = (identifier: string) => {
+    console.log("Idntifier", identifier);
+
     try {
       mutate(
         { identifier },
         {
-          onSuccess: async () => {
+          onSuccess: () => {
             console.log("otp sended successfully");
           },
-          onError: async () => {
+          onError: (error) => {
+            console.log("Error", error);
+
             Swal.fire({
               icon: "error",
               title: "Oops...",
@@ -130,7 +137,11 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   // Handle registration form submission
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setTempFormData(data);
+    console.log("Data", data);
+
     if (data.email) {
+      console.log("Hii");
+
       const success = await sendOTP(data.email);
       if (success) {
         setStep("verify");
@@ -241,9 +252,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                   name="otp"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        Enter OTP
-                      </FormLabel>
+                      <Label className="text-sm font-medium">Enter OTP</Label>
                       <FormControl>
                         <input
                           placeholder="000000"
@@ -316,19 +325,25 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                 control={form.control}
                 name="displayName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">
-                      Display Name <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="John Doe"
-                        className="rounded-xl"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <>
+                    <FormItem>
+                      <Label className="text-sm font-medium">
+                        Display Name <span className="text-red-500">*</span>
+                      </Label>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="John Doe"
+                          className="rounded-xl"
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[0-9]/g, "");
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  </>
                 )}
               />
 
@@ -337,14 +352,18 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                 name="mobileNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">
+                    <Label className="text-sm font-medium">
                       Mobile Number <span className="text-red-500">*</span>
-                    </FormLabel>
+                    </Label>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="98765 43210"
                         className="rounded-xl"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -357,7 +376,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <Label>Email</Label>
                     <FormControl>
                       <Input
                         {...field}
@@ -376,45 +395,9 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
+                    <Label>
                       Password <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      {/* <div className="relative"> */}
-                      <Input
-                        {...field}
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className="rounded-xl"
-                      />
-                      {/* {showPassword ? (
-                          <Eye
-                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
-                            onClick={() => {
-                              setShowPassword(!showPassword);
-                            }}
-                          />
-                        ) : (
-                          <EyeOff
-                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
-                        )}
-                      </div> */}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Confirm Password <span className="text-red-500">*</span>
-                    </FormLabel>
+                    </Label>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -437,6 +420,42 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
                           />
                         )}
                       </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>
+                      Confirm Password <span className="text-red-500">*</span>
+                    </Label>
+                    <FormControl>
+                      {/* <div className="relative"> */}
+                      <Input
+                        {...field}
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="rounded-xl"
+                      />
+                      {/* {showPassword ? (
+                          <Eye
+                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                            onClick={() => {
+                              setShowPassword(!showPassword);
+                            }}
+                          />
+                        ) : (
+                          <EyeOff
+                            className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        )}
+                      </div> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
