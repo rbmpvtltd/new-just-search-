@@ -75,6 +75,7 @@ export const HeroHeader = () => {
                   {menuItems.map((item, index) => (
                     <li key={index.toString()}>
                       <Link
+                        onClick={() => setMenuState(!menuState)}
                         href={item.href}
                         className=" text-muted-foreground hover:text-accent-foreground block duration-150"
                       >
@@ -88,6 +89,7 @@ export const HeroHeader = () => {
                 {data && (
                   <div className="flex gap-2">
                     <Button
+                      onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -98,6 +100,7 @@ export const HeroHeader = () => {
                       </Link>
                     </Button>
                     <Button
+                      onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -107,7 +110,8 @@ export const HeroHeader = () => {
                         <User size={18} />
                       </Link>
                     </Button>
-                     <Button
+                    <Button
+                      onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -122,6 +126,7 @@ export const HeroHeader = () => {
                 {!data && (
                   <>
                     <Button
+                      onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -130,7 +135,12 @@ export const HeroHeader = () => {
                       <Link href="/login">Login</Link>
                     </Button>
 
-                    <Button asChild size="sm" className="bg-primary text-white">
+                    <Button
+                      onClick={() => setMenuState(!menuState)}
+                      asChild
+                      size="sm"
+                      className="bg-primary text-white"
+                    >
                       <Link href="/register">Sign Up</Link>
                     </Button>
                   </>
