@@ -7,11 +7,7 @@ export default async function Register() {
   const session = await asyncHandler(trpcServer.auth.verifyauth.query());
 
   if (!session?.data?.success) {
-    return (
-      <div>
-        <RegisterForm />
-      </div>
-    );
+    return <RegisterForm />;
   }
   redirect("/");
 }

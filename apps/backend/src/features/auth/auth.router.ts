@@ -1,8 +1,10 @@
 import { db } from "@repo/db";
+import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 import { users } from "@repo/db/dist/schema/auth.schema";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import { eq, or } from "drizzle-orm";
+import { OAuth2Client } from "google-auth-library";
 import z from "zod";
 import { isEmail, isMobileNumber, normalizeMobile } from "@/utils/identifier";
 import { sendSMSOTP } from "@/utils/optGenerator";
@@ -12,7 +14,6 @@ import {
   router,
   visitorProcedure,
 } from "@/utils/trpc";
-import { OAuth2Client } from "google-auth-library";
 import { verifyOTP } from "@/utils/varifyOTP";
 import { checkPasswordGetUser } from "./auth.service";
 import {
@@ -20,7 +21,6 @@ import {
   deleteSession,
   validateSessionToken,
 } from "./lib/session";
-import { UserRole } from "@repo/db/dist/enum/allEnum.enum";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_ANDROID_CLIENT_ID);
 
@@ -101,7 +101,6 @@ export const authRouter = router({
             name: payload.name || null,
             givenName: payload.given_name || null,
           };
-          
         } else {
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -111,25 +110,25 @@ export const authRouter = router({
         console.log("======= Verified User =========", input);
 
         const existingUser = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, verifiedUser.email ?? ""));
-          let user = existingUser[0];
-          if (!user) {
-            const inserted = await db
-              .insert(users)
-              .values({
-                displayName: verifiedUser.name || verifiedUser?.givenName,
-                email: verifiedUser.email,
-                role: UserRole.guest,
-                googleId: verifiedUser.id,
-                createdAt: new Date(),
-              })
-              .returning();
+          .select()
+          .from(users)
+          .where(eq(users.email, verifiedUser.email ?? ""));
+        let user = existingUser[0];
+        if (!user) {
+          const inserted = await db
+            .insert(users)
+            .values({
+              displayName: verifiedUser.name || verifiedUser?.givenName,
+              email: verifiedUser.email,
+              role: UserRole.guest,
+              googleId: verifiedUser.id,
+              createdAt: new Date(),
+            })
+            .returning();
 
-            user = inserted[0];
-          }
-          const session = await createSession(Number(user?.id));
+          user = inserted[0];
+        }
+        const session = await createSession(Number(user?.id));
 
         return {
           data: session,
@@ -182,7 +181,6 @@ export const authRouter = router({
   sendOTP: publicProcedure
     .input(z.object({ identifier: z.string() }))
     .mutation(async ({ input }) => {
-      //TODO: add rate limiter for send otp in one minute
       console.log("========>", input);
       const result = await sendSMSOTP(input.identifier);
       return {
