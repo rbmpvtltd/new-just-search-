@@ -40,7 +40,7 @@ function page() {
   return (
     <div className="px-4 w-[90%] mx-auto">
       <div className="flex gap-6 flex-col md:flex-row items-center">
-        <div className="md:mx-0 mx-auto">
+        <div className="md:mx-0 mx-auto h-150 shadow-2xs">
           {/* <Image
             src="https://www.justsearch.net.in/assets/images/215013691738759602.jpg"
             alt="hire img"
@@ -48,7 +48,7 @@ function page() {
           <CldImage
             width="400"
             height="600"
-            className="w-full h-full object-cover"
+            className="h-150 object-cover"
             src={data?.data?.photo ?? ""}
             alt="Business image"
           />
