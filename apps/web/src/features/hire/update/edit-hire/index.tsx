@@ -38,7 +38,7 @@ export default function EditHirePage({
   return (
     <div className="max-w-5xl mx-auto">
       <div className="">
-        <div className="flex justify-between mb-2">
+        <div className="flex justify-between mb-2 w-[90%] mx-auto">
           {steps.map((label, index) => (
             <div
               key={label}
@@ -51,7 +51,7 @@ export default function EditHirePage({
           ))}
         </div>
 
-        <div className="w-full bg-gray-200 h-2 rounded-full">
+        <div className="w-[90%] bg-gray-200 h-2 rounded-full mx-auto">
           <div
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${((page + 1) / steps.length) * 100}%` }}

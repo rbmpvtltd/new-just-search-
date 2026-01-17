@@ -11,6 +11,7 @@ import {
   categoryUpdateSchema,
   subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
+import { planUserActive } from "@repo/db/dist/schema/plan.schema";
 import {
   franchises,
   profileInsertSchema,
@@ -43,7 +44,7 @@ import {
 } from "./franchise.admin.service";
 import { generateReferCode } from "./salesman.admin.service";
 
-export const franchiseSalemanRouter = router({
+export const franchiseSalesmanRouter = router({
   list: franchisesProcedure
     .input(tableInputSchema)
     .query(async ({ input, ctx }) => {
@@ -130,6 +131,22 @@ export const franchiseSalemanRouter = router({
         message: "Franchise not found",
       });
     }
+    const name = (
+      await db.query.users.findFirst({
+        where: (user, { eq }) => eq(user.id, ctx.userId),
+        columns: {
+          displayName: true,
+        },
+      })
+    )?.displayName;
+    const referCode = (
+      await db.query.salesmen.findFirst({
+        where: (salesman, { eq }) => eq(salesman.userId, ctx.userId),
+        columns: {
+          referCode: true,
+        },
+      })
+    )?.referCode;
     const businessSq = await db
       .select({ count: count() })
       .from(businessListings)
@@ -155,7 +172,43 @@ export const franchiseSalemanRouter = router({
           .where(eq(salesmen.franchiseId, franchiseUser.id))
       )[0]?.count ?? 0;
 
-    return { allSalesman, totalUsers, businessSq, hireSq };
+    const paidBusinessUsers =
+      (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${planUserActive.id})::int`,
+          })
+          .from(planUserActive)
+          .innerJoin(
+            businessListings,
+            eq(planUserActive.userId, businessListings.userId),
+          )
+          .innerJoin(salesmen, eq(salesmen.id, businessListings.salesmanId))
+          .where(eq(salesmen.franchiseId, franchiseUser.id))
+      )[0]?.count ?? 0;
+
+    const paidHireUsers =
+      (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${planUserActive.id})::int`,
+          })
+          .from(planUserActive)
+          .innerJoin(hireListing, eq(planUserActive.userId, hireListing.userId))
+          .innerJoin(salesmen, eq(salesmen.id, hireListing.salesmanId))
+          .where(eq(salesmen.franchiseId, franchiseUser.id))
+      )[0]?.count ?? 0;
+
+    return {
+      name,
+      hireSq,
+      referCode,
+      totalUsers,
+      businessSq,
+      allSalesman,
+      paidHireUsers,
+      paidBusinessUsers,
+    };
   }),
   add: franchisesProcedure.query(async ({ ctx }) => {
     const states = await db.query.states.findMany();
@@ -365,21 +418,9 @@ export const franchiseSalemanRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      //TODO: remove subcategory of these categories;
-      const allSeletedPhoto = await db
-        .select({
-          photo: categories.photo,
-        })
-        .from(categories)
-        .where(inArray(categories.id, input.ids));
-      await cloudinaryDeleteImagesByPublicIds(
-        allSeletedPhoto.map((item) => item.photo),
-      );
-      //TODO: test that subcategory is also deleting
-      await db
-        .delete(subcategories)
-        .where(inArray(subcategories.categoryId, input.ids));
-      await db.delete(categories).where(inArray(categories.id, input.ids));
+      console.log("Input", input);
+
+      await db.delete(salesmen).where(inArray(salesmen.id, input.ids));
       return { success: true };
     }),
   multiactive: franchisesProcedure

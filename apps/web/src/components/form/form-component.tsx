@@ -79,7 +79,7 @@ export const FormField = <T extends FieldValues>({
                   disabled={disabled}
                   type={type}
                   name={name}
-                  className={`h-[41px] ${className}`}
+                  className={`h-[41px] ${className}  border-black/50`}
                   placeholder={placeholder}
                   onChange={(e) => {
                     onChange(
@@ -171,7 +171,13 @@ export const FormField = <T extends FieldValues>({
               );
 
             case "textarea":
-              return <Textarea value={value} onChange={onChange} />;
+              return (
+                <Textarea
+                  value={value}
+                  onChange={onChange}
+                  className={className}
+                />
+              );
 
             case "calendar":
               return (

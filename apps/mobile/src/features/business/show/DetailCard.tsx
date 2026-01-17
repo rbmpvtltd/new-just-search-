@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
 import { memo } from "react";
 import {
@@ -12,10 +13,12 @@ import StarRating from "react-native-star-rating-widget";
 import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
 import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
+import { cld } from "@/lib/cloudinary";
+import type { OutputTrpcType } from "@/lib/trpc";
 import { useShopIdStore } from "@/store/shopIdStore";
-import { OutputTrpcType } from "@/lib/trpc";
 
-type FavouriteBsinesses = OutputTrpcType["businessrouter"]["favouritesShops"]["data"][0]["shop"][0];
+type FavouriteBsinesses =
+  OutputTrpcType["businessrouter"]["favouritesShops"]["data"][0]["shop"][0];
 
 function DetailCard({
   item,
@@ -23,11 +26,11 @@ function DetailCard({
   navigationId,
   category,
   subcategory,
-  rating
+  rating,
 }: {
-  item: SubcategoryHitType|FavouriteBsinesses;
+  item: SubcategoryHitType | FavouriteBsinesses;
   type: number;
-  navigationId : number;
+  navigationId: number;
   category?: string;
   subcategory?: string[];
   rating?: string | undefined;
@@ -53,13 +56,17 @@ function DetailCard({
       >
         <View className="flex-row p-3 ">
           <View>
-            <AvatarWithFallback
+            {/* <AvatarWithFallback
               uri={
                 "https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png"
-              } // TODO : change image when upload on cloudinary
+              } // 
               imageClass="w-[150px] h-[180px] rounded-lg"
               iconClass="items-center justify-center"
               imageStyle={{ resizeMode: "stretch" }}
+            /> */}
+            <AdvancedImage
+              cldImg={cld.image(item?.photo ?? "")}
+              className="w-[100%] h-[100%]"
             />
           </View>
           <View className="flex-1 my-1 mx-2">
@@ -125,7 +132,7 @@ function DetailCard({
                   {category}
                 </Text>
               </TouchableOpacity>
-              {subcategory?.slice(0, 2)?.map((sub:string, index:number) => (
+              {subcategory?.slice(0, 2)?.map((sub: string, index: number) => (
                 <TouchableOpacity
                   key={index.toString()}
                   className="bg-error-content rounded-lg py-2 px-2 mb-1"
@@ -147,7 +154,7 @@ function DetailCard({
                 <TouchableOpacity
                   className="bg-base-100 rounded-lg py-2 px-4 mb-1"
                   onPress={() => {
-                    setShopId(String(navigationId ));
+                    setShopId(String(navigationId));
                     router.navigate({
                       pathname:
                         "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
@@ -186,7 +193,7 @@ function DetailCard({
           <View className="rounded-lg bg-primary p-1">
             <Pressable
               onPress={() => {
-                setShopId(String(navigationId ));
+                setShopId(String(navigationId));
                 router.navigate({
                   pathname:
                     "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
@@ -224,7 +231,7 @@ function DetailCard({
                   router.navigate({
                     pathname:
                       "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-                    params: { premiumshops: navigationId},
+                    params: { premiumshops: navigationId },
                   });
                 }}
               >

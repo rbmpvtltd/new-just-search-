@@ -92,10 +92,10 @@ function HelpAndSupportPrivateChat({
         </h2>
       </div>
       {store.map((msg) => (
-        <div key={msg.id} className="flex flex-col gap-1">
+        <div key={msg.id} className="flex gap-1">
           {msg.message && (
             <div
-              className={`flex px-2 py-2 rounded-xl text-sm shadow-sm w-fit ${
+              className={`px-2 py-2 rounded-xl text-sm shadow-sm max-w-[70%] wrap-break-word whitespace-pre-wrap w-fit ${
                 msg.sendByRole === "Admin"
                   ? "bg-blue-100 ml-auto"
                   : "bg-gray-100"
@@ -163,8 +163,8 @@ export default function HelpAndSupportChat({
     <div className="p-4 max-w-md mx-auto flex flex-col h-[90vh]">
       <BoundaryWrapper>
         <MemorizedPrivateChat chatTokenSessionId={chatTokenSessionId} />
+        <MemorizedSendMessage chatTokenSessionId={chatTokenSessionId} />
       </BoundaryWrapper>
-      <MemorizedSendMessage chatTokenSessionId={chatTokenSessionId} />
     </div>
   );
 }

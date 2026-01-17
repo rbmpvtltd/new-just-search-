@@ -232,7 +232,16 @@ export default function HireCard({
       Alert.alert("Error", error?.message ?? "Unable to share");
     }
   };
-
+  const fullAddress = [
+    item.buildingName,
+    item.streetName,
+    item.landmark,
+    item?.address,
+    item?.city,
+    item?.state,
+  ]
+    .filter(Boolean)
+    .join(", ");
   return (
     <Pressable
       className=""
@@ -343,8 +352,7 @@ export default function HireCard({
               color={colorScheme === "dark" ? "#F87171" : "#DC2626"}
             />
             <Text className="text-base text-secondary-content">
-              {item?.area}, {item?.buildingName}{" "}
-              {/** TODO: add street name when seed update */}
+              {fullAddress}
             </Text>
           </View>
         </View>

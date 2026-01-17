@@ -64,7 +64,7 @@ export default function OffersList({ item }: { item: OfferProductHitType }) {
             cldImg={cld.image(item.photo[0] || "")}
             className="w-full aspect-[3/4] rounded-lg"
           />
-          {/* TODO: add listing name in algolia seed */}
+  
           {item.discountPercent > 0 && (
             <Text className="absolute bg-error text-secondary mt-8 pl-8 pr-3 rounded-r-md">
               -{item.discountPercent}%
@@ -90,7 +90,7 @@ export default function OffersList({ item }: { item: OfferProductHitType }) {
         <Text className="text-secondary text-lg ">
           {item?.item?.listing_name}
         </Text>
-      </View> TODO: add listing name in algolia seed */}
+      </View> */}
       <View className="h-auto w-full mt-4 px-4">
         {item.discountPercent > 0 && (
           <Text className="text-primary text-lg ">

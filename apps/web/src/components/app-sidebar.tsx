@@ -42,7 +42,7 @@ interface SidebarField {
 const items: SidebarField[] = [
   {
     title: "Home",
-    url: "/profile",
+    url: "/",
     icon: Home,
     role: "all",
   },
@@ -130,11 +130,12 @@ export async function AppSidebar() {
   const itemdata = items.filter(
     (item) => item?.role?.includes(role) || item?.role === "all",
   );
+
   return (
-    <Sidebar>
+    <Sidebar className="mt-16">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Profile Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {itemdata.map((item) => {

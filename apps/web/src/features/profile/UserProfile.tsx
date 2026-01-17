@@ -4,21 +4,21 @@ import { MaritalStatus } from "@repo/db/dist/enum/allEnum.enum";
 import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import { id } from "date-fns/locale";
+import { Camera } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
-import Swal from "sweetalert2";
 import type z from "zod";
 import {
   FormField,
   type FormFieldProps,
 } from "@/components/form/form-component";
 import { uploadToCloudinary } from "@/components/image/cloudinary";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 
 type UserProfile = OutputTrpcType["userRouter"]["edit"] | null;
@@ -57,8 +57,12 @@ export default function UserProfile({ user }: { user: UserProfile }) {
     mutate(finalData, {
       onSuccess: (data) => {
         if (data.success) {
+          const queryClient = getQueryClient();
+          queryClient.invalidateQueries({
+            queryKey: trpc.userRouter.edit.queryKey(),
+          });
           sweetAlertSuccess(data.message);
-          router.push("/");
+          // router.push("/");
         }
       },
       onError: (error) => {
@@ -80,10 +84,12 @@ export default function UserProfile({ user }: { user: UserProfile }) {
   const selectedStateId = useWatch({ control, name: "state" });
 
   const { data: cities, isLoading } = useQuery(
-    trpc.hirerouter.getCities.queryOptions({
+    trpc.userRouter.getCities.queryOptions({
       state: Number(selectedStateId),
     }),
   );
+
+  console.log("Cities", cities);
 
   const formFields: FormFieldProps<UserUpdateSchema>[] = [
     {
@@ -172,31 +178,47 @@ export default function UserProfile({ user }: { user: UserProfile }) {
     <div className="">
       <form onSubmit={handleSubmit(onSubmit)} className="max-w-5xl ">
         <div className="w-[90%] mx-auto bg-white shadow rounded-xl p-6 flex flex-col md:flex-row items-center gap-6">
-          <Avatar className="w-32 h-32 border shadow-sm overflow-hidden">
-            {/* <AvatarImage src="/images/demo-img.webp" alt="User Profile" /> */}
-            <div className="flex items-center justify-center w-full h-full ">
-              <FormField
-                control={control}
-                label=""
-                name="profileImage"
-                required={false}
-                className="w-6 h-6 "
-                component="image"
-              />
-            </div>
-            <AvatarFallback className="text-2xl font-bold">UP</AvatarFallback>
-          </Avatar>
+          <div className="relative group">
+            <Avatar className="w-36 h-36 border-4 border-white shadow-md overflow-hidden">
+              <div className="flex items-center justify-center w-full h-full bg-gray-50">
+                <FormField
+                  control={control}
+                  name="profileImage"
+                  required={false}
+                  component="image"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+              </div>
 
-          <div className="text-center md:text-left space-y-1">
-            <h2 className="text-2xl font-bold">
+              <AvatarFallback className="text-3xl font-semibold bg-primary/10 text-primary">
+                UP
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+              <span className="-translate-y-4 text-white text-sm font-medium">
+                <Camera />
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1 text-center md:text-left space-y-2">
+            <h2 className="text-2xl font-semibold tracking-tight">
               {user?.profile?.firstName
                 ? `${user?.profile?.firstName} ${user?.profile?.lastName ?? ""}`
                 : "User Name"}
             </h2>
-            <p className="text-muted-foreground">
-              {user?.role ? user.role : ""}
+
+            <p className="text-sm text-muted-foreground">
+              {user?.role.toUpperCase() ?? "Guest"}
             </p>
-            <p className="text-muted-foreground">Activated Plan: Free</p>
+
+            <div className="h-px w-20 bg-gray-200 mx-auto md:mx-0 my-2" />
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-700 text-sm font-medium">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              {user?.plan?.name ?? "Free Plan"}
+            </div>
           </div>
         </div>
 

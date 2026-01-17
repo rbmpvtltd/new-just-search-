@@ -1,6 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usersInsertSchema } from "@repo/db/dist/schema/auth.schema";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type z from "zod";
 import {
@@ -19,6 +21,7 @@ type UserInsertSchema = z.infer<typeof adminAddUserInsertSchema>;
 export default function UserForm() {
   const nextPage = useSalesmanFormStore((s) => s.nextPage);
   const formValue = useSalesmanFormStore((s) => s.formValue);
+  const [showPassword, setShowPassword] = useState(false);
   const {
     control,
     handleSubmit,
@@ -59,24 +62,6 @@ export default function UserForm() {
       component: "input",
       error: errors.phoneNumber?.message,
     },
-    {
-      control,
-      type: "password",
-      label: "Password",
-      name: "password",
-      placeholder: "Enter Users Login Password",
-      component: "input",
-      error: errors.email?.message,
-    },
-    {
-      control,
-      label: "Active",
-      name: "status",
-      mainDivClassName: "flex gap-4",
-      placeholder: "",
-      component: "single-checkbox",
-      error: errors.status?.message,
-    },
   ];
 
   const onSubmit = async (data: UserInsertSchema) => {
@@ -97,7 +82,37 @@ export default function UserForm() {
             <FormField key={field.name} {...field} />
           ))}
         </div>
-
+        <div className="px-8 space-y-8 relative">
+          <FormField
+            control={control}
+            label="Password"
+            name="password"
+            component="input"
+            placeholder="Enter password"
+            type={showPassword ? "text" : "password"}
+            error={errors.password?.message}
+          />
+          {showPassword ? (
+            <Eye
+              className="absolute right-14 top-8 z-10 cursor-pointer text-gray-500"
+              onClick={() => {
+                setShowPassword(!showPassword);
+              }}
+            />
+          ) : (
+            <EyeOff
+              className="absolute right-14 top-8 z-10 cursor-pointer text-gray-500"
+              onClick={() => setShowPassword(!showPassword)}
+            />
+          )}
+          <FormField
+            control={control}
+            label="Active"
+            name="status"
+            component="single-checkbox"
+            error={errors.status?.message}
+          />
+        </div>
         <div className="flex justify-end p-6 border-t border-gray-200">
           <Button
             type="submit"

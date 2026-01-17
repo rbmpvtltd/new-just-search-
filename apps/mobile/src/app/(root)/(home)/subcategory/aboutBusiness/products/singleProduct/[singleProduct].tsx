@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
+import { AdvancedImage } from "cloudinary-react-native";
 import {
   router,
   Stack,
@@ -32,6 +33,7 @@ import { Loading } from "@/components/ui/Loading";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
+import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
 import { useStartChat } from "@/query/startChat";
 import { showLoginAlert } from "@/utils/alert";
@@ -160,15 +162,19 @@ export default function TabOneScreen() {
               scrollAnimationDuration={1000}
               renderItem={({ item }) => (
                 <View className="relative  h-[500px]  mx-auto bg-base-200 w-[100%] ">
-                  <Image
+                  {/* <Image
                     className="w-[80%] mx-auto rounded-lg aspect-[3/4] mt-4 self-end"
                     source={{
-                      uri: `https://www.justsearch.net.in/assets/images/18109401431760422232.jpeg`, // TODO : change image when upload on cloudinary
-                    }}
+                      uri: `https://www.justsearch.net.in/assets/images/18109401431760422232.jpeg`, //}}
                     resizeMode="cover"
                     onError={(e) =>
                       console.log("Image loading error:", e.nativeEvent.error)
                     }
+                  /> */}
+                  <AdvancedImage
+                    cldImg={cld.image(item || "")}
+                    className="w-[80%] mx-auto rounded-lg aspect-[3/4] mt-4 self-end"
+                    resizeMode="cover"
                   />
                 </View>
               )}

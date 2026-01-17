@@ -5,7 +5,7 @@ import { DataTableColumnHeader } from "@/components/table/data-table-column-head
 import { Checkbox } from "@/components/ui/checkbox";
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
 import ChangeStatus from "../form/change.status";
-import { ViewChat } from "../form/edit.form";
+import { ViewChat } from "../form/view.chat";
 import { useTableStore } from "../store";
 
 function SelectCell({ id }: { id: number }) {

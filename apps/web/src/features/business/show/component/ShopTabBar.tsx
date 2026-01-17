@@ -6,6 +6,7 @@ import { CheckCircle2, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaPhoneAlt, FaRegCalendarAlt, FaWhatsappSquare } from "react-icons/fa";
@@ -198,26 +199,6 @@ export function ShopTabBar({ singleShop }: { singleShop: SingleShopType }) {
               longitude={String(singleShop?.longitude)}
               title={singleShop?.name}
             />
-            {/* <div className="md:w-[80%] w-full mx-auto">
-              {schedule.map((item, index) => {
-                return (
-                  <div
-                    key={index.toString()}
-                    className="flex gap-8 justify-between w-[60%]"
-                  >
-                    <h1 className="font-semibold">{item[0]}</h1>
-                    {Object.keys(item[1]).length > 1 && (
-                      <p className="font-medium text-sm">
-                        {item[1].opens_at}-{item[1].closes_at}
-                      </p>
-                    )}
-                    {Object.keys(item[1]).length === 1 && (
-                      <p className="font-medium text-sm">Closed</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div> */}
           </div>
         </TabsContent>
         <TabsContent value="reviews" className="mt-10 sm:mt-0">
@@ -318,6 +299,9 @@ function ShopOffers({
   const { data } = useQuery(
     trpc.businessrouter.shopOffers.queryOptions({ businessId: shopId }),
   );
+
+  console.log("Shop ---------------->", data);
+
   return (
     <div className="p-4 flex flex-wrap justify-between gap-4">
       {data?.length === 0 && (
@@ -338,11 +322,18 @@ function ShopOffers({
             }}
           >
             <div className="relative">
-              <Image
+              {/* <Image
                 width={200}
                 height={400}
                 alt="offer image"
-                src="https://www.justsearch.net.in/assets/images/6194461891759217396.png" // TODO : change image url when upload images to cloudinary
+                src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
+              /> */}
+              <CldImage
+                width="300"
+                height="300"
+                className="rounded-md"
+                src={item?.photos[0] ?? ""}
+                alt="Shop Image"
               />
               <span className="absolute z-1 top-3  w-[70px] bg-error text-end px-4 text-white rounded-r-md">
                 -{item.discountPercent}%

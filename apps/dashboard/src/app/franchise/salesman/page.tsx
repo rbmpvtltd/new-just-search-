@@ -8,14 +8,14 @@ import { DataTableToolbar } from "./table/toolbar";
 export default function Page() {
   const trpc = useTRPC();
   const queryConfig = {
-    queryKey: trpc.franchiseSalemanRouter.list.queryKey(),
+    queryKey: trpc.franchiseSalesmanRouter.list.queryKey(),
     queryFn: async ({
       pagination,
       sorting,
       filters,
       globalFilter,
     }: QueryFnContext) => {
-      const result = await trpcServer.franchiseSalemanRouter.list.query({
+      const result = await trpcServer.franchiseSalesmanRouter.list.query({
         sorting,
         pagination: {
           pageIndex: pagination?.pageIndex || 0,

@@ -344,30 +344,7 @@ export const adminProductRouter = router({
 
       return { success: true };
     }),
-  // multidelete: adminProcedure
-  //   .input(
-  //     z.object({
-  //       ids: z.array(z.number()),
-  //     }),
-  //   )
-  //   .mutation(async ({ input }) => {
-  //     //TODO: remove subcategory of these categories;
-  //     const allSeletedPhoto = await db
-  //       .select({
-  //         photo: categories.photo,
-  //       })
-  //       .from(categories)
-  //       .where(inArray(categories.id, input.ids));
-  //     await cloudinaryDeleteImagesByPublicIds(
-  //       allSeletedPhoto.map((item) => item.photo),
-  //     );
-  //     //TODO: test that subcategory is also deleting
-  //     await db
-  //       .delete(subcategories)
-  //       .where(inArray(subcategories.categoryId, input.ids));
-  //     await db.delete(categories).where(inArray(categories.id, input.ids));
-  //     return { success: true };
-  //   }),
+
   // multiactive: adminProcedure
   //   .input(
   //     z.array(

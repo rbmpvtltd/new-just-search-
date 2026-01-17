@@ -63,9 +63,9 @@ export default function FranchiseForm({ setOpen }: { setOpen: SetOpen }) {
     },
     {
       control,
-      label: "Refer Code",
+      label: "Refer Code Prefix",
       name: "referPrifixed",
-      placeholder: "Enter Refer Code",
+      placeholder: "Enter Refer Code Prefix",
       component: "input",
       error: errors.referPrifixed?.message,
     },

@@ -253,19 +253,6 @@ export default function BusinessDetail({
               "CONTINUE"
             )}
           </Button>
-          <Button
-            type="submit"
-            onClick={() => console.log(getValues())}
-            className="bg-orange-500 hover:bg-orange-700 font-bold"
-          >
-            {isSubmitting ? (
-              <>
-                <Spinner /> Loading...
-              </>
-            ) : (
-              "Get Value"
-            )}
-          </Button>
         </div>
       </form>
     </div>

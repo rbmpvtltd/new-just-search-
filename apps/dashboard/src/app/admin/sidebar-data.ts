@@ -1,6 +1,6 @@
 "use client";
-import { IconDatabase, IconFileWord, IconReport } from "@tabler/icons-react";
-import { BookOpen, Bot } from "lucide-react";
+import { IconBell, IconBox, IconClipboardList, IconDatabase, IconDeviceMobile, IconDiscount2, IconFileWord, IconHelp, IconMessage, IconMessageReport, IconNetwork, IconPhoto, IconReport, IconTrash, IconUser, IconUserCheck } from "@tabler/icons-react";
+import { BookOpen, Bot, CreditCard, Layers, Tags } from "lucide-react";
 import type { SidebarData } from "@/types/sidebar";
 
 export const adminSidebarData: SidebarData = {
@@ -13,7 +13,7 @@ export const adminSidebarData: SidebarData = {
     {
       title: "Category Master",
       url: "#",
-      icon: Bot,
+      icon: Layers,
       items: [
         {
           title: "Category",
@@ -43,7 +43,7 @@ export const adminSidebarData: SidebarData = {
     {
       title: "Plans Master",
       url: "#",
-      icon: BookOpen,
+      icon: CreditCard,
       items: [
         {
           title: "Plans",
@@ -61,67 +61,67 @@ export const adminSidebarData: SidebarData = {
     {
       name: "Banners",
       url: "/banners",
-      icon: IconDatabase,
+      icon: IconPhoto,
     },
     {
       name: "Manage Customer",
       url: "/users",
-      icon: IconDatabase,
+      icon: IconUser,
     },
     {
-      name: "Offer",
+      name: "Offers",
       url: "/offer",
-      icon: IconDatabase,
+      icon: IconDiscount2,
     },
     {
-      name: "Product",
+      name: "Products",
       url: "/product",
-      icon: IconDatabase,
+      icon: IconBox,
     },
     {
       name: "Manage Plan",
       url: "/plan",
-      icon: IconDatabase,
+      icon: IconClipboardList,
     },
     {
       name: "Manage Franchise",
       url: "/franchise",
-      icon: IconDatabase,
+      icon: IconNetwork,
     },
     {
       name: "Manage Saleman",
       url: "/salesman",
-      icon: IconDatabase,
+      icon: IconUserCheck,
     },
     {
       name: "Help & Support",
       url: "/help-support",
-      icon: IconReport,
+      icon: IconHelp,
     },
     {
       name: "Conversations",
       url: "/conversation",
-      icon: IconFileWord,
+      icon: IconMessage,
     },
     {
       name: "Feedback",
       url: "/feedback",
-      icon: IconFileWord,
+      icon: IconMessageReport,
     },
     {
       name: "Notification",
       url: "/notification",
-      icon: IconFileWord,
+      icon: IconBell,
     },
     {
       name: "Account Delete Request",
       url: "/delete-request",
-      icon: IconFileWord,
+      icon: IconTrash,
     },
     {
       name: "Mobile Version Update",
       url: "/update",
-      icon: IconFileWord,
+      icon: IconDeviceMobile,
     },
   ],
 };

@@ -62,7 +62,7 @@ export default function Feedback() {
     });
   };
   return (
-    <div className="flex  justify-center">
+    <div className="flex justify-center pb-14">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-3xl  bg-gray-50 rounded-2xl shadow-lg overflow-hidden"
@@ -98,7 +98,7 @@ export default function Feedback() {
               component="textarea"
               placeholder="Type here..."
               //   error={errors?.additionalFeedback?.message}
-              className="w-full min-h-[120px]"
+              className="w-full max-h-96"
               required={false}
             />
           </div>

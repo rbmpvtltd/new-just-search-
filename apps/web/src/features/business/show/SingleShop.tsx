@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -30,12 +31,19 @@ export function SingleShopTabBar({
               <div className="py-1">
                 <Card>
                   <CardContent className="flex items-center justify-center">
-                    <Image
+                    {/* <Image
                       width={500}
                       height={400}
                       alt="banner image"
-                      src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change photo url with shop.photo when upload on cloudinary
+                      src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" 
                       className="rounded-md"
+                    /> */}
+                    <CldImage
+                      width="500"
+                      height="400"
+                      className="rounded-md"
+                      src={shop?.photo ?? ""}
+                      alt="Shop Image"
                     />
                   </CardContent>
                 </Card>
@@ -49,12 +57,19 @@ export function SingleShopTabBar({
                 <div className="py-1">
                   <Card>
                     <CardContent className="flex items-center justify-center">
-                      <Image
+                      {/* <Image
                         width={500}
                         height={400}
                         alt="banner image"
-                        src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" // TODO : change photo url when upload on cloudinary
+                        src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" 
                         className="rounded-md"
+                      /> */}
+                      <CldImage
+                        width="500"
+                        height="400"
+                        className="rounded-md"
+                        src={item ?? ""}
+                        alt="Shop Image"
                       />
                     </CardContent>
                   </Card>

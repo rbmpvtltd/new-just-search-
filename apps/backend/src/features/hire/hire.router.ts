@@ -10,6 +10,10 @@ import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { count, eq, gt, sql } from "drizzle-orm";
 import z from "zod";
+import {
+  cloudinaryDeleteImageByPublicId,
+  cloudinaryDeleteImagesByPublicIds,
+} from "@/lib/cloudinary";
 import { slugify } from "@/lib/slugify";
 import {
   hireProcedure,
@@ -313,15 +317,34 @@ export const hirerouter = router({
     .mutation(async ({ ctx, input }) => {
       const isHireExists = await db.query.hireListing.findFirst({
         where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),
+        columns: {
+          id: true,
+          userId: true,
+          photo: true,
+          certificates: true,
+          resumePhoto: true,
+          idProofPhoto: true,
+        },
       });
 
-      logger.info("isHireExists", isHireExists);
-      // return isHireExists;
       if (!isHireExists) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Hire listing not found",
         });
+      }
+
+      const imageToDelete = [
+        isHireExists.photo,
+        isHireExists.resumePhoto,
+        isHireExists.idProofPhoto,
+        isHireExists.certificates,
+      ]
+        .filter(Boolean)
+        .map(String);
+
+      if (imageToDelete.length > 0) {
+        await cloudinaryDeleteImagesByPublicIds(imageToDelete);
       }
 
       const updateHire = await db

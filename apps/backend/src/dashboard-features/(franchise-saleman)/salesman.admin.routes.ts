@@ -158,7 +158,7 @@ export const adminSalemanRouter = router({
       if (isEmailOrPhoneNumberExist) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Email already exists",
+          message: "Email or Phone already exists",
         });
       }
 
@@ -259,7 +259,6 @@ export const adminSalemanRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      //TODO: remove subcategory of these categories;
       const allSeletedPhoto = await db
         .select({
           photo: categories.photo,
@@ -269,7 +268,6 @@ export const adminSalemanRouter = router({
       await cloudinaryDeleteImagesByPublicIds(
         allSeletedPhoto.map((item) => item.photo),
       );
-      //TODO: test that subcategory is also deleting
       await db
         .delete(subcategories)
         .where(inArray(subcategories.categoryId, input.ids));

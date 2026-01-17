@@ -2,7 +2,7 @@ import { trpcServer } from "@/trpc/trpc-server";
 import { SectionCards } from "./salesman/components/section-cards";
 
 export default async function Page() {
-  const data = await trpcServer.franchiseSalemanRouter.totalSalesman.query();
+  const data = await trpcServer.franchiseSalesmanRouter.totalSalesman.query();
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">

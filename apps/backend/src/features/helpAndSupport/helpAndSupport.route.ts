@@ -30,10 +30,7 @@ export const helpAndSupportRouter = router({
     .input(chatTokenSessionInsertSchema)
     .mutation(async ({ input, ctx }) => {
       const token = await tokenGenerator();
-      logger.info("Token", { token: token });
 
-      // TODO : Update this logic
-      //check status
       const status = await db.query.chatTokenSessions.findFirst({
         where: (chatTokenSessions, { eq, and }) =>
           and(

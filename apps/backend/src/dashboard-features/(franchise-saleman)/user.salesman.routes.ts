@@ -1,6 +1,7 @@
 import { db } from "@repo/db";
 import { businessListings } from "@repo/db/dist/schema/business.schema";
 import { hireListing } from "@repo/db/dist/schema/hire.schema";
+import { planUserActive } from "@repo/db/dist/schema/plan.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, sql } from "drizzle-orm";
@@ -153,6 +154,28 @@ export const salesmanUserRouter = router({
     }),
 
   totalUsers: salesmanProcedure.query(async ({ ctx }) => {
+    const saleman = await db.query.salesmen.findFirst({
+      where: (salesman, { eq }) => eq(salesman.userId, ctx.userId),
+      columns: {
+        id: true,
+        referCode: true,
+      },
+    });
+
+    if (!saleman) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Salesman not found",
+      });
+    }
+    const name = (
+      await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, ctx.userId),
+        columns: {
+          displayName: true,
+        },
+      })
+    )?.displayName;
     const allBusiness =
       (
         await db
@@ -160,7 +183,22 @@ export const salesmanUserRouter = router({
             count: sql<number>`count(distinct ${businessListings.id})::int`,
           })
           .from(businessListings)
-          .where(eq(businessListings.salesmanId, ctx.userId))
+          .where(eq(businessListings.salesmanId, saleman.id))
+      )[0]?.count ?? 0;
+
+    const paidUsers =
+      (
+        await db
+          .select({
+            count: sql<number>`count(distinct ${planUserActive.id})::int`,
+          })
+          .from(planUserActive)
+          .leftJoin(
+            businessListings,
+            eq(planUserActive.userId, businessListings.userId),
+          )
+          .leftJoin(hireListing, eq(planUserActive.userId, hireListing.userId))
+          .where(eq(businessListings.salesmanId, saleman.id))
       )[0]?.count ?? 0;
 
     const allhire =
@@ -170,12 +208,15 @@ export const salesmanUserRouter = router({
             count: sql<number>`count(distinct ${hireListing.id})::int`,
           })
           .from(hireListing)
-          .where(eq(hireListing.salesmanId, ctx.userId))
+          .where(eq(hireListing.salesmanId, saleman.id))
       )[0]?.count ?? 0;
 
-    
-    // const unPaidUsers = await db.query.
-
-    return { allBusiness, allhire };
+    return {
+      allBusiness,
+      allhire,
+      paidUsers,
+      name,
+      referCode: saleman.referCode,
+    };
   }),
 });

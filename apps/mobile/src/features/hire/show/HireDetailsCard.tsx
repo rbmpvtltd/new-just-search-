@@ -244,7 +244,7 @@ export default function HireDetailsCard(item: any) {
                         console.log("Chat started:", res.chat_session_id);
 
                         router.push({
-                          pathname: "/(root)/(home)/chat", // TODO: add real chats redirect
+                          pathname: "/(root)/(home)/chat", 
                           params: { chat: res?.chat_session_id.toString() },
                         });
                       },

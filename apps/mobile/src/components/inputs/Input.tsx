@@ -41,6 +41,7 @@ const Input = forwardRef<TextInput, InputProps>(
             Colors["light"]["base-300"]
           }
           secureTextEntry={isPassword && !showPassword}
+          
           {...rest}
         />
         {isPassword && (

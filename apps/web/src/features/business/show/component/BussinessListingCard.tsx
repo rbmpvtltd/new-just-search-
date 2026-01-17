@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 // import Favourite from "../../shared/Favourite";
 import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
 import { FaPhoneAlt } from "react-icons/fa";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import { MdLocationPin } from "react-icons/md";
@@ -35,14 +36,15 @@ type BusinessListing = {
     lng: number;
   };
 };
-type businesses = OutputTrpcType["businessrouter"]["favouritesShops"]["data"][0]["shop"][0];
+type businesses =
+  OutputTrpcType["businessrouter"]["favouritesShops"]["data"][0]["shop"][0];
 
 export const BussinessListingCard = ({
   item,
   navigationId,
   category,
   subcategory,
-  rating
+  rating,
 }: {
   item: BusinessListing | businesses;
   navigationId?: number;
