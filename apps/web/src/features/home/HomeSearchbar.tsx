@@ -6,7 +6,6 @@ import {
   Configure,
   Hits,
   InstantSearch,
-  SearchBox,
   useSearchBox,
 } from "react-instantsearch";
 import { SearchBoxComponent } from "./component/SearchBox";
