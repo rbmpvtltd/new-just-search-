@@ -16,55 +16,51 @@ import {
 
 function Hit({ hit }: { hit: any }) {
   return (
-    <div className="h-100 shadow-[0_4px_12px_rgba(0,0,0,0.650)] py-4 rounded-md hover:scale-105 transform transition-all duration-300 flex flex-col justify-center items-center">
+    <div className="group h-full rounded-xl border bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       <Link
         href={{
           pathname: hit.discountPercent
             ? `/subcategory/aboutBusiness/offers/singleOffers/${hit.navigationId}`
             : `/subcategory/aboutBusiness/products/singleProduct/${hit.navigationId}`,
         }}
-        className="w-full"
+        className="block"
       >
-        <div className="relative w-full mx-auto flex justify-center">
+        <div className="relative flex justify-center p-4">
           <div className="relative">
-            {/* <Image
-              width={200}
-              height={400}
-              alt="offer image"
-              src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
-              className="object-contain"
-            /> */}
-
             {hit.photo ? (
               <CldImage
                 width="200"
-                height="400"
-                className="object-contain"
+                height="260"
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
                 src={hit.photo}
                 alt="Offer Image"
               />
             ) : (
-              "no photo"
+              <div className="h-[260px] w-[200px] flex items-center justify-center text-sm text-muted-foreground">
+                No Image
+              </div>
             )}
+
             {hit.discountPercent > 0 && (
-              <span className="absolute z-10 top-3 left-0 min-w-17.5 bg-error text-end px-4 py-1 text-white rounded-r-md font-semibold text-sm">
+              <span className="absolute top-3 left-0 z-10 rounded-r-lg bg-red-500 px-3 py-1 text-xs font-semibold text-white shadow-md">
                 -{hit.discountPercent}%
               </span>
             )}
           </div>
         </div>
       </Link>
-      <div className="w-full px-4 mt-3 space-y-2">
-        <h2 className="text-center font-medium line-clamp-2 w-full wrap-break-words min-h-12">
+
+      <div className="px-4 pb-4 space-y-2">
+        <h2 className="min-h-[3rem] text-center text-sm font-medium line-clamp-2 text-gray-900">
           {hit.name}
         </h2>
+
         <div className="flex flex-col items-center gap-1">
           {hit.discountPercent > 0 && (
-            <p className="text-gray-500 text-sm">
-              ₹ <span className="line-through">{hit.price}</span>
-            </p>
+            <p className="text-xs text-gray-400 line-through">₹ {hit.price}</p>
           )}
-          <p className="font-bold text-primary text-lg">
+
+          <p className="text-lg font-bold text-primary">
             ₹ {hit.finalPrice > 0 ? hit.finalPrice : hit.price}
           </p>
         </div>

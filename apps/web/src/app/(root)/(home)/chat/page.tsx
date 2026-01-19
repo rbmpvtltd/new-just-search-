@@ -1,4 +1,7 @@
 // import { useSearchParams } from "next/navigation";
+export const dynamic = "force-dynamic";
+
+
 import ConversationList from "@/features/chat/ConversationList";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";

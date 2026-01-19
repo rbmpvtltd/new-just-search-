@@ -1,9 +1,11 @@
-import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
-import { trpcServer } from "@/trpc/trpc-server";
-import { asyncHandler } from "@/utils/error/asyncHandler";
+export const dynamic = "force-dynamic";
+
 import { TRPCError } from "@trpc/server";
 import { redirect } from "next/navigation";
 import React from "react";
+import { BussinessListingCard } from "@/features/business/show/component/BussinessListingCard";
+import { trpcServer } from "@/trpc/trpc-server";
+import { asyncHandler } from "@/utils/error/asyncHandler";
 
 async function page() {
   const { data, error } = await asyncHandler(
@@ -48,7 +50,7 @@ async function page() {
               subcategory={item.subcategories}
             />
           </div>
-        )
+        );
       })}
     </div>
   );

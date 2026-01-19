@@ -1,6 +1,8 @@
+export const dynamic = "force-dynamic";
+
+import { redirect } from "next/navigation";
 import UpdateDisplayNameForm from "@/features/auth/login/display-update";
 import { LoginForm } from "@/features/auth/login/login-form";
-import { redirect } from "next/navigation";
 
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";

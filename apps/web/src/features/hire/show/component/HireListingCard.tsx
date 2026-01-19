@@ -1,14 +1,15 @@
 "use client";
 import Image from "next/image";
-import { MdLocationPin } from "react-icons/md";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
 import { FaPhoneAlt } from "react-icons/fa";
 import { IoChatbubbleEllipses } from "react-icons/io5";
-import { Button } from "@/components/ui/button";
-import type { OutputTrpcType } from "@/trpc/type";
+import { MdLocationPin } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import Rating from "@/components/ui/Rating";
-import Link from "next/link";
-import { CldImage } from "next-cloudinary";
+import type { OutputTrpcType } from "@/trpc/type";
 
 export type HireListing = {
   objectID: string;
@@ -20,7 +21,7 @@ export type HireListing = {
   languages: string[];
   subcategories: string[];
   buildingName?: string;
-  photo:string;
+  photo: string;
   workExp: number;
   workShift: string[];
   address?: string;
@@ -35,6 +36,10 @@ export type HireListing = {
 };
 
 export const HireListingCard = ({ item }: { item: HireListing }) => {
+  const fullAddress = [item.buildingName, item.address, item.address, item.city]
+    .filter(Boolean)
+    .join(", ");
+  const router = useRouter();
   return (
     <div className="mx-auto p-4">
       <div className="flex flex-col justify-center gap-4">
@@ -69,14 +74,12 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
             </div>
             <div className="flex items-center gap-2 ">
               <MdLocationPin />
-              <p className="text-sm">
-                {item?.buildingName}, {item?.address}, {item?.city}
-              </p>
+              <p className="text-sm">{fullAddress}</p>
             </div>
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  console.log("chatting with", item.objectID);
+                  router.push(`/hire/hireDetail/${item.objectID}`);
                 }}
                 type="button"
                 className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
@@ -84,10 +87,9 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
                 <IoChatbubbleEllipses />
                 Chat Now
               </Button>
-              {/* </div> */}
               <Button
                 onClick={() => {
-                  console.log("calling on", item.phoneNumber ?? "9876543201");
+                  router.push(`/hire/hireDetail/${item.objectID}`);
                 }}
                 type="button"
                 className="flex whitespace-nowrap items-center text-white font-semibold gap-2 hover:scale-105 transition-all transform duration-300"
