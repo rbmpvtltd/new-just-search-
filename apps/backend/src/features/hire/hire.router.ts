@@ -5,7 +5,12 @@ import {
   hireListing,
   hireUpdateSchema,
 } from "@repo/db/dist/schema/hire.schema";
-import { cities, states } from "@repo/db/dist/schema/not-related.schema";
+import {
+  cities,
+  highestQualification,
+  languages,
+  states,
+} from "@repo/db/dist/schema/not-related.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { count, eq, gt, sql } from "drizzle-orm";
@@ -624,79 +629,89 @@ export const hirerouter = router({
   singleHire: publicProcedure
     .input(z.object({ hireId: z.number() }))
     .query(async ({ input }) => {
-      const data = (
-        await db
-          .select({
-            id: hireListing.id,
-            name: hireListing.name,
-            email: hireListing.email,
-            photo: hireListing.photo,
-            languages: hireListing.languages,
-            address: hireListing.address,
-            streetName: hireListing.streetName,
-            buildingName: hireListing.buildingName,
-            qualification: hireListing.highestQualification,
-            yearOfExp: hireListing.workExperienceYear,
-            monthOfExp: hireListing.workExperienceMonth,
-            dob: hireListing.dob,
-            gender: hireListing.gender,
-            employmentStatus: hireListing.employmentStatus,
-            phone: hireListing.mobileNumber,
-            wtspNumber: hireListing.whatsappNo,
-            workingShift: hireListing.workShift,
-            jobRole: hireListing.jobRole,
-            expertise: hireListing.expertise,
-            skillSet: hireListing.skillset,
-            martialStatus: hireListing.maritalStatus,
-            relocate: hireListing.relocate,
-            specilities: hireListing.specialities,
-            description: hireListing.description,
-            latitude: hireListing.latitude,
-            longitude: hireListing.latitude,
-            pincode: hireListing.pincode,
-            jobType: hireListing.jobType,
-            city: cities.city,
-            mobileNo: users.phoneNumber,
-            state: states.name,
-            subcategories: sql<string[]>`
+      const data = (await db
+        .select({
+          id: hireListing.id,
+          name: hireListing.name,
+          email: hireListing.email,
+          photo: hireListing.photo,
+          languages: sql<string[]>`
+          COALESCE(
+            ARRAY_AGG(DISTINCT ${languages.name})
+            FILTER (WHERE ${languages.name} IS NOT NULL),
+            '{}'
+          )
+        `,
+          address: hireListing.address,
+          streetName: hireListing.streetName,
+          buildingName: hireListing.buildingName,
+          qualification: highestQualification.name,
+          yearOfExp: hireListing.workExperienceYear,
+          monthOfExp: hireListing.workExperienceMonth,
+          dob: hireListing.dob,
+          gender: hireListing.gender,
+          employmentStatus: hireListing.employmentStatus,
+          phone: hireListing.mobileNumber,
+          wtspNumber: hireListing.whatsappNo,
+          workingShift: hireListing.workShift,
+          jobRole: hireListing.jobRole,
+          expertise: hireListing.expertise,
+          skillSet: hireListing.skillset,
+          martialStatus: hireListing.maritalStatus,
+          relocate: hireListing.relocate,
+          specilities: hireListing.specialities,
+          description: hireListing.description,
+          latitude: hireListing.latitude,
+          longitude: hireListing.latitude,
+          pincode: hireListing.pincode,
+          jobType: hireListing.jobType,
+          city: cities.city,
+          mobileNo: users.phoneNumber,
+          state: states.name,
+          subcategories: sql<string[]>`
             COALESCE(
               ARRAY_AGG(DISTINCT subcategories.name) 
               FILTER (WHERE subcategories.id IS NOT NULL),
               '{}'
             )
           `,
-            category: sql<
-              string | null
-            >`MAX(${schemas.not_related.categories.title})`,
-          })
-          .from(hireListing)
-          .leftJoin(cities, eq(hireListing.city, cities.id))
-          .leftJoin(states, eq(hireListing.state, states.id))
-          .leftJoin(users, eq(hireListing.userId, users.id))
-          .leftJoin(
-            schemas.hire.hireSubcategories,
-            eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
-          )
-          .leftJoin(
-            schemas.not_related.subcategories,
-            eq(
-              schemas.hire.hireSubcategories.subcategoryId,
-              schemas.not_related.subcategories.id,
-            ),
-          )
-          .leftJoin(
-            schemas.not_related.categories,
-            eq(
-              schemas.not_related.subcategories.categoryId,
-              schemas.not_related.categories.id,
-            ),
-          )
+          category: sql<
+            string | null
+          >`MAX(${schemas.not_related.categories.title})`,
+        })
+        .from(hireListing)
+        .leftJoin(
+          sql`LATERAL unnest(${hireListing.languages}) AS lang_id(id)`,
+          sql`true`,
+        )
+        .leftJoin(highestQualification,eq(hireListing.highestQualification,highestQualification.id))
+        .leftJoin(languages, sql`lang_id.id = ${languages.id}`)
+        .leftJoin(cities, eq(hireListing.city, cities.id))
+        .leftJoin(states, eq(hireListing.state, states.id))
+        .leftJoin(users, eq(hireListing.userId, users.id))
+        .leftJoin(
+          schemas.hire.hireSubcategories,
+          eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
+        )
+        .leftJoin(
+          schemas.not_related.subcategories,
+          eq(
+            schemas.hire.hireSubcategories.subcategoryId,
+            schemas.not_related.subcategories.id,
+          ),
+        )
+        .leftJoin(
+          schemas.not_related.categories,
+          eq(
+            schemas.not_related.subcategories.categoryId,
+            schemas.not_related.categories.id,
+          ),
+        )
 
-          .groupBy(hireListing.id, cities.city, states.name, users.phoneNumber)
-          .where(eq(hireListing.id, input.hireId))
-      )[0];
+        .groupBy(hireListing.id, cities.city, states.name, users.phoneNumber,highestQualification.name)
+        .where(eq(hireListing.id, input.hireId)))[0];
 
-      console.log("================data is =============", data);
+      console.log("================ data is =============", data);
       return {
         data,
         status: true,

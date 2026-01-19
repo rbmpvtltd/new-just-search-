@@ -48,14 +48,14 @@ function PopularaBanner({
             return (
               <div
                 key={index.toString()}
-                className="w-[70%] md:w-[46%] lg:w-[22%] border-2 border-primary rounded-md flex flex-col justify-between items-center py-2 h-[300px]"
+                className="w-[70%] lg:w-[22%] border-2 border-primary rounded-md flex flex-col justify-between items-center py-2 h-80"
               >
                 <CldImage
                   height={270}
                   width={270}
                   src={item.photo}
                   alt={`${item.title} category image`}
-                  className="object-cover"
+                  className="h-70 object-cover"
                 />
                 <p className="font-semibold">{item.title}</p>
               </div>

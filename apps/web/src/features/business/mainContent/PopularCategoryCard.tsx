@@ -25,7 +25,7 @@ export function PopularCategoryCard({
           height={50}
           alt="category image"
           src={photo ?? ""}
-          className="mx-auto"
+          className="mx-auto h-11"
         />
         <p className="w-full text-center mx-auto text-[10px] md:line-clamp-2 line-clamp-1">
           {title}
