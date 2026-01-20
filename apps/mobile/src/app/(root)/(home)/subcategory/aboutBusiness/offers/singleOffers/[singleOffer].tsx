@@ -142,7 +142,7 @@ export default function TabOneScreen() {
           headerLeft: () => (
             <Pressable
               className="ml-2"
-              onPress={() => router.replace("/(root)/(offer)/allOffers")}
+              onPress={() => router.replace("/(root)/(offer)/alloffers")}
             >
               <Ionicons
                 name="arrow-back"

@@ -8,7 +8,7 @@ export default function ProfileLayout() {
         name="hire"
         options={{ title: "All Hires", headerShown: true }}
       />
-      {/* <Stack.Screen name='hireDetail/[hiredetails]' options={{ title: 'hireDetail' }} /> */}
+      {/* <Stack.Screen name='hiredetail/[hiredetails]' options={{ title: 'hireDetail' }} /> */}
     </Stack>
   );
 }

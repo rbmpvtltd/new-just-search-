@@ -48,7 +48,7 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
             <div className="relative max-w-[400px] mx-auto ">
               <Link
                 href={{
-                  pathname: `/hire/hireDetail/${item.objectID}`,
+                  pathname: `/hire/hiredetail/${item.objectID}`,
                 }}
               >
                 <CldImage
@@ -79,7 +79,7 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  router.push(`/hire/hireDetail/${item.objectID}`);
+                  router.push(`/hire/hiredetail/${item.objectID}`);
                 }}
                 type="button"
                 className=" whitespace-nowrap flex items-center text-white font-semibold gap-2 py-2 px-4 rounded-lg hover:scale-105 transition-all transform duration-300"
@@ -89,7 +89,7 @@ export const HireListingCard = ({ item }: { item: HireListing }) => {
               </Button>
               <Button
                 onClick={() => {
-                  router.push(`/hire/hireDetail/${item.objectID}`);
+                  router.push(`/hire/hiredetail/${item.objectID}`);
                 }}
                 type="button"
                 className="flex whitespace-nowrap items-center text-white font-semibold gap-2 hover:scale-105 transition-all transform duration-300"

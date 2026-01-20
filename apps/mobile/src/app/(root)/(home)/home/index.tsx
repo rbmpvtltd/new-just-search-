@@ -196,7 +196,7 @@ function Hit({ hit }: { hit: any }) {
               `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
             );
           } else if (hit.listingType === "hire") {
-            router.push(`/(root)/(hire)/hireDetail/${hit.objectID}`);
+            router.push(`/(root)/(hire)/hiredetail/${hit.objectID}`);
           }
           console.log("clicked on", hit.objectID);
         }}

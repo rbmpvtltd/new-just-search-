@@ -168,7 +168,7 @@ export default function TabLayout() {
 
       {/* -------------------- OFFERS TAB -------------------- */}
       <Tabs.Screen
-        name="(offer)/allOffers"
+        name="(offer)/alloffers"
         options={{
           title: "All Offers",
           headerShown: true,

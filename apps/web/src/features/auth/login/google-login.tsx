@@ -24,12 +24,12 @@
 //   );
 // }
 "use client";
-import { Button } from "@/components/ui/button";
-import { useTRPC } from "@/trpc/client";
-import { setRole, setToken } from "@/utils/session";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/trpc/client";
+import { setRole, setToken } from "@/utils/session";
 
 export default function GoogleLoginBtn() {
   const trpc = useTRPC();

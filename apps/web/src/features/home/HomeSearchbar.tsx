@@ -21,7 +21,7 @@ function Hit({ hit }: { hit: any }) {
           if (hit.listingType === "business") {
             router.push(`/subcategory/aboutBusiness/${hit.objectID}`);
           } else if (hit.listingType === "hire") {
-            router.push(`/hireDetail/${hit.objectID}`);
+            router.push(`/hiredetail/${hit.objectID}`);
           }
           console.log("clicked on", hit.objectID);
         }}

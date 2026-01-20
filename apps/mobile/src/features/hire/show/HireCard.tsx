@@ -55,7 +55,7 @@
 //         className="mx-auto mt-2 w-[60%]"
 //         style={{ aspectRatio, height: screenWidth * 0.6 * (1 / aspectRatio) }}
 //       >
-//         <Pressable onPress={() => router.push(`/(root)/(hire)/hireDetail/${item.id}`)}>
+//         <Pressable onPress={() => router.push(`/(root)/(hire)/hiredetail/${item.id}`)}>
 //           <Image
 //             className="w-full h-full rounded-lg"
 //             source={{
@@ -202,7 +202,7 @@ export default function HireCard({
 
   const onShare = async () => {
     try {
-      const shareUrl = `https://web-test.justsearch.net.in//hireDetail/${item?.objectID}`;
+      const shareUrl = `https://web-test.justsearch.net.in//hiredetail/${item?.objectID}`;
 
       const result = await Share.share(
         {
@@ -245,7 +245,7 @@ export default function HireCard({
   return (
     <Pressable
       className=""
-      onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+      onPress={() => router.navigate(`/hiredetail/${item?.objectID}`)}
     >
       <View className="h-auto rounded-xl m-auto w-[90%] bg-base-200 py-8 mb-4 shadow-2xl ">
         <View className="flex-row items-center justify-center w-full">
@@ -296,7 +296,7 @@ export default function HireCard({
         <View className="flex-row flex-wrap gap-2 ml-4">
           <TouchableOpacity
             className="bg-success-content rounded-lg py-2 px-2 mb-1"
-            onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+            onPress={() => router.navigate(`/hiredetail/${item?.objectID}`)}
           >
             <Text className="text-success font-semibold text-xs">
               {item?.category ?? "fake category"}
@@ -307,7 +307,7 @@ export default function HireCard({
             <TouchableOpacity
               key={i.toString()}
               className="bg-error-content rounded-lg py-2 px-2 mb-1"
-              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+              onPress={() => router.navigate(`/hiredetail/${item?.objectID}`)}
             >
               <Text className="text-pink-700 font-semibold text-xs">{sub}</Text>
             </TouchableOpacity>
@@ -315,7 +315,7 @@ export default function HireCard({
           {Number(item?.subcategories?.length) > 2 && (
             <TouchableOpacity
               className="dark:bg-base-100 bg-base-200 rounded-lg py-2 px-4 mb-1"
-              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+              onPress={() => router.navigate(`/hiredetail/${item?.objectID}`)}
             >
               <Text className="text-secondary font-semibold text-xs">
                 + More
@@ -360,7 +360,7 @@ export default function HireCard({
         <View className="flex-row w-[60%] mx-auto items-center justify-center gap-2">
           <View className="flex-1 bg-primary rounded-lg px-2 py-2">
             <Pressable
-              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+              onPress={() => router.navigate(`/hiredetail/${item?.objectID}`)}
             >
               <View className="flex-row items-center justify-center gap-1">
                 <Ionicons name="chatbox-ellipses" size={20} color={"white"} />
@@ -376,7 +376,7 @@ export default function HireCard({
 
           <View className="flex-1 bg-primary rounded-lg px-2 py-2">
             <Pressable
-              onPress={() => router.navigate(`/hireDetail/${item?.objectID}`)}
+              onPress={() => router.navigate(`/hiredetail/${item?.objectID}`)}
             >
               <View className="flex-row items-center justify-center gap-1">
                 <Ionicons name="call" size={20} color={"white"} />

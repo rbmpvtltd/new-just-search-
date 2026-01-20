@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
-import type { OfferProductHitType } from "@/app/(root)/(offer)/allOffers";
+import type { OfferProductHitType } from "@/app/(root)/(offer)/alloffers";
 import { cld } from "@/lib/cloudinary";
 
 export default function OffersList({ item }: { item: OfferProductHitType }) {

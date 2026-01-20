@@ -151,7 +151,7 @@ function RootLayoutNav() {
                       }}
                     />
                     <Stack.Screen
-                      name="hireDetail/[hiredetails]"
+                      name="hiredetail/[hiredetails]"
                       options={({ route }) => {
                         const { hiredetails } = route.params as {
                           hiredetails: string;

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 const menuItems = [
   { name: "Home", href: "/" },
   { name: "Hire", href: "/hire" },
-  { name: "Offers", href: "/allOffers" },
+  { name: "Offers", href: "/alloffers" },
   { name: "Favourite", href: "/favourite" },
 ];
 

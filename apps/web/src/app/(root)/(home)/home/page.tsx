@@ -1,3 +1,4 @@
+import HomeSearchBar from "@/components/home-searchbar";
 import AddvertiseBanner from "@/features/business/mainContent/AddvertiseBanner";
 import AddvertiseBanner2 from "@/features/business/mainContent/AddvertiseBanner2";
 import FirstCaraousel from "@/features/business/mainContent/BannerFistCaraousel";
@@ -8,8 +9,6 @@ import { getTrpcUrl } from "@/trpc/helper";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 import { ErrorComponent } from "@/utils/error/ErrorComponent";
-import HomeSearchBar from "@/components/home-searchbar";
-
 
 export default async function Page() {
   console.log(getTrpcUrl());

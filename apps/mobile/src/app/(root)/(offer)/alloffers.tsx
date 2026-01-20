@@ -31,7 +31,7 @@ function AllOffers() {
     <>
       {/* <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
-          name="allOffers"
+          name="alloffers"
           options={{ title: "All Hires", headerShown: true }}
         />
       </Stack> */}
