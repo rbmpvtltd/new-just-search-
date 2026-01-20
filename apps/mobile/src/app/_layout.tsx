@@ -174,7 +174,7 @@ function RootLayoutNav() {
                     />
 
                     <Stack.Screen
-                      name="aboutBusiness"
+                      name="aboutbusiness"
                       options={() => {
                         return {
                           headerShown: true,

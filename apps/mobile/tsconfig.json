@@ -18,5 +18,4 @@
     "nativewind-env.d.ts",
     "components/ui/radio"
   ]
-  //"references": [{ "path": "../backend" }]
 }

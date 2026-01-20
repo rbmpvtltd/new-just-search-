@@ -188,7 +188,7 @@ function SingleOfferComp({
                         message: message,
                         conversationId: conversation?.id,
                         image: offer?.photos[0],
-                        route: `http://localhost:9000/business/singleProduct/${offer?.id}`,
+                        route: `http://localhost:9000/business/singleproduct/${offer?.id}`,
                       });
                       setMessage("");
                     }}

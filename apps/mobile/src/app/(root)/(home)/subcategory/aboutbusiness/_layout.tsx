@@ -20,8 +20,8 @@ export default function TabLayout() {
   const [showTabbar, setShowTabbar] = useState<boolean>(false);
   useEffect(() => {
     const excludedTabRoute = [
-      "/subcategory/aboutBusiness/products/singleProduct",
-      "/subcategory/aboutBusiness/offers/singleOffers",
+      "/subcategory/aboutbusiness/products/singleproduct",
+      "/subcategory/aboutbusiness/offers/singleoffers",
     ];
     for (const val of excludedTabRoute) {
       if (pathname.startsWith(val)) {

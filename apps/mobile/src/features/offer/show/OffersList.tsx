@@ -16,7 +16,7 @@ import { cld } from "@/lib/cloudinary";
 export default function OffersList({ item }: { item: OfferProductHitType }) {
   const onShare = async () => {
     try {
-      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutBusiness/offers/singleOffers/${item.navigationId}`;
+      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutbusiness/offers/singleoffers/${item.navigationId}`;
 
       const result = await Share.share(
         {
@@ -55,8 +55,8 @@ export default function OffersList({ item }: { item: OfferProductHitType }) {
           onPress={() => {
             router.push({
               pathname:
-                "/(root)/(home)/subcategory/aboutBusiness/offers/singleOffers/[singleOffer]",
-              params: { singleOffer: item.navigationId },
+                "/(root)/(home)/subcategory/aboutbusiness/offers/singleoffers/[singleoffer]",
+              params: { singleoffer: item.navigationId },
             });
           }}
         >
@@ -109,11 +109,11 @@ export default function OffersList({ item }: { item: OfferProductHitType }) {
             onPress={() => {
               if (item.discountPercent > 0) {
                 router.push(
-                  `/(root)/(home)/subcategory/aboutBusiness/offers/singleOffers/${item.navigationId}`,
+                  `/(root)/(home)/subcategory/aboutbusiness/offers/singleoffers/${item.navigationId}`,
                 );
               } else {
                 router.push(
-                  `/(root)/(home)/subcategory/aboutBusiness/products/singleProduct/${item.navigationId}`,
+                  `/(root)/(home)/subcategory/aboutbusiness/products/singleproduct/${item.navigationId}`,
                 );
               }
             }}
@@ -132,8 +132,8 @@ export default function OffersList({ item }: { item: OfferProductHitType }) {
             onPress={() => {
               router.push({
                 pathname:
-                  "/(root)/(home)/subcategory/aboutBusiness/offers/singleOffers/[singleOffer]",
-                params: { singleOffer: item.navigationId },
+                  "/(root)/(home)/subcategory/aboutbusiness/offers/singleoffers/[singleoffer]",
+                params: { singleoffer: item.navigationId },
               });
             }}
           >

@@ -60,7 +60,7 @@ export const BussinessListingCard = ({
             <div className="relative max-w-100 mx-auto ">
               <Link
                 href={{
-                  pathname: `/subcategory/aboutBusiness/${navigationId}`,
+                  pathname: `/subcategory/aboutbusiness/${navigationId}`,
                 }}
               >
                 <CldImage
@@ -102,7 +102,7 @@ export const BussinessListingCard = ({
             <div className="flex flex-col md:flex-row gap-4 ">
               <Button
                 onClick={() => {
-                  router.push(`/subcategory/aboutBusiness/${navigationId}`);
+                  router.push(`/subcategory/aboutbusiness/${navigationId}`);
                   console.log("clicked", item.latitude, item.longitude);
                 }}
                 type="button"
@@ -113,7 +113,7 @@ export const BussinessListingCard = ({
               </Button>
               <Button
                 onClick={() => {
-                  router.push(`/subcategory/aboutBusiness/${navigationId}`);
+                  router.push(`/subcategory/aboutbusiness/${navigationId}`);
                   console.log("chatting with", navigationId);
                 }}
                 type="button"
@@ -125,7 +125,7 @@ export const BussinessListingCard = ({
               {/* </div> */}
               <Button
                 onClick={() => {
-                  router.push(`/subcategory/aboutBusiness/${navigationId}`);
+                  router.push(`/subcategory/aboutbusiness/${navigationId}`);
                   console.log("calling on", item.phoneNumber);
                 }}
                 type="button"

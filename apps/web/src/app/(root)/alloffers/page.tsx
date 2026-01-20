@@ -20,8 +20,8 @@ function Hit({ hit }: { hit: any }) {
       <Link
         href={{
           pathname: hit.discountPercent
-            ? `/subcategory/aboutBusiness/offers/singleOffers/${hit.navigationId}`
-            : `/subcategory/aboutBusiness/products/singleProduct/${hit.navigationId}`,
+            ? `/subcategory/aboutbusiness/offers/singleoffers/${hit.navigationId}`
+            : `/subcategory/aboutbusiness/products/singleproduct/${hit.navigationId}`,
         }}
         className="block"
       >

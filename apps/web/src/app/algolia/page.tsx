@@ -24,8 +24,8 @@ function Hit({ hit }: { hit: any }) {
         <Link
           href={{
             pathname: hit.discountPercent
-              ? `/business/singleOffer/${hit.navigationId}`
-              : `/business/singleProduct/${hit.navigationId}`,
+              ? `/business/singleoffer/${hit.navigationId}`
+              : `/business/singleproduct/${hit.navigationId}`,
           }}
         >
           <div className="relative">

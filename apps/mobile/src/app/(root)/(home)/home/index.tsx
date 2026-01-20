@@ -193,7 +193,7 @@ function Hit({ hit }: { hit: any }) {
         onPress={() => {
           if (hit.listingType === "business") {
             router.push(
-              `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
+              `/(root)/(home)/subcategory/aboutbusiness/${hit.objectID}`,
             );
           } else if (hit.listingType === "hire") {
             router.push(`/(root)/(hire)/hiredetail/${hit.objectID}`);

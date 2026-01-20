@@ -5,7 +5,7 @@ import { Pressable } from "react-native";
 export default function HomeLayout() {
   return (
     <Stack screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="singleProduct" options={{ headerShown: true }} />
+      <Stack.Screen name="singleproduct" options={{ headerShown: true }} />
       <Stack.Screen
         name="index"
         options={{

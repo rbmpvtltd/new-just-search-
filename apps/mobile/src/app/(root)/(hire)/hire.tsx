@@ -152,7 +152,7 @@ function HireHitCard({ hit }: { hit: HireListingHitType }) {
 //         onPress={() => {
 //           console.log("clicked on", hit.objectID);
 //           router.push(
-//             `/(root)/(home)/subcategory/aboutBusiness/${hit.objectID}`,
+//             `/(root)/(home)/subcategory/aboutbusiness/${hit.objectID}`,
 //           );
 //         }}
 //       >

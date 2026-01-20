@@ -39,7 +39,7 @@ function ListingProduct({ shopId }: { shopId: string }) {
   const renderItem = ({ item }: { item: ProductType }) => {
     const onShare = async () => {
       try {
-        const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutBusiness/products/singleProduct/${item.id}`;
+        const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutbusiness/products/singleproduct/${item.id}`;
 
         const result = await Share.share(
           {
@@ -75,8 +75,8 @@ function ListingProduct({ shopId }: { shopId: string }) {
           onPress={() => {
             router.navigate({
               pathname:
-                "/(root)/(home)/subcategory/aboutBusiness/products/singleProduct/[singleProduct]",
-              params: { singleProduct: item?.id },
+                "/(root)/(home)/subcategory/aboutbusiness/products/singleproduct/[singleproduct]",
+              params: { singleproduct: item?.id },
             });
           }}
         >
@@ -134,8 +134,8 @@ function ListingProduct({ shopId }: { shopId: string }) {
             onPress={() => {
               router.push({
                 pathname:
-                  "/(root)/(home)/subcategory/aboutBusiness/products/singleProduct/[singleProduct]",
-                params: { singleProduct: item.id },
+                  "/(root)/(home)/subcategory/aboutbusiness/products/singleproduct/[singleproduct]",
+                params: { singleproduct: item.id },
               });
             }}
           >

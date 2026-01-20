@@ -318,7 +318,7 @@ function ShopOffers({
         >
           <Link
             href={{
-              pathname: `/subcategory/aboutBusiness/offers/singleOffers/${item.id}`,
+              pathname: `/subcategory/aboutbusiness/offers/singleoffers/${item.id}`,
             }}
           >
             <div className="relative">
@@ -381,7 +381,7 @@ function ShopProducts({
         >
           <Link
             href={{
-              pathname: `/subcategory/aboutBusiness/products/singleProduct/${item.id}`,
+              pathname: `/subcategory/aboutbusiness/products/singleproduct/${item.id}`,
             }}
           >
             <Image

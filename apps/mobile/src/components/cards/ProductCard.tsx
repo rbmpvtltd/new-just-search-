@@ -49,8 +49,8 @@ export default function ProductListingCard({ item }: ProductListingCardProps) {
 
   // const handleCardPress = () => {
   //   router.push({
-  //     pathname: '/singleProduct/[singleProduct]',
-  //     params: { singleProduct: item.id.toString() },
+  //     pathname: '/singleproduct/[singleproduct]',
+  //     params: { singleproduct: item.id.toString() },
   //   });
   // };
 

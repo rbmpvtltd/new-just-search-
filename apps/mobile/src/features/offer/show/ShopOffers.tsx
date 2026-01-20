@@ -29,8 +29,8 @@ export default function ShopOffersList({ listingId }: { listingId: string }) {
             onPress={() => {
               router.push({
                 pathname:
-                  "/(root)/(home)/subcategory/aboutBusiness/offers/singleOffers/[singleOffer]",
-                params: { singleOffer: item.item.id },
+                  "/(root)/(home)/subcategory/aboutbusiness/offers/singleoffers/[singleoffer]",
+                params: { singleoffer: item.item.id },
               });
             }}
           >

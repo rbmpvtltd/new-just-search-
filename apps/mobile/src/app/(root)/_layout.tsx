@@ -28,7 +28,7 @@ export default function TabLayout() {
   const pathname = usePathname();
   const colorScheme = useColorScheme();
 
-  const isAboutBusiness = pathname.startsWith("/subcategory/aboutBusiness");
+  const isAboutBusiness = pathname.startsWith("/subcategory/aboutbusiness");
   const isAuthenticated = useAuthStore((state) => state.authenticated);
 
   if (isLoading) {
