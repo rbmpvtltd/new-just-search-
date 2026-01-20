@@ -185,6 +185,7 @@ type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
                   required={false}
                   component="image"
                   className="absolute inset-0 opacity-0 cursor-pointer"
+                
                 />
               </div>
 

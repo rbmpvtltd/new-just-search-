@@ -39,9 +39,9 @@ function HireReviews({
   );
   return (
     <div>
-      <div className="p-4 flex flex-col gap-4 w-full">
+      <div className="p-4 flex gap-4 mx-auto w-full gap-8 ">
         {data?.success && (
-          <div>
+          <div className="w-[30%]">
             {submmited?.submitted && (
               <Card className="border-green-200 pt-4 bg-green-50/50">
                 <CardHeader>
@@ -66,14 +66,14 @@ function HireReviews({
           </div>
         )}
         {!data?.success && <LoginRedirect />}
-        <div className="w-full">
+        <div className="w-[60%]">
           <h1 className="text-2xl font-semibold text-secondary">
             Recommended Reviews
           </h1>
           {reviews.length === 0 && (
             <div className="mx-auto bg-primary-accent px-6 py-4 rounded-lg">
               <h1 className="text-secondary text-center">
-                No Reviews Founds On {name} Shop
+                No Reviews Founds On {name} 
               </h1>
             </div>
           )}

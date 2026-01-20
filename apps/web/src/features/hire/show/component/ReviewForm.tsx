@@ -1,6 +1,7 @@
 "use client"
+import { FormField } from "@/components/form/form-component";
 import { Button } from "@/components/ui/button";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useTRPC } from "@/trpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,27 +67,15 @@ export function ReviewForm({ hireId }: { hireId: number }) {
         </div>
       )}
 
-      <Form {...form}>
+
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
+            component="input"
+            label="Write Your Review"
+            placeholder="Tell us about your experience..."
+            error="Write at least 10 characters (max 500)"
             name="message"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Your Review</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Tell us about your experience..."
-                    className="min-h-[120px] resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Write at least 10 characters (max 500)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
           />
 
           <Button
@@ -97,7 +86,6 @@ export function ReviewForm({ hireId }: { hireId: number }) {
             {isPending ? "Submitting..." : "Submit Review"}
           </Button>
         </form>
-      </Form>
     </div>
   );
 }

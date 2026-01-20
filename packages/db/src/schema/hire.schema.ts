@@ -277,7 +277,7 @@ export const hireReviews = pgTable("hire_reviews", {
   updatedAt: timestamp("updated_at"),
 });
 export const insertHireReviewSchema = createInsertSchema(hireReviews, {
-  hireId: () => z.number().positive("Business ID is required"),
+  hireId: () => z.number().positive("Hire ID is required"),
   message: () =>
     z
       .string()
