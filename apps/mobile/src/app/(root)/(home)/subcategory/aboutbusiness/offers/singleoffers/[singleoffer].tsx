@@ -3,10 +3,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import {
-  router,
   Stack,
   useFocusEffect,
   useLocalSearchParams,
+  useRouter,
 } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -24,48 +24,44 @@ import {
   View,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
-import RenderHtml from "react-native-render-html";
+import RenderHTML from "react-native-render-html";
 import LoginRedirect from "@/components/cards/LoginRedirect";
 import Review from "@/components/forms/review";
 import PrimaryButton from "@/components/inputs/SubmitBtn";
 import TextAreaInput from "@/components/inputs/TextAreaInput";
-import { Loading } from "@/components/ui/Loading";
 import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/features/auth/authStore";
-import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
+import { OfferReviewForm } from "@/features/offer/forms/create/OfferReviewForm";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
-import { useStartChat } from "@/query/startChat";
-import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
-import { openInGoogleMaps } from "@/utils/getDirection";
 
 const { width } = Dimensions.get("window");
 
 export default function TabOneScreen() {
   const colorScheme = useColorScheme();
-  const { singleProduct } = useLocalSearchParams();
+
+  const { singleoffer } = useLocalSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState<any>(null);
 
-  const productId = Array.isArray(singleProduct)
-    ? singleProduct[0]
-    : singleProduct;
-
-  const { data: product, isLoading } = useQuery(
-    trpc.businessrouter.singleProduct.queryOptions({
-      productId: Number(productId),
+  const router = useRouter();
+  const singleOfferId = Array.isArray(singleoffer)
+    ? singleoffer[0]
+    : singleoffer;
+  const { data: offer } = useQuery(
+    trpc.businessrouter.singleOffer.queryOptions({
+      offerId: Number(singleOfferId),
     }),
   );
-  const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions());
+
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        if (product?.businessId) {
+        if (offer?.businessId) {
           router.replace({
-            pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
-            params: { premiumshops: String(product.businessId) },
+            pathname: "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
+            params: { premiumshops: String(offer.businessId) },
           });
         } else {
           router.replace("/(root)/(home)/home");
@@ -80,8 +76,10 @@ export default function TabOneScreen() {
       );
 
       return () => subscription.remove();
-    }, [product?.businessId]),
+    }, [offer?.businessId, router]),
   );
+
+  const { data: authenticated } = useQuery(trpc.auth.verifyauth.queryOptions());
 
   const { mutateAsync: createConversation } = useMutation(
     trpc.chat.createConversation.mutationOptions(),
@@ -89,7 +87,7 @@ export default function TabOneScreen() {
 
   async function handleChat() {
     const conv = await createConversation({
-      receiverId: Number(product?.userId),
+      receiverId: Number(offer?.userId),
     });
     setConversation(conv);
   }
@@ -103,24 +101,18 @@ export default function TabOneScreen() {
   const { mutate, isPending } = useMutation(
     trpc.chat.sendMessage.mutationOptions(),
   );
-  if (isLoading) {
-    return <Loading position="center" size={"large"} />;
-  }
-
-  const latitude = Number(product?.latitude);
-  const longitude = Number(product?.longitude);
 
   const onShare = async () => {
     try {
-      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutBusiness/products/singleProduct/${product?.id}`;
+      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutbusiness/offers/singleoffers/${offer?.id}`;
 
       const result = await Share.share(
         {
-          title: product?.name ?? "Check this Product",
+          title: offer?.name ?? "Check this Offer",
           message:
             Platform.OS === "android"
-              ? `${product?.name ?? "Amazing Product"}\n\n${shareUrl}`
-              : (product?.name ?? "Amazing Product"),
+              ? `${offer?.name ?? "Amazing Offer"}\n\n${shareUrl}`
+              : (offer?.name ?? "Amazing Offer"),
           url: shareUrl, // iOS uses this
         },
         {
@@ -146,94 +138,108 @@ export default function TabOneScreen() {
     <>
       <Stack.Screen
         options={{
-          title: product?.name,
+          title: offer?.name,
+          headerLeft: () => (
+            <Pressable
+              className="ml-2"
+              onPress={() => router.replace("/(root)/(offer)/alloffers")}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                className="p-2 mr-4 self-center"
+              />
+            </Pressable>
+          ),
         }}
       />
-      <ScrollView>
-        <View className="flex-1 items-center">
-          <View className="flex-1 justify-center gap-4">
-            <Carousel
-              loop
-              width={width}
-              height={400}
-              autoPlay={true}
-              autoPlayInterval={4000}
-              data={product?.photos ?? []}
-              scrollAnimationDuration={1000}
-              renderItem={({ item }) => (
-                <View className="relative  h-[500px]  mx-auto bg-base-200 w-[100%] ">
+      <ScrollView className="flex-1">
+        <View className=" justify-center gap-4">
+          <Carousel
+            loop
+            width={width}
+            height={300}
+            autoPlay={true}
+            autoPlayInterval={4000}
+            data={offer?.photos ?? ["1"]}
+            scrollAnimationDuration={1000}
+            renderItem={() => (
+              <View className="relative bg-base-200">
+                <View className="relative h-[300px] mx-auto mt-2 w-[60%] bg-base-200 ">
                   {/* <Image
-                    className="w-[80%] mx-auto rounded-lg aspect-[3/4] mt-4 self-end"
+                    className="w-full rounded-lg aspect-[3/4]"
                     source={{
-                      uri: `https://www.justsearch.net.in/assets/images/18109401431760422232.jpeg`, //}}
-                    resizeMode="cover"
-                    onError={(e) =>
-                      console.log("Image loading error:", e.nativeEvent.error)
-                    }
+                      uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC5GqGqODTAQhCbZtEwK2EMiGE91vkaXT-Iw&s`, 
+                    }}
                   /> */}
                   <AdvancedImage
-                    cldImg={cld.image(item || "")}
+                    cldImg={cld.image(offer?.photos[0] || "")}
                     className="w-[80%] mx-auto rounded-lg aspect-[3/4] mt-4 self-end"
                     resizeMode="cover"
                   />
+                  <Text className="absolute bg-error text-secondary mt-8 pl-8 pr-3 rounded-r-md t-10">
+                    -{offer?.discountPercent}%
+                  </Text>
                 </View>
-              )}
-            />
-            <View className="p-8 bg-base-200">
-              <View>
-                <Text className="text-secondary text-lg mb-4">
-                  {product?.shopName}
-                </Text>
-                <Text className="text-secondary text-[24px] font-semibold mb-4">
-                  {product?.name}
-                </Text>
-                <RenderHtml
-                  contentWidth={width}
-                  source={{ html: product?.description || "" }}
-                  tagsStyles={{
-                    body: { color: "#ff6600" }, // Orange text everywhere
-                  }}
-                />
-
-                <Text className="text-center text-primary text-[24px]">
-                  ₹ {product?.rate}
-                </Text>
-
-                <Pressable
-                  hitSlop={10}
-                  onPress={onShare}
-                  className="absolute right-0 top-1/2 -translate-y-1/2"
+              </View>
+            )}
+          />
+          <View className="p-8 bg-base-200 ">
+            <View className="mb-3">
+              <View className="flex-row items-center justify-between">
+                <Text
+                  className="text-secondary text-lg flex-1 pr-3"
+                  numberOfLines={2}
                 >
+                  {offer?.shopName}
+                </Text>
+                <Pressable hitSlop={10} onPress={onShare}>
                   <Ionicons name="share-social" size={22} color="black" />
                 </Pressable>
               </View>
-              <View className="w-full items-center gap-4 my-4">
-                <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
-                  <Pressable
-                    onPress={() =>
-                      openInGoogleMaps(String(latitude), String(longitude))
-                    }
-                  >
-                    <Text className="text-[#fff] font-semibold text-xl text-center ">
-                      Get Direction To Shop
-                    </Text>
-                  </Pressable>
-                </View>
-                <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
-                  <Pressable onPress={() => dialPhone(product?.phone ?? "")}>
-                    <Text className="text-[#fff] font-semibold text-xl text-center ">
-                      Contact Now
-                    </Text>
-                  </Pressable>
-                </View>
-                <View className="w-[100%] bg-primary rounded-lg py-2 px-4">
+              <Text className="text-secondary text-[24px] font-semibold mt-2 mb-2">
+                {offer?.name}
+              </Text>
+              <RenderHTML
+                contentWidth={width}
+                source={{ html: offer?.description || "" }}
+                tagsStyles={{
+                  body: { color: "#ff6600" },
+                }}
+              />
+              <View className="flex-row items-center gap-4 mt-2">
+                <Text className="text-primary text-lg font-semibold">
+                  ₹{offer?.finalPrice}
+                </Text>
+                <Text className="text-secondary line-through">
+                  ₹{offer?.rate}
+                </Text>
+              </View>
+            </View>
+
+            <View className="w-full items-center gap-4 my-4">
+              <View className="w-[100%] bg-error-content rounded-lg py-2 px-4">
+                <Pressable
+                  onPress={() => {
+                    router.navigate({
+                      pathname:
+                        "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
+                      params: { premiumshops: String(offer?.businessId) },
+                    });
+                  }}
+                >
+                  <Text className="text-error font-semibold text-xl text-center ">
+                    View Shop Details
+                  </Text>
+                </Pressable>
+              </View>
+              <View className="flex-row w-[100%] justify-center gap-6">
+                <View className="w-[45%] bg-primary rounded-lg px-4 py-2">
                   <Pressable
                     disabled={isPending}
                     onPress={() => {
                       handleChat();
                       setShowModal(true);
-
-                      console.log("Statrt chat");
                     }}
                   >
                     <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
@@ -248,18 +254,24 @@ export default function TabOneScreen() {
                     </View>
                   </Pressable>
                 </View>
+                <View className="w-[45%] bg-primary rounded-lg py-2 px-4">
+                  <Pressable onPress={() => dialPhone(offer?.phoneNo ?? "")}>
+                    <View className=" text-xl text-center flex-row py-1 gap-2 justify-center">
+                      <Ionicons size={20} name="call" color={"white"} />
+                      <Text className="text-[#ffffff] font-semibold">
+                        Contact Now
+                      </Text>
+                    </View>
+                  </Pressable>
+                </View>
               </View>
             </View>
             {!authenticated?.success && <LoginRedirect />}
             {authenticated?.success && (
-              <ProductReviewForm
-                productId={Number(productId)}
-                businessId={Number(product?.businessId)}
-              />
+              <OfferReviewForm offerId={Number(singleOfferId ?? 0)} />
             )}
-
-            <View className="mx-4 p-4 rounded-lg bg-base-200 mb-10 flex-shrink">
-              <Review rating={product?.rating} />
+            <View className="">
+              <Review rating={offer?.rating} />
             </View>
           </View>
         </View>
@@ -309,8 +321,8 @@ export default function TabOneScreen() {
                 mutate({
                   message: message,
                   conversationId: conversation?.id,
-                  image: product?.photos[0],
-                  route: `business/singleProduct/${product?.id}`,
+                  image: offer?.photos[0],
+                  route: `business/singleproduct/${offer?.id}`,
                 });
                 setMessage("");
               }}

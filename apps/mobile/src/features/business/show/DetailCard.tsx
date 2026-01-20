@@ -43,7 +43,7 @@ function DetailCard({
       onPress={() => {
         setShopId(String(navigationId));
         router.navigate({
-          pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+          pathname: "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
           params: { premiumshops: navigationId },
         });
       }}
@@ -84,7 +84,7 @@ function DetailCard({
                   onPress={() => {
                     router.push({
                       pathname:
-                        "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                        "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
                       params: { premiumshops: navigationId },
                     });
                   }}
@@ -123,7 +123,7 @@ function DetailCard({
                   setShopId(String(navigationId));
                   router.navigate({
                     pathname:
-                      "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                      "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
                     params: { premiumshops: navigationId },
                   });
                 }}
@@ -140,7 +140,7 @@ function DetailCard({
                     setShopId(String(navigationId));
                     router.navigate({
                       pathname:
-                        "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                        "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
                       params: { premiumshops: navigationId },
                     });
                   }}
@@ -157,7 +157,7 @@ function DetailCard({
                     setShopId(String(navigationId));
                     router.navigate({
                       pathname:
-                        "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                        "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
                       params: { premiumshops: navigationId },
                     });
                   }}
@@ -196,7 +196,7 @@ function DetailCard({
                 setShopId(String(navigationId));
                 router.navigate({
                   pathname:
-                    "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                    "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
                   params: { premiumshops: navigationId },
                 });
               }}
@@ -213,7 +213,7 @@ function DetailCard({
                 setShopId(String(navigationId));
                 router.navigate({
                   pathname:
-                    "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                    "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
                   params: { premiumshops: navigationId },
                 });
               }}
@@ -230,7 +230,7 @@ function DetailCard({
                   setShopId(String(navigationId));
                   router.navigate({
                     pathname:
-                      "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+                      "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
                     params: { premiumshops: navigationId },
                   });
                 }}

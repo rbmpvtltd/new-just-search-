@@ -213,7 +213,7 @@ function SingleProductComp({
                           message: message,
                           conversationId: conversation?.id,
                           image: product?.photos[0],
-                          route: `http://localhost:9000/business/singleProduct/${product?.id}`,
+                          route: `http://localhost:9000/business/singleproduct/${product?.id}`,
                         });
                         setMessage("");
                       }}

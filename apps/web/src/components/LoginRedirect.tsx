@@ -54,7 +54,7 @@ function LoginRedirect() {
             </Button>
             <Button
               variant="outline"
-              className="flex-1 gap-2"
+              className="flex-1 gap-2 cursor-pointer"
               onClick={() => {
                 router.push("/register");
               }}

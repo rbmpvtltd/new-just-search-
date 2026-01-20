@@ -1,4 +1,4 @@
-import SingleProductComp from "@/features/business/show/SingleProduct";
+import SingleOfferComp from "@/features/business/show/SingleOffer";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 
@@ -7,14 +7,13 @@ async function SingleProduct({
 }: {
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { singleProduct: id } = await params;
+  const { singleoffers: id } = await params;
   const { data, error } = await asyncHandler(
-    trpcServer.businessrouter.singleProduct.query({ productId: Number(id) }),
+    trpcServer.businessrouter.singleOffer.query({ offerId: Number(id) }),
   );
-  console.log("data -=---------------------->", data);
   return (
     <div>
-      <SingleProductComp productPhotos={data?.photos ?? []} product={data} />
+      <SingleOfferComp offerPhotos={data?.photos ?? []} offer={data} />
     </div>
   );
 }

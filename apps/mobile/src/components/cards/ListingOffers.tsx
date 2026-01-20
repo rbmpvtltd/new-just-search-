@@ -27,8 +27,8 @@ export default function ListingsOffersList({
             <Pressable
               onPress={() => {
                 router.push({
-                  pathname: "/(root)/(home)/subcategory/aboutBusiness/offers/singleOffers/[singleOffer]",
-                  params: { singleOffer: item?.item?.id },
+                  pathname: "/(root)/(home)/subcategory/aboutbusiness/offers/singleoffers/[singleoffer]",
+                  params: { singleoffer: item?.item?.id },
                 });
               }}
             >

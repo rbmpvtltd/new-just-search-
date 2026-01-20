@@ -4,7 +4,7 @@ export default function ProfileLayout() {
   return (
     <Stack screenOptions={{ headerShown: true }}>
       <Stack.Screen name="[subcategory]" options={{ title: "All Listings" }} />
-      <Stack.Screen name="aboutBusiness" options={{ headerShown: false }} />
+      <Stack.Screen name="aboutbusiness" options={{ headerShown: false }} />
     </Stack>
 
     // <Stack screenOptions={{ headerShown: true }}>

@@ -19,7 +19,7 @@ function Hit({ hit }: { hit: any }) {
         type="button"
         onClick={() => {
           if (hit.listingType === "business") {
-            router.push(`/subcategory/aboutBusiness/${hit.objectID}`);
+            router.push(`/subcategory/aboutbusiness/${hit.objectID}`);
           } else if (hit.listingType === "hire") {
             router.push(`/hiredetail/${hit.objectID}`);
           }
@@ -73,14 +73,12 @@ function SearchResults() {
   );
 }
 
-
-
 function SearchPage() {
   return (
     <div className=" mx-auto sm:w-[90%] md:w-[50%]">
       <InstantSearch searchClient={algoliaClient} indexName="all_listing">
         <SearchBoxComponent />
-        
+
         <SearchResults />
       </InstantSearch>
     </div>

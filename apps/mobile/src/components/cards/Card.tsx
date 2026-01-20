@@ -28,7 +28,7 @@ function Card<T>({ item }: CardPropsType) {
         onPress={() => {
           setShopId(item?.id.toString());
           router.push({
-            pathname: "/(root)/(home)/subcategory/aboutBusiness/[premiumshops]",
+            pathname: "/(root)/(home)/subcategory/aboutbusiness/[premiumshops]",
             params: { premiumshops: item?.id.toString() },
           });
         }}
