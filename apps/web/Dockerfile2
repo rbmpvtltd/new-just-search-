@@ -1,0 +1,40 @@
+# ---------- Base ----------
+FROM oven/bun:1 AS base
+WORKDIR /app
+
+RUN apt-get update \
+  && apt-get install -y libc6 \
+  && rm -rf /var/lib/apt/lists/*
+
+# ---------- Pruner ----------
+FROM base AS pruner
+WORKDIR /app
+COPY . .
+RUN bun x turbo prune --scope=web --docker
+
+# ---------- Installer ----------
+FROM base AS installer
+WORKDIR /app
+
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/bun.lockb ./bun.lockb
+
+RUN bun install --frozen-lockfile
+
+# ---------- Builder ----------
+FROM installer AS builder
+WORKDIR /app
+COPY --from=pruner /app/out/full/ .
+RUN bun x turbo run build --filter=web...
+
+# ---------- Runner ----------
+FROM oven/bun:1 AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/apps/web/.next ./.next
+COPY --from=builder /app/apps/web/package.json .
+COPY --from=builder /app/node_modules ./node_modules
+
+EXPOSE 3000
+CMD ["bun", "run", "start"]

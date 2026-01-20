@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import AddOffer from "@/features/offer/forms/create/AddOffer";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";

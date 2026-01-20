@@ -1,4 +1,3 @@
-"use client";
 export default function TermsAndConditions() {
   return (
     <section className="bg-base-100 text-secondary py-4 px-6">
