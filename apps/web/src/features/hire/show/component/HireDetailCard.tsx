@@ -13,6 +13,7 @@ import { IoMail } from "react-icons/io5";
 import { MdLocationPin, MdSwapHoriz, MdWork } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
 import type { OutputTrpcType } from "@/trpc/type";
+import HireReviews from "../HireReviews";
 
 type HireDetailCardType =
   | OutputTrpcType["hirerouter"]["singleHire"]
@@ -184,6 +185,7 @@ export default function HireDetailCard({ data }: { data: HireDetailCardType }) {
           </div>
         </div>
       </div>
+      <HireReviews hireId={data?.data?.id ?? 0} name={data?.data?.name ?? "Just Search Hire"} reviews={data?.data?.review ?? []}/>
     </div>
   );
 }

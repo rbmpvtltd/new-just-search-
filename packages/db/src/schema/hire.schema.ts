@@ -264,6 +264,30 @@ export const hireCategories = pgTable("hire_categories", {
     .references(() => categories.id),
 });
 
+export const hireReviews = pgTable("hire_reviews", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+  hireId: integer("hire_id")
+    .notNull()
+    .references(() => hireListing.id),
+  message: varchar("message").notNull(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
+export const insertHireReviewSchema = createInsertSchema(hireReviews, {
+  hireId: () => z.number().positive("Business ID is required"),
+  message: () =>
+    z
+      .string()
+      .min(10, "Review must be at least 10 characters")
+      .max(500, "Review must not exceed 500 characters")
+      .optional()
+}).omit({
+  userId: true,
+});
+
 // 5 hires_comments
 // export const hireComments = pgTable("hire_comments", {
 //   id: serial("id").primaryKey(),

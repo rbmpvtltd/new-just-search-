@@ -1,8 +1,9 @@
 import { db, schemas } from "@repo/db";
-import { hireListing } from "@repo/db/dist/schema/hire.schema";
+import { hireListing, hireReviews } from "@repo/db/dist/schema/hire.schema";
 import { cities, states } from "@repo/db/dist/schema/not-related.schema";
+import { TRPCError } from "@trpc/server";
 import { algoliasearch } from "algoliasearch";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 const algoliaClient = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
@@ -105,4 +106,55 @@ async function hireApproved(hireId: number) {
     .where(eq(hireListing.id, hireId));
 }
 
-export { hireApproved };
+async function reviewExist(
+  hireId: number,
+  userId: number,
+): Promise<boolean> {
+  // find review based on userId and businessId
+  const data = await db
+    .select()
+    .from(hireReviews)
+    .where(
+      and(
+        eq(hireReviews.userId, userId),
+        eq(hireReviews.hireId, hireId),
+      ),
+    );
+
+  // return true if reviwe already exist
+  if (data.length > 0) {
+    return true;
+  }
+  // return if review is not exist
+  return false;
+}
+
+async function createReview(
+  userId: number,
+  hireId: number,
+  message: string,
+) {
+  try {
+    console.log("execution comes here===>", userId, hireId, message);
+    const data = await db
+      .insert(hireReviews)
+      .values({
+        hireId,
+        userId,
+        message,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    console.log("review created successfully", data);
+    return data;
+  } catch (err: any) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Could Not Create Review",
+    });
+  }
+}
+
+export { hireApproved,createReview,reviewExist };
+

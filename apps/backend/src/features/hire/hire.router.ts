@@ -3,7 +3,9 @@ import { users } from "@repo/db/dist/schema/auth.schema";
 import {
   hireInsertSchema,
   hireListing,
+  hireReviews,
   hireUpdateSchema,
+  insertHireReviewSchema,
 } from "@repo/db/dist/schema/hire.schema";
 import {
   cities,
@@ -22,12 +24,13 @@ import {
 import { slugify } from "@/lib/slugify";
 import {
   hireProcedure,
+  protectedProcedure,
   publicProcedure,
   router,
   visitorProcedure,
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
-import { hireApproved } from "./hire.service";
+import { createReview, hireApproved, reviewExist } from "./hire.service";
 
 export const hirerouter = router({
   add: visitorProcedure.query(async () => {
@@ -629,95 +632,120 @@ export const hirerouter = router({
   singleHire: publicProcedure
     .input(z.object({ hireId: z.number() }))
     .query(async ({ input }) => {
-      const data = (await db
-        .select({
-          id: hireListing.id,
-          name: hireListing.name,
-          email: hireListing.email,
-          photo: hireListing.photo,
-          languages: sql<string[]>`
+      // First, get the main hire data
+      const data = (
+        await db
+          .select({
+            id: hireListing.id,
+            name: hireListing.name,
+            email: hireListing.email,
+            photo: hireListing.photo,
+            languages: sql<string[]>`
           COALESCE(
             ARRAY_AGG(DISTINCT ${languages.name})
             FILTER (WHERE ${languages.name} IS NOT NULL),
             '{}'
           )
         `,
-          address: hireListing.address,
-          streetName: hireListing.streetName,
-          buildingName: hireListing.buildingName,
-          qualification: highestQualification.name,
-          yearOfExp: hireListing.workExperienceYear,
-          monthOfExp: hireListing.workExperienceMonth,
-          dob: hireListing.dob,
-          gender: hireListing.gender,
-          employmentStatus: hireListing.employmentStatus,
-          phone: hireListing.mobileNumber,
-          wtspNumber: hireListing.whatsappNo,
-          workingShift: hireListing.workShift,
-          jobRole: hireListing.jobRole,
-          expertise: hireListing.expertise,
-          skillSet: hireListing.skillset,
-          martialStatus: hireListing.maritalStatus,
-          relocate: hireListing.relocate,
-          specilities: hireListing.specialities,
-          description: hireListing.description,
-          latitude: hireListing.latitude,
-          longitude: hireListing.latitude,
-          pincode: hireListing.pincode,
-          jobType: hireListing.jobType,
-          city: cities.city,
-          mobileNo: users.phoneNumber,
-          state: states.name,
-          subcategories: sql<string[]>`
+            address: hireListing.address,
+            streetName: hireListing.streetName,
+            buildingName: hireListing.buildingName,
+            qualification: highestQualification.name,
+            yearOfExp: hireListing.workExperienceYear,
+            monthOfExp: hireListing.workExperienceMonth,
+            dob: hireListing.dob,
+            gender: hireListing.gender,
+            employmentStatus: hireListing.employmentStatus,
+            phone: hireListing.mobileNumber,
+            wtspNumber: hireListing.whatsappNo,
+            workingShift: hireListing.workShift,
+            jobRole: hireListing.jobRole,
+            expertise: hireListing.expertise,
+            skillSet: hireListing.skillset,
+            martialStatus: hireListing.maritalStatus,
+            relocate: hireListing.relocate,
+            specilities: hireListing.specialities,
+            description: hireListing.description,
+            latitude: hireListing.latitude,
+            longitude: hireListing.longitude,
+            pincode: hireListing.pincode,
+            jobType: hireListing.jobType,
+            city: cities.city,
+            mobileNo: users.phoneNumber,
+            state: states.name,
+            subcategories: sql<string[]>`
             COALESCE(
-              ARRAY_AGG(DISTINCT subcategories.name) 
-              FILTER (WHERE subcategories.id IS NOT NULL),
+              ARRAY_AGG(DISTINCT ${schemas.not_related.subcategories.name}) 
+              FILTER (WHERE ${schemas.not_related.subcategories.id} IS NOT NULL),
               '{}'
             )
           `,
-          category: sql<
-            string | null
-          >`MAX(${schemas.not_related.categories.title})`,
-        })
-        .from(hireListing)
-        .leftJoin(
-          sql`LATERAL unnest(${hireListing.languages}) AS lang_id(id)`,
-          sql`true`,
-        )
-        .leftJoin(highestQualification,eq(hireListing.highestQualification,highestQualification.id))
-        .leftJoin(languages, sql`lang_id.id = ${languages.id}`)
-        .leftJoin(cities, eq(hireListing.city, cities.id))
-        .leftJoin(states, eq(hireListing.state, states.id))
-        .leftJoin(users, eq(hireListing.userId, users.id))
-        .leftJoin(
-          schemas.hire.hireSubcategories,
-          eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
-        )
-        .leftJoin(
-          schemas.not_related.subcategories,
-          eq(
-            schemas.hire.hireSubcategories.subcategoryId,
-            schemas.not_related.subcategories.id,
-          ),
-        )
-        .leftJoin(
-          schemas.not_related.categories,
-          eq(
-            schemas.not_related.subcategories.categoryId,
-            schemas.not_related.categories.id,
-          ),
-        )
+            category: sql<
+              string | null
+            >`MAX(${schemas.not_related.categories.title})`,
+          })
+          .from(hireListing)
+          .leftJoin(
+            sql`LATERAL unnest(${hireListing.languages}) AS lang_id(id)`,
+            sql`true`,
+          )
+          .leftJoin(
+            highestQualification,
+            eq(hireListing.highestQualification, highestQualification.id),
+          )
+          .leftJoin(languages, sql`lang_id.id = ${languages.id}`)
+          .leftJoin(cities, eq(hireListing.city, cities.id))
+          .leftJoin(states, eq(hireListing.state, states.id))
+          .leftJoin(users, eq(hireListing.userId, users.id))
+          .leftJoin(
+            schemas.hire.hireSubcategories,
+            eq(hireListing.id, schemas.hire.hireSubcategories.hireId),
+          )
+          .leftJoin(
+            schemas.not_related.subcategories,
+            eq(
+              schemas.hire.hireSubcategories.subcategoryId,
+              schemas.not_related.subcategories.id,
+            ),
+          )
+          .leftJoin(
+            schemas.not_related.categories,
+            eq(
+              schemas.not_related.subcategories.categoryId,
+              schemas.not_related.categories.id,
+            ),
+          )
+          .groupBy(
+            hireListing.id,
+            cities.city,
+            states.name,
+            users.phoneNumber,
+            highestQualification.name,
+          )
+          .where(eq(hireListing.id, input.hireId))
+      )[0];
 
-        .groupBy(hireListing.id, cities.city, states.name, users.phoneNumber,highestQualification.name)
-        .where(eq(hireListing.id, input.hireId)))[0];
+      // Then, get reviews separately
+      const reviews = await db
+        .select({
+          id: hireReviews.id,
+          created_at: hireReviews.createdAt,
+          message: hireReviews.message,
+          user: users.displayName,
+        })
+        .from(hireReviews)
+        .leftJoin(users, eq(hireReviews.userId, users.id))
+        .where(eq(hireReviews.hireId, input.hireId));
 
       console.log("================ data is =============", data);
       return {
-        data,
+        data: {
+          ...data,
+          review: reviews,
+        },
         status: true,
       };
     }),
-
   MobileAllHireLising: publicProcedure
     .input(
       z.object({
@@ -785,5 +813,31 @@ export const hirerouter = router({
         data,
         nextCursor,
       };
+    }),
+  hireReview: protectedProcedure
+    .input(insertHireReviewSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { hireId, message } = input;
+      const { userId } = ctx;
+
+      const isReviewExist = await reviewExist(hireId, userId);
+      console.log("review exist status is==>", isReviewExist);
+      if (isReviewExist) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You've already submitted review on that business",
+        });
+      }
+      await createReview(userId, hireId, message ?? "");
+
+      return { success: true, message: "Review Has Been Submitted" };
+    }),
+  ReviewSubmitted: protectedProcedure
+    .input(z.object({ hireId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { hireId } = input;
+      const { userId } = ctx;
+      const isSubmitted = await reviewExist(hireId, userId);
+      return { submitted: isSubmitted };
     }),
 });
