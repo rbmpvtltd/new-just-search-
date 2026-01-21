@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTRPC } from "@/trpc/client";
 import { setRole, setToken } from "@/utils/session";
+import GoogleLoginBtn from "../login/google-login";
 
 const formSchema = z
   .object({
@@ -484,23 +485,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
           </div>
 
           <div className="grid gap-3">
-            <Button
-              variant="outline"
-              className="w-full flex items-center gap-2 rounded-xl py-5"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 488 512"
-                className="h-5 w-5"
-              >
-                <title>Google</title>
-                <path
-                  fill="currentColor"
-                  d="M488 261.8c0-17.8-1.6-35.2-4.7-52H249v98.6h134.1c-5.8 31.4-23.2 57.9-49.5 75.8v62.7h79.8c46.7-43 74-106.4 74-185.1zM249 492c67 0 123.1-22.1 164.1-60.1l-79.8-62.7c-22.1 14.9-50.4 23.6-84.3 23.6-64.9 0-119.9-43.8-139.6-102.7H27.2v64.5C68.7 429.3 152.1 492 249 492zM109.4 289.1c-4.7-14.1-7.3-29.1-7.3-44.6s2.6-30.5 7.3-44.6v-64.5H27.2C9.8 169.5 0 207.2 0 244.5s9.8 75 27.2 108.9l82.2-64.3zM249 97.9c36.4 0 69.1 12.6 94.9 37.4l71.1-71.1C372.1 24.8 316 2 249 2 152.1 2 68.7 64.7 27.2 161.5l82.2 64.5C129.1 141.7 184.1 97.9 249 97.9z"
-                />
-              </svg>
-              Google
-            </Button>
+            <GoogleLoginBtn className="rounded-[12px] py-5"/>
           </div>
         </div>
 

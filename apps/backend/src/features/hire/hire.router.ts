@@ -735,7 +735,8 @@ export const hirerouter = router({
         })
         .from(hireReviews)
         .leftJoin(users, eq(hireReviews.userId, users.id))
-        .where(eq(hireReviews.hireId, input.hireId));
+        .where(eq(hireReviews.hireId, input.hireId))
+        .groupBy(hireReviews.id,users.displayName);
 
       console.log("================ data is =============", data);
       return {

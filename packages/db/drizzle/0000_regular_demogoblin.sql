@@ -217,6 +217,15 @@ CREATE TABLE "hire_listing" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "hire_reviews" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"hire_id" integer NOT NULL,
+	"message" varchar NOT NULL,
+	"created_at" timestamp,
+	"updated_at" timestamp
+);
+--> statement-breakpoint
 CREATE TABLE "hire_subcategories" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"hire_id" integer NOT NULL,
@@ -579,6 +588,8 @@ ALTER TABLE "hire_categories" ADD CONSTRAINT "hire_categories_category_id_catego
 ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_salesman_id_salesmen_id_fk" FOREIGN KEY ("salesman_id") REFERENCES "public"."salesmen"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_listing" ADD CONSTRAINT "hire_listing_city_cities_id_fk" FOREIGN KEY ("city") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "hire_reviews" ADD CONSTRAINT "hire_reviews_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "hire_reviews" ADD CONSTRAINT "hire_reviews_hire_id_hire_listing_id_fk" FOREIGN KEY ("hire_id") REFERENCES "public"."hire_listing"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_subcategories" ADD CONSTRAINT "hire_subcategories_hire_id_hire_listing_id_fk" FOREIGN KEY ("hire_id") REFERENCES "public"."hire_listing"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "hire_subcategories" ADD CONSTRAINT "hire_subcategories_subcategory_id_subcategories_id_fk" FOREIGN KEY ("subcategory_id") REFERENCES "public"."subcategories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recent_view_hire" ADD CONSTRAINT "recent_view_hire_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

@@ -1,5 +1,5 @@
 {
-  "id": "050c1074-e970-4338-b6ee-009321febc00",
+  "id": "007014b3-419c-4764-ae1f-f5997ecba1f5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1474,6 +1474,82 @@
           "tableTo": "cities",
           "columnsFrom": [
             "city"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hire_reviews": {
+      "name": "hire_reviews",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hire_id": {
+          "name": "hire_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "hire_reviews_user_id_users_id_fk": {
+          "name": "hire_reviews_user_id_users_id_fk",
+          "tableFrom": "hire_reviews",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "hire_reviews_hire_id_hire_listing_id_fk": {
+          "name": "hire_reviews_hire_id_hire_listing_id_fk",
+          "tableFrom": "hire_reviews",
+          "tableTo": "hire_listing",
+          "columnsFrom": [
+            "hire_id"
           ],
           "columnsTo": [
             "id"
