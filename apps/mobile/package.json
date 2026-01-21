@@ -11,6 +11,7 @@
     "test": "jest --watchAll",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "postinstall": "cd ../../ && bun x turbo run build --filter=com.rbm.justsearch",
     "format": "prettier --write ."
   },
   "expo": {

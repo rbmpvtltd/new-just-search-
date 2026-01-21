@@ -1,7 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import {
   Alert,
   Platform,
@@ -11,10 +10,8 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
 import LoginRedirect from "@/components/cards/LoginRedirect";
 import { Loading } from "@/components/ui/Loading";
-import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
 import { useToggleWishlist } from "@/query/favorite";
@@ -23,6 +20,8 @@ import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import Review from "../../../components/forms/review";
 import ReviewForm from "../create/add-business/forms/ReviewForm";
+import Colors from "@/constants/Colors";
+import { useState } from "react";
 
 type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] | undefined;
 
@@ -31,14 +30,14 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
   const latitude = Number(shop?.latitude);
   const longitude = Number(shop?.longitude);
   const { data } = useQuery(trpc.auth.verifyauth.queryOptions());
-  const colorScheme = useColorScheme();
-  const [fav, setFav] = useState<boolean>(shop?.isFavourite ?? false);
+  const colorScheme = useColorScheme()
+  const [fav, setFav] = useState<boolean>(shop?.isFavourite ?? false)
 
   const clearToken = useAuthStore((state) => state.clearToken);
   const mutation = useMutation(
     trpc.businessrouter.toggleFavourite.mutationOptions({
       onSuccess: (data) => {
-        console.log("favourit toggle successfully", data);
+        console.log("favourit toggle successfully",data)
       },
       onError: (err) => {
         setFav((prev) => !prev);
@@ -64,7 +63,7 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
 
   const handleFavClick = () => {
     setFav((prev) => !prev);
-    mutation.mutate({ businessId: shop?.id ?? 0 });
+    mutation.mutate({businessId:shop?.id ?? 0});
   };
 
   const {
@@ -96,10 +95,14 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
           <Ionicons name="checkmark-circle" size={28} color="green" />
         )} */}
         <View className="w-[10%] ">
-          <Pressable onPress={handleFavClick}>
+          <Pressable
+           onPress={handleFavClick}
+          >
             <Ionicons
               size={30}
-              color={fav ? "red" : Colors[colorScheme ?? "light"].secondary}
+              color={
+                fav ? "red" : Colors[colorScheme ?? "light"].secondary
+              }
               name={fav ? "heart" : "heart-outline"}
             />
           </Pressable>
@@ -271,31 +274,6 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
         </View>
       </View>
 
-      {latitude && longitude ? (
-        <View style={{ height: 400, borderRadius: 12, overflow: "hidden" }}>
-          <MapView
-            style={{ flex: 1 }}
-            initialRegion={{
-              latitude: latitude,
-              longitude: longitude,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.005,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: latitude,
-                longitude: longitude,
-              }}
-              pinColor="red"
-            />
-          </MapView>
-        </View>
-      ) : (
-        <Text className="text-red-500 font-semibold text-center mt-4">
-          Location not available
-        </Text>
-      )}
 
       {data?.success && <ReviewForm businessId={shop?.id ?? 0} />}
 

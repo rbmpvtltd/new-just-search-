@@ -113,7 +113,7 @@ export default function HireDetailsCard(item: any) {
           </Text>
           <Text className="text-secondary">
             {data?.data?.gender}, AGE=
-            {calculateAge(data?.data?.dob)}
+            {data?.data?.dob}
           </Text>
           <Pressable hitSlop={10}>
             <Ionicons name="share-social" size={22} color="black" />
@@ -171,9 +171,7 @@ export default function HireDetailsCard(item: any) {
             <Ionicons name="school-outline" size={16} color="#888" />
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Qualification:</Text>
-              {data?.data?.qualification === 2
-                ? "Graduation"
-                : data?.data?.qualification}
+              {data?.data?.qualification}
             </Text>
           </View>
           <View className="flex-row items-center gap-4 mb-3">
@@ -181,7 +179,7 @@ export default function HireDetailsCard(item: any) {
             <Text className="text-lg text-secondary">
               <Text className="font-semibold">Shift: </Text>
               {data?.data?.workingShift?.join(",")}
-              {!data?.data?.workingShift.length && "Morning Shift"}
+              {!data?.data?.workingShift?.length && "Morning Shift"}
             </Text>
           </View>
           <View className="flex-row items-center gap-4 mb-3">
@@ -244,7 +242,7 @@ export default function HireDetailsCard(item: any) {
                         console.log("Chat started:", res.chat_session_id);
 
                         router.push({
-                          pathname: "/(root)/(home)/chat", 
+                          pathname: "/(root)/(home)/chat",
                           params: { chat: res?.chat_session_id.toString() },
                         });
                       },

@@ -1,13 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersInsertSchema } from "@repo/db/dist/schema/offer.schema";
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import {
   Alert,
   Keyboard,
-  ScrollView,
   Text,
   TouchableWithoutFeedback,
   View,
