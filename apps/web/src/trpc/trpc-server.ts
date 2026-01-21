@@ -1,8 +1,8 @@
 import type { AppRouter } from "@repo/types";
-import { createTRPCClient, createWSClient, httpBatchLink, wsLink } from "@trpc/client";
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 import { getToken } from "@/utils/session";
-import { getTrpcUrl, getWsUrl } from "./helper";
+import { getTrpcUrl } from "./helper";
 
 // Your existing typed client
 export const trpcServer = createTRPCClient<AppRouter>({
@@ -17,11 +17,5 @@ export const trpcServer = createTRPCClient<AppRouter>({
         };
       },
     }),
-    wsLink({
-      client : createWSClient({
-        url : getWsUrl()
-      }),
-      transformer : superjson
-    })
   ],
 });

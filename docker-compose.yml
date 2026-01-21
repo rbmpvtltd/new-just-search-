@@ -6,21 +6,23 @@ services:
       dockerfile: apps/web/Dockerfile
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_BACKEND_URL=http://192.168.1.44:4000
+      - NEXT_PUBLIC_BACKEND_URL=https://backend-test.justsearch.net.in
       - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dra2pandx
       - NEXT_PUBLIC_ALGOLIA_APP_ID=XLHL5IDFH9
       - NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=4b94ea6117cbe235a2e3794e8060ee38
       - NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
     ports:
       - "3000:3000"
-  backend:
-    build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
-    ports:
-      - "4000:4000"
-    env_file:
-      - apps/backend/.env
+    volumes:
+      - .dockerfiles:/app
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/backend/Dockerfile
+  #   ports:
+  #     - "4000:4000"
+  #   env_file:
+  #     - apps/backend/.env
 # services:
 #   postgres:
 #     image: postgres:17
