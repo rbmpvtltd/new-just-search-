@@ -15,6 +15,7 @@ RUN turbo prune --scope=web --docker
 # Install dependencies
 # ---------------------------
 FROM base AS deps
+WORKDIR /app
 
 COPY --from=pruner /app/out/json/ .
 
@@ -25,20 +26,18 @@ RUN bun install
 # ---------------------------
 FROM base AS builder
 
+WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=pruner /app/out/full/ .
 
-WORKDIR /app
-
-ARG NEXT_PUBLIC_BACKEND_URL
-ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+ENV NEXT_PUBLIC_BACKEND_URL=https://backend-test.justsearch.net.in
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dra2pandx
 ENV NEXT_PUBLIC_ALGOLIA_APP_ID=XLHL5IDFH9
 ENV NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=4b94ea6117cbe235a2e3794e8060ee38
 ENV NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
-
 
 RUN bun x turbo run build --filter=web
 
@@ -65,7 +64,7 @@ USER nextjs
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_BACKEND_URL
-ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+ENV NEXT_PUBLIC_BACKEND_URL=https://backend-test.justsearch.net.in
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 # Use Node.js to run the server
