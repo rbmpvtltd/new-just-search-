@@ -13,8 +13,6 @@ services:
       - NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
     ports:
       - "3000:3000"
-    volumes:
-      - .dockerfiles:/app
   # backend:
   #   build:
   #     context: .
