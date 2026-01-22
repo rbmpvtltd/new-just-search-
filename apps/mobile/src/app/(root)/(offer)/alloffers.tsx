@@ -1,4 +1,3 @@
-import { Stack } from "expo-router";
 import type { Hit as AlgoliaHit } from "instantsearch.js";
 import { useState } from "react";
 import { Configure, InstantSearch } from "react-instantsearch-core";
@@ -6,10 +5,8 @@ import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InfiniteHits } from "@/components/home/InfiniteHits";
 import { SearchBox } from "@/components/home/SearchBox";
-import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { OfferProductFilters } from "@/features/offer/show/OfferFilter";
 import OffersList from "@/features/offer/show/OffersList";
-import OfferSearchForm from "@/features/offer/show/offerSearchForm";
 import { searchClient } from "@/lib/algoliaClient";
 
 export interface OfferProductHitType extends AlgoliaHit {

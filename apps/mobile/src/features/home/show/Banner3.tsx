@@ -1,18 +1,17 @@
-import React from "react";
-import CarouselCompo from "../../../components/Carousel/Carousel";
-import { useSuspenceData } from "@/query/getAllSuspense";
-import { BANNER_URL } from "@/constants/apis";
-import MainCard from "../../../components/cards/MainCard";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
+import CarouselCompo from "../../../components/Carousel/Carousel";
+import MainCard from "../../../components/cards/MainCard";
 
 function Banner3() {
-  const {data,isLoading,isError} = useQuery(trpc.banners.getBannerData.queryOptions({type:3}))
+  const { data, isLoading, isError } = useQuery(
+    trpc.banners.getBannerData.queryOptions({ type: 3 }),
+  );
 
   return (
     <CarouselCompo
       height={400}
-      data={data??[]}
+      data={data ?? []}
       renderItem={({ item }) => <MainCard item={item} />}
       mode="horizontal-stack"
     />

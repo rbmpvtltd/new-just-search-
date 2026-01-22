@@ -5,7 +5,6 @@ import { router, useFocusEffect, usePathname } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -15,11 +14,9 @@ import {
 } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { CATEGORY_URL } from "@/constants/apis";
 import Colors from "@/constants/Colors";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
-import { useSuspenceData } from "@/query/getAllSuspense";
 import { useHeadingStore } from "@/store/heading";
 import Input from "../../../components/inputs/Input";
 

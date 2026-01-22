@@ -6,7 +6,6 @@ import { useState } from "react";
 import {
   Alert,
   Dimensions,
-  Image,
   Pressable,
   ScrollView,
   Text,
@@ -16,7 +15,6 @@ import {
 import { useAuthStore } from "@/features/auth/authStore";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
-import { useStartChat } from "@/query/startChat";
 import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { Loading } from "../../../components/ui/Loading";
@@ -25,8 +23,6 @@ const screenWidth = Dimensions.get("window").width;
 export default function HireDetailsCard(item: any) {
   const [aspectRatio, setAspectRatio] = useState(3 / 4);
 
-  // const colorScheme = useColorScheme();
-  const { mutate: startChat } = useStartChat();
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   const clearToken = useAuthStore((state) => state.clearToken);
 
@@ -255,19 +251,7 @@ export default function HireDetailsCard(item: any) {
                       },
                     });
                   } else {
-                    startChat(String(data?.data?.id), {
-                      onSuccess: (res) => {
-                        console.log("Chat started:", res.chat_session_id);
-
-                        router.push({
-                          pathname: "/(root)/(home)/chat",
-                          params: { chat: res?.chat_session_id.toString() },
-                        });
-                      },
-                      onError: (err) => {
-                        console.error("Failed to start chat:", err);
-                      },
-                    });
+                    //TODO : Complete this with chat api
                   }
                 }}
               >

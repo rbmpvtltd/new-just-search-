@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
-  Platform,
   Pressable,
   Text,
   TouchableOpacity,
@@ -17,8 +16,6 @@ import { Loading } from "@/components/ui/Loading";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { useToggleWishlist } from "@/query/favorite";
-import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import Review from "../../../components/forms/review";
@@ -27,6 +24,8 @@ import ReviewForm from "../create/add-business/forms/ReviewForm";
 type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] | undefined;
 
 const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
+  console.log("Shop ", shop);
+
   const router = useRouter();
   const latitude = Number(shop?.latitude);
   const longitude = Number(shop?.longitude);
@@ -188,27 +187,35 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
           </TouchableOpacity>
         ))}
       </View>
-      {/* <View className="p-4">
-        {Object.entries(schedules).map(([day, value]) => {
-          const open = value?.opens_at;
-          const close = value?.closes_at;
+      <View className="p-4">
+        {shop?.days?.map((day: string) => {
+          const isOpen = shop.fromHour && shop.toHour;
 
-          const timeLabel = open && close ? `${open} - ${close}` : "Closed";
+          const timeLabel = isOpen
+            ? `${shop.fromHour} - ${shop.toHour}`
+            : "Closed";
+
           return (
             <View
               key={day}
               className="flex-row justify-between py-2 border-b border-gray-200"
             >
               <Text className="font-medium text-secondary">{day}</Text>
+
               <Text
-                className={` ${timeLabel === "Closed" ? "text-secondary" : "text-secondary"}`}
+                className={`${
+                  timeLabel === "Closed"
+                    ? "text-secondary-content"
+                    : "text-secondary"
+                }`}
               >
                 {timeLabel}
               </Text>
             </View>
           );
         })}
-      </View>  TODO : ==> Set schedule when dbsync is complete */}
+      </View>
+
 
       <View className="flex-row w-full justify-center gap-2">
         {/* Chat Now */}

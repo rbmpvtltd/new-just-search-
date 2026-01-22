@@ -13,7 +13,6 @@ import {
   Alert,
   BackHandler,
   Dimensions,
-  Image,
   Modal,
   Platform,
   Pressable,
@@ -31,12 +30,9 @@ import PrimaryButton from "@/components/inputs/SubmitBtn";
 import TextAreaInput from "@/components/inputs/TextAreaInput";
 import { Loading } from "@/components/ui/Loading";
 import Colors from "@/constants/Colors";
-import { useAuthStore } from "@/features/auth/authStore";
 import { ProductReviewForm } from "@/features/product/forms/create/ProductReviewForm";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
-import { useStartChat } from "@/query/startChat";
-import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 

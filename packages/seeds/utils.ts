@@ -108,23 +108,6 @@ export const insertUser = async (userId: string, role: DbUserRole) => {
     updatedAt: row?.updated_at,
   };
 
-  const plan = await db.query.plans.findMany();
-
-  const [subscriptions]: any[] = await sql.execute(
-    "SELECT * FROM user_subscriptions where user_id = ?",
-    [row?.id],
-  );
-
-  const userActivePlans: DbUserActivePlans = {
-    id: subscriptions?.id,
-    planId: subscriptions?.plan_id,
-    userId: row?.id,
-    features: subscriptions?.features,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-  //TODO: add current user plan
-
   const [insertedUser] = await db.insert(users).values(user).returning();
 
   if (!insertedUser) {

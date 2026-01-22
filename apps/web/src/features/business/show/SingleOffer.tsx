@@ -233,7 +233,6 @@ function SingleOfferComp({
           Recommended Reviews
         </h1>
       </div>
-      {/* TODO : uncommen when offer review seeding complete correctly */}
       <div className="w-[80%] mx-auto mt-5">
         {offer?.rating?.map((item, index) => {
           return (

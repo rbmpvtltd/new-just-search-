@@ -1,21 +1,21 @@
+import Slider from "@react-native-community/slider";
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  ScrollView,
-  Animated,
-  Dimensions,
-  TouchableWithoutFeedback,
-} from "react-native";
 import {
   useClearRefinements,
   useInstantSearch,
   useRefinementList,
 } from "react-instantsearch-core";
-import Slider from "@react-native-community/slider";
+import {
+  Animated,
+  Button,
+  Dimensions,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { useLocationStore } from "@/store/locationStore";
 
 const { width } = Dimensions.get("window");
@@ -34,13 +34,14 @@ export function SubcategoryFilters({
 }: FiltersProps) {
   const { setUiState, uiState } = useInstantSearch();
   const translateX = React.useRef(new Animated.Value(DRAWER_WIDTH)).current;
-  const latitude = useLocationStore(state => state.latitude);
-  const longitude = useLocationStore(state => state.longitude)
+  const latitude = useLocationStore((state) => state.latitude);
+  const longitude = useLocationStore((state) => state.longitude);
   // Distance filter state
   const [pendingRadiusKm, setPendingRadiusKm] = React.useState<number>(2000);
 
-
-  console.log(`========== latitude is ${latitude} and longitude is ${longitude} ==========`);
+  console.log(
+    `========== latitude is ${latitude} and longitude is ${longitude} ==========`,
+  );
 
   const [pendingFilters, setPendingFilters] = React.useState<{
     category: string[];
@@ -277,13 +278,18 @@ export function SubcategoryFilters({
 
   if (!isDrawerOpen) {
     return (
-      <Pressable className="py-5 flex-row justify-center items-center" onPress={onToggleDrawer}>
+      <Pressable
+        className="py-5 flex-row justify-center items-center"
+        onPress={onToggleDrawer}
+      >
         <Text className="text-center text-xl text-secondary-content">
           Filters
         </Text>
         {totalPendingFilters > 0 && (
           <View className="bg-primary rounded-3xl py-1 px-2 ml-1">
-            <Text className="text-secondary font-extrabold">{totalPendingFilters}</Text>
+            <Text className="text-secondary font-extrabold">
+              {totalPendingFilters}
+            </Text>
           </View>
         )}
       </Pressable>
@@ -295,7 +301,7 @@ export function SubcategoryFilters({
       {/* Backdrop */}
       <TouchableWithoutFeedback onPress={onToggleDrawer}>
         <Animated.View
-        className={"absolute top-0 right-0 bottom-0 left-0 bg-base-100 z-40"}
+          className={"absolute top-0 right-0 bottom-0 left-0 bg-base-100 z-40"}
           style={[
             {
               opacity: translateX.interpolate({
@@ -317,7 +323,7 @@ export function SubcategoryFilters({
         ]}
         className={`bg-base-200 absolute top-0 right-0 bottom-0 z-50 shadow-base-200 shadow-sm`}
       >
-        <ScrollView className="flex-1">
+        <ScrollView className="flex-1 ">
           <View className="flex-row justify-between items-center p-6 border-b-[1px] border-b-secondary bg-base-200">
             <Text className="text-2xl text-secondary">Filters</Text>
             <Pressable onPress={onToggleDrawer}>
@@ -326,7 +332,7 @@ export function SubcategoryFilters({
           </View>
 
           <View className="p-6 bg-base-200">
-            {(latitude && longitude) && (
+            {latitude && longitude && (
               <View className="mb-7">
                 <Text className="text-xl font-semibold mb-3 text-secondary">
                   Distance
@@ -519,7 +525,6 @@ export function SubcategoryFilters({
                     <Pressable
                       key={lang.value}
                       className="py-3 flex-row justify-between border-b-[1px] border-base-300 items-center"
-
                       onPress={() =>
                         togglePendingFilter("languages", lang.value)
                       }
@@ -621,7 +626,7 @@ export function SubcategoryFilters({
           </View>
 
           {/* Action Buttons */}
-          <View className="flex-row p-5 border-t-[1px] border-t-secondary bg-base-200">
+          <View className="flex-row py-4 border-t-[1px] border-t-secondary bg-base-200 mb-16">
             <View className="flex-1 mx-2">
               <Button
                 title="Clear all"
@@ -630,10 +635,10 @@ export function SubcategoryFilters({
                 onPress={clearAllFilters}
               />
             </View>
-            <View className="flex-1 mx-2">
+            <View className="flex-1 mx-4">
               <Button
                 onPress={applyFilters}
-                title="See results"
+                title="Show Results"
                 color="#252b33"
               />
             </View>
@@ -648,5 +653,5 @@ const styles = StyleSheet.create({
   drawer: {
     width: DRAWER_WIDTH,
     elevation: 5,
-  }
+  },
 });

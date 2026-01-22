@@ -1,13 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Notifications from "expo-notifications";
-import { router, Tabs, usePathname } from "expo-router";
-import { Pressable, useColorScheme } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Loading } from "@/components/ui/Loading";
-import { SomethingWrong } from "@/components/ui/SomethingWrong";
+import { Tabs, usePathname } from "expo-router";
+import { useColorScheme } from "react-native";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
-import { useNotificationCount } from "@/query/notification/notication";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,24 +16,11 @@ Notifications.setNotificationHandler({
 });
 
 export default function TabLayout() {
-  const {
-    data: notificationCount,
-    isLoading,
-    isError,
-  } = useNotificationCount();
   const pathname = usePathname();
   const colorScheme = useColorScheme();
 
   const isAboutBusiness = pathname.startsWith("/subcategory/aboutbusiness");
   const isAuthenticated = useAuthStore((state) => state.authenticated);
-
-  if (isLoading) {
-    return <Loading position="center" />;
-  }
-
-  if (isError) {
-    return <SomethingWrong />;
-  }
 
   return (
     <Tabs

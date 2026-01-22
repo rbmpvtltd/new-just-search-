@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { StyleSheet, View, TextInput, useColorScheme } from "react-native";
-import { useSearchBox, type UseSearchBoxProps } from "react-instantsearch-core";
+import { type UseSearchBoxProps, useSearchBox } from "react-instantsearch-core";
+import { StyleSheet, TextInput, useColorScheme, View } from "react-native";
 import Colors from "@/constants/Colors";
 
 interface SearchBoxProps extends UseSearchBoxProps {

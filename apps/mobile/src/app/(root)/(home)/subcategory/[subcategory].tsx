@@ -167,10 +167,7 @@ export default function SubCategory() {
       <SafeAreaView className="flex-1">
         <View className="-mb-14 flex-1">
           <View className="flex-1">
-            <InstantSearch
-              searchClient={searchClient}
-              indexName="all_listing"
-            >
+            <InstantSearch searchClient={searchClient} indexName="all_listing">
               <Configure hitsPerPage={10} filters={filters} />
               <SearchBox placeholder={`Search Anything In ${title}`} />
 
@@ -213,12 +210,19 @@ function SubcategoryHitCard({
       onTitleExtract(hit.category);
     }
   }, [hit.category, onTitleExtract]);
-  console.log("=============================hit is =======>",hit)
+  console.log("=============================hit is =======>", hit);
 
+  
   return hit.listingType === "business" ? (
-    <MemoizedDetailCard navigationId={Number(hit.objectID)} type={1} item={hit}  rating={String(hit.rating)}
+    
+    <MemoizedDetailCard
+      navigationId={Number(hit.objectID)}
+      type={1}
+      item={hit}
+      rating={String(hit.rating)}
       category={hit.category}
-      subcategory={hit.subcategory} />
+      subcategory={hit.subcategory}
+    />
   ) : (
     // <HireCard item={hit} />
     <HireCard item={hit} />

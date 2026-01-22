@@ -579,6 +579,9 @@ export const businessrouter = router({
             landMark: businessListing.landmark,
             whatsappNo: businessListing.whatsappNo,
             description: businessListing.description,
+            days: businessListing.days,
+            fromHour: businessListing.fromHour,
+            toHour: businessListing.toHour,
             updatedAt: businessListing.updatedAt,
             specialities: businessListing.specialities,
             rating: sql<
@@ -673,6 +676,9 @@ export const businessrouter = router({
             landMark: businessListing.landmark,
             whatsappNo: businessListing.whatsappNo,
             description: businessListing.description,
+            days: businessListing.days,
+            fromHour: businessListing.fromHour,
+            toHour: businessListing.toHour,
             updatedAt: businessListing.updatedAt,
             specialities: businessListing.specialities,
             rating: sql<

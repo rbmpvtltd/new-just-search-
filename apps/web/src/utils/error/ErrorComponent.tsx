@@ -5,6 +5,7 @@ import { isTRPCClientError, type TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
+import SomethingWentWrongPage from "@/features/something-went-wrorg/SomethingWentWrong";
 import { errorCodeMap } from "./errorCode";
 
 type TRCPServerError = {
@@ -43,8 +44,7 @@ function SomethingWentWrong(error: unknown) {
       color: "white",
     },
   });
-  // TODO: redirect to something went wrong page
-  return <div>Something went wrong</div>;
+  return <SomethingWentWrongPage />;
 }
 
 function HandleTRPCError(
@@ -52,7 +52,6 @@ function HandleTRPCError(
   router: ReturnType<typeof useRouter>,
 ): ReactNode {
   const code = error.data?.code;
-  // TODO: create or check all redirect pages like 404.tsx , error.tsx etc..
   const config = errorCodeMap[code ?? "undefined"];
 
   if (!config) {

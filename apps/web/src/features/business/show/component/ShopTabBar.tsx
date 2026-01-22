@@ -384,12 +384,20 @@ function ShopProducts({
               pathname: `/subcategory/aboutbusiness/products/singleproduct/${item.id}`,
             }}
           >
-            <Image
+            {/* <Image
               width={200}
               height={400}
               className="rounded-md"
-              src="https://www.justsearch.net.in/assets/images/10922718251737465572.JPEG" // TODO : change image when upload on cloudinary
+              src="https://www.justsearch.net.in/assets/images/10922718251737465572.JPEG"
               alt="product image"
+            /> */}
+
+            <CldImage
+              width="200"
+              height="400"
+              className="w-full h-full object-cover"
+              src={item.photos[0] ?? ""}
+              alt="Business image"
             />
           </Link>
           <h2 className="text-center font-medium p-2">{item.name}</h2>

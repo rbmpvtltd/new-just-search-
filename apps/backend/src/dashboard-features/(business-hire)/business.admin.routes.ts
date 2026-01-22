@@ -74,7 +74,7 @@ export const adminBusinessRouter = router({
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
       .leftJoin(users, eq(businessListings.userId, users.id))
-      .leftJoin(cities, eq(businessListings.city, cities.id)) // TODO: I commited this to avoid error future me you must remove this commit
+      .leftJoin(cities, eq(businessListings.city, cities.id)) 
       .leftJoin(
         businessSubcategories,
         eq(businessListings.id, businessSubcategories.businessId),

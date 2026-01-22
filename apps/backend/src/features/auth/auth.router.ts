@@ -317,8 +317,6 @@ export const authRouter = router({
       }
 
       if (isEmailInput) {
-        // TODO: implement otp send on real email or phone number
-
         sendSMSOTP(identifier);
       } else {
         const normalNumber = normalizeMobile(identifier);

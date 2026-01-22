@@ -5,20 +5,15 @@ import { router } from "expo-router";
 import {
   Alert,
   FlatList,
-  Image,
   Platform,
   Pressable,
   Share,
   Text,
   View,
 } from "react-native";
-import { LISTING_PRODUCT_LIST_URL } from "@/constants/apis";
 import { useAuthStore } from "@/features/auth/authStore";
 import { cld } from "@/lib/cloudinary";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { useSuspenceData } from "@/query/getAllSuspense";
-import { useStartProductChat } from "@/query/startProductChat";
-import { showLoginAlert } from "@/utils/alert";
 import DataNotFound from "../../../components/ui/DataNotFound";
 
 type ProductType = OutputTrpcType["businessrouter"]["shopProducts"][0];
@@ -30,7 +25,6 @@ function ListingProduct({ shopId }: { shopId: string }) {
     }),
   );
   const isAuthenticated = useAuthStore((state) => state.authenticated);
-  const { mutate: startChat } = useStartProductChat();
   const clearToken = useAuthStore((state) => state.clearToken);
   if (data?.length === 0) {
     return <DataNotFound />;

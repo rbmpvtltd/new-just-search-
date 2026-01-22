@@ -1,5 +1,9 @@
 // import { Ionicons } from "@expo/vector-icons";
+
+import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { useState } from "react";
 // import { router } from "expo-router";
 import {
   FlatList,
@@ -10,23 +14,9 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import DataNotFound from "@/components/ui/DataNotFound";
-import { Loading } from "@/components/ui/Loading";
-import { NOTIFICATION_URL } from "@/constants/apis";
 import Colors from "@/constants/Colors";
-import { useClearNotification } from "@/query/clearNotifications";
-import { useSuspenceData } from "@/query/getAllSuspense";
-import { useMaskAsRead } from "@/query/notification/notication";
-import { useStartChat } from "@/query/startChat";
-import { isoStringToTime } from "@/utils/dateAndTime";
-import { trpc } from "@/lib/trpc";
 import { useAuthStore } from "@/features/auth/authStore";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-
-
+import { trpc } from "@/lib/trpc";
 
 export default function Notification() {
   const colorScheme = useColorScheme();
@@ -34,32 +24,36 @@ export default function Notification() {
   const isAuthenticated = useAuthStore((state) => state.authenticated);
   console.log("Is Authenticated", isAuthenticated);
   if (!isAuthenticated) {
-    router.push("/")
+    router.push("/");
   }
-  const { data } = useQuery(trpc.notificationRouter.getNotifications.queryOptions())
+  const { data } = useQuery(
+    trpc.notificationRouter.getNotifications.queryOptions(),
+  );
   console.log("Notification Data", data);
-    const [selectedNotification, setSelectedNotification] = useState<any>(null);
+  const [selectedNotification, setSelectedNotification] = useState<any>(null);
 
-  if(data?.data.length === 0){
-    return <View className="flex-1 justify-center items-center">
-      <Text className="text-secondary text-2xl">No Notifications To Show</Text>
-    </View>
+  if (data?.data.length === 0) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-secondary text-2xl">
+          No Notifications To Show
+        </Text>
+      </View>
+    );
   }
 
   return (
     <View>
-
       <FlatList
         className="bg-base-200 mb-10"
         data={data?.data}
         renderItem={({ item, index }) => {
           return (
             <Pressable
-                          onPress={() => {
+              onPress={() => {
                 setShowModal(true);
                 setSelectedNotification(item);
               }}
-
             >
               <View
                 className={`${index % 2 === 0 ? "bg-base-200" : "bg-base-100"} px-4 py-3 flex-row gap-6 items-center w-[100%]`}
@@ -128,7 +122,6 @@ export default function Notification() {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }

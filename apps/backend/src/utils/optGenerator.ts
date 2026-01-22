@@ -24,18 +24,8 @@ export const sendSMSOTP = async (identifier: string) => {
     await sendEmailOTP(identifier, otp);
     return { success: true, method: "email" };
   } else {
-    // TODO: implement fast to sms when identifier is number
+    // implement fast to sms when identifier is number
     await sendSMSViaFast2SMSDLT(identifier, otp);
     return { success: true, method: "sms" };
   }
 };
-
-// export const sendEmailOTP = (email: string) => {
-//   const otp = otpGenerator();
-
-//   logger.info("otp is", {
-//     otp,
-//     "email is ": email,
-//   });
-//   redis.set(`otpsession:${email}`, otp, "EX", 60 * 20); // TODO: set short life time for expiry otp
-// };

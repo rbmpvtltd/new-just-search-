@@ -1,9 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Alert,
-  Platform,
   Pressable,
   Text,
   TouchableOpacity,
@@ -12,16 +12,13 @@ import {
 } from "react-native";
 import LoginRedirect from "@/components/cards/LoginRedirect";
 import { Loading } from "@/components/ui/Loading";
+import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { useToggleWishlist } from "@/query/favorite";
-import { showLoginAlert } from "@/utils/alert";
 import { dialPhone } from "@/utils/getContact";
 import { openInGoogleMaps } from "@/utils/getDirection";
 import Review from "../../../components/forms/review";
 import ReviewForm from "../create/add-business/forms/ReviewForm";
-import Colors from "@/constants/Colors";
-import { useState } from "react";
 
 type ShopCardType = OutputTrpcType["businessrouter"]["singleShop"] | undefined;
 
@@ -30,14 +27,14 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
   const latitude = Number(shop?.latitude);
   const longitude = Number(shop?.longitude);
   const { data } = useQuery(trpc.auth.verifyauth.queryOptions());
-  const colorScheme = useColorScheme()
-  const [fav, setFav] = useState<boolean>(shop?.isFavourite ?? false)
+  const colorScheme = useColorScheme();
+  const [fav, setFav] = useState<boolean>(shop?.isFavourite ?? false);
 
   const clearToken = useAuthStore((state) => state.clearToken);
   const mutation = useMutation(
     trpc.businessrouter.toggleFavourite.mutationOptions({
       onSuccess: (data) => {
-        console.log("favourit toggle successfully",data)
+        console.log("favourit toggle successfully", data);
       },
       onError: (err) => {
         setFav((prev) => !prev);
@@ -63,7 +60,7 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
 
   const handleFavClick = () => {
     setFav((prev) => !prev);
-    mutation.mutate({businessId:shop?.id ?? 0});
+    mutation.mutate({ businessId: shop?.id ?? 0 });
   };
 
   const {
@@ -95,14 +92,10 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
           <Ionicons name="checkmark-circle" size={28} color="green" />
         )} */}
         <View className="w-[10%] ">
-          <Pressable
-           onPress={handleFavClick}
-          >
+          <Pressable onPress={handleFavClick}>
             <Ionicons
               size={30}
-              color={
-                fav ? "red" : Colors[colorScheme ?? "light"].secondary
-              }
+              color={fav ? "red" : Colors[colorScheme ?? "light"].secondary}
               name={fav ? "heart" : "heart-outline"}
             />
           </Pressable>
@@ -191,27 +184,34 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
           </TouchableOpacity>
         ))}
       </View>
-      {/* <View className="p-4">
-        {Object.entries(schedules).map(([day, value]) => {
-          const open = value?.opens_at;
-          const close = value?.closes_at;
+      <View className="p-4">
+        {shop?.days?.map((day: string) => {
+          const isOpen = shop.fromHour && shop.toHour;
 
-          const timeLabel = open && close ? `${open} - ${close}` : "Closed";
+          const timeLabel = isOpen
+            ? `${shop.fromHour} - ${shop.toHour}`
+            : "Closed";
+
           return (
             <View
               key={day}
               className="flex-row justify-between py-2 border-b border-gray-200"
             >
               <Text className="font-medium text-secondary">{day}</Text>
+
               <Text
-                className={` ${timeLabel === "Closed" ? "text-secondary" : "text-secondary"}`}
+                className={`${
+                  timeLabel === "Closed"
+                    ? "text-secondary-content"
+                    : "text-secondary"
+                }`}
               >
                 {timeLabel}
               </Text>
             </View>
           );
         })}
-      </View>  TODO : ==> Set schedule when dbsync is complete */}
+      </View>
 
       <View className="flex-row w-full justify-center gap-2">
         {/* Chat Now */}
@@ -273,7 +273,6 @@ const ShposCard = ({ item: shop }: { item: ShopCardType }) => {
           </Pressable>
         </View>
       </View>
-
 
       {data?.success && <ReviewForm businessId={shop?.id ?? 0} />}
 

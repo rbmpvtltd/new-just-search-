@@ -76,7 +76,7 @@ export const BussinessListingCard = ({
                   businessId={Number(item.id)}
                   initialFav={initialFav ?? false}
                 />
-              </div> TODO: navigate to single shop when trying clicked on favourite */}
+              </div> */}
             </div>
           </div>
           <div className="flex flex-col py-2 mt-4 gap-4 ">

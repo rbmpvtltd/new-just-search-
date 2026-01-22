@@ -25,12 +25,6 @@ export default function Page() {
         globalFilter,
       });
 
-      // TODO: delete this comment if I didnot find any errors;
-      // filters.map((item) => {
-      //   item.id;
-      //   item.value;
-      // });
-
       return {
         data: result?.data || [],
         totalPages: result?.totalPages || 0,

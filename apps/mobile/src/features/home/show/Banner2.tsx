@@ -1,10 +1,7 @@
-import React from "react";
-import { BANNER_URL } from "@/constants/apis";
-import { useSuspenceData } from "@/query/getAllSuspense";
-import CarouselCompo from "../../../components/Carousel/Carousel";
-import Card from "../../../components/cards/Card";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
+import CarouselCompo from "../../../components/Carousel/Carousel";
+import Card from "../../../components/cards/Card";
 
 function Banner2() {
   const { data } = useQuery(trpc.banners.premiumShops.queryOptions());

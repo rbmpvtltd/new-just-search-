@@ -3,7 +3,10 @@ import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
 import { memo } from "react";
 import {
+  Alert,
+  Platform,
   Pressable,
+  Share,
   Text,
   TouchableOpacity,
   useColorScheme,
@@ -11,7 +14,6 @@ import {
 } from "react-native";
 import StarRating from "react-native-star-rating-widget";
 import type { SubcategoryHitType } from "@/app/(root)/(home)/subcategory/[subcategory]";
-import AvatarWithFallback from "@/components/ui/AvatarWithFallback";
 import Colors from "@/constants/Colors";
 import { cld } from "@/lib/cloudinary";
 import type { OutputTrpcType } from "@/lib/trpc";
@@ -37,7 +39,36 @@ function DetailCard({
 }) {
   const { setShopId } = useShopIdStore();
   const colorScheme = useColorScheme();
+  const onShare = async () => {
+    try {
+      const shareUrl = `https://web-test.justsearch.net.in/subcategory/aboutbusiness/${navigationId}`;
+      const businessName = item?.name ?? "This business";
 
+      const shareMessage =
+        `Check out *${businessName}* listed on Just Search —\n` +
+        `a platform where multiple local shops and services are available in one place.\n\n` +
+        `🔎 Find, compare & contact businesses easily 👇\n` +
+        `🔗 ${shareUrl}`;
+
+      await Share.share(
+        {
+          title: businessName,
+          message: Platform.OS === "android" ? shareMessage : businessName,
+          url: shareUrl, // iOS
+        },
+        {
+          dialogTitle: "Share Business",
+        },
+      );
+    } catch (error: any) {
+      Alert.alert("Error", error?.message ?? "Unable to share");
+    }
+  };
+
+  const fallback = item?.name?.split(" ");
+  const fullAddress = [item?.buildingName, item?.streetName, item?.area].filter(
+    Boolean,
+  );
   return (
     <Pressable
       onPress={() => {
@@ -55,19 +86,20 @@ function DetailCard({
         }}
       >
         <View className="flex-row p-3 ">
-          <View>
-            {/* <AvatarWithFallback
-              uri={
-                "https://www.justsearch.net.in/assets/images/banners/ZmQkEttf1759906394.png"
-              } // 
-              imageClass="w-[150px] h-[180px] rounded-lg"
-              iconClass="items-center justify-center"
-              imageStyle={{ resizeMode: "stretch" }}
-            /> */}
-            <AdvancedImage
-              cldImg={cld.image(item?.photo ?? "")}
-              className="w-[100%] h-[100%]"
-            />
+          <View className="border border-gray-300 rounded-lg">
+            {item?.photo ? (
+              <AdvancedImage
+                cldImg={cld.image(item?.photo)}
+                className="w-[150px] h-[180px] rounded-lg"
+                resizeMode="stretch"
+              />
+            ) : (
+              <View className="w-[150px] h-[180px] rounded-lg bg-primary/10 flex items-center justify-center">
+                <Text className="text-4xl font-bold text-primary">
+                  {fallback.map((item) => item.charAt(0)).join("")}
+                </Text>
+              </View>
+            )}
           </View>
           <View className="flex-1 my-1 mx-2">
             <View className="flex-row items-center justify-between">
@@ -104,12 +136,6 @@ function DetailCard({
                 starSize={18}
                 enableSwiping={false}
               />
-              {/* <View className="flex-row items-center gap-1">
-                <Ionicons name="star" size={16} color="#fbbf24" />
-                <Text className="text-secondary text-sm font-medium">
-                  {rating}
-                </Text>
-              </View> */}
             </View>
             <View className="mx-2">
               <Text className="text-secondary text-lg font-semibold">
@@ -171,10 +197,10 @@ function DetailCard({
           </View>
         </View>
         {/* <View className="w-full mx-4">
-        <Text className="text-secondary text-lg font-semibold ">
-          {item.name}
-        </Text>
-      </View> */}
+          <Text className="text-secondary text-lg font-semibold ">
+            {item.name}
+          </Text>
+        </View> */}
         <View className="w-[80%] mx-4 flex-row items-center gap-2 ">
           <Text className="text-secondary-content flex items-center justify-center">
             <Ionicons
@@ -184,8 +210,7 @@ function DetailCard({
             />
           </Text>
           <Text className="text-secondary text-lg font-semibold ">
-            {item.buildingName} {item.streetName}
-            {item.area}
+            {fullAddress.join(", ")}
           </Text>
         </View>
 
@@ -241,6 +266,14 @@ function DetailCard({
               </Pressable>
             </View>
           )}
+
+          <View className="rounded-lg bg-primary p-1">
+            <Pressable onPress={onShare}>
+              <View className=" text-xl text-center flex-row py-1 gap-2 px-3 justify-center">
+                <Ionicons size={20} name="share-social" color={"white"} />
+              </View>
+            </Pressable>
+          </View>
         </View>
       </View>
     </Pressable>

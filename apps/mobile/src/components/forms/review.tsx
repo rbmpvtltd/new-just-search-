@@ -1,16 +1,9 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import { Keyboard, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import StarRating from "react-native-star-rating-widget";
 
 const Review = ({ rating }: { rating: any }) => {
-  // const { data: userProfile, isLoading: profileLoading } = useSuspenceData(
-  //   PROFILE_URL.url,
-  //   PROFILE_URL.key,
-  // );
-
   // const {
   //   control,
   //   reset,

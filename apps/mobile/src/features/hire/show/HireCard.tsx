@@ -11,7 +11,6 @@
 // } from "react-native";
 // import { Pressable } from "react-native-gesture-handler";
 // import Colors from "@/constants/Colors";
-// import { useStartChat } from "@/query/startChat";
 // import { useAuthStore } from "@/store/authStore";
 // import { showLoginAlert } from "@/utils/alert";
 // import { dialPhone } from "@/utils/getContact";
@@ -22,7 +21,6 @@
 // const screenWidth = Dimensions.get("window").width;
 // export default function HireCard({ item, title }: {item : HireCardType ,title? :any}) {
 //   const colorScheme = useColorScheme();
-//   const { mutate: startChat } = useStartChat();
 //   const isAuthenticated = useAuthStore((state) => state.authenticated);
 //   const clearToken = useAuthStore((state) => state.clearToken);
 

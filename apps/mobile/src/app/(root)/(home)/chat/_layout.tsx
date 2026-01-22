@@ -23,7 +23,7 @@ export default function HomeLayout() {
               </Pressable>
             );
           },
-          headerTitle: "All Messages", // TODO: this will be set into there screen for specific name
+          headerTitle: "All Messages",
         }}
       />
       {/* <Stack.Screen

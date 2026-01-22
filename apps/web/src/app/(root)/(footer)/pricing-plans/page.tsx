@@ -1,5 +1,5 @@
 import React from "react";
-import PricingPlans from "@/features/pricing-plans/PricingPlans";
+import PricingPlans from "@/features/footer/pricing-plans/PricingPlans";
 
 export default function page() {
   return <PricingPlans />;

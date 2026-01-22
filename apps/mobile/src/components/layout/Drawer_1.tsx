@@ -20,7 +20,6 @@ import {
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import { trpc } from "@/lib/trpc";
-import { useNotificationCount } from "@/query/notification/notication";
 import { showLoginAlert } from "@/utils/alert";
 import { Loading } from "../ui/Loading";
 import { SomethingWrong } from "../ui/SomethingWrong";
@@ -138,23 +137,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 }
 
 export default function DrawerLayout() {
-  const {
-    data: notificationCount,
-    isLoading,
-    isError,
-  } = useNotificationCount();
   const segment = useSegments();
   const currentRoute = segment.join("/");
   const isAuthenticated = useQuery(trpc.auth.verifyauth.queryOptions());
   const clearToken = useAuthStore((state) => state.clearToken);
   const colorScheme = useColorScheme();
-  if (isLoading) {
-    return <Loading position="center" />;
-  }
 
-  if (isError) {
-    return <SomethingWrong />;
-  }
   return (
     <Drawer
       screenOptions={{
@@ -243,11 +231,11 @@ export default function DrawerLayout() {
                   size={20}
                   color={Colors[colorScheme ?? "light"].secondary}
                 />
-                {!!notificationCount?.unread_count && (
+                {/* {!!notificationCount?.unread_count && (
                   <Text className="text-white bg-red-500 px-1 text-xs rounded-full ml-1">
                     {notificationCount.unread_count.toString()}
                   </Text>
-                )}
+                )} */}
               </View>
             </Pressable>
           </View>

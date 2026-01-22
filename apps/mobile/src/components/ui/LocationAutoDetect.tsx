@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import Colors from "@/constants/Colors";
-import { useDetectLocation } from "@/query/useDetectLocation";
+import { useDetectLocation } from "@/hooks/useDetectLocation";
 
 type LocationResult = {
   success: boolean;

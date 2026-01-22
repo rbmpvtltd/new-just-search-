@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Alert, Dimensions, Image, ScrollView, Text, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { Dimensions, ScrollView, View } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { Loading } from "@/components/ui/Loading";
 import ShposCard from "@/features/business/show/PremiumShopsCard";
@@ -20,79 +20,12 @@ export default function TabOneScreen() {
       businessId: Number(premiumshops),
     }),
   );
-  console.log("premium shop is ==================>",premiumshops)
+  console.log("premium shop is ==================>", premiumshops);
   setShopId(Array.isArray(premiumshops) ? premiumshops[0] : premiumshops);
   if (isLoading) {
     return <Loading position="center" size={"large"} />;
   }
 
-  // const premiumShopId = Array.isArray(premiumshops)
-  //   ? premiumshops[0]
-  //   : premiumshops;
-
-  // const { data: banner } = useSuspenceData(
-  //   MY_LISTING_URL.url,
-  //   MY_LISTING_URL.key,
-  //   premiumShopId,
-  // );
-  // useEffect(() => {
-  //   setShopId(premiumShopId);
-  // }, [setShopId, premiumShopId]);
-  // const listing = banner?.data?.listing;
-
-  // Show alert and early return if listing not found
-  // if (!listing) {
-  //   Alert.alert(
-  //     "Listing not found",
-  //     "This listing was not found or approval pending.",
-  //     [
-  //       {
-  //         text: "Go Back",
-  //         onPress: () => router.replace("/(root)/(home)/home"),
-  //         style: "default",
-  //       },
-  //     ],
-  //   );
-  // }
-
-  // useEffect(() => {
-  //   queryClient.invalidateQueries({
-  //     queryKey: [
-  //       "suspense-data",
-  //       premiumShopId,
-  //       `${MY_LISTING_URL.url}${premiumShopId}`,
-  //     ],
-  //   });
-  // }, [premiumShopId]);
-
-  // const caraouselImg = useMemo(() => {
-  //   return [
-  //     { image: banner?.data?.listing?.photo },
-  //     { image: banner?.data?.listing?.image1 },
-  //     { image: banner?.data?.listing?.image2 },
-  //     { image: banner?.data?.listing?.image3 },
-  //     { image: banner?.data?.listing?.image4 },
-  //     { image: banner?.data?.listing?.image5 },
-  //   ].filter((item: { image: string }) => item?.image?.split(".").length > 1);
-  // }, [banner]);
-
-  // const [validImages, setValidImages] = useState(caraouselImg);
-
-  // const handleImageError = (failedImageUri: string) => {
-  //   setValidImages((prev) =>
-  //     prev.filter(
-  //       (img) =>
-  //         `https://www.justsearch.net.in/assets/images/${img.image}` !==
-  //         failedImageUri,
-  //     ),
-  //   );
-  // };
-
-  // useEffect(() => {
-  //   setValidImages(caraouselImg);
-  // }, [caraouselImg]);
-
-  // if (!listing) return null;
   return (
     <ScrollView>
       <View className="flex-1 items-center">

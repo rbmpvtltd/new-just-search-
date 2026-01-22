@@ -31,11 +31,6 @@ export const statuses = [
     icon: HelpCircle,
   },
   {
-    value: "todo",
-    label: "Todo",
-    icon: Circle,
-  },
-  {
     value: "in progress",
     label: "In Progress",
     icon: Timer,

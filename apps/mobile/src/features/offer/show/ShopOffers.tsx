@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
-import { LISTING_OFFER_LIST_URL } from "@/constants/apis";
 import { type OutputTrpcType, trpc } from "@/lib/trpc";
-import { useSuspenceData } from "@/query/getAllSuspense";
 import DataNotFound from "../../../components/ui/DataNotFound";
 
 type OfferType = OutputTrpcType["businessrouter"]["shopOffers"][0];

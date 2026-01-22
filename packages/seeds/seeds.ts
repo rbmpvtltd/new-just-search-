@@ -67,7 +67,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
   } catch (err) {
     console.error("❌ Seed error:", err);
   }
-  // TODO: uncommit this on live server
+
   // Bun.serve({
   //   port: 4001,
   //   fetch() {

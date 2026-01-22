@@ -20,8 +20,6 @@ import "../../global.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { is } from "zod/v4/locales";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import {
   CustomDrawerContent,
@@ -29,7 +27,6 @@ import {
 } from "@/components/layout/Drawer";
 import ErrorHandler from "@/components/layout/NativeErrorBoundry";
 import { androidPaymentApiKey, iosPaymentApiKey } from "@/constants/Variable";
-import { useAuthStore } from "@/features/auth/authStore";
 import { queryClient } from "@/lib/trpc";
 
 export {
@@ -202,23 +199,6 @@ function RootLayoutNav() {
                         return {
                           headerShown: false,
                         };
-                        //
-                        // headerTitle: () => (
-                        //   <View className="flex-row items-center gap-4  px-4 py-2 rounded-lg sticky">
-                        //     <AvatarWithFallback
-                        //       uri={`https://www.justsearch.net.in/assets/images/${imageUri}`}
-                        //       imageClass="w-[40px] h-[40px]"
-                        //       iconSize={20}
-                        //     />
-                        //     <Text className="text-secondary font-semibold text-xl">
-                        //       {heading
-                        //         ? heading.length > 20
-                        //           ? `${heading.slice(0, 20)}...`
-                        //           : heading
-                        //         : "Loading..."}
-                        //     </Text>
-                        //   </View>
-                        // ),
                       }}
                     />
                   </Stack>

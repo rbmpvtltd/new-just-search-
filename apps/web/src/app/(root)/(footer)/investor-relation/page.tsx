@@ -1,5 +1,5 @@
 import React from "react";
-import InvestorRelation from "@/features/investor-relation/InvestorRelation";
+import InvestorRelation from "@/features/footer/investor-relation/InvestorRelation";
 
 export default function page() {
   return (
