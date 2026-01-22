@@ -1,26 +1,29 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   useColorScheme,
   View,
-  ActivityIndicator,
-  Pressable,
 } from "react-native";
 import { z } from "zod";
+import GoogleLogin from "@/app/(root)/google";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
 import TermsAndConditions from "@/features/terms-and-conditions/TermConditions";
+import { trpc } from "@/lib/trpc";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../../../components/inputs/Input";
-import { trpc } from "@/lib/trpc";
-import { useMutation } from "@tanstack/react-query";
 
 // Form schemas
 const formSchema = z
@@ -233,7 +236,7 @@ const SignUpComponent: React.FC = () => {
                     <Input
                       placeholder="000000"
                       maxLength={6}
-                      className="rounded-xl text-center text-2xl tracking-widest bg-base-300 text-secondary"
+                      className="rounded-xl text-center text-2xl tracking-widest text-secondary"
                       value={field.value}
                       onChangeText={(text) => {
                         field.onChange(text);
@@ -300,173 +303,180 @@ const SignUpComponent: React.FC = () => {
 
   // Registration Screen
   return (
-    <ScrollView className="flex-1 w-full px-4 bg-base-100">
-      <View className="flex-1 items-center justify-center py-10">
-        <View className="w-full ">
-          <View className="text-center mb-6">
-            <Text className="text-3xl font-bold text-secondary text-center mb-2">
-              Create your account
-            </Text>
-            <Text className="text-sm text-secondary-content text-center">
-              Join <Text className="font-semibold">Just Search</Text> and start
-              exploring today
-            </Text>
-          </View>
+    <KeyboardAvoidingView
+      className="flex-1 w-full px-4 "
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+    >
+      <ScrollView
+        className="flex-1 w-full px-4"
+        contentContainerStyle={{ paddingBottom: 10 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="flex-1 items-center justify-center pt-10">
+          <View className="w-full ">
+            <View className="text-center mb-6">
+              <Text className="text-3xl font-bold text-secondary text-center mb-2">
+                Create your account
+              </Text>
+              <Text className="text-sm text-secondary-content text-center">
+                Join <Text className="font-semibold">Just Search</Text> and
+                start exploring today
+              </Text>
+            </View>
 
-          <View className="rounded-2xl bg-base-200 shadow-sm border border-gray-200 p-6">
-            <View>
-              {/* Display Name */}
-              <Controller
-                control={form.control}
-                name="displayName"
-                render={({ field }) => (
-                  <View className="mb-5">
-                    <Text className="text-sm font-medium text-secondary mb-2">
-                      Display Name <Text className="text-error">*</Text>
-                    </Text>
-                    <Input
-                      {...field}
-                      placeholder="John Doe"
-                      className="rounded-xl bg-base-300 text-secondary"
-                      onChangeText={field.onChange}
-                      value={field.value}
-                    />
-                    {form.formState.errors.displayName && (
-                      <Text className="text-error text-sm mt-2">
-                        {form.formState.errors.displayName.message}
+            <View className="rounded-2xl bg-base-200 shadow-sm border border-gray-200 p-6">
+              <View>
+                <Controller
+                  control={form.control}
+                  name="displayName"
+                  render={({ field }) => (
+                    <View className="mb-5">
+                      <Text className="text-sm font-medium text-secondary mb-2">
+                        Display Name <Text className="text-error">*</Text>
                       </Text>
-                    )}
-                  </View>
-                )}
-              />
+                      <Input
+                        {...field}
+                        placeholder="John Doe"
+                        className="rounded-xl text-secondary"
+                        onChangeText={field.onChange}
+                        value={field.value}
+                      />
+                      {form.formState.errors.displayName && (
+                        <Text className="text-error text-sm mt-2">
+                          {form.formState.errors.displayName.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
 
-              {/* Mobile Number */}
-              <Controller
-                control={form.control}
-                name="mobileNumber"
-                render={({ field }) => (
-                  <View className="mb-5">
-                    <Text className="text-sm font-medium text-secondary mb-2">
-                      Mobile Number <Text className="text-error">*</Text>
-                    </Text>
-                    <Input
-                      {...field}
-                      placeholder="98765 43210"
-                      className="rounded-xl bg-base-300 text-secondary"
-                      onChangeText={field.onChange}
-                      value={field.value}
-                      keyboardType="number-pad"
-                    />
-                    {form.formState.errors.mobileNumber && (
-                      <Text className="text-error text-sm mt-2">
-                        {form.formState.errors.mobileNumber.message}
+                <Controller
+                  control={form.control}
+                  name="mobileNumber"
+                  render={({ field }) => (
+                    <View className="mb-5">
+                      <Text className="text-sm font-medium text-secondary mb-2">
+                        Mobile Number <Text className="text-error">*</Text>
                       </Text>
-                    )}
-                  </View>
-                )}
-              />
+                      <Input
+                        {...field}
+                        placeholder="98765 43210"
+                        className="rounded-xl text-secondary"
+                        onChangeText={field.onChange}
+                        value={field.value}
+                        keyboardType="number-pad"
+                      />
+                      {form.formState.errors.mobileNumber && (
+                        <Text className="text-error text-sm mt-2">
+                          {form.formState.errors.mobileNumber.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
 
-              {/* Email */}
-              <Controller
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <View className="mb-5">
-                    <Text className="text-sm font-medium text-secondary mb-2">
-                      Email
-                    </Text>
-                    <Input
-                      {...field}
-                      placeholder="example@email.com"
-                      className="rounded-xl bg-base-300 text-secondary"
-                      onChangeText={field.onChange}
-                      value={field.value}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                    />
-                    {form.formState.errors.email && (
-                      <Text className="text-error text-sm mt-2">
-                        {form.formState.errors.email.message}
+                <Controller
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <View className="mb-5">
+                      <Text className="text-sm font-medium text-secondary mb-2">
+                        Email
                       </Text>
-                    )}
-                  </View>
-                )}
-              />
+                      <Input
+                        {...field}
+                        placeholder="example@email.com"
+                        className="rounded-xl text-secondary"
+                        onChangeText={field.onChange}
+                        value={field.value}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                      />
+                      {form.formState.errors.email && (
+                        <Text className="text-error text-sm mt-2">
+                          {form.formState.errors.email.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
 
-              {/* Password */}
-              <Controller
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <View className="mb-5">
-                    <Text className="text-sm font-medium text-secondary mb-2">
-                      Password <Text className="text-error">*</Text>
-                    </Text>
-                    <Input
-                      {...field}
-                      placeholder="••••••••"
-                      className="rounded-xl bg-base-300 text-secondary"
-                      onChangeText={field.onChange}
-                      value={field.value}
-                      isPassword
-                      autoCapitalize="none"
-                    />
-                    {form.formState.errors.password && (
-                      <Text className="text-error text-sm mt-2">
-                        {form.formState.errors.password.message}
+                <Controller
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <View className="mb-5">
+                      <Text className="text-sm font-medium text-secondary mb-2">
+                        Password <Text className="text-error">*</Text>
                       </Text>
-                    )}
-                  </View>
-                )}
-              />
+                      <Input
+                        {...field}
+                        placeholder="••••••••"
+                        className="rounded-xl text-secondary"
+                        onChangeText={field.onChange}
+                        value={field.value}
+                        isPassword
+                        autoCapitalize="none"
+                      />
+                      {form.formState.errors.password && (
+                        <Text className="text-error text-sm mt-2">
+                          {form.formState.errors.password.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
 
-              {/* Confirm Password */}
-              <Controller
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <View className="mb-5">
-                    <Text className="text-sm font-medium text-secondary mb-2">
-                      Confirm Password <Text className="text-error">*</Text>
-                    </Text>
-                    <Input
-                      {...field}
-                      placeholder="••••••••"
-                      className="rounded-xl bg-base-300 text-secondary"
-                      onChangeText={field.onChange}
-                      value={field.value}
-                      isPassword
-                      autoCapitalize="none"
-                    />
-                    {form.formState.errors.confirmPassword && (
-                      <Text className="text-error text-sm mt-2">
-                        {form.formState.errors.confirmPassword.message}
+                <Controller
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <View className="mb-5">
+                      <Text className="text-sm font-medium text-secondary mb-2">
+                        Confirm Password <Text className="text-error">*</Text>
                       </Text>
-                    )}
-                  </View>
-                )}
-              />
+                      <Input
+                        {...field}
+                        placeholder="••••••••"
+                        className="rounded-xl text-secondary"
+                        onChangeText={field.onChange}
+                        value={field.value}
+                        isPassword
+                        autoCapitalize="none"
+                      />
+                      {form.formState.errors.confirmPassword && (
+                        <Text className="text-error text-sm mt-2">
+                          {form.formState.errors.confirmPassword.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
 
-              <TouchableOpacity
-                onPress={form.handleSubmit(onSubmit)}
-                className="w-full rounded-xl py-4 font-semibold bg-primary items-center justify-center"
-                disabled={isPending}
-              >
-                {isPending ? (
-                  <ActivityIndicator
-                    color={Colors[colorScheme ?? "light"].secondary}
-                  />
-                ) : (
-                  <Text className="text-secondary text-lg font-semibold">
-                    Continue
-                  </Text>
-                )}
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={form.handleSubmit(onSubmit)}
+                  className="w-full rounded-xl py-4 font-semibold bg-primary items-center justify-center"
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <ActivityIndicator
+                      color={Colors[colorScheme ?? "light"].secondary}
+                    />
+                  ) : (
+                    <Text className="text-secondary text-lg font-semibold">
+                      Continue
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </ScrollView>
+        <GoogleLogin />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

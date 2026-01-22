@@ -72,6 +72,7 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 
 function getTrpcUrl() {
   const base = (() => {
+    console.log("backendUrl", backendUrl);
     if (backendUrl) return backendUrl;
     return "http://192.168.1.44:4000";
   })();

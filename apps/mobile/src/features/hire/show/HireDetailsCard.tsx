@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { useAuthStore } from "@/features/auth/authStore";
+import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
 import { useStartChat } from "@/query/startChat";
 import { showLoginAlert } from "@/utils/alert";
@@ -36,8 +38,6 @@ export default function HireDetailsCard(item: any) {
   if (isLoading) {
     return <Loading position="center" size={"large"} />;
   }
-  console.log("data is ===========>", JSON.stringify(data, null, 2));
-
   // return <Text className="text-secondary text-3xl">for test purpose {hiredetails}</Text>
 
   // useEffect(() => {
@@ -56,6 +56,9 @@ export default function HireDetailsCard(item: any) {
   // }, [hireDetails?.photo]);
 
   const calculateAge = (dob: string | null): number => {
+    if (!dob) {
+      return 0;
+    }
     const birthDate = new Date(String(dob));
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -94,7 +97,7 @@ export default function HireDetailsCard(item: any) {
             aspectRatio,
           }}
         >
-          <Image
+          {/* <Image
             className=""
             source={{
               uri: "https://www.justsearch.net.in/assets/images/9706277681737097544.jpg",
@@ -104,21 +107,36 @@ export default function HireDetailsCard(item: any) {
               height: "100%",
             }}
             resizeMode="contain"
+          /> */}
+          <AdvancedImage
+            cldImg={cld.image(data?.data?.photo || "")}
+            className="w-[100%] h-[100%]"
           />
         </View>
 
-        <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-xl font-semibold text-secondary">
-            {data.data?.name}
-          </Text>
-          <Text className="text-secondary">
-            {data?.data?.gender}, AGE=
-            {data?.data?.dob}
-          </Text>
-          <Pressable hitSlop={10}>
+        <View className="flex-row items-center mb-4">
+          <View className="flex-1">
+            <Text
+              className="text-xl font-semibold text-secondary"
+              numberOfLines={1}
+            >
+              {data?.data?.name}
+            </Text>
+          </View>
+
+          <View className="flex-row items-center px-3">
+            <Text className="text-secondary text-sm">{data?.data?.gender}</Text>
+            <Text className="text-secondary text-sm mx-1">•</Text>
+            <Text className="text-secondary text-sm">
+              {calculateAge(data?.data?.dob ?? "")} yrs
+            </Text>
+          </View>
+
+          <Pressable hitSlop={10} className="ml-2">
             <Ionicons name="share-social" size={22} color="black" />
           </Pressable>
         </View>
+
         <View className="flex-row gap-2 mb-2 flex-wrap">
           <TouchableOpacity className="bg-success-content rounded-lg py-2 px-3 mb-1">
             <Text className="text-success font-semibold text-xs">

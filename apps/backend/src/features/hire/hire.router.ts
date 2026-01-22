@@ -738,7 +738,6 @@ export const hirerouter = router({
         .where(eq(hireReviews.hireId, input.hireId))
         .groupBy(hireReviews.id,users.displayName);
 
-      console.log("================ data is =============", data);
       return {
         data: {
           ...data,

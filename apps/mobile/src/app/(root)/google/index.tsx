@@ -1,12 +1,14 @@
-import { useAuthStore } from "@/features/auth/authStore";
-import { queryClient, trpc } from "@/lib/trpc";
-import { setTokenRole } from "@/utils/secureStore";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useMutation } from "@tanstack/react-query";
-import { Pressable, Text, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { deviceId, platform } from "@/utils/getDeviceId";
 import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
+import { useAuthStore } from "@/features/auth/authStore";
+import { queryClient, trpc } from "@/lib/trpc";
+import { deviceId, platform } from "@/utils/getDeviceId";
+import { setTokenRole } from "@/utils/secureStore";
+
 GoogleSignin.configure({
   webClientId:
     "968676221050-ootcr7d06h9a6qqc5bd335n2tu6htadr.apps.googleusercontent.com",
@@ -18,8 +20,8 @@ const GoogleLogin = () => {
   const { mutate } = useMutation(trpc.auth.mobileOauth.mutationOptions());
   const setAuthStoreToken = useAuthStore((state) => state.setToken);
   const { mutate: pushTokenMutation } = useMutation(
-      trpc.notificationRouter.createPushToken.mutationOptions(),
-    );
+    trpc.notificationRouter.createPushToken.mutationOptions(),
+  );
   async function onClick() {
     console.log("start login with google");
     await GoogleSignin.hasPlayServices();
@@ -36,11 +38,17 @@ const GoogleLogin = () => {
         },
       },
       {
-        onSuccess:async (data) => {
+        onSuccess: async (data) => {
           console.log("==============>", data);
-          setAuthStoreToken(data?.data?.token ?? "", data.data?.role ?? "visiter");
+          setAuthStoreToken(
+            data?.data?.token ?? "",
+            data.data?.role ?? "visiter",
+          );
           // await Purchases.logIn(data?.revanueCatToken ?? "");
-          await setTokenRole(data?.data?.token ?? "", data.data?.role ?? "visiter");
+          await setTokenRole(
+            data?.data?.token ?? "",
+            data.data?.role ?? "visiter",
+          );
           queryClient.invalidateQueries({
             queryKey: trpc.auth.verifyauth.queryKey(),
           });
@@ -71,7 +79,7 @@ const GoogleLogin = () => {
           // await Purchases.logIn(data?.ravanueCatId ?? "");
           // Alert.alert("Login Successfully");
           console.log("Login Successfully");
-          router.push("/")
+          router.push("/");
         },
         onError: (error) => {
           console.log("==============>", error);
@@ -80,9 +88,16 @@ const GoogleLogin = () => {
     );
   }
   return (
-    <View className="flex-1 justify-center items-center">
-      <Pressable onPress={onClick} className="bg-primary text-white py-4 px-5">
-        <Text className="text-secondary">Login With Google</Text>
+    <View className="w-full items-center mt-6">
+      <Pressable
+        onPress={onClick}
+        className="flex-row items-center justify-center w-full bg-white border border-gray-300 rounded-xl py-4"
+        android_ripple={{ color: "#e5e7eb" }}
+      >
+        <Ionicons name="logo-google" size={20} color="#EA4335" />
+        <Text className="ml-3 text-base font-semibold text-gray-800">
+          Continue with Google
+        </Text>
       </Pressable>
     </View>
   );

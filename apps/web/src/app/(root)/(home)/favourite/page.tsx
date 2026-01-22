@@ -11,12 +11,8 @@ async function page() {
   const { data, error } = await asyncHandler(
     trpcServer.businessrouter.favouritesShops.query(),
   );
-  console.log(
-    "data is =================================================================>",
-    data,
-  );
 
-  console.log(`${JSON.stringify(error, null, 2)}`);
+
   // if (error?.error?.shape?.data?.httpStatus === 401) {
   //   redirect("/login");
   // }

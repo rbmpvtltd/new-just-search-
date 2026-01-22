@@ -190,7 +190,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="google/index"
         options={{
           headerShown: false,
           href: null, // tab bar se hide

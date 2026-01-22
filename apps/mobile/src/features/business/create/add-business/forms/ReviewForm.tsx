@@ -42,7 +42,6 @@ function ReviewForm({ businessId }: { businessId: number }) {
   });
 
   function onSubmit(data: ReviewFormValues) {
-    console.log("form is sumitting with data is ====>", data);
     mutate(data, {
       onSuccess: (responseData) => {
         console.log("Review submitted successfully:", responseData);

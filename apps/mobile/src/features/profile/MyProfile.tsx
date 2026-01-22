@@ -35,7 +35,7 @@ export const MyProfile = () => {
             <View className="w-[80%]">
               <Text className="text-secondary text-2xl p-2 font-semibold w-full">
                 {userData?.firstName
-                  ? `${userData.firstName} ${userData.lastName}`
+                  ? `${userData?.firstName} ${userData?.lastName}`
                   : "Guest"}
               </Text>
             </View>
@@ -51,7 +51,7 @@ export const MyProfile = () => {
           </View>
           <View className="w-[80%]">
             <Text className="w-full mx-2 text-secondary-content text-[16px]  mt-2">
-              {userData.role}
+              {userData?.role}
             </Text>
 
             {/* <Text className="w-full mx-2 text-secondary-content text-[16px] ">
@@ -66,7 +66,7 @@ export const MyProfile = () => {
           <Text className="font-semibold text-lg text-secondary">
             Profile Type :
           </Text>
-          <Text className="text-secondary">{userData.role}</Text>
+          <Text className="text-secondary">{userData?.role}</Text>
         </View>
         <View className="flex-row gap-4 mb-6 w-[100%] items-start">
           <Text className="font-semibold text-lg text-secondary">
@@ -74,7 +74,7 @@ export const MyProfile = () => {
           </Text>
           <Text className="text-secondary break-words w-[200px]">
             {userData?.address
-              ? userData.address
+              ? userData?.address
               : (userData?.address ?? "No Address")}
           </Text>
         </View>

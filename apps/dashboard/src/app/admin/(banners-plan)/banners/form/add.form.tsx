@@ -88,7 +88,6 @@ function BannerAddForm({ setOpen }: AddForm) {
       console.error("file uploading to cloudinary failed");
       return;
     }
-    console.log("data is", data);
     createBanner(
       {
         ...data,

@@ -95,7 +95,6 @@ function BannerEditForm({ id, setOpen }: EditForm) {
       console.error("file uploading to cloudinary failed");
       return;
     }
-    console.log("data is", data);
     update(
       {
         ...data,

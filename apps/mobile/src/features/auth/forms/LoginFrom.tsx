@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
 import Purchases from "react-native-purchases";
+import GoogleLogin from "@/app/(root)/google";
 import { useAuthStore } from "@/features/auth/authStore";
 import { queryClient, trpc } from "@/lib/trpc";
 import { deviceId, platform } from "@/utils/getDeviceId";
@@ -33,6 +34,8 @@ export default function LoginFrom() {
   const loginMutation = useMutation(
     trpc.auth.loginMobile.mutationOptions({
       onSuccess: async (data) => {
+        console.log("Data", data);
+
         if (data) {
           setAuthStoreToken(data?.session ?? "", data.role ?? "visiter");
           // await Purchases.logIn(data?.revanueCatToken ?? "");
@@ -79,76 +82,84 @@ export default function LoginFrom() {
   );
 
   const onSubmit = async (data: { username: string; password: string }) => {
+    console.log("data", data);
     loginMutation.mutate(data);
   };
 
   return (
-    <View className="flex-1 justify-center items-center p-4 w-full">
-      <Text className="text-2xl font-bold mb-8 text-secondary">Login Now</Text>
+    <View className="flex-1 justify-center py-10 w-full px-4">
+      <View className="w-full">
+        <View className="mb-5">
+          <Text className="text-3xl font-bold text-secondary text-center mb-1">
+            Welcome Back
+          </Text>
+          <Text className="text-sm text-secondary-content text-center">
+            Login to continue
+          </Text>
+        </View>
 
-      <View className="w-full max-w-md">
-        <Text className="text-lg font-medium text-secondary mb-2">
-          Email / Mobile Number :
-        </Text>
-        <Controller
-          control={businessControl}
-          name="username"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              className="text-secondary bg-base-200"
-              placeholder="Enter your email or mobile number"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              autoCapitalize="none"
+        <View className="rounded-2xl bg-base-200 shadow-sm border border-gray-200 p-6 ">
+          <View className="mb-4 w-full">
+            <Text className="text-sm font-medium text-secondary mb-1">
+              Email / Mobile Number
+            </Text>
+            <Controller
+              control={businessControl}
+              name="username"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  className="w-full bg-base-200 text-secondary"
+                  placeholder="Enter your email or mobile number"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  autoCapitalize="none"
+                />
+              )}
             />
-          )}
-        />
-        {errors.username && (
-          <Text className="text-error text-sm mb-4">
-            {errors.username.message}
-          </Text>
-        )}
+          </View>
 
-        <Text className="text-lg font-medium text-secondary-content mb-2">
-          Password :
-        </Text>
-        <Controller
-          control={businessControl}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              className="bg-base-200"
-              placeholder="Enter your password"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              isPassword
+          <View className="mb-2 w-full">
+            <Text className="text-sm font-medium text-secondary mb-1">
+              Password
+            </Text>
+            <Controller
+              control={businessControl}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  className="w-full bg-base-200"
+                  placeholder="Enter your password"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  isPassword
+                />
+              )}
             />
-          )}
-        />
-        {errors.password && (
-          <Text className="text-error text-sm mb-4">
-            {errors.password.message}
-          </Text>
-        )}
+          </View>
 
-        {/* Forget Password */}
-        <Pressable onPress={() => router.navigate("/forgetPassword")}>
-          <Text className="text-primary text-md mt-4">Forgot Password?</Text>
-        </Pressable>
-        <TouchableOpacity
-          onPress={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-          className={`w-full mt-5 p-4 rounded-lg flex items-center justify-center ${
-            isSubmitting ? "bg-primary-content" : "bg-primary"
-          }`}
-        >
-          <Text className="text-secondary text-lg font-semibold">
-            {isSubmitting ? "Logging in..." : "Login"}
-          </Text>
-        </TouchableOpacity>
+          <Pressable
+            onPress={() => router.navigate("/forgetPassword")}
+            className="self-end mt-1 mb-5"
+          >
+            <Text className="text-primary text-sm">Forgot password?</Text>
+          </Pressable>
+
+          <TouchableOpacity
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+            className={`w-full py-4 rounded-xl items-center justify-center ${
+              isSubmitting ? "bg-primary-content" : "bg-primary"
+            }`}
+          >
+            <Text className="text-secondary text-lg font-semibold">
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
+      <GoogleLogin />
     </View>
   );
 }

@@ -36,32 +36,32 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
     logger.info("Complete", {
       message: "fakeSeed",
     });
-    await businessSeed();
-    logger.info("Complete", {
-      message: "business",
-    });
-    await productSeed();
-    logger.info("Complete", {
-      message: "productSeed",
-    });
-    await offerSeed();
-    logger.info("Complete", {
-      message: "offerseed",
-    });
-    await hireSeed();
-    logger.info("Complete", {
-      message: "hireseed",
-    });
-    await feedbackseed();
-    logger.info("Complete", {
-      message: "feedbackseed",
-    });
-    await seedRequestAccounts();
-    logger.info("Complete", {
-      message: "seedRequestAccounts",
-    });
-    await planSeed();
-    await algoliaSeed();
+    // await businessSeed();
+    // logger.info("Complete", {
+    //   message: "business",
+    // });
+    // await productSeed();
+    // logger.info("Complete", {
+    //   message: "productSeed",
+    // });
+    // await offerSeed();
+    // logger.info("Complete", {
+    //   message: "offerseed",
+    // });
+    // await hireSeed();
+    // logger.info("Complete", {
+    //   message: "hireseed",
+    // });
+    // await feedbackseed();
+    // logger.info("Complete", {
+    //   message: "feedbackseed",
+    // });
+    // await seedRequestAccounts();
+    // logger.info("Complete", {
+    //   message: "seedRequestAccounts",
+    // });
+    // await planSeed();
+    // await algoliaSeed();
     console.log("✅ All seeds inserted successfully");
     // Bun.$`notify-send -u normal "Seed Complete" "Please check your complete"`;
   } catch (err) {

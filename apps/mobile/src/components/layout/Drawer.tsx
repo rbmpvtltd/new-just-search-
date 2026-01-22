@@ -93,13 +93,13 @@ const drawerFields: DrawerField[] = [
     name: "Feedback",
     route: "/(root)/profile/feedback",
     icon: "chatbox-ellipses-outline",
-    role: "all",
+    role: ["visiter", "guest", "hire", "business"],
   },
   {
     name: "Help and Support",
     route: "/(root)/profile/help-and-support",
     icon: "help-circle-outline",
-    role: "all",
+    role: ["visiter", "guest", "hire", "business"],
   },
   {
     name: "Terms & Conditions",
