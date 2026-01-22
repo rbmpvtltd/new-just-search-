@@ -1,5 +1,5 @@
 import { createCallerFactory } from "@trpc/server/unstable-core-do-not-import";
-import express from "express";
+import express, { Router } from "express";
 import { adminBusinessRouter } from "./dashboard-features/(business-hire)/business.admin.routes";
 import { adminHireRouter } from "./dashboard-features/(business-hire)/hire.admin.routes";
 import { adminCategoryRouter } from "./dashboard-features/(category)/category.admin.routes";
@@ -83,7 +83,7 @@ const adminRouter = router({
   salesmanUserRouter,
 });
 
-const openRouter = express.Router();
+const openRouter:Router = express.Router();
 openRouter.post("/revenue", revenueCatRouter);
 
 export { openRouter };

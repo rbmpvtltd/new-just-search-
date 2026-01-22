@@ -22,7 +22,7 @@ export const asyncHandler =
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 
-export const revenueCatRouter = asyncHandler(
+export const revenueCatRouter:RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (token !== env.REVENUECAT_TOKEN)

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import PricingCard from "@/features/plan/Plans";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
