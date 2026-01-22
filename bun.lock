@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "justsearch-fullstack",
@@ -97,7 +96,6 @@
         "@radix-ui/react-toggle": "^1.1.10",
         "@radix-ui/react-toggle-group": "^1.1.11",
         "@radix-ui/react-tooltip": "^1.2.8",
-        "@repo/algolia": "*",
         "@repo/db": "*",
         "@repo/types": "*",
         "@repo/typescript-config": "*",
