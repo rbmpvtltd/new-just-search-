@@ -24,6 +24,7 @@ import { useTRPC } from "@/trpc/client";
 import { setRole, setToken } from "@/utils/session";
 import AppleLoginBtn from "./apple-login";
 import GoogleLoginBtn from "./google-login";
+import Swal from "sweetalert2";
 
 const formSchema = z.object({
   username: z.string(),
@@ -52,7 +53,21 @@ export function LoginForm({
   });
 
   if (isError) {
-    console.log("oo error ho gyo=====>", error);
+    // TODO;
+    if (error.data?.httpStatus === 401) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Cradentials",
+        text: `Your Cradentials Is Incorrect Try Again`,
+      });
+    }else {
+      Swal.fire({
+        icon: "error",
+        title: "Something Wents Wrong",
+        text: `Something Wents Wrong Please Check Your Internet Connection Or Cradentials`,
+      });
+    }
+
   }
 
   function onSubmit(data: { username: string; password: string }) {
@@ -105,7 +120,7 @@ export function LoginForm({
                       <div className="flex items-center">
                         <FormLabel>Password</FormLabel>
                         <Link
-                          href="/forgetPasswor"
+                          href="/forget-password"
                           className="ml-auto text-sm underline-offset-2 hover:underline"
                         >
                           Forgot your password?

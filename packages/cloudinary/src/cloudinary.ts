@@ -36,7 +36,7 @@ const multiUploadOnCloudinary = async (
   onlineUpload = false,
 ) => {
   if (!onlineUpload) {
-    const customName = `sample`;
+    const customName = ``;
 
     const result = {
       public_id: customName,
@@ -66,7 +66,7 @@ const multiUploadOnCloudinary = async (
 
       return {
         id: file.id,
-        public_id: "sample",
+        public_id: "",
       };
     }
   });
@@ -97,7 +97,7 @@ const uploadOnCloudinary = async (
   // if (!localFilePath) return null;
   try {
     if (!uploadOnline) {
-      const customName = `sample`;
+      const customName = "";
       const result = {
         public_id: customName,
       };

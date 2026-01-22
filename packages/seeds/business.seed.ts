@@ -663,8 +663,6 @@ const updateBusinessPhoto = async () => {
   );
 
   for (const row of rows) {
-    //TODO: comment this line in future;
-    if (row.id < 1329) continue;
     const isBuissnessExist = await db
       .select()
       .from(businessListings)

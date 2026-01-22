@@ -139,19 +139,9 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setTempFormData(data);
     console.log("Data", data);
-
-    if (data.email) {
-      console.log("Hii");
-
-      const success = await sendOTP(data.email);
-      if (success) {
-        setStep("verify");
-      }
-    } else {
-      const success = await sendOTP(String(data.mobileNumber));
-      if (success) {
-        setStep("verify");
-      }
+    const success = sendOTP(String(data.mobileNumber));
+    if (success) {
+      setStep("verify");
     }
   };
 
@@ -213,10 +203,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   // Handle resend OTP
   const handleResendOTP = async () => {
     if (resendTimer > 0) return;
-    if (tempFormData.email) {
-      await sendOTP(tempFormData.email);
-    }
-    await sendOTP(tempFormData.mobileNumber);
+    sendOTP(tempFormData.mobileNumber);
   };
 
   // Handle back to registration
@@ -485,7 +472,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
           </div>
 
           <div className="grid gap-3">
-            <GoogleLoginBtn className="rounded-[12px] py-5"/>
+            <GoogleLoginBtn className="rounded-[12px] py-5" />
           </div>
         </div>
 
