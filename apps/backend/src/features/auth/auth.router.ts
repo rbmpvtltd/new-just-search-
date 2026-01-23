@@ -182,7 +182,16 @@ export const authRouter = router({
   sendOTP: publicProcedure
     .input(z.object({ identifier: z.string() }))
     .mutation(async ({ input }) => {
-      console.log("========>", input);
+      
+      const existingUser = await db.select().from(users).where(eq(users.phoneNumber,input.identifier));
+
+      if (existingUser.length > 0) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Phone number Or Email already registered",
+        });
+      }
+
       const result = await sendSMSOTP(input.identifier);
       return {
         method: result?.method,
@@ -244,12 +253,12 @@ export const authRouter = router({
       const { phoneNumber, otp, displayName, email, password } = input;
       console.log("auth.router.ts:149 :: input is =>", input);
 
-      let isValid = true;
-      if (email) {
-        isValid = await verifyOTP(String(email), otp);
-      } else {
-        isValid = await verifyOTP(String(phoneNumber), otp);
-      }
+      let isValid =  await verifyOTP(String(phoneNumber), otp);;
+      // if (email) {
+      //   isValid = await verifyOTP(String(email), otp);
+      // } else {
+      //   isValid = await verifyOTP(String(phoneNumber), otp);
+      // }
       if (!isValid) {
         throw new TRPCError({
           code: "UNAUTHORIZED",

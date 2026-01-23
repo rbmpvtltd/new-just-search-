@@ -1,6 +1,7 @@
 import { logger } from "@repo/logger";
 import axios from "axios";
 import nodemailer from "nodemailer";
+import env from "./envaild";
 
 const emailTransporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -50,8 +51,8 @@ export async function sendSMSViaFast2SMSDLT(
 
     const payload = {
       route: "dlt",
-      sender_id: "RBMPLA",
-      template_id: "1207174228739240000",
+      sender_id: env.FAST2SMS_SENDER_ID,
+      template_id: env.FAST2SMS_TMP_ID,
       variables_values: otp,
       numbers: mobile,
       flash: "0",
@@ -68,7 +69,7 @@ export async function sendSMSViaFast2SMSDLT(
       payload,
       {
         headers: {
-          authorization: process.env.FAST2SMS_API_KEY,
+          authorization: env.FAST2SMS_API_KEY,
         },
         timeout: 10000,
       },

@@ -103,16 +103,24 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
         {
           onSuccess: () => {
             console.log("otp sended successfully");
+            setStep("verify");
+
           },
           onError: (error) => {
-            console.log("Error", error);
-
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong!",
-            });
-            console.log("oops error while seding otp");
+            console.log("Error", error.data?.httpStatus);
+            if (error?.data?.httpStatus === 401) {
+              Swal.fire({
+                icon: "error",
+                title: "Already In Use",
+                text: "Mobile Number You've Try With Singup Is Already In Use!",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+            }
           },
         },
       );
@@ -139,10 +147,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setTempFormData(data);
     console.log("Data", data);
-    const success = sendOTP(String(data.mobileNumber));
-    if (success) {
-      setStep("verify");
-    }
+    sendOTP(String(data.mobileNumber));
   };
 
   // Handle OTP verification
