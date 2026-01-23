@@ -94,12 +94,13 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
     },
   });
 
-  const sendOTP = (identifier: string) => {
-    console.log("Idntifier", identifier);
+  const sendOTP = (phoneNumber: string,email?:string) => {
+    console.log("Idntifier", phoneNumber);
 
     try {
-      mutate(
-        { identifier },
+      if(email){
+        mutate(
+        { phone: phoneNumber,email:email},
         {
           onSuccess: () => {
             console.log("otp sended successfully");
@@ -112,7 +113,7 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
               Swal.fire({
                 icon: "error",
                 title: "Already In Use",
-                text: "Mobile Number You've Try With Singup Is Already In Use!",
+                text: "Mobile number or email you've try with singup is already in use! try login or use another number or email",
               });
             } else {
               Swal.fire({
@@ -124,6 +125,35 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
           },
         },
       );
+      }else {
+
+        mutate(
+          { phone: phoneNumber},
+          {
+            onSuccess: () => {
+              console.log("otp sended successfully");
+              setStep("verify");
+              
+            },
+            onError: (error) => {
+              console.log("Error", error.data?.httpStatus);
+              if (error?.data?.httpStatus === 401) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Already In Use",
+                  text: "Mobile number you've try with singup is already in use! try login or use another number",
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something went wrong!",
+                });
+              }
+            },
+          },
+        );
+      }
 
       // Start resend timer (60 seconds)
       setResendTimer(60);
@@ -147,7 +177,11 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setTempFormData(data);
     console.log("Data", data);
-    sendOTP(String(data.mobileNumber));
+    if(data.email){
+      sendOTP(String(data.mobileNumber),String(data.email));
+    }else{
+      sendOTP(String(data.mobileNumber))
+    }
   };
 
   // Handle OTP verification

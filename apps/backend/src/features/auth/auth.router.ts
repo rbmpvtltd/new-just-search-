@@ -180,10 +180,20 @@ export const authRouter = router({
     return "yes";
   }),
   sendOTP: publicProcedure
-    .input(z.object({ identifier: z.string() }))
+    .input(z.object({ phone: z.string(),email: z.string().optional() }))
     .mutation(async ({ input }) => {
-      
-      const existingUser = await db.select().from(users).where(eq(users.phoneNumber,input.identifier));
+      const {phone,email} = input
+      let whereCondition: any;
+
+      if (email) {
+        whereCondition = or(
+          eq(users.phoneNumber, phone),
+          eq(users.email, email),
+        );
+      } else {
+        whereCondition = eq(users.phoneNumber, phone);
+      }
+      const existingUser = await db.select().from(users).where(whereCondition);
 
       if (existingUser.length > 0) {
         throw new TRPCError({
@@ -192,11 +202,11 @@ export const authRouter = router({
         });
       }
 
-      const result = await sendSMSOTP(input.identifier);
+      const result = await sendSMSOTP(input.phone);
       return {
         method: result?.method,
         success: true,
-        message: `OTP send on ${input.identifier}`,
+        message: `OTP send on ${input.phone}`,
       };
     }),
   verifyauth: publicProcedure.query(async ({ ctx }) => {
