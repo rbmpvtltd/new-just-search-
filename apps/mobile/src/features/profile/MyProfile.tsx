@@ -1,99 +1,123 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
+import { use } from "passport";
 import { Pressable, Text, View } from "react-native";
+import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/features/auth/authStore";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
 
 export const MyProfile = () => {
   const role = useAuthStore((state) => state.role);
-  const { data: userData } = useSuspenseQuery(
+  const { data: userData, isLoading } = useQuery(
     trpc.userRouter.getUserProfile.queryOptions(),
   );
 
-  console.log("User data", userData);
+  if (isLoading) {
+    return <Loading position="center" />;
+  }
 
   return (
-    <View className=" bg-base-300 py-8 mt-4 w-[90%] rounded-lg">
-      <View className="flex-row items-center relative justify-around w-[100%] gap-4 px-8">
-        <View className="relative">
-          <View className="w-28 h-28 rounded-lg">
+    <View className="bg-base-300 py-6 mt-4 w-[92%] rounded-2xl self-center">
+      <View className="flex-row items-center gap-5 px-6">
+        <View className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary items-center justify-center bg-primary/10">
+          {userData?.profile?.profileImage ? (
             <AdvancedImage
-              cldImg={cld.image(userData?.profileImage || "")}
-              className="w-[100%] h-[100%] rounded-full border-2 border-secondary"
+              cldImg={cld.image(userData.profile.profileImage)}
+              className="w-full h-full"
             />
-          </View>
-          {/* <AdvancedImage
-              cldImg={cld.image(userData?.profileImage || "")}
-              className="w-[100%] h-[100%] rounded-full border-2 border-secondary"
-            />
-          </View> */}
-        </View>
-        <View className="w-[80%] ">
-          <View className=" w-[90%] flex-row items-center">
-            <View className="w-[80%]">
-              <Text className="text-secondary text-2xl p-2 font-semibold w-full">
-                {userData?.firstName
-                  ? `${userData?.firstName} ${userData?.lastName}`
-                  : "Guest"}
-              </Text>
-            </View>
-            <View className="w-[20%]">
-              {/* {data?.verify && (
-                        <Ionicons
-                          name="checkmark-circle"
-                          size={36}
-                          color="green"
-                        />
-                      )} */}
-            </View>
-          </View>
-          <View className="w-[80%]">
-            <Text className="w-full mx-2 text-secondary-content text-[16px]  mt-2">
-              {userData?.role}
+          ) : (
+            <Text className="text-primary font-bold text-3xl">
+              {userData?.profile?.firstName
+                ? userData.profile.lastName
+                  ? userData.profile.firstName.charAt(0).toUpperCase() +
+                    userData.profile.lastName.charAt(0).toUpperCase()
+                  : userData.profile.firstName.charAt(0).toUpperCase()
+                : "G"}
             </Text>
+          )}
+        </View>
 
-            {/* <Text className="w-full mx-2 text-secondary-content text-[16px] ">
-                      {userData?.email ? userData.email : `+91 1234567890`}
-                    </Text> */}
+        <View className="flex-1">
+          <Text className="text-secondary text-xl font-semibold">
+            {userData?.profile?.firstName
+              ? `${userData.profile.firstName} ${userData?.profile?.lastName ?? ""}`
+              : "Guest User"}
+          </Text>
+
+          <Text className="text-secondary-content text-sm mt-1">
+            {userData?.role?.toUpperCase() ?? "GUEST"}
+          </Text>
+
+          <Text className="text-secondary-content text-sm mt-1">
+            {userData?.userEmail ?? "email not available"}
+          </Text>
+        </View>
+      </View>
+
+      <View className="h-px bg-base-200 my-6 mx-6" />
+
+      <View className="px-6 space-y-10 gap-2">
+        <View className="flex-row gap-2">
+          <Text className="font-semibold text-secondary w-32">
+            Profile Type
+          </Text>
+          <Text className="text-secondary-content flex-1">
+            {userData?.role?.toUpperCase() ?? "N/A"}
+          </Text>
+        </View>
+
+        <View className="flex-row gap-2 items-start">
+          <Text className="font-semibold text-secondary w-32">Address</Text>
+          <Text className="text-secondary-content flex-1">
+            {userData?.profile?.address?.trim()
+              ? userData.profile.address
+              : "No address provided"}
+          </Text>
+        </View>
+
+        <View className="flex-row items-center gap-3">
+          <Text className="font-semibold text-secondary w-32">
+            Activated Plan
+          </Text>
+
+          {/* Status Dot */}
+          <View
+            className={`w-2.5 h-2.5 rounded-full ${
+              userData?.plan?.name && userData.plan.name !== "FREE"
+                ? "bg-green-500"
+                : "bg-red-500"
+            }`}
+          />
+
+          {/* Plan Badge */}
+          <View
+            className={`px-3 py-1 rounded-full ${
+              userData?.plan?.name && userData.plan.name !== "FREE"
+                ? "bg-green-100"
+                : "bg-red-100"
+            }`}
+          >
+            <Text
+              className={`text-sm font-medium ${
+                userData?.plan?.name && userData.plan.name !== "FREE"
+                  ? "text-green-700"
+                  : "text-red-700"
+              }`}
+            >
+              {userData?.plan?.name ?? "Free"}
+            </Text>
           </View>
         </View>
       </View>
 
-      <View className="mx-10 mt-8 w-[100%]">
-        <View className="flex-row gap-4 mb-6 items-center">
-          <Text className="font-semibold text-lg text-secondary">
-            Profile Type :
-          </Text>
-          <Text className="text-secondary">{userData?.role}</Text>
-        </View>
-        <View className="flex-row gap-4 mb-6 w-[100%] items-start">
-          <Text className="font-semibold text-lg text-secondary">
-            Address :
-          </Text>
-          <Text className="text-secondary break-words w-[200px]">
-            {userData?.address
-              ? userData?.address
-              : (userData?.address ?? "No Address")}
-          </Text>
-        </View>
-        <View className="flex-row gap-4 mb-6 w-[100%] items-center">
-          <Text className="font-semibold text-lg text-secondary">
-            Activated Plan :
-          </Text>
-          <Text className="text-secondary w-[80%] break-words ">
-            {/* {data?.plan?.title ?? "Free"} */}
-          </Text>
-        </View>
-      </View>
       <Pressable
         onPress={() => router.navigate("/(root)/profile/edit-profile")}
+        className="mt-8 mx-6"
       >
-        <View className="mx-10">
-          <View className="flex-row gap-4 bg-primary p-4 rounded-lg w-full items-center justify-center">
-            <Text className="text-secondary text-center">Profile Setting</Text>
-          </View>
+        <View className="bg-primary py-3 rounded-xl items-center">
+          <Text className="text-white font-semibold">Edit Profile</Text>
         </View>
       </Pressable>
     </View>

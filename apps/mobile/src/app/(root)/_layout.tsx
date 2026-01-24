@@ -170,6 +170,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-outline" size={24} color={color} />
           ),
+          href: "/(root)/profile",
         }}
       />
       <Tabs.Screen

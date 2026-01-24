@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import UpdateDisplayNameForm from "@/features/auth/login/display-update";
-import UserProfile from "@/features/profile/UserProfile";
 import GetUserProfile from "@/features/profile/UserProfile";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";

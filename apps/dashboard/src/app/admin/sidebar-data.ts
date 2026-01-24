@@ -1,5 +1,23 @@
 "use client";
-import { IconBell, IconBox, IconClipboardList, IconDatabase, IconDeviceMobile, IconDiscount2, IconFileWord, IconHelp, IconMessage, IconMessageReport, IconNetwork, IconPhoto, IconReport, IconTrash, IconUser, IconUserCheck } from "@tabler/icons-react";
+import {
+  IconBell,
+  IconBox,
+  IconClipboardList,
+  IconDatabase,
+  IconDeviceMobile,
+  IconDiscount2,
+  IconFileWord,
+  IconHelp,
+  IconKey,
+  IconMessage,
+  IconMessageReport,
+  IconNetwork,
+  IconPhoto,
+  IconReport,
+  IconTrash,
+  IconUser,
+  IconUserCheck,
+} from "@tabler/icons-react";
 import { BookOpen, Bot, CreditCard, Layers, Tags } from "lucide-react";
 import type { SidebarData } from "@/types/sidebar";
 
@@ -122,6 +140,11 @@ export const adminSidebarData: SidebarData = {
       name: "Mobile Version Update",
       url: "/update",
       icon: IconDeviceMobile,
+    },
+    {
+      name: "Change Password",
+      url: "/change-password",
+      icon: IconKey,
     },
   ],
 };

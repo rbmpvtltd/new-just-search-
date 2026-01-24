@@ -108,6 +108,12 @@ const drawerFields: DrawerField[] = [
     role: "all",
   },
   {
+    name: "Privacy Policy",
+    route: "/(root)/profile/privacy-policy",
+    icon: "shield-checkmark-outline",
+    role: "all",
+  },
+  {
     name: "Logout",
     route: "/(root)/profile/logout",
     icon: "log-out-outline",

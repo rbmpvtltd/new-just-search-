@@ -160,7 +160,7 @@ export const columns: ColumnDef<Subcategory>[] = [
       <DataTableColumnHeader column={column} title="Expired At" />
     ),
     cell: ({ row }) => (
-      <div>{row?.original?.created_at?.toLocaleDateString() ?? "null"}</div>
+      <div>{row?.original?.expired_at?.toLocaleDateString() ?? "null"}</div>
     ),
   },
   {

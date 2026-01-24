@@ -96,10 +96,7 @@ export default function ProfileLayout() {
             title: "Delete Account Request",
           }}
         />
-        <Stack.Screen
-          name="feedback/index"
-          options={{ headerLeft: () => <DrawerMenu />, title: "Feedback" }}
-        />
+        <Stack.Screen name="feedback/index" options={{ title: "Feedback" }} />
         <Stack.Screen
           name="help-and-support/index"
           options={{
@@ -110,6 +107,12 @@ export default function ProfileLayout() {
           name="terms-and-conditions/index"
           options={{
             title: "Terms and Conditions",
+          }}
+        />
+        <Stack.Screen
+          name="privacy-policy/index"
+          options={{
+            title: "Privacy Policy",
           }}
         />
         <Stack.Screen

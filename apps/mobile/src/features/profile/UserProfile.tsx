@@ -37,8 +37,8 @@ export default function UserProfile() {
       firstName: data?.profile?.firstName ?? "",
       dob: data?.profile?.dob ?? "",
       lastName: data?.profile?.lastName ?? "",
-      salutation: data?.profile?.salutation ?? NaN,
-      occupation: data?.profile?.occupation ?? NaN,
+      salutation: data?.profile?.salutation ?? 0,
+      occupation: data?.profile?.occupation ?? 0,
       maritalStatus: data?.profile?.maritalStatus ?? "Married",
       address: data?.profile?.address ?? "",
       pincode: data?.profile?.pincode ?? "",
@@ -46,6 +46,8 @@ export default function UserProfile() {
       state: data?.profile?.state ?? 0,
     },
   });
+
+  console.log("Error", errors);
 
   const { mutate } = useMutation(trpc.userRouter.update.mutationOptions());
   const onSubmit = async (data: UserUpdateSchema) => {

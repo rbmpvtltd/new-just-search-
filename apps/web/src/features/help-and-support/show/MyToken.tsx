@@ -22,7 +22,7 @@ export default function MyToken() {
     <div className="p-6 ">
       <div className="w-full border overflow-x-auto rounded-lg">
         <div className="min-w-[800px]">
-          <div className="flex p-2">
+          <div className="flex p-2 justify-end">
             <Link href="/profile/help-and-support/add">
               <Button>Create Token</Button>
             </Link>

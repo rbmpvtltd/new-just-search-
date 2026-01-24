@@ -49,7 +49,7 @@ export const adminOfferRouter = router({
         offerName: offers.offerName,
         businessName: businessListings.name,
         status: offers.status,
-        expired_at: offers.createdAt,
+        expired_at: offers.offerEndDate,
         created_at: offers.createdAt,
       })
       .from(offers)
@@ -102,8 +102,44 @@ export const adminOfferRouter = router({
       return businessSubCategories;
     }),
 
+  getBusinessPlan: adminProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ input }) => {
+      const userId = (
+        await db.query.businessListings.findFirst({
+          where: (businessList, { eq }) =>
+            eq(businessList.id, input.businessId),
+          columns: {
+            userId: true,
+          },
+        })
+      )?.userId;
+      if (!userId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Business Not Found",
+        });
+      }
+      const plan = await db.query.planUserActive.findFirst({
+        where: (userPlan, { eq }) => eq(userPlan.planId, userId),
+        columns: {
+          features: true,
+        },
+      });
+
+      const expireDate = new Date(
+        Date.now() + (plan?.features.offerDuration ?? 0) * 24 * 60 * 60 * 1000,
+      );
+
+      return expireDate;
+    }),
   create: adminProcedure
-    .input(offersInsertSchema.extend({ businessId: z.number() }))
+    .input(
+      offersInsertSchema.extend({
+        businessId: z.number(),
+        offerExpireDate: z.string(),
+      }),
+    )
     .mutation(async ({ input }) => {
       const now = new Date();
       const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -175,8 +211,11 @@ export const adminOfferRouter = router({
       const slugifyName = slugify(input.offerName);
 
       const startDate = new Date();
-      const endDate = new Date(startDate);
+      const endDate = new Date(input.offerExpireDate) ?? new Date(startDate);
       endDate.setDate(startDate.getDate() + 5);
+      console.log("Offer End Date", endDate);
+      logger.info("Offer End Date", endDate);
+
       const [offer] = await db
         .insert(offers)
         .values({
@@ -259,19 +298,24 @@ export const adminOfferRouter = router({
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
           eq(businessListings.id, offer.businessId),
+        columns: {
+          id: true,
+          name: true,
+        },
       });
+
       if (!business) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Business not found",
         });
       }
-      const allBusinessListings = await db.query.businessListings.findMany({
-        columns: {
-          name: true,
-          id: true,
-        },
-      });
+      // const allBusinessListings = await db.query.businessListings.findMany({
+      //   columns: {
+      //     name: true,
+      //     id: true,
+      //   },
+      // });
       const category = await db.query.businessCategories.findFirst({
         where: (businessCategories, { eq }) =>
           eq(businessCategories.businessId, business.id),
@@ -304,21 +348,27 @@ export const adminOfferRouter = router({
       });
       return {
         offer,
+        business,
         category,
         offerPhotos,
         subcategories,
         getSubCategories,
-        allBusinessListings,
         getBusinessCategories,
       };
     }),
 
   update: adminProcedure
-    .input(offersUpdateSchema.extend({ businessId: z.number() }))
+    .input(
+      offersUpdateSchema.extend({
+        offerExpireDate: z.string(),
+      }),
+    )
     .mutation(async ({ input }) => {
+      console.log("Input", input);
+
       const business = await db.query.businessListings.findFirst({
         where: (businessListings, { eq }) =>
-          eq(businessListings.id, input.businessId),
+          eq(businessListings.id, Number(input.businessId)),
       });
       if (!business) {
         throw new TRPCError({
@@ -328,8 +378,7 @@ export const adminOfferRouter = router({
       }
 
       const isOfferExists = await db.query.offers.findFirst({
-        where: (offers, { eq }) =>
-          eq(offers.businessId, Number(input.businessId)),
+        where: (offers, { eq }) => eq(offers.businessId, Number(business.id)),
       });
       if (!isOfferExists) {
         throw new TRPCError({
@@ -337,6 +386,11 @@ export const adminOfferRouter = router({
           message: "Offer not found or does not belong to this business",
         });
       }
+
+      console.log("offerEndDate", { offerEndDate: input.offerEndDate });
+      console.log("offerExpireDate", {
+        offerExpireDate: input.offerExpireDate,
+      });
       const updateOffer = await db
         .update(offers)
         .set({
@@ -347,6 +401,8 @@ export const adminOfferRouter = router({
           discountPercent: input.discountPercent,
           finalPrice: input.finalPrice,
           offerDescription: input.offerDescription,
+          offerEndDate:
+            new Date(input.offerExpireDate) ?? isOfferExists.offerEndDate,
         })
         .where(eq(offers.id, isOfferExists.id));
 
@@ -396,14 +452,12 @@ export const adminOfferRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-
       const allSeletedPhoto = await db
         .select({
           photo: offerPhotos.photo,
         })
         .from(offerPhotos)
         .where(inArray(offerPhotos.offerId, input.ids));
-
 
       if (allSeletedPhoto.length !== 0) {
         await cloudinaryDeleteImagesByPublicIds(
@@ -424,7 +478,6 @@ export const adminOfferRouter = router({
       return { success: true };
     }),
 
- 
   // multiactive: adminProcedure
   //   .input(
   //     z.array(

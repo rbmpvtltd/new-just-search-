@@ -1,11 +1,12 @@
 import { createCallerFactory } from "@trpc/server/unstable-core-do-not-import";
-import express, { Router } from "express";
+import express, { type Router } from "express";
 import { adminBusinessRouter } from "./dashboard-features/(business-hire)/business.admin.routes";
 import { adminHireRouter } from "./dashboard-features/(business-hire)/hire.admin.routes";
 import { adminCategoryRouter } from "./dashboard-features/(category)/category.admin.routes";
 import { adminSubcategoryRouter } from "./dashboard-features/(category)/subcategory.admin.routes";
 import { adminFranchiseRouter } from "./dashboard-features/(franchise-saleman)/franchise.admin.routes";
 import { adminSalemanRouter } from "./dashboard-features/(franchise-saleman)/salesman.admin.routes";
+import { franchiseSalesmanRouter } from "./dashboard-features/(franchise-saleman)/salesman.franchise.routes";
 import { salesmanUserRouter } from "./dashboard-features/(franchise-saleman)/user.salesman.routes";
 import { adminOfferRouter } from "./dashboard-features/(offer-product)/offer.admin.routes";
 import { adminProductRouter } from "./dashboard-features/(offer-product)/product.admin.routes";
@@ -15,6 +16,7 @@ import { adminHelpAndSupportRouter } from "./dashboard-features/(users)/help-and
 import { adminNotificationRouter } from "./dashboard-features/(users)/notification.admin.routes";
 import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
 import { adminBannerRouter } from "./dashboard-features/banners/banners.admin.routes";
+import { adminChangePasswordRouter } from "./dashboard-features/change-password/change-password.admin.routes";
 import { adminAttributesRouter } from "./dashboard-features/plan/attibutes.admin.routes";
 import { adminPlanRouter } from "./dashboard-features/plan/plan.admin.routes";
 import { revenueCatRouter } from "./dashboard-features/plan/webhooks/revenue-cat.routes";
@@ -38,7 +40,6 @@ import { testRouter } from "./features/test/test.routes";
 import { userRouter } from "./features/user/user.router";
 import { versionRouter } from "./features/version/version.routes";
 import { mergeRouters, router } from "./utils/trpc";
-import { franchiseSalesmanRouter } from "./dashboard-features/(franchise-saleman)/salesman.franchise.routes";
 
 const usersRouter = router({
   auth: authRouter,
@@ -81,9 +82,10 @@ const adminRouter = router({
   adminAttributesRouter,
   franchiseSalesmanRouter,
   salesmanUserRouter,
+  adminChangePasswordRouter,
 });
 
-const openRouter:Router = express.Router();
+const openRouter: Router = express.Router();
 openRouter.post("/revenue", revenueCatRouter);
 
 export { openRouter };

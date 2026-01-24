@@ -3,9 +3,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { offersInsertSchema } from "@repo/db/dist/schema/offer.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import Swal from "sweetalert2";
 import z from "zod";
 import {
   FormField,
@@ -22,6 +22,7 @@ import type { SetOpen } from "../add.form";
 
 export const adminOfferSchema = offersInsertSchema.extend({
   businessId: z.number(),
+  offerExpireDate: z.string(),
 });
 type AddOfferSchema = z.infer<typeof adminOfferSchema>;
 type AddAdminOfferType = OutputTrpcType["adminOfferRouter"]["add"];
@@ -59,6 +60,7 @@ export default function AddOffer({
       image5: "",
       categoryId: 0,
       subcategoryId: [],
+      offerExpireDate: "",
     },
   });
   const categories = data?.getBusinessCategories.map((item) => {
@@ -73,6 +75,19 @@ export default function AddOffer({
       categoryId: selectedCategoryId,
     }),
   );
+
+  const selectBusinessId = useWatch({ control, name: "businessId" });
+  const { data: expireDate, isLoading: planLoading } = useQuery(
+    trpc.adminOfferRouter.getBusinessPlan.queryOptions({
+      businessId: selectBusinessId,
+    }),
+  );
+
+  useEffect(() => {
+    if (!expireDate) return;
+    setValue("offerExpireDate", String(expireDate));
+  }, [expireDate, setValue]);
+
   const formFields: FormFieldProps<AddOfferSchema>[] = [
     {
       control,
@@ -159,6 +174,16 @@ export default function AddOffer({
           value: item.id,
         })) ?? [],
       error: errors.subcategoryId?.message,
+    },
+    {
+      control,
+      label: "Offer Expire Date",
+      name: "offerExpireDate",
+      placeholder: "Expire Date",
+      component: "calendar",
+      required: false,
+      loading: planLoading,
+      error: errors.offerExpireDate?.message,
     },
 
     {

@@ -3,9 +3,11 @@ import { plans, planUserActive } from "@repo/db/dist/schema/plan.schema";
 import {
   account_delete_request,
   feedbackInsertSchema,
+  profiles,
   profileUpdateSchema,
   requestAccountsInsertSchema,
 } from "@repo/db/dist/schema/user.schema";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
@@ -16,7 +18,14 @@ export const userRouter = router({
     const getStates = await db.query.states.findMany();
     const getOccupations = await db.query.occupation.findMany();
     const getSlutation = await db.query.salutation.findMany();
-
+    const userEmail = (
+      await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, ctx.userId),
+        columns: {
+          email: true,
+        },
+      })
+    )?.email;
     const profile = await db.query.profiles.findFirst({
       where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
     });
@@ -31,7 +40,15 @@ export const userRouter = router({
         .where(eq(planUserActive.userId, ctx.userId))
     )[0];
     const role = ctx.role;
-    return { getStates, profile, role, getOccupations, getSlutation, plan };
+    return {
+      role,
+      plan,
+      profile,
+      userEmail,
+      getStates,
+      getSlutation,
+      getOccupations,
+    };
   }),
 
   getCities: protectedProcedure
@@ -49,34 +66,38 @@ export const userRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const isStateExists = await db.query.states.findFirst({
-        where: (states, { eq }) => eq(states.id, Number(input.state)),
-      });
+      console.log("Hiii", input);
 
-      if (!isStateExists) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "State not found",
-        });
-      }
+      // const isStateExists = await db.query.states.findFirst({
+      //   where: (states, { eq }) => eq(states.id, Number(input.state)),
+      // });
 
-      const isCityExists = await db.query.cities.findFirst({
-        where: (cities, { eq }) => eq(cities.id, Number(input.city)),
-      });
+      // if (!isStateExists) {
+      //   throw new TRPCError({
+      //     code: "NOT_FOUND",
+      //     message: "State not found",
+      //   });
+      // }
 
-      if (!isCityExists) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "City not found",
-        });
-      }
+      // const isCityExists = await db.query.cities.findFirst({
+      //   where: (cities, { eq }) => eq(cities.id, Number(input.city)),
+      // });
+
+      // if (!isCityExists) {
+      //   throw new TRPCError({
+      //     code: "NOT_FOUND",
+      //     message: "City not found",
+      //   });
+      // }
 
       const profileExists = await db.query.profiles.findFirst({
         where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
       });
 
+      console.log("profile E", profileExists, ctx.userId);
+
       if (!profileExists) {
-        const createUser = await db.insert(schemas.user.profiles).values({
+        const createUser = await db.insert(profiles).values({
           userId: ctx.userId,
           profileImage: input.profileImage,
           salutation: input.salutation,
@@ -92,7 +113,7 @@ export const userRouter = router({
         });
       } else {
         const updateProfile = await db
-          .update(schemas.user.profiles)
+          .update(profiles)
           .set({
             profileImage: input.profileImage,
             userId: ctx.userId,
@@ -114,19 +135,49 @@ export const userRouter = router({
     }),
 
   getUserProfile: protectedProcedure.query(async ({ ctx }) => {
+    console.log("Hiii");
+
+    const userEmail = (
+      await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, ctx.userId),
+        columns: {
+          email: true,
+        },
+      })
+    )?.email;
+
     const profile = await db.query.profiles.findFirst({
       where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
+      columns: {
+        profileImage: true,
+        salutation: true,
+        firstName: true,
+        lastName: true,
+        address: true,
+      },
     });
 
+    const plan = (
+      await db
+        .select({
+          name: plans.name,
+        })
+        .from(planUserActive)
+        .leftJoin(plans, eq(plans.id, planUserActive.planId))
+        .where(eq(planUserActive.userId, ctx.userId))
+    )[0];
     const role = ctx.role;
-    return { ...profile, role };
+    logger.info("profile is", profile);
+    logger.info("plan is", plan);
+    logger.info("role is", role);
+    logger.info("userEmail is", userEmail);
+    return { role, profile, plan, userEmail };
   }),
   getUserDetail: protectedProcedure.query(async ({ ctx }) => {
     const user = await db.query.users.findFirst({
       where: (userDetail, { eq }) => eq(userDetail.id, ctx.userId),
     });
 
-    // const role = ctx.role;
     return user;
   }),
 

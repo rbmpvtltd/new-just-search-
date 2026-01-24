@@ -162,7 +162,7 @@ export const FormField = <T extends FieldValues>({
                   {...props}
                 />
               );
-            case "calendar":
+            case "calendar": {
               return (
                 <DatePicker
                   value={denormalizeDate(value)}
@@ -172,6 +172,7 @@ export const FormField = <T extends FieldValues>({
                   }}
                 />
               );
+            }
             case "checkbox":
               return (
                 <div className="flex gap-3 flex-wrap">

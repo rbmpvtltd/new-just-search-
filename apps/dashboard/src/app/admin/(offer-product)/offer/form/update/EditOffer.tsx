@@ -1,12 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { offersUpdateSchema } from "@repo/db/dist/schema/offer.schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Swal from "sweetalert2";
-import type z from "zod";
+import z from "zod";
 import {
   FormField,
   type FormFieldProps,
@@ -20,7 +19,12 @@ import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
 import type { SetOpen } from "../edit.form";
 
-type EditOfferSchema = z.infer<typeof offersUpdateSchema>;
+export const adminEditOfferSchema = offersUpdateSchema.extend({
+  offerExpireDate: z.string(),
+  businessName: z.string(),
+});
+
+type EditOfferSchema = z.infer<typeof adminEditOfferSchema>;
 
 type EditAdminOfferType = OutputTrpcType["adminOfferRouter"]["edit"] | null;
 export default function EditOffer({
@@ -41,10 +45,10 @@ export default function EditOffer({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<EditOfferSchema>({
-    resolver: zodResolver(offersUpdateSchema),
+    resolver: zodResolver(adminEditOfferSchema),
     defaultValues: {
-      businessId: data?.offer.businessId,
-      offerName: data?.offer.offerName,
+      businessName: data?.business?.name,
+      offerName: data?.offer?.offerName,
       rate: data?.offer?.rate,
       discountPercent: data?.offer?.discountPercent,
       finalPrice: data?.offer?.finalPrice,
@@ -58,22 +62,21 @@ export default function EditOffer({
       subcategoryId: data?.offer.offerSubcategory.map(
         (item) => item.subcategoryId,
       ),
+      offerExpireDate: String(data?.offer.offerEndDate),
     },
   });
+
+  const businessId = data?.business?.id;
 
   const formFields: FormFieldProps<EditOfferSchema>[] = [
     {
       control,
       label: "Business Name",
-      name: "businessId",
+      name: "businessName",
       placeholder: "Business name",
-      component: "select",
-      options:
-        data?.allBusinessListings?.map((item) => ({
-          label: ` ${item.name ?? "unknown"}  , id  ${item.id}`,
-          value: item.id,
-        })) ?? [],
-      error: errors.businessId?.message,
+      component: "input",
+      disabled: true,
+      error: errors.businessName?.message,
     },
     {
       control,
@@ -134,6 +137,16 @@ export default function EditOffer({
         })) ?? [],
       error: errors.subcategoryId?.message,
     },
+    {
+      control,
+      label: "Offer Expire Date",
+      name: "offerExpireDate",
+      placeholder: "Expire Date",
+      component: "calendar",
+      required: false,
+      // loading: planLoading,
+      error: errors.offerExpireDate?.message,
+    },
 
     {
       control,
@@ -150,6 +163,7 @@ export default function EditOffer({
       control,
       name: "mainImage",
       component: "image",
+      required: false,
       error: errors.mainImage?.message,
     },
     {
@@ -194,12 +208,13 @@ export default function EditOffer({
     mutate(
       {
         ...data,
+        offerExpireDate: data.offerExpireDate,
         mainImage: file[0] ?? "",
         image2: file[1] ?? "",
         image3: file[2] ?? "",
         image4: file[3] ?? "",
         image5: file[4] ?? "",
-        businessId: Number(data?.businessId) ?? "",
+        businessId: Number(businessId) ?? "",
       },
       {
         onSuccess: (data) => {

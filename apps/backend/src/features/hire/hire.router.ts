@@ -97,16 +97,16 @@ export const hirerouter = router({
         });
       }
 
-      // const existingBusiness = await db.query.businessListings.findFirst({
-      //   where: (businessListings, { eq }) =>
-      //     eq(businessListings.userId, ctx.userId),
-      // });
-      // if (existingBusiness) {
-      //   throw new TRPCError({
-      //     code: "CONFLICT",
-      //     message: "User already have business listing",
-      //   });
-      // }
+      const existingBusiness = await db.query.businessListings.findFirst({
+        where: (businessListings, { eq }) =>
+          eq(businessListings.userId, ctx.userId),
+      });
+      if (existingBusiness) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "User already have business listing",
+        });
+      }
 
       const existingHire = await db.query.hireListing.findFirst({
         where: (hireListing, { eq }) => eq(hireListing.userId, ctx.userId),

@@ -23,7 +23,7 @@ import type { OutputTrpcType } from "@/trpc/type";
 type UserProfile = OutputTrpcType["userRouter"]["edit"] | null | undefined;
 
 type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
- function UserProfile({ data }: { data: UserProfile }) {
+function UserProfile({ data }: { data: UserProfile }) {
   const trpc = useTRPC();
   const {
     control,
@@ -172,6 +172,9 @@ type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
       error: errors.city?.message,
     },
   ];
+
+  console.log("Plan", data);
+
   return (
     <div className="">
       <form onSubmit={handleSubmit(onSubmit)} className="max-w-5xl ">
@@ -185,7 +188,6 @@ type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
                   required={false}
                   component="image"
                   className="absolute inset-0 opacity-0 cursor-pointer"
-                
                 />
               </div>
 
@@ -211,11 +213,18 @@ type UserUpdateSchema = z.infer<typeof profileUpdateSchema>;
             <p className="text-sm text-muted-foreground">
               {data?.role.toUpperCase() ?? "Guest"}
             </p>
+            <p className="text-sm text-muted-foreground">
+              {data?.userEmail ?? "user@email.com"}
+            </p>
 
             <div className="h-px w-20 bg-gray-200 mx-auto md:mx-0 my-2" />
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-700 text-sm font-medium">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+            <div
+              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 ${data?.plan?.name === "FREE" || data?.plan?.name === undefined ? "text-red-700" : "text-green-700"} text-sm font-medium`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${data?.plan?.name === "FREE" || data?.plan?.name === undefined ? "bg-red-500" : "bg-green-500"} `}
+              />
               {data?.plan?.name ?? "Free Plan"}
             </div>
           </div>

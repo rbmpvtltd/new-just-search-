@@ -9,12 +9,10 @@ export default function Index() {
   console.log("Is Authenticated", isAuthenticated);
 
   return (
-    <BoundaryWrapper>
-      <ScrollView>
-        <View className="flex-1 items-center justify-center rounded-3xl w-full">
-          {!isAuthenticated ? <LoginComponent /> : <MyProfile />}
-        </View>
-      </ScrollView>
-    </BoundaryWrapper>
+    <ScrollView>
+      <View className="flex-1 items-center justify-center rounded-3xl w-full">
+        {!isAuthenticated ? <LoginComponent /> : <MyProfile />}
+      </View>
+    </ScrollView>
   );
 }

@@ -11,10 +11,12 @@ export default function ProfileLayout({
     <SidebarProvider minHeight={true}>
       <AppSidebar />
       <main className="flex min-h-screen w-full flex-col bg-linear-to-br from-gray-50 to-gray-200">
-        <SidebarTrigger />
+        <SidebarTrigger className="lg:hidden m-2" />
         <div className="flex-1">{children}</div>
         <FooterSection />
       </main>
     </SidebarProvider>
   );
 }
+
+2;
