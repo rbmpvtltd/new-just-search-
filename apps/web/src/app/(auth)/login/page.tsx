@@ -9,14 +9,10 @@ import { asyncHandler } from "@/utils/error/asyncHandler";
 import { getToken } from "@/utils/session";
 
 export default async function Login() {
-  const { data: userData, error } = await asyncHandler(
-    trpcServer.userRouter.getUserDetail.query(),
-  );
   const data = await getToken();
 
   // try {
   const session = await asyncHandler(trpcServer.auth.verifyauth.query());
-  console.log("Hii dasdasda", userData);
   if (data) {
     redirect("/");
   }
@@ -33,13 +29,4 @@ export default async function Login() {
   }
 
   // User is logged in fetch user data
-
-  // Force display name update
-  if (!userData?.displayName || userData.displayName === "null") {
-    return (
-      <div className="w-full">
-        <UpdateDisplayNameForm userId={Number(userData?.id)} />
-      </div>
-    );
-  }
 }

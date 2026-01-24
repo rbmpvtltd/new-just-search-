@@ -187,7 +187,7 @@ export default function HireDetailCard({ data }: { data: HireDetailCardType }) {
           </div>
         </div>
       </div>
-      {/* <HireReviews hireId={data?.data?.id ?? 0} name={data?.data?.name ?? "Just Search Hire"} reviews={data?.data?.review ?? []}/> */}
+      <HireReviews hireId={data?.data?.id ?? 0} name={data?.data?.name ?? "Just Search Hire"} reviews={data?.data?.review ?? []}/>
     </div>
   );
 }

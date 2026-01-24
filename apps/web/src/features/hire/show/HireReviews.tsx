@@ -13,6 +13,7 @@ import React from "react";
 import { ReviewForm } from "./component/ReviewForm";
 import type { OutputTrpcType } from "@/trpc/type";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import { CldImage } from "next-cloudinary";
 
 type HireReviews = {
   id: number;
@@ -90,15 +91,34 @@ function HireReviews({
                   className="p-2 m-2 shadow-[0_4px_12px_rgba(0,0,0,0.650)] w-full rounded-md flex flex-col gap-2"
                 >
                   <div className="flex justify-between items-center w-full ">
+                    <div className="flex items-center gap-2">
+                      {item.photo ? (
+                        <CldImage
+                          src={item.photo}
+                          alt="Reviewer Image"
+                          width={80}
+                          height={80}
+                          className="w-10 h-10 rounded-full"
+                        />
+                      ):(
+                        <div className="flex w-10 h-10 bg-primary justify-between items-center rounded-full">
+                          <p className="m-auto text-white font-semibold">{item.user?.split(" ").map((name)=> name[0]?.toUpperCase()).join("")}</p>
+                        </div>
+                      )}
+                    <div>
+
                     <h2 className=" font-medium text-secondary">
-                      {item.user ?? "Unknown"}
+                      {item.user ?? "J/S User"}
                     </h2>
+                     <p className="text-sm">{item.message}</p>
+                    </div>
+                    </div>
                     <p className="flex items-center gap-2 text-sm">
                       <FaRegCalendarAlt className="text-primary" />{" "}
                       {item.created_at ? item.created_at.toLocaleDateString() : ""}
                     </p>
                   </div>
-                  <p className="text-sm">{item.message}</p>
+                 
                 </div>
               );
             },

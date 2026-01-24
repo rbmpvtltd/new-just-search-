@@ -727,11 +727,11 @@ export const hirerouter = router({
       )[0];
 
       const profileCheck = await db
-  .select()
-  .from(profiles)
-  .where(eq(profiles.userId, 8));
+        .select()
+        .from(profiles)
+        .where(eq(profiles.userId, 8));
 
-console.log("Profile for user 8:", profileCheck);
+      console.log("Profile for user 8:", profileCheck);
 
       // Then, get reviews separately
       const reviews = await db
@@ -740,7 +740,7 @@ console.log("Profile for user 8:", profileCheck);
           created_at: hireReviews.createdAt,
           message: hireReviews.message,
           user: users.displayName,
-          profilId: profiles.id,
+          photo: profiles.profileImage,
         })
         .from(hireReviews)
         .leftJoin(users, eq(hireReviews.userId, users.id))

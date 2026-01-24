@@ -24,13 +24,13 @@ function PremiumShop() {
         Premium Shops{" "}
       </h1>
       <Carousel opts={{ loop: true }} className="w-full ">
-        <CarouselContent className="ml-10">
+        <CarouselContent className="gap-4">
           {data?.map((item, index: number) => {
             console.log(item.isFavourite);
             return (
               <CarouselItem
                 key={index.toString()}
-                className="pl-1 md:basis-1/2 lg:basis-1/3"
+                className="cursor-grab active:cursor-grabbing pl-1 md:basis-1/2 lg:basis-1/3 max-w-200 2xl:basis-1/4"
               >
                 <div className="p-1">
                   <Card className="">
@@ -39,7 +39,7 @@ function PremiumShop() {
                         <div className="relative max-w-[400px] mx-auto ">
                           <Link
                             href={{
-                              pathname: `/business/shop/${item.id}`,
+                              pathname: `/subcategory/aboutbusiness/${item.id}`,
                             }}
                           >
                             <Image
@@ -79,7 +79,7 @@ function PremiumShop() {
                         </div>
                         <div className="flex p-2">
                           <MdLocationPin />
-                          <p className="px-2 text-[12px] flex text-secondary-text break-words w-[80%] ">
+                          <p className="px-2 text-[12px] text-secondary-text w-100 line-clamp-1">
                             {item.address} {item.streetName} {item.buildingName}
                           </p>
                         </div>

@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import HomeSearchBar from "@/components/home-searchbar";
+import UpdateDisplayNameForm from "@/features/auth/login/display-update";
 import AddvertiseBanner from "@/features/business/mainContent/AddvertiseBanner";
 import AddvertiseBanner2 from "@/features/business/mainContent/AddvertiseBanner2";
 import FirstCaraousel from "@/features/business/mainContent/BannerFistCaraousel";
@@ -30,6 +31,17 @@ export default async function Page() {
   const { data: addvertiseBanner2 } = await asyncHandler(
     trpcServer.banners.getBannerData.query({ type: 3 }),
   );
+  const { data: userData } = await asyncHandler(
+    trpcServer.userRouter.getUserDetail.query(),
+  );
+
+  if (!userData?.displayName || userData.displayName === "null") {
+      return (
+        <div className="w-full">
+          <UpdateDisplayNameForm userId={Number(userData?.id)} />
+        </div>
+      );
+    }
 
   if (error) return <ErrorComponent error={error} />;
 
