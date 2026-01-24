@@ -31,6 +31,7 @@ function Category({
               photo={item.photo}
               title={item.title}
               id={item.id}
+              type={item.type}
             />
           );
         })}

@@ -19,6 +19,7 @@ type HireReviews = {
   created_at: Date | null;
   message: string;
   user: string | null;
+  photo : string | null;
 }
 
 function HireReviews({
@@ -37,11 +38,12 @@ function HireReviews({
       hireId: hireId,
     }),
   );
+  console.log(reviews)
   return (
     <div>
-      <div className="p-4 flex gap-4 mx-auto w-full gap-8 ">
+      <div className="p-4 flex flex-col md:flex-row mx-auto w-full gap-8 ">
         {data?.success && (
-          <div className="w-[30%]">
+          <div className="md:w-[30%] w-[90%]">
             {submmited?.submitted && (
               <Card className="border-green-200 pt-4 bg-green-50/50">
                 <CardHeader>
@@ -66,7 +68,7 @@ function HireReviews({
           </div>
         )}
         {!data?.success && <LoginRedirect />}
-        <div className="w-[60%]">
+        <div className="md:w-[60%] w-[90%]">
           <h1 className="text-2xl font-semibold text-secondary">
             Recommended Reviews
           </h1>
@@ -88,15 +90,15 @@ function HireReviews({
                   className="p-2 m-2 shadow-[0_4px_12px_rgba(0,0,0,0.650)] w-full rounded-md flex flex-col gap-2"
                 >
                   <div className="flex justify-between items-center w-full ">
-                    <h1 className="text-xl font-medium text-secondary">
+                    <h2 className=" font-medium text-secondary">
                       {item.user ?? "Unknown"}
-                    </h1>
+                    </h2>
                     <p className="flex items-center gap-2 text-sm">
                       <FaRegCalendarAlt className="text-primary" />{" "}
                       {item.created_at ? item.created_at.toLocaleDateString() : ""}
                     </p>
                   </div>
-                  <p>{item.message}</p>
+                  <p className="text-sm">{item.message}</p>
                 </div>
               );
             },

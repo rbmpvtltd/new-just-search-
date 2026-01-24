@@ -24,9 +24,9 @@ const algoliaClient = algoliasearch(
 
 export async function algoliaSeed() {
   await algoliaHireSeed();
-  await algoliaBusinessSeed();
-  await algoliaProductOfferSeed();
-  await algoliaAllListingSeed();
+  // await algoliaBusinessSeed();
+  // await algoliaProductOfferSeed();
+  // await algoliaAllListingSeed();
 }
 
 async function algoliaHireSeed() {
@@ -41,6 +41,7 @@ async function algoliaHireSeed() {
         "expectedSalary",
         "searchable(workShift)",
         "workExp",
+         "categoryId",
       ],
     },
   });
@@ -67,6 +68,7 @@ async function algoliaHireSeed() {
         workShift: hireListing.workShift,
         phoneNumber: hireListing.mobileNumber,
         jobType: hireListing.jobType,
+        categoryId: hireCategories.categoryId,
         city: cities.city,
         state: states.name,
         subcategories: sql<string[]>`
@@ -110,7 +112,7 @@ async function algoliaHireSeed() {
           schemas.not_related.categories.id,
         ),
       )
-      .groupBy(hireListing.id, cities.city, states.name);
+      .groupBy(hireListing.id, cities.city, states.name,hireCategories.id);
 
     const finalData = data.map((item) => {
       const longitude = item.longitude;
@@ -140,6 +142,7 @@ async function algoliaHireSeed() {
         state: item.state,
         phoneNumber: item.phoneNumber,
         workShift: item.workShift,
+        categoryId: item.categoryId,
         subcategories: item.subcategories,
         category: item.category,
         _geoloc: {

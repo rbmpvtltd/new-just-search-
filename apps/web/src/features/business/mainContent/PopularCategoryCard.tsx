@@ -6,17 +6,22 @@ export function PopularCategoryCard({
   photo,
   title,
   id,
+  type,
 }: {
   photo: string | null;
   title: string;
   id: number;
+  type: number;
 }) {
   return (
-    <div className="min-h-[80px] mb-4 max-w-[100px] flex flex-col items-center justify-evenly border-2 rounded-2xl hover:scale-105 transform transition-all duration-300 hover:shadow-xl hover:border-amber-600">
+    <div className="min-h-20 mb-4 max-w-25 flex flex-col items-center justify-evenly border-2 rounded-2xl hover:scale-105 transform transition-all duration-300 hover:shadow-xl hover:border-amber-600">
       <Link
         href={{
-          pathname: `/subcategory/${id}`,
-          query: { page: 1 },
+          pathname: type === 1 ? `/subcategory/${id}` : `/hire`,
+          query:
+            type === 1
+              ? { page: 1 }
+              : { categoryId: id },
         }}
         className="flex items-center justify-center flex-col"
       >

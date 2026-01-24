@@ -31,6 +31,7 @@ import {
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
 import { createReview, hireApproved, reviewExist } from "./hire.service";
+import { profiles } from "@repo/db/dist/schema/user.schema";
 
 export const hirerouter = router({
   add: visitorProcedure.query(async () => {
@@ -725,6 +726,13 @@ export const hirerouter = router({
           .where(eq(hireListing.id, input.hireId))
       )[0];
 
+      const profileCheck = await db
+  .select()
+  .from(profiles)
+  .where(eq(profiles.userId, 8));
+
+console.log("Profile for user 8:", profileCheck);
+
       // Then, get reviews separately
       const reviews = await db
         .select({
@@ -732,11 +740,12 @@ export const hirerouter = router({
           created_at: hireReviews.createdAt,
           message: hireReviews.message,
           user: users.displayName,
+          profilId: profiles.id,
         })
         .from(hireReviews)
         .leftJoin(users, eq(hireReviews.userId, users.id))
-        .where(eq(hireReviews.hireId, input.hireId))
-        .groupBy(hireReviews.id,users.displayName);
+        .leftJoin(profiles, eq(profiles.userId, users.id))
+        .where(eq(hireReviews.hireId, input.hireId));
 
       return {
         data: {

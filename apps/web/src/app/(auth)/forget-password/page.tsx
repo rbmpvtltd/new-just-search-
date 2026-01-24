@@ -85,6 +85,21 @@ export default function ForgotPasswordForm() {
         setMasked(mask);
         setStep("verify");
       },
+      onError: (error)=> {
+        if(error.data?.httpStatus === 404){
+          Swal.fire({
+            icon: "error",
+            title: "Account Not Found (404)",
+            text: `This phone number or email is not registered. Please sign up first.`,
+          });
+        }else {
+           Swal.fire({
+            icon: "error",
+            title: "Something Wents Wrong",
+            text: `something wents wrong couldn't send otp`,
+          });
+        }
+      }
     });
     setResendTimer(60);
     const interval = setInterval(() => {

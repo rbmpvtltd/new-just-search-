@@ -46,6 +46,8 @@ export default function HireDetailCard({ data }: { data: HireDetailCardType }) {
   ]
     .filter(Boolean)
     .join(", ");
+
+  console.log("=====>==>==>",data?.data.review)
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="rounded-2xl border bg-white shadow-sm p-6">
@@ -185,7 +187,7 @@ export default function HireDetailCard({ data }: { data: HireDetailCardType }) {
           </div>
         </div>
       </div>
-      <HireReviews hireId={data?.data?.id ?? 0} name={data?.data?.name ?? "Just Search Hire"} reviews={data?.data?.review ?? []}/>
+      {/* <HireReviews hireId={data?.data?.id ?? 0} name={data?.data?.name ?? "Just Search Hire"} reviews={data?.data?.review ?? []}/> */}
     </div>
   );
 }

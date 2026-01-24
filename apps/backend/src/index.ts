@@ -13,6 +13,7 @@ import { createSession } from "./features/auth/lib/session";
 import { appRouter, openRouter } from "./route";
 import { createContext } from "./utils/context";
 import { limiter } from "./utils/limiter";
+import env from "./utils/envaild";
 
 const app = express();
 
@@ -140,18 +141,23 @@ app.post("/auth/apple/callback", async (req, res) => {
 
 app.get("/auth/google/callback", async (req, res) => {
   const code = req.query.code as string;
+  console.log("====execution comes here line:144 index.ts")
   if (!code) {
     return res.status(400).json({ error: "Missing code parameter" });
   }
+  console.log("======index.ts======",env.GOOGLE_REDIRECT_URI);
+  console.log("======index.ts======",env.GOOGLE_CLIENT_ID);
+  console.log("======index.ts======",env.GOOGLE_CLIENT_SECRET);
+
   try {
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        client_id: env.GOOGLE_CLIENT_ID,
+        client_secret: env.GOOGLE_CLIENT_SECRET,
         code,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+        redirect_uri: env.GOOGLE_REDIRECT_URI,
         grant_type: "authorization_code",
       }),
     });

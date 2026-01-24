@@ -21,16 +21,20 @@ import {
   deleteSession,
   validateSessionToken,
 } from "./lib/session";
+import env from "@/utils/envaild";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_ANDROID_CLIENT_ID);
 
 export const authRouter = router({
   googleLogin: publicProcedure.query(async ({ ctx }) => {
+    console.log("=====>===>",env.GOOGLE_REDIRECT_URI)
+    console.log("=====>===>",env.GOOGLE_CLIENT_ID)
+
     const redirectUrl =
       "https://accounts.google.com/o/oauth2/v2/auth?" +
       new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI!, // oo url apne google console me authorized redirect url me add karno howe
+        client_id: env.GOOGLE_CLIENT_ID,
+        redirect_uri: env.GOOGLE_REDIRECT_URI, // oo url apne google console me authorized redirect url me add karno howe
         response_type: "code",
         scope: "profile email",
       }).toString();
@@ -146,7 +150,7 @@ export const authRouter = router({
   login: publicProcedure
     .input(z.object({ username: z.string(), password: z.string().min(6) }))
     .mutation(async ({ input }) => {
-      console.log("=======================dsdss========")
+      console.log("=======================dsdss========");
       const user = await checkPasswordGetUser(input.username, input.password);
 
       if (!user) {
@@ -180,9 +184,9 @@ export const authRouter = router({
     return "yes";
   }),
   sendOTP: publicProcedure
-    .input(z.object({ phone: z.string(),email: z.string().optional() }))
+    .input(z.object({ phone: z.string(), email: z.string().optional() }))
     .mutation(async ({ input }) => {
-      const {phone,email} = input
+      const { phone, email } = input;
       let whereCondition: any;
 
       if (email) {
@@ -263,7 +267,7 @@ export const authRouter = router({
       const { phoneNumber, otp, displayName, email, password } = input;
       console.log("auth.router.ts:149 :: input is =>", input);
 
-      let isValid =  await verifyOTP(String(phoneNumber), otp);;
+      let isValid = await verifyOTP(String(phoneNumber), otp);
       // if (email) {
       //   isValid = await verifyOTP(String(email), otp);
       // } else {
@@ -336,9 +340,31 @@ export const authRouter = router({
       }
 
       if (isEmailInput) {
+        const existingUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, identifier));
+
+        if (existingUser.length === 0) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Phone number Or Email not registered yet",
+          });
+        }
         sendSMSOTP(identifier);
       } else {
         const normalNumber = normalizeMobile(identifier);
+        const existingUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.phoneNumber, identifier));
+
+        if (existingUser.length === 0) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Phone number Or Email not registered yet",
+          });
+        }
         sendSMSOTP(normalNumber);
       }
     }),
