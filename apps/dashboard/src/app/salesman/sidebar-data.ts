@@ -2,6 +2,7 @@
 import {
   IconBuildingSkyscraper,
   IconHome,
+  IconKey,
   IconUsers,
 } from "@tabler/icons-react";
 import type { SidebarData } from "@/types/sidebar";
@@ -29,6 +30,11 @@ export const adminSidebarData: SidebarData = {
       name: "Manage Hire",
       url: "/hire",
       icon: IconUsers,
+    },
+    {
+      name: "Change Password",
+      url: "/change-password",
+      icon: IconKey,
     },
   ],
 };

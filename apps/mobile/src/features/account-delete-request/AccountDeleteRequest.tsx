@@ -44,33 +44,49 @@ export default function AccountDeleteRequestForm() {
   };
 
   return (
-    <View className="h-full m-4 shadow-md bg-base-200 rounded-lg">
-      <LableText title="Reason To Delete The Account" className="text-3xl" />
-      <Controller
-        control={control}
-        name="reason"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextAreaInput
-            className="bg-base-200 w-[90%] mx-auto"
-            onChangeText={onChange}
-            onBlur={onBlur}
-            value={value}
-            placeholder="Enter Your Message"
-          />
-        )}
-      />
-      {errors.reason && (
-        <Text className="text-error text-sm mb-4">{errors.reason.message}</Text>
-      )}
+    <View className="m-4 bg-base-200 rounded-2xl shadow-md">
+      <View className="px-6 pt-6 pb-4 border-b border-base-300">
+        <LableText
+          title="Delete Account"
+          className="text-2xl font-bold text-error"
+        />
+        <Text className="text-sm text-secondary-content mt-2">
+          Please let us know why you want to delete your account. This action is
+          irreversible.
+        </Text>
+      </View>
 
-      <View className="flex-row justify-between w-[90%] self-center mt-6 mb-12">
-        <View className="w-[45%] mx-auto">
-          <PrimaryButton
-            title="Submit"
-            isLoading={isSubmitting}
-            onPress={handleSubmit(onSubmit)}
-          />
-        </View>
+      <View className="px-6 py-6 space-y-3">
+        <Text className="text-secondary font-semibold">
+          Reason for deleting your account
+        </Text>
+
+        <Controller
+          control={control}
+          name="reason"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextAreaInput
+              className="bg-base-100 rounded-lg min-h-[120px] px-3 py-2"
+              onChangeText={onChange}
+              onBlur={onBlur}
+              value={value}
+              placeholder="Tell us your reason..."
+            />
+          )}
+        />
+
+        {errors.reason && (
+          <Text className="text-error text-sm">{errors.reason.message}</Text>
+        )}
+      </View>
+
+      <View className="px-6 py-5 border-t border-base-300">
+        <PrimaryButton
+          title="Request Account Deletion"
+          isLoading={isSubmitting}
+          onPress={handleSubmit(onSubmit)}
+          className="bg-error"
+        />
       </View>
     </View>
   );

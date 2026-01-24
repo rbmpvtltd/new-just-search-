@@ -135,25 +135,24 @@ export const userRouter = router({
     }),
 
   getUserProfile: protectedProcedure.query(async ({ ctx }) => {
-    console.log("Hiii");
-
-    const userEmail = (
-      await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, ctx.userId),
-        columns: {
-          email: true,
-        },
-      })
-    )?.email;
+    const user = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, ctx.userId),
+      columns: {
+        email: true,
+        phoneNumber: true,
+      },
+    });
 
     const profile = await db.query.profiles.findFirst({
       where: (userProfiles, { eq }) => eq(userProfiles.userId, ctx.userId),
       columns: {
-        profileImage: true,
-        salutation: true,
-        firstName: true,
-        lastName: true,
+        id: true,
+        userId: true,
         address: true,
+        lastName: true,
+        firstName: true,
+        salutation: true,
+        profileImage: true,
       },
     });
 
@@ -167,12 +166,9 @@ export const userRouter = router({
         .where(eq(planUserActive.userId, ctx.userId))
     )[0];
     const role = ctx.role;
-    logger.info("profile is", profile);
-    logger.info("plan is", plan);
-    logger.info("role is", role);
-    logger.info("userEmail is", userEmail);
-    return { role, profile, plan, userEmail };
+    return { role, profile, plan, user };
   }),
+
   getUserDetail: protectedProcedure.query(async ({ ctx }) => {
     const user = await db.query.users.findFirst({
       where: (userDetail, { eq }) => eq(userDetail.id, ctx.userId),

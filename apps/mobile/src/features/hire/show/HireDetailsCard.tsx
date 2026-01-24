@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -30,6 +30,12 @@ export default function HireDetailsCard(item: any) {
   const { data, isLoading } = useQuery(
     trpc.hirerouter.singleHire.queryOptions({ hireId: Number(hiredetails) }),
   );
+  const {
+    mutateAsync: createConversation,
+    isPending,
+    error,
+    isError,
+  } = useMutation(trpc.chat.createConversation.mutationOptions());
 
   if (isLoading) {
     return <Loading position="center" size={"large"} />;
@@ -76,6 +82,17 @@ export default function HireDetailsCard(item: any) {
     router.back();
     return;
   }
+
+  const handleChat = async () => {
+    const conv = await createConversation({
+      receiverId: Number(data?.data?.userId),
+    });
+    // setTimeout(() => {
+    // router.push(`/(root)/chats/private-chat/${conv?.id}`);
+    router.push(`/(root)/(home)/chat/${conv?.id}`);
+
+    // }, 5000);
+  };
 
   return (
     <ScrollView className="flex-1 px-4 h-full w-[100%]  mx-auto">
@@ -241,17 +258,18 @@ export default function HireDetailsCard(item: any) {
           <View className="flex-row w-[100%] justify-center gap-6">
             <View className="w-[45%] bg-primary rounded-lg py-2 px-4">
               <Pressable
+                disabled={isPending}
                 onPress={() => {
                   if (!isAuthenticated) {
                     showLoginAlert({
                       message: "Need to login to chat on your behalf",
                       onConfirm: () => {
                         clearToken();
-                        router.push("/(root)/profile");
+                        router.navigate("/(root)/profile");
                       },
                     });
                   } else {
-                    //TODO : Complete this with chat api
+                    handleChat();
                   }
                 }}
               >

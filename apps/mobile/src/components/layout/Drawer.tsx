@@ -66,15 +66,15 @@ const drawerFields: DrawerField[] = [
     role: "business",
   },
   {
-    name: "Add Product",
-    route: "/(root)/profile/product/add",
-    icon: "add-circle-outline",
-    role: "business",
-  },
-  {
     name: "My Products",
     route: "/(root)/profile/product",
     icon: "cube-outline",
+    role: "business",
+  },
+  {
+    name: "Add Product",
+    route: "/(root)/profile/product/add",
+    icon: "add-circle-outline",
     role: "business",
   },
   {

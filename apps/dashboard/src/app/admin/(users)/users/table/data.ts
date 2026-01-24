@@ -1,9 +1,10 @@
 import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUp,
+  Briefcase,
   Circle,
   HelpCircle,
+  User,
+  UserCheck,
+  UserPlus,
 } from "lucide-react";
 
 export const active = [
@@ -21,13 +22,23 @@ export const active = [
 
 export const type = [
   {
-    label: "Hire",
-    value: 1,
-    icon: ArrowDown,
+    label: "Guest",
+    value: "1",
+    icon: User,
+  },
+  {
+    label: "Visitor",
+    value: "2",
+    icon: UserCheck,
   },
   {
     label: "Business",
-    value: 2,
-    icon: ArrowRight,
+    value: "3",
+    icon: Briefcase,
+  },
+  {
+    label: "Hire",
+    value: "4",
+    icon: UserPlus,
   },
 ];

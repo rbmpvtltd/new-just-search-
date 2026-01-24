@@ -5,7 +5,6 @@ import { Stack } from "expo-router";
 import { memo, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { KeyboardStickyView } from "react-native-keyboard-controller";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
 import { cld } from "@/lib/cloudinary";
 import { type OutputTrpcType, queryClient, trpc } from "@/lib/trpc";
@@ -20,7 +19,6 @@ const MemorizedPrivateChat = memo(
   ({
     userData,
     conversationId,
-    displayName,
   }: {
     userData: UserDataType;
     conversationId: number;
@@ -51,17 +49,13 @@ const MemorizedPrivateChat = memo(
       listRef.current?.scrollToEnd({ animated: true });
     }, [newMessage]);
 
-    // useEffect(() => {
-    //   setStore(messageList);
-    // }, [messageList]);
-
     const { mutate: markRead } = useMutation(
       trpc.chat.markAsRead.mutationOptions(),
     );
 
     useEffect(() => {
       const unread = store
-        .filter((m) => m.senderId !== userData?.id && !m.isRead)
+        .filter((m) => m.senderId !== userData?.profile?.id && !m.isRead)
         .map((m) => m.id);
 
       if (unread.length > 0) {
@@ -90,17 +84,16 @@ const MemorizedPrivateChat = memo(
             paddingTop: 8,
           }}
           renderItem={({ item: msg }) => (
-            <View className="px-1 mb-2">
+            <View className="px-2 mb-3">
               {msg.message && (
                 <View
-                  className={`max-w-[80%] px-3 py-2 rounded-2xl shadow-sm ${
-                    msg.senderId === userData?.userId
+                  className={`max-w-[78%] px-4 py-2 rounded-2xl ${
+                    msg.senderId === userData?.profile?.userId
                       ? "bg-blue-100 self-end"
                       : "bg-gray-200 self-start"
                   }`}
                 >
                   <Text className="text-gray-800">{msg.message}</Text>
-
                   <Text className="text-[10px] text-gray-500 mt-1 text-right">
                     {msg.updatedAt &&
                       new Date(msg.updatedAt).toLocaleTimeString([], {
@@ -113,15 +106,15 @@ const MemorizedPrivateChat = memo(
 
               {msg.image && (
                 <View
-                  className={`max-w-[65%] mt-1 ${
-                    msg.senderId === userData?.userId
+                  className={`max-w-[70%] mt-1 ${
+                    msg.senderId === userData?.profile?.userId
                       ? "self-end"
                       : "self-start"
                   }`}
                 >
                   <AdvancedImage
                     cldImg={cld.image(msg.image)}
-                    className="w-48 h-48 rounded-xl shadow border"
+                    className="w-56 h-56 rounded-2xl shadow-sm border border-gray-200"
                   />
                 </View>
               )}
@@ -141,28 +134,28 @@ const MemorizedSendMessage = memo(
       trpc.chat.sendMessage.mutationOptions(),
     );
     return (
-      <View className="flex-row bg-base-100 border-t border-gray-200 py-2 px-4 gap-4">
+      <View className="flex-row items-end  bg-white border-t border-gray-200 px-4 py-3 gap-3">
         <TextInput
-          className="bg-white flex-1  text-gray-800 border border-gray-200 rounded-3xl px-4"
+          className="flex-1 bg-gray-100 text-gray-800 rounded-2xl px-4 py-4 text-sm"
           value={message}
-          onChangeText={(newText) => setMessage(newText)}
-          placeholder="Type your message..."
-          placeholderTextColor="#999"
+          onChangeText={setMessage}
+          placeholder="Type a message…"
+          placeholderTextColor="#9ca3af"
+          multiline
         />
+
         <Pressable
-          className="bg-primary  justify-center items-center rounded-3xl px-4"
+          className={`h-12 w-12 rounded-full items-center justify-center mb-1 ${
+            message.length === 0 ? "bg-gray-300" : "bg-primary"
+          }`}
           onPress={() => {
             if (message.length === 0) return;
-
-            mutate({
-              message: message,
-              conversationId: conversationId,
-            });
+            mutate({ message, conversationId });
             setMessage("");
           }}
         >
-          <Text className="text-white font-bold">
-            {isPending ? "Sending..." : "Send"}
+          <Text className="text-white font-bold self-center">
+            {isPending ? "…" : "➤"}
           </Text>
         </Pressable>
       </View>
@@ -212,7 +205,7 @@ export default function StoreChat({
           <KeyboardStickyView
             className="flex-1"
             offset={{
-              opened: 70,
+              opened: 50,
             }}
           >
             <MemorizedPrivateChat

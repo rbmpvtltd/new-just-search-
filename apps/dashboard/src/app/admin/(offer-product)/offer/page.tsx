@@ -25,7 +25,6 @@ export default function Page() {
         globalFilter,
       });
 
-      console.log("result", result.data);
       return {
         data: result?.data || [],
         totalPages: result?.totalPages || 0,

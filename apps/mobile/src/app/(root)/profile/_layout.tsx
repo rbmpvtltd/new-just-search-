@@ -96,7 +96,7 @@ export default function ProfileLayout() {
             title: "Delete Account Request",
           }}
         />
-        <Stack.Screen name="feedback/index" options={{ title: "Feedback" }} />
+        <Stack.Screen name="feedback/index" options={{ title: "Feedback" , }} />
         <Stack.Screen
           name="help-and-support/index"
           options={{

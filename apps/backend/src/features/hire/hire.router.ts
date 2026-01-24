@@ -13,6 +13,7 @@ import {
   languages,
   states,
 } from "@repo/db/dist/schema/not-related.schema";
+import { profiles } from "@repo/db/dist/schema/user.schema";
 import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { count, eq, gt, sql } from "drizzle-orm";
@@ -31,7 +32,6 @@ import {
 } from "@/utils/trpc";
 import { changeRoleInSession } from "../auth/lib/session";
 import { createReview, hireApproved, reviewExist } from "./hire.service";
-import { profiles } from "@repo/db/dist/schema/user.schema";
 
 export const hirerouter = router({
   add: visitorProcedure.query(async () => {
@@ -638,6 +638,7 @@ export const hirerouter = router({
         await db
           .select({
             id: hireListing.id,
+            userId: hireListing.userId,
             name: hireListing.name,
             email: hireListing.email,
             photo: hireListing.photo,

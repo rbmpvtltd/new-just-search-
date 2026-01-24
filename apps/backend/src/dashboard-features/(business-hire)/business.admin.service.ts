@@ -22,7 +22,9 @@ export const businessGlobalFilterColumns = [
   businessListings.name,
   subcategories.name,
   categories.title,
+  // cities.city,
   users.phoneNumber,
+  // businessListings.city,
 ];
 export const businessAllowedSortColumns = [
   "id",

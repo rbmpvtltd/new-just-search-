@@ -7,18 +7,15 @@ import {
 } from "@repo/db/dist/schema/auth.schema";
 import {
   categories,
-  subcategories,
 } from "@repo/db/dist/schema/not-related.schema";
 import {
   profileInsertSchema,
   profiles,
   profileUpdateSchema,
 } from "@repo/db/dist/schema/user.schema";
-import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import z from "zod";
-import { cloudinaryDeleteImagesByPublicIds } from "@/lib/cloudinary";
 import {
   buildOrderByClause,
   buildWhereClause,

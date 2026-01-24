@@ -17,6 +17,8 @@ import { adminNotificationRouter } from "./dashboard-features/(users)/notificati
 import { adminUsersRouter } from "./dashboard-features/(users)/users.admin.routes";
 import { adminBannerRouter } from "./dashboard-features/banners/banners.admin.routes";
 import { adminChangePasswordRouter } from "./dashboard-features/change-password/change-password.admin.routes";
+import { franchiseChangePasswordRouter } from "./dashboard-features/change-password/change-password.frachise.routes";
+import { salesmanChangePasswordRouter } from "./dashboard-features/change-password/change-password.salesman.routes";
 import { adminAttributesRouter } from "./dashboard-features/plan/attibutes.admin.routes";
 import { adminPlanRouter } from "./dashboard-features/plan/plan.admin.routes";
 import { revenueCatRouter } from "./dashboard-features/plan/webhooks/revenue-cat.routes";
@@ -83,6 +85,8 @@ const adminRouter = router({
   franchiseSalesmanRouter,
   salesmanUserRouter,
   adminChangePasswordRouter,
+  salesmanChangePasswordRouter,
+  franchiseChangePasswordRouter,
 });
 
 const openRouter: Router = express.Router();
