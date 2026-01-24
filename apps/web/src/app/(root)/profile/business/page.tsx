@@ -1,3 +1,4 @@
+import { BecomeVisitorForm } from "@/features/auth/login/VerifyNumber";
 import CreateBusinessListing from "@/features/business/create/add-business";
 import MyBusiness from "@/features/business/show/MyBusiness";
 import { trpcServer } from "@/trpc/trpc-server";
@@ -6,7 +7,11 @@ import { getRole } from "@/utils/session";
 
 export default async function page() {
   const role = await getRole();
-  console.log("");
+  if (role === "guest") {
+    return (
+      <BecomeVisitorForm />
+    )
+  }
 
   return (
     <div>
@@ -19,6 +24,7 @@ async function MyBusinessList() {
   const { data: myBusiness, error } = await asyncHandler(
     trpcServer.businessrouter.show.query(),
   );
+
   console.log("Error", error);
 
   if (!myBusiness) return <CreateBusinessListing />;

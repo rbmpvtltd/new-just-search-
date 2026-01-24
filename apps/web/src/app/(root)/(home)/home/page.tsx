@@ -11,8 +11,11 @@ import PremiumShop from "@/features/business/mainContent/PremiumShop";
 import { trpcServer } from "@/trpc/trpc-server";
 import { asyncHandler } from "@/utils/error/asyncHandler";
 import { ErrorComponent } from "@/utils/error/ErrorComponent";
+import { getToken } from "@/utils/session";
 
 export default async function Page() {
+  const token = await getToken();
+    
   const { data: bannerFirst } = await asyncHandler(
     trpcServer.banners.getBannerData.query({ type: 1 }),
   );
@@ -31,11 +34,13 @@ export default async function Page() {
   const { data: addvertiseBanner2 } = await asyncHandler(
     trpcServer.banners.getBannerData.query({ type: 3 }),
   );
-  const { data: userData } = await asyncHandler(
+  const { data: userData,error:userError } = await asyncHandler(
     trpcServer.userRouter.getUserDetail.query(),
   );
 
-  if (!userData?.displayName || userData.displayName === "null") {
+  if (token && (!userData?.displayName || userData.displayName === "null")) {
+    console.log(userData)
+    console.log("=====> error is ",userError)
       return (
         <div className="w-full">
           <UpdateDisplayNameForm userId={Number(userData?.id)} />
