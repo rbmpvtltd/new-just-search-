@@ -135,7 +135,7 @@ export const columns: ColumnDef<Banner>[] = [
     ),
   },
   {
-    accessorKey: "isActive",
+    accessorKey: "is_active",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Active" />
     ),
@@ -154,7 +154,7 @@ export const columns: ColumnDef<Banner>[] = [
     cell: ({ row }) => <div>{row.original.type}</div>,
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "created_at",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
