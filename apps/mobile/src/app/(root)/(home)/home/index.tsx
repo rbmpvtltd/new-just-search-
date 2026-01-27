@@ -18,6 +18,10 @@ import { UpdateModel } from "@/features/version/Component/UpdateModel";
 import { searchClient } from "@/lib/algoliaClient";
 import { trpc } from "@/lib/trpc";
 import { useLocationStore } from "@/store/locationStore";
+import { getTokenRole } from "@/utils/secureStore";
+import { useAuthStore } from "@/features/auth/authStore";
+import UpdateDisplayNameForm from "@/features/auth/forms/UpdateDisplay";
+import UpdateDisplayNameModal from "@/features/auth/forms/UpdateDisplay";
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === "android") {
@@ -71,8 +75,13 @@ export default function TabOneScreen() {
   const { data: latestVersion, isLoading } = useQuery(
     trpc.versionRouter.checkLatestVesion.queryOptions(),
   );
+  const { data: userData, error: userError } = useQuery(
+    trpc.userRouter.getUserDetail.queryOptions(),
+  );
   const setLongitude = useLocationStore((state) => state.setLongitude);
   const setLatitude = useLocationStore((state) => state.setLatitude);
+  const token = useAuthStore((state) => state.token);
+  const [showDisplayNameModal, setShowDisplayNameModal] = useState(false);
 
   console.log("Latest virsion", latestVersion);
 
@@ -80,6 +89,16 @@ export default function TabOneScreen() {
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
   >(undefined);
+
+  useEffect(() => {
+    if (
+      token &&
+      userData &&
+      (!userData.displayName || userData.displayName === "null")
+    ) {
+      setShowDisplayNameModal(true);
+    }
+  }, [token, userData]);
 
   useEffect(() => {
     registerForPushNotificationsAsync()
@@ -119,27 +138,46 @@ export default function TabOneScreen() {
     getCurrentLocation();
   }, []);
 
+  // if (
+  //   token &&
+  //   userData &&
+  //   (!userData.displayName || userData.displayName === "null")
+  // ) {
+  //   return (
+  //     <View className="w-full">
+  //       <UpdateDisplayNameForm userId={Number(userData.id)} />
+  //     </View>
+  //   );
+  // }
+
   if (isLoading) {
     return <Loading position="center" />;
   }
   return (
-    <ScrollView keyboardShouldPersistTaps="handled">
-      <View className="flex items-center r rounded-4xl">
-        <UpdateModel latestVersion={latestVersion ?? "1.0.0"} />
-        <CustomCarousel />
-        <InstantSearch searchClient={searchClient} indexName="all_listing">
-          <SearchBox />
-          <Configure hitsPerPage={5} />
-          <InfiniteHits hitComponent={Hit} />
-        </InstantSearch>
-        <BoundaryWrapper>
-          <CategoryList />
-        </BoundaryWrapper>
-        <CustomCarousel />
-        <CustomCarousel />
-        <CustomCarousel />
-      </View>
-    </ScrollView>
+    <>
+     <UpdateDisplayNameModal
+        visible={showDisplayNameModal}
+        userId={Number(userData?.id)}
+        onClose={() => setShowDisplayNameModal(false)} // Remove this if you want to force users to set display name
+      />
+      <ScrollView keyboardShouldPersistTaps="handled">
+        <View className="flex items-center r rounded-4xl">
+          <UpdateModel latestVersion={latestVersion ?? "1.0.0"} />
+          <CustomCarousel />
+          <InstantSearch searchClient={searchClient} indexName="all_listing">
+            <SearchBox />
+            <Configure hitsPerPage={5} />
+            <InfiniteHits hitComponent={Hit} />
+          </InstantSearch>
+          <BoundaryWrapper>
+            <CategoryList />
+          </BoundaryWrapper>
+          <CustomCarousel />
+          <CustomCarousel />
+          <CustomCarousel />
+        </View>
+      </ScrollView>
+    </>
   );
 }
 

@@ -4,9 +4,16 @@ import { useAuthStore } from "@/features/auth/authStore";
 import CreateHireListing from "@/features/hire/create/add-hire";
 import MyHireCard from "@/features/hire/show/MyHire";
 import { trpc } from "@/lib/trpc";
+import { BecomeVisitorForm } from "@/features/auth/forms/BecomeVisitor";
 
 export default function MyHireListing() {
+  const role = useAuthStore(state => state.role)
   const getAuthStoreToken = useAuthStore((state) => state.token);
+  if(role === "guest"){
+      return (
+        <BecomeVisitorForm />
+      )
+    }
 
   return <View>{getAuthStoreToken ? <MyHire /> : <CreateHireListing />}</View>;
 }
