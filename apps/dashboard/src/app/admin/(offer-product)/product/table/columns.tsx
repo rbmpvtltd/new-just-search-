@@ -124,24 +124,24 @@ export const columns: ColumnDef<Product>[] = [
       ),
   },
   {
-    accessorKey: "productName",
+    accessorKey: "product_name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.productName || "No Name"}
+        {row.original.product_name || "No Name"}
       </div>
     ),
   },
   {
-    accessorKey: "businessName",
+    accessorKey: "business_name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Business Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.businessName || "No Name"}
+        {row.original.business_name || "No Name"}
       </div>
     ),
   },

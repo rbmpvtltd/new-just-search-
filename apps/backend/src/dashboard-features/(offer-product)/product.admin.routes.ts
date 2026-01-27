@@ -45,17 +45,17 @@ export const adminProductRouter = router({
       .select({
         id: products.id,
         photo: products.mainImage,
-        productName: products.productName,
-        businessName: businessListings.name,
+        product_name: products.productName,
+        business_name: businessListings.name,
         status: products.status,
         expired_at: products.createdAt,
         created_at: products.createdAt,
       })
       .from(products)
+      .leftJoin(businessListings, eq(businessListings.id, products.businessId))
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
-      .leftJoin(businessListings, eq(businessListings.id, products.businessId))
       .offset(offset);
 
     const totalResult = await db
@@ -63,6 +63,7 @@ export const adminProductRouter = router({
         count: sql<number>`count(distinct ${products.id})::int`,
       })
       .from(products)
+      .leftJoin(businessListings, eq(businessListings.id, products.businessId))
       .where(where);
 
     const total = totalResult[0]?.count ?? 0;

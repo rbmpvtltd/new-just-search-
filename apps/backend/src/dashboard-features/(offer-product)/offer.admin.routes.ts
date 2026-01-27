@@ -64,6 +64,7 @@ export const adminOfferRouter = router({
         count: sql<number>`count(distinct ${offers.id})::int`,
       })
       .from(offers)
+      .leftJoin(businessListings, eq(businessListings.id, offers.businessId))
       .where(where);
 
     const total = totalResult[0]?.count ?? 0;

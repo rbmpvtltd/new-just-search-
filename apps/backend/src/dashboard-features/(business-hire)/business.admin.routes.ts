@@ -119,7 +119,7 @@ export const adminBusinessRouter = router({
       )
       .leftJoin(categories, eq(businessCategories.categoryId, categories.id))
       .leftJoin(users, eq(businessListings.userId, users.id));
-    // .groupBy(businessListings.id);
+      // .groupBy(businessListings.id)
 
     const total = totalResult[0]?.count ?? 0;
     const totalPages = Math.ceil(total / input.pagination.pageSize);
