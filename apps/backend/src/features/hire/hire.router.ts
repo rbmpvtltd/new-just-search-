@@ -550,11 +550,11 @@ export const hirerouter = router({
     await db
       .update(schemas.auth.users)
       .set({
-        role: "visiter",
+        role: "visitor",
       })
       .where(eq(schemas.auth.users.id, ctx.userId));
 
-    changeRoleInSession(ctx.sessionId, "visiter");
+    changeRoleInSession(ctx.sessionId, "visitor");
 
     return {
       success: true,

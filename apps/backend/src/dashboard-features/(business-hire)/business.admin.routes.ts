@@ -74,7 +74,7 @@ export const adminBusinessRouter = router({
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
       .leftJoin(users, eq(businessListings.userId, users.id))
-      .leftJoin(cities, eq(businessListings.city, cities.id)) 
+      .leftJoin(cities, eq(businessListings.city, cities.id))
       .leftJoin(
         businessSubcategories,
         eq(businessListings.id, businessSubcategories.businessId),
@@ -137,7 +137,7 @@ export const adminBusinessRouter = router({
     });
     const getStates = await db.query.states.findMany();
     const users = await db.query.users.findMany({
-      where: (user, { eq }) => eq(user.role, "visiter"),
+      where: (user, { eq }) => eq(user.role, "visitor"),
       columns: {
         displayName: true,
         id: true,
@@ -550,7 +550,7 @@ export const adminBusinessRouter = router({
       await db
         .delete(businessCategories)
         .where(inArray(businessCategories.businessId, input.ids));
-        
+
       await db
         .delete(businessListings)
         .where(inArray(businessListings.id, input.ids));

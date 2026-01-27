@@ -15,7 +15,7 @@ import {
   notification,
   type notificationInsertSchema,
 } from "@repo/db/dist/schema/user.schema";
-import { and, eq, inArray, type InferInsertModel } from "drizzle-orm";
+import { and, eq, type InferInsertModel, inArray } from "drizzle-orm";
 import type z from "zod";
 
 export const notificationColumns = {
@@ -166,7 +166,7 @@ export const getUsersMatchingCriteria = async (
   }
 
   // For visitor and guest roles, category/location filters don't apply
-  const isSimpleRole = role === "visiter" || role === "guest";
+  const isSimpleRole = role === "visitor" || role === "guest";
 
   if (isSimpleRole) {
     console.log(`Simple role (${role}) - fetching all users with this role`);

@@ -248,7 +248,7 @@ export const businessrouter = router({
         .where(eq(users.id, ctx.userId));
 
       await changeRoleInSession(ctx.sessionId, "business");
-      
+
       const myPlan = await db.query.planUserActive.findFirst({
         where: (planUserActive, { eq }) =>
           eq(planUserActive.userId, ctx.userId),
@@ -542,11 +542,11 @@ export const businessrouter = router({
     await db
       .update(schemas.auth.users)
       .set({
-        role: "visiter",
+        role: "visitor",
       })
       .where(eq(schemas.auth.users.id, ctx.userId));
 
-    changeRoleInSession(ctx.sessionId, "visiter");
+    changeRoleInSession(ctx.sessionId, "visitor");
 
     return {
       success: true,

@@ -189,9 +189,9 @@ const SignUpComponent: React.FC = () => {
         onSuccess: async (data) => {
           Alert.alert("Successfull", "OTP send Successfully");
 
-          setAuthStoreToken(data?.session ?? "", data.role ?? "visiter");
+          setAuthStoreToken(data?.session ?? "", data.role ?? "visitor");
           // await Purchases.logIn(data?.revanueCatToken ?? "");
-          await setTokenRole(data?.session ?? "", data.role ?? "visiter");
+          await setTokenRole(data?.session ?? "", data.role ?? "visitor");
           console.log("registration sucessfully");
           router.push("/");
         },

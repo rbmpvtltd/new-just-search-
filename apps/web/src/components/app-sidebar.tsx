@@ -56,7 +56,7 @@ const items: SidebarField[] = [
     title: "My Business Listings",
     url: "/profile/business",
     icon: Building2,
-    role: ["business", "visiter", "guest"],
+    role: ["business", "visitor", "guest"],
   },
   {
     title: "Add Product",
@@ -86,7 +86,7 @@ const items: SidebarField[] = [
     title: "My Hire Listings",
     url: "/profile/hire",
     icon: Briefcase,
-    role: ["hire", "visiter", "guest"],
+    role: ["hire", "visitor", "guest"],
   },
   {
     title: "Pricing Plan",
@@ -110,7 +110,7 @@ const items: SidebarField[] = [
     title: "Request to Delete Account",
     url: "/profile/account-delete-request",
     icon: Trash2,
-    role: ["visiter", "guest", "hire", "business"],
+    role: ["visitor", "guest", "hire", "business"],
   },
   {
     title: "Logout",

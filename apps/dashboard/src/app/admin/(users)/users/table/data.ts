@@ -2,9 +2,11 @@ import {
   Briefcase,
   Circle,
   HelpCircle,
+  Store,
   User,
   UserCheck,
   UserPlus,
+  UserSearch,
 } from "lucide-react";
 
 export const active = [
@@ -20,25 +22,36 @@ export const active = [
   },
 ];
 
+
 export const type = [
   {
     label: "Guest",
-    value: "1",
+    value: "guest",
     icon: User,
   },
   {
     label: "Visitor",
-    value: "2",
+    value: "visitor",
     icon: UserCheck,
   },
   {
     label: "Business",
-    value: "3",
+    value: "business",
     icon: Briefcase,
   },
   {
     label: "Hire",
-    value: "4",
+    value: "hire",
     icon: UserPlus,
+  },
+  {
+    label: "Salesman",
+    value: "salesman",
+    icon: UserSearch,
+  },
+  {
+    label: "Franchise",
+    value: "franchises",
+    icon: Store,
   },
 ];

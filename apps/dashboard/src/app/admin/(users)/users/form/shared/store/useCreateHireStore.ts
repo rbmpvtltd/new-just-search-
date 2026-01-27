@@ -24,7 +24,7 @@ const initialFormValue: CombinedForm = {
   //user
   // userId: NaN,
   password: "",
-  role: "visiter",
+  role: "visitor",
   googleId: "",
   status: true,
   phoneNumber: "",

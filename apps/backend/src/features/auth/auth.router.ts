@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { eq, or } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
 import z from "zod";
+import env from "@/utils/envaild";
 import { isEmail, isMobileNumber, normalizeMobile } from "@/utils/identifier";
 import { sendSMSOTP } from "@/utils/optGenerator";
 import {
@@ -22,14 +23,13 @@ import {
   deleteSession,
   validateSessionToken,
 } from "./lib/session";
-import env from "@/utils/envaild";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_ANDROID_CLIENT_ID);
 
 export const authRouter = router({
   googleLogin: publicProcedure.query(async ({ ctx }) => {
-    console.log("=====>===>",env.GOOGLE_REDIRECT_URI)
-    console.log("=====>===>",env.GOOGLE_CLIENT_ID)
+    console.log("=====>===>", env.GOOGLE_REDIRECT_URI);
+    console.log("=====>===>", env.GOOGLE_CLIENT_ID);
 
     const redirectUrl =
       "https://accounts.google.com/o/oauth2/v2/auth?" +
@@ -268,7 +268,7 @@ export const authRouter = router({
       const { phoneNumber, otp, displayName, email, password } = input;
       console.log("auth.router.ts:149 :: input is =>", input);
 
-      let isValid = await verifyOTP(String(phoneNumber), otp);
+      const isValid = await verifyOTP(String(phoneNumber), otp);
       // if (email) {
       //   isValid = await verifyOTP(String(email), otp);
       // } else {
@@ -311,7 +311,7 @@ export const authRouter = router({
           email,
           password: hashPassword,
           phoneNumber,
-          role: "visiter",
+          role: "visitor",
         })
         .returning();
 
@@ -406,18 +406,18 @@ export const authRouter = router({
       };
     }),
 
-    verifyVisitorBecomeOtp: protectedProcedure
+  verifyVisitorBecomeOtp: protectedProcedure
     .input(
       z.object({
         phoneNumber: z.string().length(10),
         otp: z.string().length(6),
       }),
     )
-    .mutation(async ({ input,ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       const { phoneNumber, otp } = input;
       console.log("auth.router.ts:417 :: input is =>", input);
 
-      let isValid = await verifyOTP(String(phoneNumber), otp);
+      const isValid = await verifyOTP(String(phoneNumber), otp);
       // if (email) {
       //   isValid = await verifyOTP(String(email), otp);
       // } else {
@@ -430,7 +430,10 @@ export const authRouter = router({
         });
       }
 
-      const existingUser = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber));
+      const existingUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.phoneNumber, phoneNumber));
 
       if (existingUser.length > 0) {
         throw new TRPCError({
@@ -439,13 +442,16 @@ export const authRouter = router({
         });
       }
 
-      await db.update(users).set({role:"visiter"}).where(eq(users.id,ctx.userId))
-      const success = await changeRoleInSession(ctx.sessionId,"visiter");
-      
+      await db
+        .update(users)
+        .set({ role: "visitor" })
+        .where(eq(users.id, ctx.userId));
+      const success = await changeRoleInSession(ctx.sessionId, "visitor");
+
       // For now, just return success
       return {
         success,
-        role : UserRole.visiter,
+        role: UserRole.visitor,
         message: "Yo've become visitor successfully",
       };
     }),

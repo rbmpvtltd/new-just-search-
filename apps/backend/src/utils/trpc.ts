@@ -88,7 +88,7 @@ export const protectedProcedure = publicProcedure.use(async (opts) => {
 export const visitorProcedure = protectedProcedure.use(async (opts) => {
   const { ctx } = opts;
   if (
-    ctx.role === "visiter" ||
+    ctx.role === "visitor" ||
     ctx.role === "hire" ||
     ctx.role === "business" ||
     ctx.role === "admin"

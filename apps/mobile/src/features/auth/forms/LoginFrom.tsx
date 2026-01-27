@@ -37,9 +37,9 @@ export default function LoginFrom() {
         console.log("Data", data);
 
         if (data) {
-          setAuthStoreToken(data?.session ?? "", data.role ?? "visiter");
+          setAuthStoreToken(data?.session ?? "", data.role ?? "visitor");
           // await Purchases.logIn(data?.revanueCatToken ?? "");
-          await setTokenRole(data?.session ?? "", data.role ?? "visiter");
+          await setTokenRole(data?.session ?? "", data.role ?? "visitor");
           queryClient.invalidateQueries({
             queryKey: trpc.auth.verifyauth.queryKey(),
           });

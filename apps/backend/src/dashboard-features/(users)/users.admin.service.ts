@@ -1,9 +1,9 @@
 import { users } from "@repo/db/dist/schema/auth.schema";
 
 export const usersColumns = {
-  id: users.id,
-  displayName: users.displayName,
-  status: users.status,
+  // id: users.id,
+  // displayName: users.displayName,
+  // status: users.status,
   role: users.role,
 };
 
