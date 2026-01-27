@@ -1,0 +1,22 @@
+{
+  "name": "@repo/imagesmanager",
+  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "version": "0.1.0",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"tsc -p tsconfig.json -w\" \"bun run --watch dist/index.js\"",
+    "test": "tsc -p tsconfig.json && bun run dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "setup": "tsc -p tsconfig.json",
+    "start": "bun run --watch dist/index.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "elysia": "^1.4.22",
+    "@elysiajs/static": "^1.4.7"
+  }
+}

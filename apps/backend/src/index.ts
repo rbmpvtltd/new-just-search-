@@ -12,8 +12,8 @@ import jwt from "jsonwebtoken";
 import { createSession } from "./features/auth/lib/session";
 import { appRouter, openRouter } from "./route";
 import { createContext } from "./utils/context";
-import { limiter } from "./utils/limiter";
 import env from "./utils/envaild";
+import { limiter } from "./utils/limiter";
 
 const app = express();
 
@@ -27,7 +27,7 @@ app.use(
   "/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext, 
+    createContext,
     middleware: cors({ origin: "*" }),
     onError: (opts) => {
       logger.error(opts.error.code, { message: opts.error.message });
@@ -141,13 +141,13 @@ app.post("/auth/apple/callback", async (req, res) => {
 
 app.get("/auth/google/callback", async (req, res) => {
   const code = req.query.code as string;
-  console.log("====execution comes here line:144 index.ts")
+  console.log("====execution comes here line:144 index.ts");
   if (!code) {
     return res.status(400).json({ error: "Missing code parameter" });
   }
-  console.log("======index.ts======",env.GOOGLE_REDIRECT_URI);
-  console.log("======index.ts======",env.GOOGLE_CLIENT_ID);
-  console.log("======index.ts======",env.GOOGLE_CLIENT_SECRET);
+  console.log("======index.ts======", env.GOOGLE_REDIRECT_URI);
+  console.log("======index.ts======", env.GOOGLE_CLIENT_ID);
+  console.log("======index.ts======", env.GOOGLE_CLIENT_SECRET);
 
   try {
     const response = await fetch("https://oauth2.googleapis.com/token", {
