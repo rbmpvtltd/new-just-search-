@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
@@ -91,11 +92,19 @@ function ProductCard({ product }: { product: ProductType }) {
       <div className="flex justify-center sm:justify-start sm:w-44">
         <div className="w-40 h-40 rounded-xl overflow-hidden border bg-gray-50 flex items-center justify-center">
           {product?.mainImage ? (
-            <CldImage
+            // <CldImage
+            //   width="200"
+            //   height="200"
+            //   className="w-full h-full object-cover"
+            //   src={product.mainImage}
+            //   alt={product.productName}
+            // />
+            <Image
+              unoptimized
               width="200"
               height="200"
               className="w-full h-full object-cover"
-              src={product.mainImage}
+              src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${product.mainImage}`}
               alt={product.productName}
             />
           ) : (

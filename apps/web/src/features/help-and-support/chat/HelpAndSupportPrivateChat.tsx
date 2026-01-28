@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
+import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -71,12 +72,21 @@ function HelpAndSupportPrivateChat({
     >
       <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg shadow-sm sticky top-0 left-0 right-0 ">
         <div className="border rounded-full overflow-hidden shadow ">
-          <CldImage
+          {/* <CldImage
             src={"Banner/cbycmehjeetyxbuxc6ie"}
             width="40"
             height="40"
             alt="image"
             className="rounded-full"
+          /> */}
+          <Image
+            unoptimized
+            width="40"
+            height="40"
+            alt="image"
+            className="rounded-full"
+            // src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${msg.image}`}
+            src={"Banner/cbycmehjeetyxbuxc6ie"}
           />
         </div>
 

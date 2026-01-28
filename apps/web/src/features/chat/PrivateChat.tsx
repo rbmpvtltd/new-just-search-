@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
+import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import React, { useEffect, useRef, useState } from "react";
@@ -79,12 +80,20 @@ function PrivateChat({
       <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg shadow-sm sticky top-0 left-0 right-0 ">
         <div className="border rounded-full overflow-hidden shadow ">
           {displayName?.[0]?.profileImage ? (
-            <CldImage
-              src={displayName?.[0]?.profileImage as string}
+            // <CldImage
+            //   src={displayName?.[0]?.profileImage as string}
+            //   width="40"
+            //   height="40"
+            //   alt="image"
+            //   className="rounded-full"
+            // />
+            <Image
+              unoptimized
               width="40"
               height="40"
-              alt="image"
               className="rounded-full"
+              src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${displayName?.[0]?.profileImage as string}`}
+              alt="image"
             />
           ) : (
             <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-medium text-lg ">
@@ -126,11 +135,19 @@ function PrivateChat({
               }`}
             >
               <Link href={msg.route ? msg.route : "#"}>
-                <CldImage
+                {/* <CldImage
                   width="220"
                   height="220"
                   className="rounded-lg shadow border"
                   src={msg.image}
+                  alt="Chat image"
+                /> */}
+                <Image
+                  unoptimized
+                  width="220"
+                  height="220"
+                  className="rounded-lg shadow border"
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${msg.image}`}
                   alt="Chat image"
                 />
               </Link>

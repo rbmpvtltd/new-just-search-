@@ -122,11 +122,19 @@ function SingleProductComp({
               <CarouselItem key={index.toString()} className="pl-1">
                 <Card className="shadow-sm border rounded-xl overflow-hidden">
                   <CardContent className="p-0 flex items-center justify-center bg-gray-50 h-full">
-                    <CldImage
+                    {/* <CldImage
                       width="500"
                       height="400"
                       className="object-cover w-full h-[280px] sm:h-[320px] lg:h-full"
                       src={item ?? ""}
+                      alt="Product Image"
+                    /> */}
+                    <Image
+                      unoptimized
+                      width="500"
+                      height="400"
+                      className="object-cover w-full h-[280px] sm:h-[320px] lg:h-full"
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${item}`}
                       alt="Product Image"
                     />
                   </CardContent>

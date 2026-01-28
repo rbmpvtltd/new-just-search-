@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
@@ -106,11 +107,19 @@ function OfferCard({ offer, index }: { offer: OfferType; index: number }) {
 
         <div>
           {offer?.mainImage ? (
-            <CldImage
+            // <CldImage
+            //   width="100"
+            //   height="100"
+            //   className="border rounded"
+            //   src={offer.mainImage}
+            //   alt={offer.offerName}
+            // />
+            <Image
+              unoptimized
               width="100"
               height="100"
               className="border rounded"
-              src={offer.mainImage}
+              src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${offer?.mainImage}`}
               alt={offer.offerName}
             />
           ) : (

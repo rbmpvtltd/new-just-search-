@@ -1,6 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -112,11 +113,11 @@ export const columns: ColumnDef<Banner>[] = [
     ),
     cell: ({ row }) =>
       row.original.photo ? (
-        <CldImage
+        <Image
           width="100"
           height="100"
           className="border rounded "
-          src={row.original.photo}
+          src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${row.original.photo}`}
           alt="cloudinary image not loaded"
         />
       ) : (
@@ -135,7 +136,7 @@ export const columns: ColumnDef<Banner>[] = [
     ),
   },
   {
-    accessorKey: "isActive",
+    accessorKey: "is_active",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Active" />
     ),
@@ -154,7 +155,7 @@ export const columns: ColumnDef<Banner>[] = [
     cell: ({ row }) => <div>{row.original.type}</div>,
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "created_at",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),

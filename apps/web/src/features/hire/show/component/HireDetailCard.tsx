@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import {
@@ -47,18 +48,26 @@ export default function HireDetailCard({ data }: { data: HireDetailCardType }) {
     .filter(Boolean)
     .join(", ");
 
-  console.log("=====>==>==>",data?.data.review)
+  console.log("=====>==>==>", data?.data.review);
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="rounded-2xl border bg-white shadow-sm p-6">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="shrink-0 mx-auto md:mx-0">
             <div className="relative h-[320px] w-[240px] overflow-hidden rounded-xl border">
-              <CldImage
+              {/* <CldImage
                 fill
                 src={data?.data?.photo ?? ""}
                 alt="Profile image"
                 className="object-cover"
+              /> */}
+              <Image
+                unoptimized
+                width="640"
+                height="640"
+                className="object-cover"
+                src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${data?.data?.photo ?? ""}`}
+                alt="Profile image"
               />
             </div>
           </div>
@@ -187,7 +196,11 @@ export default function HireDetailCard({ data }: { data: HireDetailCardType }) {
           </div>
         </div>
       </div>
-      <HireReviews hireId={data?.data?.id ?? 0} name={data?.data?.name ?? "Just Search Hire"} reviews={data?.data?.review ?? []}/>
+      <HireReviews
+        hireId={data?.data?.id ?? 0}
+        name={data?.data?.name ?? "Just Search Hire"}
+        reviews={data?.data?.review ?? []}
+      />
     </div>
   );
 }

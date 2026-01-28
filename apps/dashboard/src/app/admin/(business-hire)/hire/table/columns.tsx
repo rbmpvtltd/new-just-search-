@@ -15,6 +15,7 @@ import {
 import type { OutputTrpcType, UnwrapArray } from "@/trpc/type";
 import { EditEntiry } from "../form/edit.form";
 import { useTableStore } from "../store";
+import Image from "next/image";
 
 function SelectCell({ id }: { id: number }) {
   const select = useTableStore((state) => state.select);
@@ -131,11 +132,11 @@ export const columns: ColumnDef<Subcategory>[] = [
     ),
     cell: ({ row }) =>
       row.original.photo ? (
-        <CldImage
+        <Image
           width="100"
           height="100"
           className="border rounded "
-          src={row.original.photo}
+          src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${row.original.photo}`}
           alt="cloudinary image not loaded"
         />
       ) : (

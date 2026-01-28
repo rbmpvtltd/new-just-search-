@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 
@@ -18,19 +19,24 @@ export function PopularCategoryCard({
       <Link
         href={{
           pathname: type === 1 ? `/subcategory/${id}` : `/hire`,
-          query:
-            type === 1
-              ? { page: 1 }
-              : { categoryId: id },
+          query: type === 1 ? { page: 1 } : { categoryId: id },
         }}
         className="flex items-center justify-center flex-col"
       >
-        <CldImage
+        {/* <CldImage
           width={40}
           height={50}
           alt="category image"
           src={photo ?? ""}
           className="mx-auto h-11"
+        /> */}
+        <Image
+          unoptimized
+          width={40}
+          height={50}
+          className="mx-auto h-11"
+          src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${photo}`}
+          alt="category image"
         />
         <p className="w-full text-center mx-auto text-[10px] md:line-clamp-2 line-clamp-1">
           {title}

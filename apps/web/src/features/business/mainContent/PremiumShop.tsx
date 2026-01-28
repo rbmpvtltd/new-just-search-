@@ -48,6 +48,7 @@ function PremiumShop() {
                               className="rounded-md object-cover"
                               alt="Bussiness Image"
                               src="https://www.justsearch.net.in/assets/images/banners/uDgo0nRB1738750520.png"
+                              // src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${item?.photo}`}
                             />
                           </Link>
                           <div className="absolute top-2 right-2 bg-primary rounded-full pt-2 px-2">

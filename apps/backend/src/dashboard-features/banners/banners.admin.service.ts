@@ -1,6 +1,4 @@
-import { schemas } from "@repo/db"; // assuming this is a PgTable
-
-const banners = schemas.not_related.banners;
+import { banners } from "@repo/db/dist/schema/not-related.schema";
 
 export const bannerColumns = {
   id: banners.id,

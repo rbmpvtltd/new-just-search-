@@ -1,4 +1,10 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import { CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import { CldImage } from "next-cloudinary";
+import React from "react";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import LoginRedirect from "@/components/LoginRedirect";
 import {
   Card,
@@ -7,21 +13,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
-import { CheckCircle2 } from "lucide-react";
-import React from "react";
-import { ReviewForm } from "./component/ReviewForm";
 import type { OutputTrpcType } from "@/trpc/type";
-import { FaRegCalendarAlt } from "react-icons/fa";
-import { CldImage } from "next-cloudinary";
+import { ReviewForm } from "./component/ReviewForm";
 
 type HireReviews = {
   id: number;
   created_at: Date | null;
   message: string;
   user: string | null;
-  photo : string | null;
-}
+  photo: string | null;
+};
 
 function HireReviews({
   hireId,
@@ -39,7 +40,7 @@ function HireReviews({
       hireId: hireId,
     }),
   );
-  console.log(reviews)
+  console.log(reviews);
   return (
     <div>
       <div className="p-4 flex flex-col md:flex-row mx-auto w-full gap-8 ">
@@ -76,53 +77,61 @@ function HireReviews({
           {reviews.length === 0 && (
             <div className="mx-auto bg-primary-accent px-6 py-4 rounded-lg">
               <h1 className="text-secondary text-center">
-                No Reviews Founds On {name} 
+                No Reviews Founds On {name}
               </h1>
             </div>
           )}
-          {reviews?.map(
-            (
-              item: HireReviews,
-              index: number,
-            ) => {
-              return (
-                <div
-                  key={index.toString()}
-                  className="p-2 m-2 shadow-[0_4px_12px_rgba(0,0,0,0.650)] w-full rounded-md flex flex-col gap-2"
-                >
-                  <div className="flex justify-between items-center w-full ">
-                    <div className="flex items-center gap-2">
-                      {item.photo ? (
-                        <CldImage
-                          src={item.photo}
-                          alt="Reviewer Image"
-                          width={80}
-                          height={80}
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ):(
-                        <div className="flex w-10 h-10 bg-primary justify-between items-center rounded-full">
-                          <p className="m-auto text-white font-semibold">{item.user?.split(" ").map((name)=> name[0]?.toUpperCase()).join("")}</p>
-                        </div>
-                      )}
+          {reviews?.map((item: HireReviews, index: number) => {
+            return (
+              <div
+                key={index.toString()}
+                className="p-2 m-2 shadow-[0_4px_12px_rgba(0,0,0,0.650)] w-full rounded-md flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-center w-full ">
+                  <div className="flex items-center gap-2">
+                    {item.photo ? (
+                      // <CldImage
+                      //   src={item.photo}
+                      //   alt="Reviewer Image"
+                      //   width={80}
+                      //   height={80}
+                      //   className="w-10 h-10 rounded-full"
+                      // />
+                      <Image
+                        unoptimized
+                        width={80}
+                        height={80}
+                        alt="image"
+                        className="w-10 h-10 rounded-full"
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${item.photo}`}
+                      />
+                    ) : (
+                      <div className="flex w-10 h-10 bg-primary justify-between items-center rounded-full">
+                        <p className="m-auto text-white font-semibold">
+                          {item.user
+                            ?.split(" ")
+                            .map((name) => name[0]?.toUpperCase())
+                            .join("")}
+                        </p>
+                      </div>
+                    )}
                     <div>
-
-                    <h2 className=" font-medium text-secondary">
-                      {item.user ?? "J/S User"}
-                    </h2>
-                     <p className="text-sm">{item.message}</p>
+                      <h2 className=" font-medium text-secondary">
+                        {item.user ?? "J/S User"}
+                      </h2>
+                      <p className="text-sm">{item.message}</p>
                     </div>
-                    </div>
-                    <p className="flex items-center gap-2 text-sm">
-                      <FaRegCalendarAlt className="text-primary" />{" "}
-                      {item.created_at ? item.created_at.toLocaleDateString() : ""}
-                    </p>
                   </div>
-                 
+                  <p className="flex items-center gap-2 text-sm">
+                    <FaRegCalendarAlt className="text-primary" />{" "}
+                    {item.created_at
+                      ? item.created_at.toLocaleDateString()
+                      : ""}
+                  </p>
                 </div>
-              );
-            },
-          )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

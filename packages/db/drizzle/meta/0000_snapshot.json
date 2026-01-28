@@ -1,5 +1,5 @@
 {
-  "id": "273ea3f9-10e1-4e6a-bbd3-6ff24804dfce",
+  "id": "d45e120d-0d2b-4e17-a26a-aef6fa9f6258",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -4157,7 +4157,7 @@
       "schema": "public",
       "values": [
         "guest",
-        "visiter",
+        "visitor",
         "hire",
         "business",
         "salesman",
@@ -4198,7 +4198,7 @@
       "schema": "public",
       "values": [
         "guest",
-        "visiter",
+        "visitor",
         "hire",
         "business",
         "salesman",

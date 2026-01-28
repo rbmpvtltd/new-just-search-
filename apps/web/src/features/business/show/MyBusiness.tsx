@@ -68,11 +68,12 @@ export default function MyBusiness({ data }: { data: MyBusinessType }) {
           <div className="flex justify-center sm:justify-start sm:w-1/3">
             <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-xl overflow-hidden border bg-gray-50 shadow-sm">
               {data?.photo ? (
-                <CldImage
+                <Image
+                  unoptimized
                   width="640"
                   height="640"
                   className="w-full h-full object-cover"
-                  src={data.photo}
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${data?.photo}`}
                   alt="Business image"
                 />
               ) : (

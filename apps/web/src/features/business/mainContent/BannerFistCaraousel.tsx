@@ -1,6 +1,7 @@
 "use client";
 
 import Autoplay from "embla-carousel-autoplay";
+import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -74,12 +75,21 @@ function FirstCaraousel({
               >
                 <Card className="overflow-hidden border-none shadow-sm">
                   <CardContent className="relative aspect-square p-0 flex items-center justify-center bg-white">
-                    <CldImage
+                    {/* <CldImage
                       fill
                       src={item?.photo ?? ""}
                       alt="banner image"
                       className="object-contain"
                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    /> */}
+                    <Image
+                      unoptimized
+                      height={300}
+                      width={300}
+                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      className="object-contain"
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${item.photo}`}
+                      alt="Offer Image"
                     />
                   </CardContent>
                 </Card>
