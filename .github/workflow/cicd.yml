@@ -7,47 +7,50 @@ on:
 jobs:
   detect:
     runs-on: ubuntu-latest
-    outputs:
-      web: ${{ steps.filter.outputs.web }}
-      # backend: ${{ steps.filter.outputs.api }}
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            web:
-              - 'apps/web/**'
-              - 'packages/**'
-            backend:
-              - 'apps/backend/**'
-              - 'packages/**'
-            dashboard:
-              - 'apps/dashboard/**'
-              - 'packages/**'
-  build-web:
-    needs: detect
-    if: needs.detect.outputs.web == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: registry-server.justsearch.net.in
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: Build and Push
-        run: |
-          docker build \
-            -f apps/web/Dockerfile \
-            -t registry-server.justsearch.net.in/test/web:latest \
-            .
-          docker push registry-server.justsearch.net.in/test/web:latest
+      name: test
+      run: echo "test"
+    # outputs:
+    #   web: ${{ steps.filter.outputs.web }}
+    #   # backend: ${{ steps.filter.outputs.api }}
+    # steps:
+      # - uses: actions/checkout@v4
+      #
+      # - uses: dorny/paths-filter@v3
+      #   id: filter
+      #   with:
+      #     filters: |
+      #       web:
+      #         - 'apps/web/**'
+      #         - 'packages/**'
+      #       backend:
+      #         - 'apps/backend/**'
+      #         - 'packages/**'
+      #       dashboard:
+      #         - 'apps/dashboard/**'
+      #         - 'packages/**'
+  # build-web:
+  #   needs: detect
+  #   if: needs.detect.outputs.web == 'true'
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: registry-server.justsearch.net.in
+  #         username: ${{ secrets.REGISTRY_USERNAME }}
+  #         password: ${{ secrets.REGISTRY_PASSWORD }}
+  #
+  #     - name: Build and Push
+  #       run: |
+  #         docker build \
+  #           -f apps/web/Dockerfile \
+  #           -t registry-server.justsearch.net.in/test/web:latest \
+  #           .
+  #         docker push registry-server.justsearch.net.in/test/web:latest
   # build-backend:
   #   needs: detect
   #   if: needs.detect.outputs.api == 'true'
