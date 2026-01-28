@@ -49,6 +49,8 @@ jobs:
             -t registry-server.justsearch.net.in/test/web:latest \
             .
           docker push registry-server.justsearch.net.in/test/web:latest
+          # my webhook https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
+          curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
   # build-backend:
   #   needs: detect
   #   if: needs.detect.outputs.api == 'true'
