@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { useAuthStore } from "@/features/auth/authStore";
 import {
   type ForgetPasswordFormData,
@@ -13,6 +13,8 @@ import {
 } from "@/query/forgetPassword";
 import { setTokenRole } from "@/utils/secureStore";
 import Input from "../inputs/Input";
+import { trpc } from "@/lib/trpc";
+import { useMutation } from "@tanstack/react-query";
 
 export default function ForgetPasswordForm() {
   const {
@@ -30,19 +32,33 @@ export default function ForgetPasswordForm() {
       password: "",
     },
   });
-  const setAuthStoreToken = useAuthStore((state) => state.setToken);
 
-  const [mobile_no, otp, password] = watch(["mobile_no", "otp", "password"]);
+  const sendOtpMutation = useMutation(
+    trpc.auth.forgetPassword.mutationOptions(),
+  );
+
+  const verifyOtpMutation = useMutation(
+    trpc.auth.resetPassword.mutationOptions(),
+  );
 
   const onSubmit = async (data: ForgetPasswordFormData) => {
-    const response = await verifyForgetPasswordOtp(data);
-
-    if (response.success) {
-      setAuthStoreToken(response.token, response.role);
-      await setTokenRole(response.token, response.role);
-      return router.navigate("/(root)/profile");
-    }
-    Alert.alert(response.message);
+    verifyOtpMutation.mutate(
+      { identifier:data.mobile_no, newPassword: data.password, otp: data.otp },
+      {
+        onSuccess: (data) => {
+          Alert.alert(
+             "Successful",
+             "Password Update Successfully",
+          );
+          router.navigate("/(root)/profile");
+        },
+        onError: async (err) => {
+          Alert.alert(
+             "Invalid OTP",
+             "Invalid Otp Try Again.",
+          );
+        },
+      },)
   };
 
   return (
@@ -93,15 +109,27 @@ export default function ForgetPasswordForm() {
                   return;
                 }
 
-                const response = await sendForgetPasswordOtp({
-                  mobile_no: mobileNo,
-                });
-                if (response.success) {
-                  Alert.alert("OTP sent successfully");
-                } else {
-                  console.log(response);
-                  Alert.alert("Something went wrong");
-                }
+                sendOtpMutation.mutate(
+                  { identifier: mobileNo },
+                  {
+                    onSuccess: () => {
+                      Alert.alert("Successful", "OTP send successfully");
+                    },
+                    onError: (error) => {
+                      if (error.data?.httpStatus === 404) {
+                        Alert.alert(
+                          "Account Not Found (404)",
+                          `This phone number or email is not registered. Please sign up first.`,
+                        );
+                      } else {
+                        Alert.alert(
+                          "Something Wents Wrong",
+                          `something wents wrong couldn't send otp`,
+                        );
+                      }
+                    },
+                  },
+                );
               }}
               disabled={isSubmitting}
               className={`w-full mt-6 py-4 rounded-xl items-center justify-center ${
@@ -123,6 +151,7 @@ export default function ForgetPasswordForm() {
                   className="text-secondary bg-base-200"
                   placeholder="Enter OTP"
                   onBlur={onBlur}
+                  keyboardType="number-pad"
                   onChangeText={onChange}
                   value={value}
                 />
@@ -161,8 +190,8 @@ export default function ForgetPasswordForm() {
             )}
           </View>
 
-          <TouchableOpacity
-            onPress={() => onSubmit({ mobile_no, otp, password })}
+          <Pressable
+            onPress={handleSubmit(onSubmit)}
             disabled={isSubmitting}
             className={`w-full mt-6 py-4 rounded-xl items-center justify-center ${
               isSubmitting ? "bg-primary-content" : "bg-primary"
@@ -171,7 +200,7 @@ export default function ForgetPasswordForm() {
             <Text className="text-secondary text-lg font-semibold">
               {isSubmitting ? "Loading..." : " Submit"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </View>

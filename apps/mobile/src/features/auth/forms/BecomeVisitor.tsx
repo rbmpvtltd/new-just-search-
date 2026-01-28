@@ -472,7 +472,6 @@ export function BecomeVisitorForm() {
   return (
     <View className="min-h-screen items-center px-5 bg-base-100 py-10">
       <View className="w-full max-w-lg">
-        {/* Header Section */}
         <View className="mb-8">
           <Text className="text-3xl font-bold text-secondary text-center mb-3">
             Verify Your Number
@@ -485,9 +484,7 @@ export function BecomeVisitorForm() {
           </Text>
         </View>
 
-        {/* Card Container */}
         <View className="bg-base-200 rounded-2xl p-8 border border-gray-200">
-          {/* Phone Input */}
           <View className="mb-6">
             
             <FormField
@@ -502,7 +499,6 @@ export function BecomeVisitorForm() {
             />
           </View>
 
-          {/* Send OTP Button */}
           <View className="mb-6">
             <PrimaryButton
               title="Send OTP"
@@ -511,14 +507,8 @@ export function BecomeVisitorForm() {
               onPress={handleSendOtpSend(onSubmitSend)}
             />
           </View>
-
-          {/* Divider */}
           <View className="h-px bg-gray-300 my-4" />
-
-          {/* Back to Login */}
         </View>
-
-        {/* Bottom Info */}
         <View className="mt-6 px-4">
           <Text className="text-xs text-secondary text-center opacity-60">
             By continuing, you agree to receive SMS verification codes

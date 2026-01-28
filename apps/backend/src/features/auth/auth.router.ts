@@ -442,8 +442,11 @@ export const authRouter = router({
         });
       }
 
-      await db.update(users).set({role:"visitor",phoneNumber:phoneNumber}).where(eq(users.id,ctx.userId))
-      const success = await changeRoleInSession(ctx.sessionId,"visitor");
+      await db
+        .update(users)
+        .set({ role: "visitor", phoneNumber: phoneNumber })
+        .where(eq(users.id, ctx.userId));
+      const success = await changeRoleInSession(ctx.sessionId, "visitor");
       return {
         success,
         role: UserRole.visitor,

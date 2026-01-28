@@ -49,7 +49,8 @@ export const HeroHeader = () => {
                 />
               </Link>
 
-              <button
+      
+                        <button
                 onClick={() => setMenuState(!menuState)}
                 type="button"
                 aria-label={menuState === true ? "Close Menu" : "Open Menu"}
@@ -83,7 +84,7 @@ export const HeroHeader = () => {
                   {menuItems.map((item, index) => (
                     <li key={index.toString()}>
                       <Link
-                        onClick={() => setMenuState(!menuState)}
+                        // onClick={() => setMenuState(!menuState)}
                         href={item.href}
                         className=" text-muted-foreground hover:text-accent-foreground block duration-150"
                       >
@@ -97,7 +98,7 @@ export const HeroHeader = () => {
                 {data && (
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      // onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -108,7 +109,7 @@ export const HeroHeader = () => {
                       </Link>
                     </Button>
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      // onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -119,7 +120,7 @@ export const HeroHeader = () => {
                       </Link>
                     </Button>
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      // onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -134,7 +135,7 @@ export const HeroHeader = () => {
                 {!data && (
                   <>
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      // onClick={() => setMenuState(!menuState)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -144,7 +145,7 @@ export const HeroHeader = () => {
                     </Button>
 
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      // onClick={() => setMenuState(!menuState)}
                       asChild
                       size="sm"
                       className="bg-primary text-white"
