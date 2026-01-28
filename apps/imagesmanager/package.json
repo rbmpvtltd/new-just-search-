@@ -6,11 +6,8 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"tsc -p tsconfig.json -w\" \"bun run --watch dist/index.js\"",
-    "test": "tsc -p tsconfig.json && bun run dist/index.js",
-    "build": "tsc -p tsconfig.json",
-    "setup": "tsc -p tsconfig.json",
-    "start": "bun ./src/index.ts"
+    "dev": "bun run --watch ./src/index.ts",
+    "start": "bun run ./src/index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
