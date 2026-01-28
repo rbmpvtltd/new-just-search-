@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 // upload-image.tsx
 import { CldImage } from "next-cloudinary";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -58,6 +59,11 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
     [onChange],
   );
 
+  console.log(
+    "IMG BASE URL:",
+    `${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${value}`,
+  );
+
   return (
     <>
       <div className="h-50 relative w-50 rounded overflow-hidden border-2 border-gray-600 ">
@@ -70,15 +76,12 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
 
         {value ? (
           firstTime.current ? (
-            <CldImage
-              width="100"
-              height="100"
-              className="w-full h-full object-contain p-4"
-              src={value}
-              alt="Cloudinary image"
-              onError={(e) =>
-                console.error("Error loading Cloudinary image:", e)
-              }
+            <img
+              src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${value}`}
+              width={500}
+              height={500}
+              className=""
+              alt="profile-image"
             />
           ) : (
             // biome-ignore lint/performance/noImgElement: <explanation>

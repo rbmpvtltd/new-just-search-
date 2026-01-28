@@ -24,30 +24,30 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
   try {
     // console.log(process.env);
     // Postgres seeding
-    // await notRelated();
-    // logger.info("Complete", {
-    //   message: "notRelated",
-    // });
-    // await userSeed();
-    // logger.info("Complete", {
-    //   message: "userseed",
-    // });
-    // await fakeSeed();
-    // logger.info("Complete", {
-    //   message: "fakeSeed",
-    // });
-    // await businessSeed();
-    // logger.info("Complete", {
-    //   message: "business",
-    // });
-    // await productSeed();
-    // logger.info("Complete", {
-    //   message: "productSeed",
-    // });
-    // await offerSeed();
-    // logger.info("Complete", {
-    //   message: "offerseed",
-    // });
+    await notRelated();
+    logger.info("Complete", {
+      message: "notRelated",
+    });
+    await userSeed();
+    logger.info("Complete", {
+      message: "userseed",
+    });
+    await fakeSeed();
+    logger.info("Complete", {
+      message: "fakeSeed",
+    });
+    await businessSeed();
+    logger.info("Complete", {
+      message: "business",
+    });
+    await productSeed();
+    logger.info("Complete", {
+      message: "productSeed",
+    });
+    await offerSeed();
+    logger.info("Complete", {
+      message: "offerseed",
+    });
     await hireSeed();
     logger.info("Complete", {
       message: "hireseed",

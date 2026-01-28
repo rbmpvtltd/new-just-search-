@@ -5,6 +5,7 @@ import { profileUpdateSchema } from "@repo/db/dist/schema/user.schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { Camera } from "lucide-react";
+import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import type z from "zod";
 import {
@@ -19,6 +20,7 @@ import { sweetAlertError, sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { getQueryClient } from "@/trpc/query-client";
 import type { OutputTrpcType } from "@/trpc/type";
+import profileImage from "../../../public/images/logo.png";
 
 type UserProfile = OutputTrpcType["userRouter"]["edit"] | null | undefined;
 
@@ -33,7 +35,7 @@ function UserProfile({ data }: { data: UserProfile }) {
     resolver: zodResolver(profileUpdateSchema),
     defaultValues: {
       profileImage: data?.profile?.profileImage ?? "",
-      salutation: data?.profile?.salutation ?? NaN,
+      salutation: data?.profile?.salutation ?? 0,
       firstName: data?.profile?.firstName ?? "",
       lastName: data?.profile?.lastName ?? "",
       dob: data?.profile?.dob ?? "",
@@ -48,12 +50,16 @@ function UserProfile({ data }: { data: UserProfile }) {
 
   const { mutate } = useMutation(trpc.userRouter.update.mutationOptions());
 
+  console.log("data", data);
+
   const onSubmit = async (data: UserUpdateSchema) => {
     const file = await uploadToCloudinary([data.profileImage], "profile");
     const finalData = {
       ...data,
       profileImage: file[0] ?? "",
     };
+
+    console.log("finalData", file);
     mutate(finalData, {
       onSuccess: (data) => {
         if (data.success) {
@@ -228,6 +234,16 @@ function UserProfile({ data }: { data: UserProfile }) {
               {data?.plan?.name ?? "Free Plan"}
             </div>
           </div>
+        </div>
+
+        <div>
+          <Image
+            src={profileImage}
+            width={500}
+            height={500}
+            className=""
+            alt="profile image"
+          />
         </div>
 
         <div className="p-8 space-y-8">

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -112,11 +113,11 @@ export const columns: ColumnDef<Banner>[] = [
     ),
     cell: ({ row }) =>
       row.original.photo ? (
-        <CldImage
+        <Image
           width="100"
           height="100"
           className="border rounded "
-          src={row.original.photo}
+          src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${row.original.photo}`}
           alt="cloudinary image not loaded"
         />
       ) : (

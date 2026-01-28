@@ -27,6 +27,18 @@ const nextConfig = {
         port: "",
         pathname: "/dra2pandx/image/**",
       },
+      {
+        protocol: "http",
+        hostname: "192.168.1.64",
+        port: "5000",
+        pathname: "/public/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "5000",
+        pathname: "/public/**",
+      },
     ],
   },
 };
