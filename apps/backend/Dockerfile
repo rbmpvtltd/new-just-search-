@@ -26,8 +26,8 @@ WORKDIR /app
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/bun.lock ./bun.lock
 
-RUN bun install --frozen-lockfile
 
+RUN bun install
 # ----------------------------
 # Build
 # ----------------------------
