@@ -913,7 +913,7 @@ export const businessrouter = router({
       return offer[0];
     }),
 
-  toggleFavourite: visitorProcedure
+  toggleFavourite: protectedProcedure
     .input(z.object({ businessId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.userId;
