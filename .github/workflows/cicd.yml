@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       web: ${{ steps.filter.outputs.web }}
-      # backend: ${{ steps.filter.outputs.api }}
+      backend: ${{ steps.filter.outputs.backend }}
+      dashboard: ${{ steps.filter.outputs.dashboard }}
     steps:
       - uses: actions/checkout@v4
 
@@ -51,17 +52,51 @@ jobs:
           docker push registry-server.justsearch.net.in/test/web:latest
           # my webhook https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
           curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
-  # build-backend:
-  #   needs: detect
-  #   if: needs.detect.outputs.api == 'true'
-  #   runs-on: ubuntu-latest
-  #
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #
-  #     - name: Build Backend Image
-  #       run: |
-  #         docker build \
-  #           -f apps/backend/Dockerfile \
-  #           -t myorg/backend:latest \
-  #           .
+  build-backend:
+    needs: detect
+    if: needs.detect.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry-server.justsearch.net.in
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push
+        run: |
+          docker build \
+            -f apps/backend/Dockerfile \
+            -t registry-server.justsearch.net.in/test/backend:latest \
+            .
+          docker push registry-server.justsearch.net.in/test/backend:latest
+          # my webhook https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
+          curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/3iX1YBb51xpaQMUAvk_Z0
+  build-dashboard:
+    needs: detect
+    if: needs.detect.outputs.dashboard == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry-server.justsearch.net.in
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push
+        run: |
+          docker build \
+            -f apps/dashboard/Dockerfile \
+            -t registry-server.justsearch.net.in/test/dashboard:latest \
+            .
+          docker push registry-server.justsearch.net.in/test/dashboard:latest
+          # my webhook https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
+          curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/0Af7G29obY01mJPSaB9Cq
