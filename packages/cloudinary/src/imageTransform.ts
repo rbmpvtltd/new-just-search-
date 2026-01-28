@@ -8,7 +8,7 @@ export async function urlToWebP(url: string, folderName: string, quality = 80) {
   }
   const res = await fetch(url.trim());
   const outputName = url.split("/").pop()?.split(".")[0];
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  if (!res.ok) return "";
   const imageBytes = await res.bytes();
   sharp(imageBytes).webp({ quality }).toFile(`${uploadDir}/${outputName}.webp`);
   return `${uploadDir}/${outputName}.webp`;

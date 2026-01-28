@@ -97,7 +97,7 @@ export const HeroHeader = () => {
                 {data && (
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      onClick={() => setMenuState(false)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -108,7 +108,7 @@ export const HeroHeader = () => {
                       </Link>
                     </Button>
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      onClick={() => setMenuState(false)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -119,7 +119,7 @@ export const HeroHeader = () => {
                       </Link>
                     </Button>
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      onClick={() => setMenuState(false)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -134,7 +134,7 @@ export const HeroHeader = () => {
                 {!data && (
                   <>
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      onClick={() => setMenuState(false)}
                       asChild
                       variant="outline"
                       size="sm"
@@ -144,7 +144,7 @@ export const HeroHeader = () => {
                     </Button>
 
                     <Button
-                      onClick={() => setMenuState(!menuState)}
+                      onClick={() => setMenuState(false)}
                       asChild
                       size="sm"
                       className="bg-primary text-white"
