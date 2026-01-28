@@ -20,6 +20,7 @@ export const customName = `banner/cbycmehjeetyxbuxc6ie`;
 
 // dotenv.config();
 
+console.log("rebuild");
 (async () => {
   try {
     // console.log(process.env);
