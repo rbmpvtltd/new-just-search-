@@ -41,11 +41,11 @@ export const subscriptionRouter = router({
         const plan = await db.query.plans.findFirst({
           where: eq(plans.id, input.planId),
         });
-        await changeRoleInSession(ctx.sessionId, plan?.role || "visiter");
+        await changeRoleInSession(ctx.sessionId, plan?.role || "visitor");
 
         return {
           success: true,
-          role: plan?.role || "visiter",
+          role: plan?.role || "visitor",
         };
       }
       return {
@@ -161,7 +161,7 @@ export const subscriptionRouter = router({
         .set({ role: plan?.role })
         .where(eq(users.id, ctx.userId));
 
-      await changeRoleInSession(ctx.sessionId, plan?.role || "visiter");
+      await changeRoleInSession(ctx.sessionId, plan?.role || "visitor");
       return { success: true, message: "Subscription verified successfully" };
     }),
 });

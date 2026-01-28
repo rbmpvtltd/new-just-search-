@@ -124,24 +124,24 @@ export const columns: ColumnDef<Subcategory>[] = [
       ),
   },
   {
-    accessorKey: "offerName",
+    accessorKey: "offer_name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Offer Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.offerName || "No Name"}
+        {row.original.offer_name || "No Name"}
       </div>
     ),
   },
   {
-    accessorKey: "businessName",
+    accessorKey: "business_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="business Name" />
+      <DataTableColumnHeader column={column} title="Business Name" />
     ),
     cell: ({ row }) => (
       <div className="max-w-[200px] truncate">
-        {row.original.businessName || "No Name"}
+        {row.original.business_name || "No Name"}
       </div>
     ),
   },

@@ -69,14 +69,14 @@ const SubscriptionEventComponent = () => {
   }
 
   if (paymentVerify?.success) {
-    setToken(token, paymentVerify?.role ?? "visiter");
+    setToken(token, paymentVerify?.role ?? "visitor");
     queryClient.invalidateQueries({
       queryKey: trpc.planRouter.list.queryKey(),
     });
     return (
       <SuccessPaymentComponent
         token={token ?? ""}
-        role={paymentVerify?.role ?? "visiter"}
+        role={paymentVerify?.role ?? "visitor"}
       />
     );
   }
@@ -99,7 +99,7 @@ const SuccessPaymentComponent = ({
   const { isLoading, isError } = useQuery({
     queryKey: ["setTokenRole"],
     queryFn: async () => {
-      await setTokenRole(token ?? "", role ?? "visiter");
+      await setTokenRole(token ?? "", role ?? "visitor");
       return true;
     },
   });

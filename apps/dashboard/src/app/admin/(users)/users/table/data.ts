@@ -1,9 +1,12 @@
 import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUp,
+  Briefcase,
   Circle,
   HelpCircle,
+  Store,
+  User,
+  UserCheck,
+  UserPlus,
+  UserSearch,
 } from "lucide-react";
 
 export const active = [
@@ -19,15 +22,36 @@ export const active = [
   },
 ];
 
+
 export const type = [
   {
-    label: "Hire",
-    value: 1,
-    icon: ArrowDown,
+    label: "Guest",
+    value: "guest",
+    icon: User,
+  },
+  {
+    label: "Visitor",
+    value: "visitor",
+    icon: UserCheck,
   },
   {
     label: "Business",
-    value: 2,
-    icon: ArrowRight,
+    value: "business",
+    icon: Briefcase,
+  },
+  {
+    label: "Hire",
+    value: "hire",
+    icon: UserPlus,
+  },
+  {
+    label: "Salesman",
+    value: "salesman",
+    icon: UserSearch,
+  },
+  {
+    label: "Franchise",
+    value: "franchises",
+    icon: Store,
   },
 ];

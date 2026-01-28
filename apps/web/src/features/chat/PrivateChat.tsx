@@ -57,7 +57,7 @@ function PrivateChat({
 
   useEffect(() => {
     const unread = store
-      .filter((m) => m.senderId !== userData?.id && !m.isRead)
+      .filter((m) => m.senderId !== userData?.profile?.id && !m.isRead)
       .map((m) => m.id);
 
     if (unread.length > 0) {
@@ -102,7 +102,7 @@ function PrivateChat({
           {msg.message && (
             <div
               className={`flex px-2 py-2 rounded-xl text-sm shadow-sm w-fit ${
-                msg.senderId !== userData?.id
+                msg.senderId !== userData?.profile?.id
                   ? "bg-blue-100 ml-auto"
                   : "bg-gray-100"
               }`}
@@ -122,7 +122,7 @@ function PrivateChat({
           {msg.image && (
             <div
               className={`mt-1 max-w-[55%] ${
-                msg.senderId !== userData?.id ? "ml-auto" : ""
+                msg.senderId !== userData?.profile?.id ? "ml-auto" : ""
               }`}
             >
               <Link href={msg.route ? msg.route : "#"}>

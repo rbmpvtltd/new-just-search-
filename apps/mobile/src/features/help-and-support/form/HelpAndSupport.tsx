@@ -68,56 +68,58 @@ export default function HelpAndSupport() {
         }}
       />
 
-      <View className="flex-1 h-full">
-        <View className="bg-white w-full h-full">
-          <View className="">
-            <View className="p-6 ">
-              <Text className="text-xl font-black text-gray-800 mb-6">
-                Help and Support
-              </Text>
+      <View className="flex-1 bg-gray-100">
+        <View className="bg-white px-6 pt-4 pb-6 shadow-sm">
+          <Text className="text-2xl font-extrabold text-gray-900">
+            Help & Support
+          </Text>
+          <Text className="text-sm text-gray-500 mt-1">
+            Tell us how we can help you. Our team will get back to you shortly.
+          </Text>
+        </View>
 
-              <View className="space-y-6">
-                <FormField
-                  control={control}
-                  label="Subject"
-                  name="subject"
-                  placeholder="Select subject"
-                  component="dropdown"
-                  data={[
-                    { label: "Payment Issue", value: "payment issue" },
-                    {
-                      label: "Business Profile Issue",
-                      value: "business profile issue",
-                    },
-                    {
-                      label: "Hire/Job Profile Issue",
-                      value: "hire/job profile issue",
-                    },
-                    { label: "Suggestions", value: "suggestions" },
-                  ]}
-                  error={errors.subject?.message}
-                />
+        <View className="flex-1 px-4 mt-6">
+          <View className="bg-white rounded-2xl p-6 shadow-md">
+            <View className="space-y-6">
+              <FormField
+                control={control}
+                label="Subject"
+                name="subject"
+                placeholder="Select subject"
+                component="dropdown"
+                data={[
+                  { label: "Payment Issue", value: "payment issue" },
+                  {
+                    label: "Business Profile Issue",
+                    value: "business profile issue",
+                  },
+                  {
+                    label: "Hire / Job Profile Issue",
+                    value: "hire/job profile issue",
+                  },
+                  { label: "Suggestions", value: "suggestions" },
+                ]}
+                error={errors.subject?.message}
+              />
 
-                <FormField
-                  control={control}
-                  label="Message"
-                  name="message"
-                  placeholder="Message here..."
-                  component="textarea"
-                  error={errors.message?.message}
-                />
-              </View>
-            </View>
-          </View>
-          <View className="flex-row justify-between w-[90%] self-center">
-            <View className="w-[45%] mx-auto">
-              <PrimaryButton
-                title="Submit"
-                isLoading={isSubmitting}
-                onPress={handleSubmit(onSubmit)}
+              <FormField
+                control={control}
+                label="Message"
+                name="message"
+                placeholder="Write your message here..."
+                component="textarea"
+                error={errors.message?.message}
               />
             </View>
           </View>
+        </View>
+
+        <View className="bg-white px-6 py-4 border-t border-gray-200">
+          <PrimaryButton
+            title="Submit Request"
+            isLoading={isSubmitting}
+            onPress={handleSubmit(onSubmit)}
+          />
         </View>
       </View>
     </>

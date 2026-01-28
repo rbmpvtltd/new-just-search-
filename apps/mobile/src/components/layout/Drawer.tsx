@@ -45,13 +45,13 @@ const drawerFields: DrawerField[] = [
     name: "Hire Listing",
     route: "/(root)/profile/hire",
     icon: "briefcase-outline",
-    role: ["hire", "visiter", "guest"],
+    role: ["hire", "visitor", "guest"],
   },
   {
     name: "Business Listing",
     route: "/(root)/profile/business",
     icon: "business-outline",
-    role: ["business", "visiter", "guest"],
+    role: ["business", "visitor", "guest"],
   },
   {
     name: "My Offers",
@@ -66,15 +66,15 @@ const drawerFields: DrawerField[] = [
     role: "business",
   },
   {
-    name: "Add Product",
-    route: "/(root)/profile/product/add",
-    icon: "add-circle-outline",
-    role: "business",
-  },
-  {
     name: "My Products",
     route: "/(root)/profile/product",
     icon: "cube-outline",
+    role: "business",
+  },
+  {
+    name: "Add Product",
+    route: "/(root)/profile/product/add",
+    icon: "add-circle-outline",
     role: "business",
   },
   {
@@ -87,19 +87,19 @@ const drawerFields: DrawerField[] = [
     name: "Request to Delete Account",
     route: "/(root)/profile/account-delete-request",
     icon: "trash-outline",
-    role: ["visiter", "guest", "hire", "business"],
+    role: ["visitor", "guest", "hire", "business"],
   },
   {
     name: "Feedback",
     route: "/(root)/profile/feedback",
     icon: "chatbox-ellipses-outline",
-    role: ["visiter", "guest", "hire", "business"],
+    role: ["visitor", "guest", "hire", "business"],
   },
   {
     name: "Help and Support",
     route: "/(root)/profile/help-and-support",
     icon: "help-circle-outline",
-    role: ["visiter", "guest", "hire", "business"],
+    role: ["visitor", "guest", "hire", "business"],
   },
   {
     name: "Terms & Conditions",

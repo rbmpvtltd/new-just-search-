@@ -52,7 +52,6 @@ export default function UpdateDisplayNameForm({ userId }: { userId: number }) {
             icon: "error",
             title: "Oops...",
             text: "Something went wrong!",
-            // footer: '<a href="#">Why do I have this issue?</a>',
           });
           console.log("oops error while seding otp", error);
         },

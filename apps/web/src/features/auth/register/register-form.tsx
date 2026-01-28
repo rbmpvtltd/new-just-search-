@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { sweetAlertSuccess } from "@/lib/sweetalert";
 import { useTRPC } from "@/trpc/client";
 import { setRole, setToken } from "@/utils/session";
 import GoogleLoginBtn from "../login/google-login";
@@ -94,46 +95,46 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
     },
   });
 
-  const sendOTP = (phoneNumber: string,email?:string) => {
+  const sendOTP = (phoneNumber: string, email?: string) => {
     console.log("Idntifier", phoneNumber);
 
     try {
-      if(email){
+      if (email) {
         mutate(
-        { phone: phoneNumber,email:email},
-        {
-          onSuccess: () => {
-            console.log("otp sended successfully");
-            setStep("verify");
-
+          { phone: phoneNumber, email: email },
+          {
+            onSuccess: (data) => {
+              if (data?.success) {
+                sweetAlertSuccess(data?.message);
+                setStep("verify");
+              }
+              console.log("otp sended successfully");
+            },
+            onError: (error) => {
+              console.log("Error", error.data?.httpStatus);
+              if (error?.data?.httpStatus === 401) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Already In Use",
+                  text: "Mobile number or email you've try with singup is already in use! try login or use another number or email",
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something went wrong!",
+                });
+              }
+            },
           },
-          onError: (error) => {
-            console.log("Error", error.data?.httpStatus);
-            if (error?.data?.httpStatus === 401) {
-              Swal.fire({
-                icon: "error",
-                title: "Already In Use",
-                text: "Mobile number or email you've try with singup is already in use! try login or use another number or email",
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Something went wrong!",
-              });
-            }
-          },
-        },
-      );
-      }else {
-
+        );
+      } else {
         mutate(
-          { phone: phoneNumber},
+          { phone: phoneNumber },
           {
             onSuccess: () => {
               console.log("otp sended successfully");
               setStep("verify");
-              
             },
             onError: (error) => {
               console.log("Error", error.data?.httpStatus);
@@ -177,10 +178,10 @@ export function RegisterForm({ className }: React.ComponentProps<"div">) {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setTempFormData(data);
     console.log("Data", data);
-    if(data.email){
-      sendOTP(String(data.mobileNumber),String(data.email));
-    }else{
-      sendOTP(String(data.mobileNumber))
+    if (data.email) {
+      sendOTP(String(data.mobileNumber), String(data.email));
+    } else {
+      sendOTP(String(data.mobileNumber));
     }
   };
 

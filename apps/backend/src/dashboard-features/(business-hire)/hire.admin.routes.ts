@@ -127,7 +127,7 @@ export const adminHireRouter = router({
 
     const getStates = await db.query.states.findMany();
     const users = await db.query.users.findMany({
-      where: (user, { eq }) => eq(user.role, "visiter"),
+      where: (user, { eq }) => eq(user.role, "visitor"),
       columns: {
         displayName: true,
         id: true,

@@ -1,21 +1,21 @@
 import { users } from "@repo/db/dist/schema/auth.schema";
 
 export const usersColumns = {
-  // status: subcategories.status,
-  id: users.id,
-  // category: categories.title,
-  // subcategory_name: subcategories.name,
-  // slug: subcategories.slug,
-  // status: subcategories.status,
+  // id: users.id,
+  // displayName: users.displayName,
+  // status: users.status,
+  role: users.role,
 };
 
 export const usersGlobalFilterColumns = [
-  // subcategories.name, categories.title
+  users.displayName,
+  users.phoneNumber,
+  users.email,
 ];
 export const usersAllowedSortColumns = [
-  // "title",
-  // "name",
-  "id",
+  // "display_name",
+  // "id",
+  // "email",
+  "role",
   // "status",
-  // "created_at",
 ];

@@ -2,7 +2,7 @@ import { pgEnum } from "drizzle-orm/pg-core";
 
 export const UserRole = {
   guest: "guest",
-  visiter: "visiter",
+  visitor: "visitor",
   hire: "hire",
   business: "business",
   salesman: "salesman",

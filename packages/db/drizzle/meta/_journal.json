@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1768983150345,
-      "tag": "0000_regular_demogoblin",
+      "when": 1769513528591,
+      "tag": "0000_green_hydra",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769490057362,
+      "tag": "0001_flimsy_nekra",
       "breakpoints": true
     }
   ]

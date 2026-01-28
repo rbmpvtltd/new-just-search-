@@ -79,7 +79,7 @@ export default function UserForm({ data }: { data: EditAdminUserType }) {
         { label: UserRole.business, value: UserRole.business },
         { label: UserRole.hire, value: UserRole.hire },
         { label: UserRole.guest, value: UserRole.guest },
-        { label: UserRole.visiter, value: UserRole.visiter },
+        { label: UserRole.visitor, value: UserRole.visitor },
       ],
       error: errors.role?.message,
     },

@@ -1,5 +1,5 @@
 "use client";
-import { IconHome, IconUserCheck } from "@tabler/icons-react";
+import { IconHome, IconKey, IconUserCheck } from "@tabler/icons-react";
 import type { SidebarData } from "@/types/sidebar";
 
 export const adminSidebarData: SidebarData = {
@@ -20,6 +20,11 @@ export const adminSidebarData: SidebarData = {
       name: "Manage Saleman",
       url: "/salesman",
       icon: IconUserCheck,
+    },
+    {
+      name: "Change Password",
+      url: "/change-password",
+      icon: IconKey,
     },
   ],
 };

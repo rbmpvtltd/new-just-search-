@@ -22,7 +22,7 @@ export const asyncHandler =
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 
-export const revenueCatRouter:RequestHandler = asyncHandler(
+export const revenueCatRouter: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (token !== env.REVENUECAT_TOKEN)
@@ -104,7 +104,7 @@ export const revenueCatRouter:RequestHandler = asyncHandler(
 
         const sessionId = await getSessionByUserId(user.id);
         if (sessionId) {
-          await changeRoleInSession(sessionId, plan?.role || "visiter");
+          await changeRoleInSession(sessionId, plan?.role || "visitor");
         }
         break;
       }

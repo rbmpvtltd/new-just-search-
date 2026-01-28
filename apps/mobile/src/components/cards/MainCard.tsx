@@ -1,6 +1,6 @@
+import { AdvancedImage } from "cloudinary-react-native";
 import { memo } from "react";
 import { Pressable, View } from "react-native";
-import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "@/lib/cloudinary";
 
 type MainCardPropsType = {
@@ -12,7 +12,6 @@ type MainCardPropsType = {
 
 const MainCard = memo(({ item }: MainCardPropsType) => {
   const bannerImage = cld.image(item.photo);
-
 
   return (
     <Pressable className="w-full px-4 mx-4">
@@ -27,4 +26,4 @@ const MainCard = memo(({ item }: MainCardPropsType) => {
   );
 });
 
-export default MainCard
+export default MainCard;

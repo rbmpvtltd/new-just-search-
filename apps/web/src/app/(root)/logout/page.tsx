@@ -1,6 +1,5 @@
 "use client";
 import { useTRPC } from "@/trpc/client";
-import { asyncHandler } from "@/utils/error/asyncHandler";
 import { delToken } from "@/utils/session";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -17,9 +16,10 @@ import { useRouter } from "next/navigation";
 function Logout() {
   const trpc = useTRPC();
   const router = useRouter()
-  const { mutate } = useMutation(
+  const { mutate,isPending } = useMutation(
     trpc.auth.logout.mutationOptions({
       onSuccess: async () => {
+        router.refresh()
         await delToken();
       },
       onError: async () => {
@@ -30,6 +30,7 @@ function Logout() {
   
   const handleLogout = () => {
     mutate();
+     
     router.push("/")
   };
 
@@ -44,7 +45,7 @@ function Logout() {
               by clicking on logout you will be logged out.
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={handleLogout}>Logout</Button>
+          <Button onClick={handleLogout} disabled={isPending}>{isPending ? "Logging Out..." : "Logout"}</Button>
         </DialogContent>
       </Dialog>
       <Button>Go Back</Button>

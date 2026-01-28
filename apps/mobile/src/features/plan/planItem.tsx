@@ -27,7 +27,7 @@ export default function PricingCard({
   const storePlan = usePlanStore((state) => state.activePlan);
   const setNewStore = usePlanStore((state) => state.setNew);
   const currentRole = useAuthStore((state) => state.role);
-  const showBtn = currentRole === plan.role || currentRole === "visiter";
+  const showBtn = currentRole === plan.role || currentRole === "visitor";
   const buttonDisable =
     (plan.role === "all" || !showBtn) && activePlan.isactive;
 

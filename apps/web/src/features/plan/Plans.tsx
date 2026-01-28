@@ -16,7 +16,7 @@ export default async function PricingCard({
 }) {
   const currentRole = await getRole();
   console.log("currentRole", currentRole);
-  const showBtn = currentRole === plan.role || currentRole === "visiter";
+  const showBtn = currentRole === plan.role || currentRole === "visitor";
   console.log("showBtn", showBtn);
   const buttonDisable =
     (!showBtn && activePlan.isactive) || plan.role === "all";

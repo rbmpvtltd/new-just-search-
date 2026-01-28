@@ -6,11 +6,10 @@ import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-fi
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { DebouncedInput } from "@/components/ui/input-debounced";
-import { active } from "./data";
-import { MuiltDeleteButton } from "../form/delete.form";
 import { MuiltActiveButton } from "../form/active.form";
-import { MuiltPopularButton } from "../form/popular.form";
 import { AddNewEntiry } from "../form/add.form";
+import { MuiltDeleteButton } from "../form/delete.form";
+import { active, type } from "./data";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -32,11 +31,11 @@ export function DataTableToolbar<TData>({
         />
 
         {/* const allowedColumns = ["id", "route", "photo", "is_active", "type"]; */}
-        {table.getColumn("status") && (
+        {table.getColumn("role") && (
           <DataTableFacetedFilter
-            column={table.getColumn("status")}
-            title="is_active"
-            options={active}
+            column={table.getColumn("role")}
+            title="Role"
+            options={type}
             type="select"
           />
         )}
@@ -53,7 +52,6 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         <MuiltActiveButton />
-        <MuiltPopularButton />
         <MuiltDeleteButton />
         <DataTableViewOptions table={table} />
         <AddNewEntiry />

@@ -16,7 +16,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { z } from "zod";
+import { email, z } from "zod";
 import GoogleLogin from "@/app/(root)/google";
 import Colors from "@/constants/Colors";
 import { useAuthStore } from "@/features/auth/authStore";
@@ -95,20 +95,41 @@ const SignUpComponent: React.FC = () => {
     },
   });
 
-  const sendOTP = async (identifier: string) => {
+  const sendOTP = async (identifier: string, email?: string) => {
     try {
-      mutate(
-        { identifier },
-        {
-          onSuccess: async () => {
-            console.log("otp sended successfully");
+      if (email) {
+        mutate(
+          { phone: identifier, email: email },
+          {
+            onSuccess: (data) => {
+              if (data?.success) {
+                Alert.alert("Successfull", data?.message);
+                console.log("otp sended successfully");
+              }
+            },
+            onError: (error) => {
+              Alert.alert("Error", "Could Not Send OTP");
+              console.log("oops error while seding otp", error);
+            },
           },
-          onError: async (error) => {
-            Alert.alert("Error", "Could Not Send OTP");
-            console.log("oops error while seding otp", error);
+        );
+      } else {
+        mutate(
+          { phone: identifier },
+          {
+            onSuccess: (data) => {
+              if (data?.success) {
+                Alert.alert("Successfull", data?.message);
+                console.log("otp sended successfully");
+              }
+            },
+            onError: (error) => {
+              Alert.alert("Error", "Could Not Send OTP");
+              console.log("oops error while seding otp", error);
+            },
           },
-        },
-      );
+        );
+      }
 
       // Start resend timer (60 seconds)
       setResendTimer(60);
@@ -132,15 +153,9 @@ const SignUpComponent: React.FC = () => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setTempFormData(data);
     if (data.email) {
-      const success = await sendOTP(data.email);
-      if (success) {
-        setStep("verify");
-      }
+      sendOTP(String(data.mobileNumber), String(data.email));
     } else {
-      const success = await sendOTP(String(data.mobileNumber));
-      if (success) {
-        setStep("verify");
-      }
+      sendOTP(String(data.mobileNumber));
     }
   };
 
@@ -174,9 +189,9 @@ const SignUpComponent: React.FC = () => {
         onSuccess: async (data) => {
           Alert.alert("Successfull", "OTP send Successfully");
 
-          setAuthStoreToken(data?.session ?? "", data.role ?? "visiter");
+          setAuthStoreToken(data?.session ?? "", data.role ?? "visitor");
           // await Purchases.logIn(data?.revanueCatToken ?? "");
-          await setTokenRole(data?.session ?? "", data.role ?? "visiter");
+          await setTokenRole(data?.session ?? "", data.role ?? "visitor");
           console.log("registration sucessfully");
           router.push("/");
         },

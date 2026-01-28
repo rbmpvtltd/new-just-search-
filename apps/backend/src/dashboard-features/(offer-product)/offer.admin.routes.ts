@@ -46,17 +46,17 @@ export const adminOfferRouter = router({
       .select({
         id: offers.id,
         photo: offers.mainImage,
-        offerName: offers.offerName,
-        businessName: businessListings.name,
+        offer_name: offers.offerName,
+        business_name: businessListings.name,
         status: offers.status,
         expired_at: offers.offerEndDate,
         created_at: offers.createdAt,
       })
       .from(offers)
+      .leftJoin(businessListings, eq(businessListings.id, offers.businessId))
       .where(where)
       .orderBy(orderBy)
       .limit(input.pagination.pageSize)
-      .leftJoin(businessListings, eq(businessListings.id, offers.businessId))
       .offset(offset);
 
     const totalResult = await db

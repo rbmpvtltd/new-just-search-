@@ -26,26 +26,24 @@ export const seedUsers = async () => {
   const [rows]: any[] = await sql.execute(
     `SELECT u.* FROM users u left join listings l on u.id = l.user_id where l.user_id is null`,
   );
-  const allUsersPromise : Promise<number>[] = [];
-   for (const row of rows) {
+  const allUsersPromise: Promise<number>[] = [];
+  for (const row of rows) {
     let role: UserRole = "guest";
     if (row.phone) {
-      role = "visiter";
+      role = "visitor";
     }
     allUsersPromise.push(insertUser(row.id, role));
   }
   const allSettledUsers = await Promise.allSettled(allUsersPromise);
   allSettledUsers.forEach((o, i) => {
     if (o.status === "fulfilled") {
-      console.log("user created successfully")
+      console.log("user created successfully");
     } else {
       console.error(i, "reason", o.reason);
     }
   });
-  
 
- 
-  console.log("===== user success end =====")
+  console.log("===== user success end =====");
 };
 
 const seedfranchises = async () => {

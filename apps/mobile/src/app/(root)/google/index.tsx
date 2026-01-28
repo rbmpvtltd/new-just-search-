@@ -42,12 +42,12 @@ const GoogleLogin = () => {
           console.log("==============>", data);
           setAuthStoreToken(
             data?.data?.token ?? "",
-            data.data?.role ?? "visiter",
+            data.data?.role ?? "visitor",
           );
           // await Purchases.logIn(data?.revanueCatToken ?? "");
           await setTokenRole(
             data?.data?.token ?? "",
-            data.data?.role ?? "visiter",
+            data.data?.role ?? "visitor",
           );
           queryClient.invalidateQueries({
             queryKey: trpc.auth.verifyauth.queryKey(),

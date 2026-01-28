@@ -102,7 +102,7 @@ export const columns: ColumnDef<Lister>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "display_name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Display Name" />
     ),
@@ -113,7 +113,7 @@ export const columns: ColumnDef<Lister>[] = [
     ),
   },
   {
-    accessorKey: "phoneNumber",
+    accessorKey: "phone_number",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Phone Number" />
     ),

@@ -13,9 +13,9 @@ export const fakeSeed = async () => {
     await seedRealUser("ranjeet@gmail.com", "admin@123", "admin");
     await seedRealUser("ritik@gmail.com", "admin@123", "admin");
     await seedRealUser("meekail@gmail.com", "admin@123", "admin");
-    await seedRealUser("salonimam@gmail.com", "admin@123", "visiter");
-    await seedRealUser("visitor@gmail.com", "visitor@123", "visiter");
-    await seedRealUser("visitor@rbm.com", "rbm.justsearch@123", "visiter");
+    await seedRealUser("salonimam@gmail.com", "admin@123", "visitor");
+    await seedRealUser("visitor@gmail.com", "visitor@123", "visitor");
+    await seedRealUser("visitor@rbm.com", "rbm.justsearch@123", "visitor");
     await seedRealUser("business@rbm.com", "rbm.justsearch@123", "business");
     await seedRealUser("hire@rbm.com", "rbm.justsearch@123", "hire");
 

@@ -1,22 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { AdvancedImage } from "cloudinary-react-native";
 import { router } from "expo-router";
-import { use } from "passport";
 import { Pressable, Text, View } from "react-native";
 import { Loading } from "@/components/ui/Loading";
+import { SomethingWrong } from "@/components/ui/SomethingWrong";
 import { useAuthStore } from "@/features/auth/authStore";
 import { cld } from "@/lib/cloudinary";
 import { trpc } from "@/lib/trpc";
 
 export const MyProfile = () => {
   const role = useAuthStore((state) => state.role);
-  const { data: userData, isLoading } = useQuery(
-    trpc.userRouter.getUserProfile.queryOptions(),
-  );
+  const {
+    data: userData,
+    isLoading,
+    error,
+    isError,
+  } = useQuery(trpc.userRouter.getUserProfile.queryOptions());
 
   if (isLoading) {
     return <Loading position="center" />;
   }
+
+  if (isError) {
+    return <SomethingWrong />;
+  }
+
+  console.log("User", userData);
 
   return (
     <View className="bg-base-300 py-6 mt-4 w-[92%] rounded-2xl self-center">
@@ -51,7 +60,9 @@ export const MyProfile = () => {
           </Text>
 
           <Text className="text-secondary-content text-sm mt-1">
-            {userData?.userEmail ?? "email not available"}
+            {userData?.user?.email
+              ? userData.user.email
+              : userData?.user?.phoneNumber}
           </Text>
         </View>
       </View>
