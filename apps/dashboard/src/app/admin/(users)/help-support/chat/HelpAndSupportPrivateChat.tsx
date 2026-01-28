@@ -1,6 +1,7 @@
 "use client";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
+import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import React, { useEffect, useState } from "react";
 import BoundaryWrapper from "@/components/layout/BoundaryWrapper";
@@ -73,12 +74,19 @@ function HelpAndSupportPrivateChat({
       <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg shadow-sm sticky top-0 left-0 right-0 ">
         <div className="border rounded-full overflow-hidden shadow ">
           {getUser?.[0]?.profileImage ? (
-            <CldImage
-              src={getUser?.[0]?.profileImage as string}
+            // <CldImage
+            //   src={getUser?.[0]?.profileImage as string}
+            //   width="40"
+            //   height="40"
+            //   alt="image"
+            //   className="rounded-full"
+            // />
+            <Image
               width="40"
               height="40"
-              alt="image"
               className="rounded-full"
+              src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${getUser?.[0]?.profileImage as string}`}
+              alt="cloudinary image not loaded"
             />
           ) : (
             <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-medium text-lg ">

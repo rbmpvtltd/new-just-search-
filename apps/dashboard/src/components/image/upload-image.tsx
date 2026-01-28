@@ -70,15 +70,12 @@ const CropperComponent = ({ value, onChange }: CropperProps) => {
 
         {value ? (
           firstTime.current ? (
-            <CldImage
-              width="100"
-              height="100"
-              className="w-full h-full object-cover p-4"
-              src={value}
-              alt="Cloudinary image"
-              onError={(e) =>
-                console.error("Error loading Cloudinary image:", e)
-              }
+            <img
+              src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${value}`}
+              width={500}
+              height={500}
+              className=""
+              alt="profile-image"
             />
           ) : (
             // biome-ignore lint/performance/noImgElement: <explanation>

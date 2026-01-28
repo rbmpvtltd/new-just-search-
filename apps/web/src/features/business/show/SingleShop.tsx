@@ -31,20 +31,21 @@ export function SingleShopTabBar({
               <div className="py-1">
                 <Card>
                   <CardContent className="flex items-center justify-center">
-                    {/* <Image
-                      width={500}
-                      height={400}
-                      alt="banner image"
-                      src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" 
+                    <Image
+                      unoptimized
+                      width="500"
+                      height="400"
                       className="rounded-md"
-                    /> */}
-                    <CldImage
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${shop?.photo ?? ""}`}
+                      alt="Shop Image"
+                    />
+                    {/* <CldImage
                       width="500"
                       height="400"
                       className="rounded-md"
                       src={shop?.photo ?? ""}
                       alt="Shop Image"
-                    />
+                    /> */}
                   </CardContent>
                 </Card>
               </div>
@@ -57,20 +58,21 @@ export function SingleShopTabBar({
                 <div className="py-1">
                   <Card>
                     <CardContent className="flex items-center justify-center">
-                      {/* <Image
-                        width={500}
-                        height={400}
-                        alt="banner image"
-                        src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" 
+                      <Image
+                        unoptimized
+                        width="500"
+                        height="400"
                         className="rounded-md"
-                      /> */}
-                      <CldImage
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${item ?? ""}`}
+                        alt="Shop Image"
+                      />
+                      {/* <CldImage
                         width="500"
                         height="400"
                         className="rounded-md"
                         src={item ?? ""}
                         alt="Shop Image"
-                      />
+                      /> */}
                     </CardContent>
                   </Card>
                 </div>

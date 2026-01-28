@@ -8,7 +8,7 @@ import sharp from "sharp";
 const app = new Elysia();
 app
   .use(cors())
-  .listen(3000)
+  .listen(5000)
   // 1. Serve static files from /public
   .use(staticPlugin())
 

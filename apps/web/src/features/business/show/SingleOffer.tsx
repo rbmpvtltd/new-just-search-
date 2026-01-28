@@ -105,19 +105,21 @@ function SingleOfferComp({
                   <Card>
                     <CardContent className="flex items-center justify-center">
                       <div className="relative">
-                        {/* <Image
-                          width={500}
-                          height={400}
-                          alt="offer image"
-                          src="https://www.justsearch.net.in/assets/images/2642394691738214177.jpg" 
-                        /> */}
-                        <CldImage
+                        <Image
+                          unoptimized
+                          width="500"
+                          height="400"
+                          className="border rounded"
+                          src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${item}`}
+                          alt={item}
+                        />
+                        {/* <CldImage
                           width="500"
                           height="400"
                           className="border rounded"
                           src={item}
                           alt={item}
-                        />
+                        /> */}
                         <span className="absolute z-1 top-5 w-[90px] bg-error text-end px-4 text-white rounded-r-md">
                           -{offer?.discountPercent}%
                         </span>

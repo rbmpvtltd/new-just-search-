@@ -2,6 +2,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import { CheckCircle, Eye, Pencil, Trash } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
@@ -57,11 +58,19 @@ export default function MyHire({ data }: { data: MyHireType }) {
         <div className="flex flex-col sm:flex-row gap-6 p-4 sm:p-6">
           <div className="w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-lg overflow-hidden border shadow-sm bg-gray-50">
             {data.photo ? (
-              <CldImage
+              // <CldImage
+              //   width="640"
+              //   height="640"
+              //   className="w-full h-full object-cover"
+              //   src={data.photo}
+              //   alt="cloudinary image not loaded"
+              // />
+              <Image
+                unoptimized
                 width="640"
                 height="640"
                 className="w-full h-full object-cover"
-                src={data.photo}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${data.photo}`}
                 alt="cloudinary image not loaded"
               />
             ) : (

@@ -52,6 +52,8 @@ export const BussinessListingCard = ({
   rating?: string | undefined;
 }) => {
   const router = useRouter();
+  console.log("ITEM", item);
+
   return (
     <div className="mx-auto p-4">
       <div className="flex flex-col justify-center gap-4">
@@ -63,11 +65,19 @@ export const BussinessListingCard = ({
                   pathname: `/subcategory/aboutbusiness/${navigationId}`,
                 }}
               >
-                <CldImage
+                {/* <CldImage
                   width="300"
                   height="300"
                   className="h-70 object-cover"
                   src={item.photo ?? ""}
+                  alt="Business image"
+                /> */}
+                <Image
+                  unoptimized
+                  width="300"
+                  height="300"
+                  className="h-70 object-cover"
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${item.photo ?? ""}`}
                   alt="Business image"
                 />
               </Link>

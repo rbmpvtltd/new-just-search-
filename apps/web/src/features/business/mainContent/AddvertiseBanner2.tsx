@@ -1,4 +1,6 @@
 "use client";
+import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -6,7 +8,6 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import type { OutputTrpcType } from "@/trpc/type";
-import { CldImage } from "next-cloudinary";
 
 type AddvertiseBannerType = OutputTrpcType["banners"]["getBannerData"] | null;
 
@@ -28,11 +29,18 @@ function AddvertiseBanner2({
             <div className="p-1">
               <Card>
                 <CardContent className="flex items-center justify-center">
-                  <CldImage
+                  {/* <CldImage
                     width={1400}
                     height={1400}
                     alt="banner image"
                     src={item?.photo ?? ""}
+                  /> */}
+                  <Image
+                    unoptimized
+                    width={1400}
+                    height={1400}
+                    src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${item?.photo ?? ""}`}
+                    alt="banner image"
                   />
                 </CardContent>
               </Card>
