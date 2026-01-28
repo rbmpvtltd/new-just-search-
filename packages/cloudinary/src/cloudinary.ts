@@ -2,19 +2,20 @@
 
 import { v2 as cloudinary } from "cloudinary";
 
-const config = {
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-};
-
-cloudinary.config(config);
+// const config = {
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// };
+//
+// cloudinary.config(config);
 
 export default cloudinary;
 
 // import fs, { unlinkSync } from "fs";
 
 import type { UploadApiResponse } from "cloudinary";
+import { urlToWebP } from "./imageTransform";
 
 export type MultiUploadOnCloudinaryFile = {
   filename: string;
@@ -29,6 +30,8 @@ function withTimeout<T>(promise: Promise<T>, ms = 30000): Promise<T> {
     ),
   ]);
 }
+
+const noCloudinary = true;
 
 const multiUploadOnCloudinary = async (
   files: MultiUploadOnCloudinaryFile[],
@@ -48,6 +51,13 @@ const multiUploadOnCloudinary = async (
     }));
   }
   const uploadPromises = files.map(async (file) => {
+    if (noCloudinary) {
+      const public_id = await urlToWebP(file.filename, folderName);
+      return {
+        id: file.id,
+        public_id,
+      };
+    }
     try {
       const cloudinaryData: UploadApiResponse = await withTimeout(
         cloudinary.uploader.upload(file.filename, {
@@ -103,6 +113,11 @@ const uploadOnCloudinary = async (
       };
 
       return result.public_id;
+    }
+
+    if (noCloudinary) {
+      const public_id = await urlToWebP(localFilePath, folderName);
+      return public_id;
     }
 
     const result = await cloudinary.uploader.upload(localFilePath, {

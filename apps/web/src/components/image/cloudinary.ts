@@ -14,16 +14,16 @@ function isBlobUrl(url: string) {
 export const uploadToCloudinary = async (
   files: (string | null | undefined)[],
   folder: string = "unknown",
-  tags: string = "",
-  eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
+  // tags: string = "",
+  // eager: string = "c_pad,h_300,w_400|c_crop,h_200,w_260",
 ): Promise<(string | null)[]> => {
-  const signResponse = await asyncHandler(
-    trpcServer.cloudinarySignature.signUploadForm.query({
-      eager,
-      folder,
-      tags,
-    }),
-  );
+  // const signResponse = await asyncHandler(
+  //   trpcServer.cloudinarySignature.signUploadForm.query({
+  //     eager,
+  //     folder,
+  //     tags,
+  //   }),
+  // );
 
   const uploadPromises: Promise<string | null>[] = [];
 
@@ -39,11 +39,11 @@ export const uploadToCloudinary = async (
       continue;
     }
 
-    if (signResponse.error || !signResponse.data) {
-      uploadPromises.push(Promise.resolve(fileUrl));
-      continue;
-    }
-    const url = `https://api.cloudinary.com/v1_1/${signResponse.data.cloudname}/auto/upload`;
+    // if (signResponse.error || !signResponse.data) {
+    //   uploadPromises.push(Promise.resolve(fileUrl));
+    //   continue;
+    // }
+    const url = "http://localhost:3000/upload";
     // Fetch the blob from the blob URL
     const blobResponse = await fetch(fileUrl);
     const blob = await blobResponse.blob();
@@ -55,13 +55,13 @@ export const uploadToCloudinary = async (
     const fileName = `${timestamp}_${Math.floor(Math.random() * 10000)}.${ext}`;
 
     const formData = new FormData();
-    formData.append("file", blob, fileName);
-    formData.append("api_key", signResponse.data.apikey);
-    formData.append("timestamp", signResponse.data.timestamp.toString());
-    formData.append("signature", signResponse.data.signature);
-    formData.append("eager", eager);
+    formData.append("image", blob, fileName);
+    // formData.append("api_key", signResponse.data.apikey);
+    // formData.append("timestamp", signResponse.data.timestamp.toString());
+    // formData.append("signature", signResponse.data.signature);
+    // formData.append("eager", eager);
     formData.append("folder", folder);
-    formData.append("tags", signResponse.data.tags);
+    // formData.append("tags", signResponse.data.tags);
 
     const uploadPromise = fetch(url, {
       method: "POST",
@@ -84,7 +84,11 @@ export const uploadToCloudinary = async (
   }
 
   try {
+    console.log("Upload Promiss", uploadPromises);
+
     const uploadedUrls = await Promise.all(uploadPromises);
+    console.log("Upload Promiss ----------------------------", uploadedUrls);
+
     return uploadedUrls;
   } catch (error) {
     console.error("One or more uploads failed:", error);

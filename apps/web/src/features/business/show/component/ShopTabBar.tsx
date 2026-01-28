@@ -322,19 +322,21 @@ function ShopOffers({
             }}
           >
             <div className="relative">
-              {/* <Image
-                width={200}
-                height={400}
-                alt="offer image"
-                src="https://www.justsearch.net.in/assets/images/6194461891759217396.png"
-              /> */}
-              <CldImage
+              <Image
+                unoptimized
+                width="300"
+                height="300"
+                className="rounded-md"
+                src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${item?.photos[0] ?? ""}`}
+                alt="Shop Image"
+              />
+              {/* <CldImage
                 width="300"
                 height="300"
                 className="rounded-md"
                 src={item?.photos[0] ?? ""}
                 alt="Shop Image"
-              />
+              /> */}
               <span className="absolute z-1 top-3  w-[70px] bg-error text-end px-4 text-white rounded-r-md">
                 -{item.discountPercent}%
               </span>
@@ -384,21 +386,22 @@ function ShopProducts({
               pathname: `/subcategory/aboutbusiness/products/singleproduct/${item.id}`,
             }}
           >
-            {/* <Image
-              width={200}
-              height={400}
-              className="rounded-md"
-              src="https://www.justsearch.net.in/assets/images/10922718251737465572.JPEG"
-              alt="product image"
-            /> */}
+            <Image
+              unoptimized
+              width="200"
+              height="400"
+              className="w-full h-full object-cover"
+              src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${item?.photos[0] ?? ""}`}
+              alt="Business image"
+            />
 
-            <CldImage
+            {/* <CldImage
               width="200"
               height="400"
               className="w-full h-full object-cover"
               src={item.photos[0] ?? ""}
               alt="Business image"
-            />
+            /> */}
           </Link>
           <h2 className="text-center font-medium p-2">{item.name}</h2>
           <h2 className="font-medium">

@@ -1,5 +1,6 @@
 "use client";
 import { algoliaClient } from "@repo/algolia";
+import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
@@ -15,6 +16,7 @@ import {
 } from "react-instantsearch";
 
 function Hit({ hit }: { hit: any }) {
+  console.log("hit is ", hit);
   return (
     <div className="group h-full rounded-xl border bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       <Link
@@ -28,11 +30,19 @@ function Hit({ hit }: { hit: any }) {
         <div className="relative flex justify-center p-4">
           <div className="relative">
             {hit.photo ? (
-              <CldImage
+              // <CldImage
+              //   width="200"
+              //   height="260"
+              //   className="object-contain transition-transform duration-300 group-hover:scale-105"
+              //   src={hit.photo}
+              //   alt="Offer Image"
+              // />
+              <Image
+                unoptimized
                 width="200"
                 height="260"
                 className="object-contain transition-transform duration-300 group-hover:scale-105"
-                src={hit.photo}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${hit.photo}`}
                 alt="Offer Image"
               />
             ) : (

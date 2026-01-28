@@ -1,7 +1,8 @@
 "use client";
-import type { OutputTrpcType } from "@/trpc/type";
+import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
+import type { OutputTrpcType } from "@/trpc/type";
 import AllCategory from "./AllCategory";
 
 type PopularBannerType =
@@ -23,7 +24,9 @@ function PopularaBanner({
   return (
     <div className="">
       <div className="flex flex-col mx-auto sm:mx-0 sm:flex-row justify-between lg:w-[60%] w-[90%]  gap-4 m-5 px-12">
-        <h1 className="text-2xl font-semibold text-center">Popular On Just <span className="text-primary"> Search</span></h1>
+        <h1 className="text-2xl font-semibold text-center">
+          Popular On Just <span className="text-primary"> Search</span>
+        </h1>
         <div className="flex gap-4 mx-auto sm:mx-0">
           <button
             onClick={() => setCategoryType(2)}
@@ -50,12 +53,20 @@ function PopularaBanner({
                 key={index.toString()}
                 className="w-[70%] lg:w-[22%] border-2 border-primary rounded-md flex flex-col justify-between items-center py-2 h-80"
               >
-                <CldImage
+                {/* <CldImage
                   height={270}
                   width={270}
                   src={item.photo}
                   alt={`${item.title} category image`}
                   className="h-70 object-cover"
+                /> */}
+                <Image
+                  unoptimized
+                  height={270}
+                  width={270}
+                  className="h-70 object-cover"
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${item.photo}`}
+                  alt={`${item.title} category image`}
                 />
                 <p className="font-semibold">{item.title}</p>
               </div>

@@ -6,10 +6,10 @@ import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-fi
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { DebouncedInput } from "@/components/ui/input-debounced";
-import { active, type } from "./data";
-import { MuiltDeleteButton } from "../form/delete.form";
 import { MuiltActiveButton } from "../form/active.form";
 import { AddBanner } from "../form/add.form";
+import { MuiltDeleteButton } from "../form/delete.form";
+import { active, type } from "./data";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -31,9 +31,9 @@ export function DataTableToolbar<TData>({
         />
 
         {/* const allowedColumns = ["id", "route", "photo", "is_active", "type"]; */}
-        {table.getColumn("isActive") && (
+        {table.getColumn("is_active") && (
           <DataTableFacetedFilter
-            column={table.getColumn("isActive")}
+            column={table.getColumn("is_active")}
             title="is_active"
             options={active}
           />

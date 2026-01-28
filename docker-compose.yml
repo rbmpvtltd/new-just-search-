@@ -1,65 +1,65 @@
-services:
-  web:
-    image: web
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_BACKEND_URL=https://backend-test.justsearch.net.in
-      - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dhhfs2ixp
-      - NEXT_PUBLIC_ALGOLIA_APP_ID=XLHL5IDFH9
-      - NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=4b94ea6117cbe235a2e3794e8060ee38
-      - NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
-    ports:
-      - "3000:3000"
-
-  # dashboard:
-  #   image: dashboard
-  #   build:
-  #     context: .
-  #     dockerfile: apps/dashboard/Dockerfile
-  #   environment:
-  #     - NODE_ENV=production
-  #     - NEXT_PUBLIC_BACKEND_URL=https://backend-test.justsearch.net.in
-  #     - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dra2pandx
-  #     - NEXT_PUBLIC_ALGOLIA_APP_ID=XLHL5IDFH9
-  #     - NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=4b94ea6117cbe235a2e3794e8060ee38
-  #     - NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
-  #   ports:
-  #     - "3000:3000"
-  backend:
-    build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
-    ports:
-      - "4000:4000"
-    env_file:
-      - apps/backend/.env
 # services:
-#   postgres:
-#     image: postgres:17
-#     container_name: postgres
-#     ports:
-#       - "5432:5432"
+#   web:
+#     image: web
+#     build:
+#       context: .
+#       dockerfile: apps/web/Dockerfile
 #     environment:
-#       POSTGRES_USER: myuser
-#       POSTGRES_PASSWORD: mypassword
-#       POSTGRES_DB: mydb
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-#
-#   valkey:
-#     image: valkey/valkey:8.1.3
-#     container_name: valkey
-#     restart: unless-stopped
+#       - NODE_ENV=production
+#       - NEXT_PUBLIC_BACKEND_URL=https://backend-test.justsearch.net.in
+#       - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dhhfs2ixp
+#       - NEXT_PUBLIC_ALGOLIA_APP_ID=XLHL5IDFH9
+#       - NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=4b94ea6117cbe235a2e3794e8060ee38
+#       - NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
 #     ports:
-#       - "6379:6379"
-#     volumes:
-#       - valkey_data:/data
-#       - ./valkey.conf:/etc/valkey/valkey.conf
-#     command: ["valkey-server", "/etc/valkey/valkey.conf"]
-#
-# volumes:
-#   postgres_data:
-#   valkey_data:
+#       - "3000:3000"
+#   dashboard:
+#     image: dashboard
+#     build:
+#       context: .
+#       dockerfile: apps/dashboard/Dockerfile
+#     environment:
+#       - NODE_ENV=production
+#       - NEXT_PUBLIC_BACKEND_URL=https://backend-test.justsearch.net.in
+#       - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dra2pandx
+#       - NEXT_PUBLIC_ALGOLIA_APP_ID=XLHL5IDFH9
+#       - NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=4b94ea6117cbe235a2e3794e8060ee38
+#       - NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
+#     ports:
+#       - "3000:3000"
+#   backend:
+#     image: backend
+#     build:
+#       context: .
+#       dockerfile: apps/backend/Dockerfile
+#     ports:
+#       - "4000:4000"
+#     env_file:
+#       - apps/backend/.env
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  valkey:
+    image: valkey/valkey:8.1.3
+    container_name: valkey
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+      - ./valkey.conf:/etc/valkey/valkey.conf
+    command: ["valkey-server", "/etc/valkey/valkey.conf"]
+
+volumes:
+  postgres_data:
+  valkey_data:

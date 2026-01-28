@@ -194,6 +194,8 @@ export default function BusinessDetail({
       ],
       "business",
     );
+
+    console.log(file);
     setFormValue("photo", file[0] ?? "");
     setFormValue("name", data.name ?? "");
     setFormValue("categoryId", data.categoryId ?? "");

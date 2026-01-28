@@ -1,21 +1,22 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
+import { useEffect, useState } from "react";
 import { IoCloseCircleOutline } from "react-icons/io5";
-import { useState, useEffect } from "react";
 
 interface AllCategoryProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   data:
-  | {
-    photo: string;
-    title: string;
-    type: number | null;
-    id: string | number;
-  }[]
-  | null;
+    | {
+        photo: string;
+        title: string;
+        type: number | null;
+        id: string | number;
+      }[]
+    | null;
   type?: 1 | 2 | 0;
 }
 
@@ -42,7 +43,7 @@ function AllCategory({ isOpen, setIsOpen, data, type = 0 }: AllCategoryProps) {
     })
     .filter((item) => {
       if (searchQuery === "") return true;
-      return item.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+      return item.title.toLowerCase().startsWith(searchQuery.toLowerCase());
     });
 
   const handleClose = () => setIsOpen(false);
@@ -93,19 +94,24 @@ function AllCategory({ isOpen, setIsOpen, data, type = 0 }: AllCategoryProps) {
                 key={index.toString()}
                 href={{
                   pathname: type === 1 ? `/subcategory/${item.id}` : `/hire`,
-                  query:
-                    type === 1
-                      ? { page: 1 }
-                      : { categoryId: item.id },
+                  query: type === 1 ? { page: 1 } : { categoryId: item.id },
                 }}
                 className="flex items-center gap-4 mb-4 cursor-pointer"
               >
-                <CldImage
+                {/* <CldImage
                   height={30}
                   width={30}
                   src={item.photo}
                   alt={`${item.title} category image`}
                   className="object-cover"
+                /> */}
+                <Image
+                  unoptimized
+                  height={30}
+                  width={30}
+                  className="object-cover"
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/${item?.photo}`}
+                  alt="category image"
                 />
                 <p className="text-sm">{item.title}</p>
               </Link>

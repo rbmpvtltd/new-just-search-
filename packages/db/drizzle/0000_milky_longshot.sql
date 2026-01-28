@@ -2,11 +2,11 @@ CREATE TYPE "public"."gender" AS ENUM('Male', 'Female', 'Others');--> statement-
 CREATE TYPE "public"."job_duration" AS ENUM('Day', 'Week', 'Month', 'Year');--> statement-breakpoint
 CREATE TYPE "public"."job_type" AS ENUM('FullTime', 'PartTime', 'Both');--> statement-breakpoint
 CREATE TYPE "public"."marital_status" AS ENUM('Married', 'Unmarried', 'Widowed', 'Divorced', 'Others');--> statement-breakpoint
-CREATE TYPE "public"."notification_enum" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
+CREATE TYPE "public"."notification_enum" AS ENUM('guest', 'visitor', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
 CREATE TYPE "public"."plan_period" AS ENUM('daily', 'weekly', 'monthly', 'yearly');--> statement-breakpoint
 CREATE TYPE "public"."send_by_role" AS ENUM('Admin', 'User');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('Pending', 'Approved', 'Rejected');--> statement-breakpoint
-CREATE TYPE "public"."user_role" AS ENUM('guest', 'visiter', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('guest', 'visitor', 'hire', 'business', 'salesman', 'franchises', 'admin', 'all');--> statement-breakpoint
 CREATE TYPE "public"."work_shift" AS ENUM('Morning', 'Evening', 'Night');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,

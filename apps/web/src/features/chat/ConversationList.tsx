@@ -1,5 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { CldImage } from "next-cloudinary";
@@ -58,12 +59,20 @@ export default function ConversationList({
                 <div className="flex items-center space-x-3 gap-4">
                   <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-medium text-lg ">
                     {conversation.profileImage ? (
-                      <CldImage
-                        src={conversation.profileImage}
+                      // <CldImage
+                      //   src={conversation.profileImage}
+                      //   width="40"
+                      //   height="40"
+                      //   alt="image"
+                      //   className="rounded-full"
+                      // />
+                      <Image
+                        unoptimized
                         width="40"
                         height="40"
+                        className="w-full h-full object-cover"
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}/public${conversation.profileImage}`}
                         alt="image"
-                        className="rounded-full"
                       />
                     ) : (
                       String(conversation?.displayName).charAt(0).toUpperCase()
