@@ -3,7 +3,7 @@ import { Logo } from "@/components/logo";
 
 const links = [
   {
-    group: "Quick Link",
+    group: "Quick Links",
     items: [
       {
         title: "About Us",
