@@ -8,8 +8,8 @@ jobs:
   detect:
     runs-on: ubuntu-latest
     steps:
-      name: test
-      run: echo "test"
+      - name: test
+        run: echo "test"
     # outputs:
     #   web: ${{ steps.filter.outputs.web }}
     #   # backend: ${{ steps.filter.outputs.api }}
