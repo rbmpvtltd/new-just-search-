@@ -10,7 +10,7 @@ const DefaultErrorFallback: React.FC<FallbackProps> = ({
   return (
     <div>
       <h2>Something went wrong</h2>
-      <p>{error?.message || "An unexpected error occurred."}</p>
+      <p>{"An unexpected error occurred."}</p>
       <button type="button" onClick={resetErrorBoundary}>
         Try Again
       </button>
