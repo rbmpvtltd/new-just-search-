@@ -12,6 +12,7 @@ jobs:
       web: ${{ steps.filter.outputs.web }}
       backend: ${{ steps.filter.outputs.backend }}
       dashboard: ${{ steps.filter.outputs.dashboard }}
+      imagesmanager: ${{ steps.filter.outputs.imagesmanager }}
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +29,8 @@ jobs:
             dashboard:
               - 'apps/dashboard/**'
               - 'packages/**'
+            imagesmanager:
+              - 'apps/imagesmanager/**'
   build-web:
     needs: detect
     if: needs.detect.outputs.web == 'true'
@@ -50,7 +53,6 @@ jobs:
             -t registry-server.justsearch.net.in/test/web:latest \
             .
           docker push registry-server.justsearch.net.in/test/web:latest
-          # my webhook https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
           curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
   build-backend:
     needs: detect
@@ -74,7 +76,6 @@ jobs:
             -t registry-server.justsearch.net.in/test/backend:latest \
             .
           docker push registry-server.justsearch.net.in/test/backend:latest
-          # my webhook https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
           curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/3iX1YBb51xpaQMUAvk_Z0
   build-dashboard:
     needs: detect
@@ -98,5 +99,27 @@ jobs:
             -t registry-server.justsearch.net.in/test/dashboard:latest \
             .
           docker push registry-server.justsearch.net.in/test/dashboard:latest
-          # my webhook https://dokploy.justsearch.net.in/api/deploy/BkNJ5crnsI2O4bsaUzhOo
           curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/0Af7G29obY01mJPSaB9Cq
+  build-imagesmanager:
+    needs: detect
+    if: needs.detect.outputs.imagesmanager == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry-server.justsearch.net.in
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push
+        run: |
+          docker build \
+            -f apps/imagesmanager/Dockerfile \
+            -t registry-server.justsearch.net.in/test/imagesmanager:latest \
+            ./apps/imagesmanager
+          docker push registry-server.justsearch.net.in/test/imagesmanager:latest
+          curl -X POST -H "Content-Type: application/json" https://dokploy.justsearch.net.in/api/deploy/pMLGiTrIPLU5U5Eq7u2S4

@@ -8,8 +8,6 @@ import sharp from "sharp";
 const app = new Elysia();
 app
   .use(cors())
-  .listen(5000)
-  // 1. Serve static files from /public
   .use(staticPlugin())
 
   // 2. Route for uploading images
@@ -50,6 +48,6 @@ app
       }),
     },
   )
-  .listen(5000);
+  .listen(3000);
 
 console.log(`🚀 Server running at ${app.server?.hostname}:${app.server?.port}`);
