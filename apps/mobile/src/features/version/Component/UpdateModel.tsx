@@ -43,9 +43,6 @@ export function UpdateModel({ latestVersion }: { latestVersion: string }) {
   return (
     <View style={{ flex: 1 }}>
       {/* ✅ HOME PAGE CONTENT (NOW VISIBLE) */}
-      <Text style={{ fontSize: 22, margin: 20 }}>
-        Home Page Loaded Successfully
-      </Text>
 
       {/* 🔔 UPDATE MODAL */}
       <Modal

@@ -28,14 +28,14 @@ services:
   #     - NEXT_PUBLIC_RAZOR_PAY_KEY_ID="rzp_test_Rr3gB4MMpYOcsq"
   #   ports:
   #     - "3000:3000"
-  # backend:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/backend/Dockerfile
-  #   ports:
-  #     - "4000:4000"
-  #   env_file:
-  #     - apps/backend/.env
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    ports:
+      - "4000:4000"
+    env_file:
+      - apps/backend/.env
 # services:
 #   postgres:
 #     image: postgres:17

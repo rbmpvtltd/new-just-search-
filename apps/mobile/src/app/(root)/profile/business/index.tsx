@@ -4,6 +4,8 @@ import { useAuthStore } from "@/features/auth/authStore";
 import CreateBusinessListing from "@/features/business/create/add-business";
 import MyBusinessCard from "@/features/business/show/MyBusiness";
 import { trpc } from "@/lib/trpc";
+import { getTokenRole } from "@/utils/secureStore";
+import { BecomeVisitorForm } from "@/features/auth/forms/BecomeVisitor";
 
 export default function MyBusinessListing() {
   const getAuthStoreToken = useAuthStore((state) => state.token);
@@ -15,9 +17,17 @@ export default function MyBusinessListing() {
 }
 
 function MyBusiness() {
+  const role = useAuthStore(state => state.role)
   const { data, error, isLoading, isError } = useQuery(
     trpc.businessrouter.show.queryOptions(),
   );
+  console.log("======> role is ====>",role)
+  if(role === "guest"){
+    return (
+      <BecomeVisitorForm />
+    )
+  }
+  
 
   console.log("DATA BUSINESS", data);
 

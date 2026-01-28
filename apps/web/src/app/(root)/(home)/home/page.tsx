@@ -38,15 +38,17 @@ export default async function Page() {
     trpcServer.userRouter.getUserDetail.query(),
   );
 
-  if (token && (!userData?.displayName || userData.displayName === "null")) {
-    console.log(userData)
-    console.log("=====> error is ",userError)
-      return (
-        <div className="w-full">
-          <UpdateDisplayNameForm userId={Number(userData?.id)} />
-        </div>
-      );
-    }
+  if (
+  token &&
+  userData &&
+  (!userData.displayName || userData.displayName === "null")
+) {
+  return (
+    <div className="w-full">
+      <UpdateDisplayNameForm userId={Number(userData.id)} />
+    </div>
+  );
+}
 
   if (error) return <ErrorComponent error={error} />;
 
